@@ -258,6 +258,14 @@ gains.
   learning curve swings between 0.12 and 0.41 ECE across snapshots, so it can reach the exact
   arms' level (step 200) but does not stay there. Training took 1 h 55 min, against 34 min.
 
+- **Released code on Modal** (Llama-3-8B, exact pinned environment, our 1,024/512 questions;
+  [report](../runs/modal-stage2-20261001T082216Z/report.md)). Its base model reproduces the
+  paper's Table 1 (ECE 0.333 vs 0.346, accuracy 63.3% vs 63.1%). After 256 steps, ECE falls
+  smoothly from 0.333 to 0.074 (AUROC 0.56 → 0.77), much better than our Tinker `paper-ppo`
+  (0.474 → 0.300 on Qwen). The model and the missing value head are confounded. Under the same
+  released evaluation protocol, our exact objectives reach 0.117/0.120 ECE on Qwen, but
+  cross-model comparisons are not valid. The decisive test is the exact objectives on Llama.
+
 ## Caveat both exact objectives share: nothing anchors the format
 
 $\pi$ is renormalized over the eleven strings, so both exact objectives are invariant to

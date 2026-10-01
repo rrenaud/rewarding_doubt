@@ -7,7 +7,7 @@ name = "rewarding-doubt-tinker"
 version = "0.1.0"
 description = "Confidence calibration experiments with Tinker"
 requires-python = ">=3.11"
-dependencies = ["tinker>=0.31.0,<0.32", "torch>=2.2", "datasets>=3", "transformers>=4.51", "numpy>=1.26", "scikit-learn>=1.4"]
+dependencies = ["tinker>=0.31.0,<0.32", "torch>=2.2", "datasets>=3", "transformers>=4.51", "numpy>=1.26", "scikit-learn>=1.4", "torchmetrics>=1.6"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]

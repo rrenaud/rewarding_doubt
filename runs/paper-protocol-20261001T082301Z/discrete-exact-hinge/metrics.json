@@ -1,0 +1,12 @@
+{
+  "n": 512,
+  "wrong_format_rate": 0.017578125,
+  "ece": 0.11650097370147705,
+  "accuracy": 0.48111332007952284,
+  "auroc": 0.8526566606503911,
+  "brier": 0.17165009940357853,
+  "model": "Qwen/Qwen3-8B",
+  "checkpoint": "tinker://bc734e23-4f9d-59ed-aa32-5c68864818c4:train:0/sampler_weights/final",
+  "prompt": "ours",
+  "data_sha256": "d006b0f35c9f4dbcc13649c2de0da4c0bc0e4db2693a56f9a9fc37ab978271af"
+}

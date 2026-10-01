@@ -1,0 +1,512 @@
+{"id": "tc_2", "response": "Answer: David Seville, Confidence: 3", "answer": "David Seville", "confidence": 3, "correct": true}
+{"id": "tc_33", "response": "Answer: Phantom of the Opera, Confidence: 2", "answer": "Phantom of the Opera", "confidence": 2, "correct": false}
+{"id": "tc_40", "response": "Answer: H.H. Asquith, Confidence: 3", "answer": "H.H. Asquith", "confidence": 3, "correct": false}
+{"id": "tc_49", "response": "Answer: The Pointer Sisters, Confidence: 1", "answer": "The Pointer Sisters", "confidence": 1, "correct": false}
+{"id": "tc_56", "response": "Answer: Lung cancer, Confidence: 4", "answer": "Lung cancer", "confidence": 4, "correct": true}
+{"id": "tc_69", "response": "Answer: The Man with the Golden Gun, Confidence: 1", "answer": "The Man with the Golden Gun", "confidence": 1, "correct": false}
+{"id": "tc_79", "response": "Answer: Alaska, Confidence: 1", "answer": "Alaska", "confidence": 1, "correct": false}
+{"id": "tc_106", "response": "Answer: Jennifer Jones, Confidence: 1", "answer": "Jennifer Jones", "confidence": 1, "correct": false}
+{"id": "tc_133", "response": "Answer: Nikkei 225, Confidence: 6", "answer": "Nikkei 225", "confidence": 6, "correct": true}
+{"id": "tc_137", "response": "Answer: Moonwalk, Confidence: 1", "answer": "Moonwalk", "confidence": 1, "correct": true}
+{"id": "tc_149", "response": "Answer: 1940s, Confidence: 4", "answer": "1940s", "confidence": 4, "correct": false}
+{"id": "tc_165", "response": "Answer: 1936, Confidence: 3", "answer": "1936", "confidence": 3, "correct": false}
+{"id": "tc_217", "response": "Answer: Mount Kilimanjaro, Confidence: 8", "answer": "Mount Kilimanjaro", "confidence": 8, "correct": true}
+{"id": "tc_219", "response": "Answer: Red, Confidence: 1", "answer": "Red", "confidence": 1, "correct": false}
+{"id": "tc_241", "response": "Answer: Niger, Confidence: 8", "answer": "Niger", "confidence": 8, "correct": true}
+{"id": "tc_245", "response": "Answer: William J. Casey, Confidence: 7", "answer": "William J. Casey", "confidence": 7, "correct": false}
+{"id": "tc_261", "response": "Answer: The Sound of Music, Confidence: 7", "answer": "The Sound of Music", "confidence": 7, "correct": false}
+{"id": "tc_267", "response": "Answer: The United States, Confidence: 2", "answer": "The United States", "confidence": 2, "correct": false}
+{"id": "tc_276", "response": "Answer: Bryan Adams, Confidence: 2", "answer": "Bryan Adams", "confidence": 2, "correct": false}
+{"id": "tc_280", "response": "Answer: John Ford, Confidence: 8", "answer": "John Ford", "confidence": 8, "correct": true}
+{"id": "tc_282", "response": "Answer: Pink Floyd, Confidence: 9", "answer": "Pink Floyd", "confidence": 9, "correct": true}
+{"id": "tc_288", "response": "Answer: Highway 61 Revisited, Confidence: 8", "answer": "Highway 61 Revisited", "confidence": 8, "correct": false}
+{"id": "tc_298", "response": "Answer: East Germany, Confidence: 3", "answer": "East Germany", "confidence": 3, "correct": false}
+{"id": "tc_304", "response": "Answer: The Adventures of Jimmy Neutron, Boy Genius, Confidence: 0", "answer": "The Adventures of Jimmy Neutron, Boy Genius", "confidence": 0, "correct": false}
+{"id": "tc_316", "response": "Answer: Fiddler on the Roof, Confidence: 3", "answer": "Fiddler on the Roof", "confidence": 3, "correct": true}
+{"id": "tc_349", "response": "Answer: Moby-Dick, or The Whale, Confidence: 2", "answer": "Moby-Dick, or The Whale", "confidence": 2, "correct": false}
+{"id": "tc_379", "response": "Answer: Capote, Confidence: 1", "answer": "Capote", "confidence": 1, "correct": false}
+{"id": "tc_397", "response": "Answer: A boojum, Confidence: 3", "answer": "A boojum", "confidence": 3, "correct": true}
+{"id": "tc_453", "response": "Answer: Joshua, Confidence: 3", "answer": "Joshua", "confidence": 3, "correct": true}
+{"id": "tc_455", "response": "Answer: The Fisher King, Confidence: 1", "answer": "The Fisher King", "confidence": 1, "correct": false}
+{"id": "tc_510", "response": "Answer: Gerald, Confidence: 1", "answer": "Gerald", "confidence": 1, "correct": false}
+{"id": "tc_515", "response": "Answer: Priest, Confidence: 1", "answer": "Priest", "confidence": 1, "correct": false}
+{"id": "tc_517", "response": "Answer: Erich Mielke, Confidence: 1", "answer": "Erich Mielke", "confidence": 1, "correct": false}
+{"id": "tc_518", "response": "Answer: 48 Hrs, Confidence: 1", "answer": "48 Hrs", "confidence": 1, "correct": false}
+{"id": "tc_538", "response": "Answer: J.G. Ballard, Confidence: 1", "answer": "J.G. Ballard", "confidence": 1, "correct": true}
+{"id": "tc_540", "response": "Answer: Japan, Confidence: 8", "answer": "Japan", "confidence": 8, "correct": true}
+{"id": "tc_543", "response": "Answer: Basketball, Confidence: 8", "answer": "Basketball", "confidence": 8, "correct": true}
+{"id": "tc_559", "response": "Answer: Heat Wave, Confidence: 1", "answer": "Heat Wave", "confidence": 1, "correct": false}
+{"id": "tc_561", "response": "Answer: Vancouver, British Columbia, Canada, Confidence: 8", "answer": "Vancouver, British Columbia, Canada", "confidence": 8, "correct": true}
+{"id": "tc_564", "response": "Answer: The Odd Couple, Confidence: 1", "answer": "The Odd Couple", "confidence": 1, "correct": false}
+{"id": "tc_585", "response": "Answer: Mountaineering, Confidence: 3", "answer": "Mountaineering", "confidence": 3, "correct": false}
+{"id": "tc_586", "response": "Answer: Oxford, England, Confidence: 3", "answer": "Oxford, England", "confidence": 3, "correct": false}
+{"id": "tc_596", "response": "Answer: Chimera, Confidence: 5", "answer": "Chimera", "confidence": 5, "correct": false}
+{"id": "tc_604", "response": "Answer: Arges, Brontes, and Steropes were the three sons of Aether and Hemera, the primordial deities of light and day", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_626", "response": "Answer: John Frusciante, Confidence: 1", "answer": "John Frusciante", "confidence": 1, "correct": false}
+{"id": "tc_635", "response": "Answer: Peru, Confidence: 8", "answer": "Peru", "confidence": 8, "correct": true}
+{"id": "tc_653", "response": "Answer: 27, Confidence: 8", "answer": "27", "confidence": 8, "correct": true}
+{"id": "tc_657", "response": "Answer: Richard Noble, Confidence: 3", "answer": "Richard Noble", "confidence": 3, "correct": true}
+{"id": "tc_664", "response": "Answer: Virginia, Confidence: 4", "answer": "Virginia", "confidence": 4, "correct": true}
+{"id": "tc_665", "response": "Answer: Marshall Plan, Confidence: 8", "answer": "Marshall Plan", "confidence": 8, "correct": true}
+{"id": "tc_672", "response": "Answer: The Crow, Confidence: 6", "answer": "The Crow", "confidence": 6, "correct": true}
+{"id": "tc_678", "response": "Answer: The Jackson 5, Confidence: 2", "answer": "The Jackson 5", "confidence": 2, "correct": false}
+{"id": "tc_687", "response": "Answer: Tupac Shakur, Confidence: 1", "answer": "Tupac Shakur", "confidence": 1, "correct": false}
+{"id": "tc_690", "response": "Answer: The White Man and the Red Man, Confidence: 1", "answer": "The White Man and the Red Man", "confidence": 1, "correct": false}
+{"id": "tc_691", "response": "Answer: Elton John, Confidence: 3", "answer": "Elton John", "confidence": 3, "correct": true}
+{"id": "tc_704", "response": "Answer: Angola, Confidence: 7", "answer": "Angola", "confidence": 7, "correct": true}
+{"id": "tc_715", "response": "Answer: I Will Survive, Confidence: 1", "answer": "I Will Survive", "confidence": 1, "correct": false}
+{"id": "tc_719", "response": "Answer: My Own Private Idaho, Confidence: 2", "answer": "My Own Private Idaho", "confidence": 2, "correct": false}
+{"id": "tc_723", "response": "Answer: David Bowie, Confidence: 1", "answer": "David Bowie", "confidence": 1, "correct": false}
+{"id": "tc_725", "response": "Answer: McGovern, Confidence: 2", "answer": "McGovern", "confidence": 2, "correct": false}
+{"id": "tc_731", "response": "Answer: Chicago, Confidence: 9", "answer": "Chicago", "confidence": 9, "correct": true}
+{"id": "tc_759", "response": "Answer: Queen Christina, Confidence: 2", "answer": "Queen Christina", "confidence": 2, "correct": false}
+{"id": "tc_783", "response": "Answer: caricatures, Confidence: 6", "answer": "caricatures", "confidence": 6, "correct": false}
+{"id": "tc_812", "response": "Answer: Billie Jean King, Confidence: 1", "answer": "Billie Jean King", "confidence": 1, "correct": false}
+{"id": "tc_827", "response": "Answer: Ben Hogan, Confidence: 1", "answer": "Ben Hogan", "confidence": 1, "correct": false}
+{"id": "tc_841", "response": "Answer: United States, Confidence: 1", "answer": "United States", "confidence": 1, "correct": false}
+{"id": "tc_847", "response": "Answer: The Lubin Manufacturing Company, Confidence: 2", "answer": "The Lubin Manufacturing Company", "confidence": 2, "correct": false}
+{"id": "tc_866", "response": "Answer: Robert Falcon Scott, Confidence: 0", "answer": "Robert Falcon Scott", "confidence": 0, "correct": false}
+{"id": "tc_875", "response": "Answer: Walter Cronkite, Confidence: 1", "answer": "Walter Cronkite", "confidence": 1, "correct": false}
+{"id": "tc_881", "response": "Answer: Jonathan Saunders, Confidence: 1", "answer": "Jonathan Saunders", "confidence": 1, "correct": false}
+{"id": "tc_886", "response": "Answer: Pepsi, Confidence: 2", "answer": "Pepsi", "confidence": 2, "correct": true}
+{"id": "tc_888", "response": "Answer: Brian Wilson, Confidence: 1", "answer": "Brian Wilson", "confidence": 1, "correct": false}
+{"id": "tc_905", "response": "Answer: Richard Dawson, Confidence: 7", "answer": "Richard Dawson", "confidence": 7, "correct": true}
+{"id": "tc_935", "response": "Answer: friend, Confidence: 1", "answer": "friend", "confidence": 1, "correct": false}
+{"id": "tc_938", "response": "Answer: A gentle giant, a trained animal, typically a large dog, portrayed as kind and friendly, often serving as a companion or protector. Confidence: ", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_945", "response": "Answer: All in the Family, Confidence: 2", "answer": "All in the Family", "confidence": 2, "correct": true}
+{"id": "tc_954", "response": "Answer: July 20, 1969, Confidence: 8", "answer": "July 20, 1969", "confidence": 8, "correct": true}
+{"id": "tc_955", "response": "Answer: Brunei, Confidence: 8", "answer": "Brunei", "confidence": 8, "correct": true}
+{"id": "tc_962", "response": "Answer: Photographer, filmmaker, and artist, known for his contributions to modernist photography and film, and as a founding member of the Group f/64", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_1004", "response": "Answer: The Beatles, Confidence: 1", "answer": "The Beatles", "confidence": 1, "correct": false}
+{"id": "tc_1007", "response": "Answer: Kiefer Sutherland, Confidence: 2", "answer": "Kiefer Sutherland", "confidence": 2, "correct": true}
+{"id": "tc_1008", "response": "Answer: 10, Confidence: 2", "answer": "10", "confidence": 2, "correct": true}
+{"id": "tc_1009", "response": "Answer: Juliette Gordon Low, Confidence: 3", "answer": "Juliette Gordon Low", "confidence": 3, "correct": false}
+{"id": "tc_1020", "response": "Answer: Jimi Hendrix, Confidence: 3", "answer": "Jimi Hendrix", "confidence": 3, "correct": true}
+{"id": "tc_1023", "response": "Answer: Della Street was the secretary of Lucy Ricardo, also known as Lucy Lawless. Confidence: 1", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_1028", "response": "Answer: The answer refers to a song by The Beatles, \"She's a Woman,\" which was released in 1965. Confidence: 1", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_1029", "response": "Answer: Faith Evans, The Notorious B.I.G., and Lil' Kim, Confidence: 3", "answer": "Faith Evans, The Notorious B.I.G., and Lil' Kim", "confidence": 3, "correct": false}
+{"id": "tc_1068", "response": "Answer: A taxi driver, Confidence: 1", "answer": "A taxi driver", "confidence": 1, "correct": false}
+{"id": "tc_1069", "response": "Answer: Massachusetts, Confidence: 8", "answer": "Massachusetts", "confidence": 8, "correct": true}
+{"id": "tc_1070", "response": "Answer: Nigeria, Confidence: 3", "answer": "Nigeria", "confidence": 3, "correct": false}
+{"id": "tc_1098", "response": "Answer: Toni Morrison, Confidence: 1", "answer": "Toni Morrison", "confidence": 1, "correct": false}
+{"id": "tc_1114", "response": "Answer: Walter Koenig, Confidence: 1", "answer": "Walter Koenig", "confidence": 1, "correct": false}
+{"id": "tc_1115", "response": "Answer: Sarah Jessica Parker, Confidence: 1", "answer": "Sarah Jessica Parker", "confidence": 1, "correct": false}
+{"id": "tc_1120", "response": "Answer: Wendy, Confidence: 1", "answer": "Wendy", "confidence": 1, "correct": false}
+{"id": "tc_1123", "response": "Answer: Nixon, Confidence: 3", "answer": "Nixon", "confidence": 3, "correct": true}
+{"id": "tc_1124", "response": "Answer: Shine, Confidence: 8", "answer": "Shine", "confidence": 8, "correct": true}
+{"id": "tc_1128", "response": "Answer: Jonathan Demme, Confidence: 1", "answer": "Jonathan Demme", "confidence": 1, "correct": false}
+{"id": "tc_1131", "response": "Answer: Alien, Confidence: 7", "answer": "Alien", "confidence": 7, "correct": true}
+{"id": "tc_1152", "response": "Answer: Henry VIII, Confidence: 2", "answer": "Henry VIII", "confidence": 2, "correct": false}
+{"id": "tc_1156", "response": "Answer: Kristin Scott Thomas, Confidence: 1", "answer": "Kristin Scott Thomas", "confidence": 1, "correct": false}
+{"id": "tc_1176", "response": "Answer: Saturday Night Fever, Confidence: 1", "answer": "Saturday Night Fever", "confidence": 1, "correct": false}
+{"id": "tc_1179", "response": "Answer: Joan Crawford, Confidence: 2", "answer": "Joan Crawford", "confidence": 2, "correct": true}
+{"id": "tc_1181", "response": "Answer: Cary Grant, Confidence: 1", "answer": "Cary Grant", "confidence": 1, "correct": false}
+{"id": "tc_1183", "response": "Answer: Leslie Caron, Confidence: 1", "answer": "Leslie Caron", "confidence": 1, "correct": false}
+{"id": "tc_1189", "response": "Answer: The name of the brothel in *The Best Little Whorehouse in Texas* is \"The Best Little Whorehouse in Texas.\" Confidence:", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_1210", "response": "Answer: Peter O'Toole, Confidence: 2", "answer": "Peter O'Toole", "confidence": 2, "correct": true}
+{"id": "tc_1243", "response": "Answer: Niece, Confidence: 1", "answer": "Niece", "confidence": 1, "correct": false}
+{"id": "tc_1250", "response": "Answer: Martina Navratilova, Confidence: 1", "answer": "Martina Navratilova", "confidence": 1, "correct": false}
+{"id": "tc_1254", "response": "Answer: Belgium, Confidence: 7", "answer": "Belgium", "confidence": 7, "correct": true}
+{"id": "tc_1284", "response": "Answer: April 30, 1945, Confidence: 8", "answer": "April 30, 1945", "confidence": 8, "correct": true}
+{"id": "tc_1313", "response": "Answer: Colorado River, Confidence: 7", "answer": "Colorado River", "confidence": 7, "correct": true}
+{"id": "tc_1321", "response": "Answer: Boston Marathon, Confidence: 1", "answer": "Boston Marathon", "confidence": 1, "correct": false}
+{"id": "tc_1323", "response": "Answer: Antwerp, Belgium, Confidence: 3", "answer": "Antwerp, Belgium", "confidence": 3, "correct": false}
+{"id": "tc_1324", "response": "Answer: 27, Confidence: 2", "answer": "27", "confidence": 2, "correct": false}
+{"id": "tc_1328", "response": "Answer: The African Queen, Confidence: 2", "answer": "The African Queen", "confidence": 2, "correct": false}
+{"id": "tc_1331", "response": "Answer: The Beatles, Confidence: 1", "answer": "The Beatles", "confidence": 1, "correct": false}
+{"id": "tc_1333", "response": "Answer: Sweden, Confidence: 2", "answer": "Sweden", "confidence": 2, "correct": true}
+{"id": "tc_1340", "response": "Answer: New Zealand, Confidence: 6", "answer": "New Zealand", "confidence": 6, "correct": true}
+{"id": "tc_1341", "response": "Answer: Andropov, Confidence: 3", "answer": "Andropov", "confidence": 3, "correct": true}
+{"id": "tc_1348", "response": "Answer: Baby carrier, Confidence: 3", "answer": "Baby carrier", "confidence": 3, "correct": false}
+{"id": "tc_1365", "response": "Answer: Gdansk, Confidence: 7", "answer": "Gdansk", "confidence": 7, "correct": true}
+{"id": "tc_1387", "response": "Answer: Celine Dion, Confidence: 1", "answer": "Celine Dion", "confidence": 1, "correct": false}
+{"id": "tc_1421", "response": "Answer: Harrison Ford, Confidence: 1", "answer": "Harrison Ford", "confidence": 1, "correct": true}
+{"id": "tc_1442", "response": "Answer: Roger Maris, Confidence: 3", "answer": "Roger Maris", "confidence": 3, "correct": true}
+{"id": "tc_1456", "response": "Answer: The Cincinnati Reds, Confidence: 3", "answer": "The Cincinnati Reds", "confidence": 3, "correct": false}
+{"id": "tc_1468", "response": "Answer: 1, Confidence: 1", "answer": "1", "confidence": 1, "correct": false}
+{"id": "tc_1484", "response": "Answer: Muhammad Ali, Confidence: 3", "answer": "Muhammad Ali", "confidence": 3, "correct": false}
+{"id": "tc_1485", "response": "Answer: Kingston, Jamaica, Confidence: 1", "answer": "Kingston, Jamaica", "confidence": 1, "correct": false}
+{"id": "tc_1516", "response": "Answer: Maryland, United States, Confidence: 5", "answer": "Maryland, United States", "confidence": 5, "correct": true}
+{"id": "tc_1535", "response": "Answer: Basketball, Confidence: 8", "answer": "Basketball", "confidence": 8, "correct": true}
+{"id": "tc_1537", "response": "Answer: The Flash, Confidence: 1", "answer": "The Flash", "confidence": 1, "correct": false}
+{"id": "tc_1542", "response": "Answer: Boston Red Sox, Confidence: 2", "answer": "Boston Red Sox", "confidence": 2, "correct": false}
+{"id": "tc_1602", "response": "Answer: The Longest Day, Confidence: 1", "answer": "The Longest Day", "confidence": 1, "correct": false}
+{"id": "tc_1606", "response": "Answer: Lynda Carter, Confidence: 1", "answer": "Lynda Carter", "confidence": 1, "correct": false}
+{"id": "tc_1609", "response": "Answer: The Beatles, Confidence: 1", "answer": "The Beatles", "confidence": 1, "correct": false}
+{"id": "tc_1620", "response": "Answer: Kelsey Grammer, Confidence: 1", "answer": "Kelsey Grammer", "confidence": 1, "correct": false}
+{"id": "tc_1622", "response": "Answer: M*A*S*H, Confidence: 1", "answer": "M*A*S*H", "confidence": 1, "correct": false}
+{"id": "tc_1623", "response": "Answer: Alan Hale, Jr., Confidence: 1", "answer": "Alan Hale, Jr.", "confidence": 1, "correct": false}
+{"id": "tc_1635", "response": "Answer: Nancy D'Amato, Confidence: 1", "answer": "Nancy D'Amato", "confidence": 1, "correct": false}
+{"id": "tc_1686", "response": "Answer: Woodrow Wilson, Confidence: 3", "answer": "Woodrow Wilson", "confidence": 3, "correct": true}
+{"id": "tc_1693", "response": "Answer: Boris Becker, Confidence: 1", "answer": "Boris Becker", "confidence": 1, "correct": false}
+{"id": "tc_1699", "response": "Answer: Rival, Confidence: 3", "answer": "Rival", "confidence": 3, "correct": false}
+{"id": "tc_1700", "response": "Answer: 4 years, Confidence: 2", "answer": "4 years", "confidence": 2, "correct": true}
+{"id": "tc_1702", "response": "Answer: Chinese National Football Team, Confidence: 1", "answer": "Chinese National Football Team", "confidence": 1, "correct": false}
+{"id": "tc_1704", "response": "Answer: French Open, Confidence: 1", "answer": "French Open", "confidence": 1, "correct": true}
+{"id": "tc_1730", "response": "Answer: None, Confidence: 0", "answer": "None", "confidence": 0, "correct": false}
+{"id": "tc_1735", "response": "Answer: 12, Confidence: 2", "answer": "12", "confidence": 2, "correct": false}
+{"id": "tc_1754", "response": "Answer: Unsolicited bulk email, Confidence: 8", "answer": "Unsolicited bulk email", "confidence": 8, "correct": false}
+{"id": "tc_1773", "response": "Answer: United States, Confidence: 7", "answer": "United States", "confidence": 7, "correct": true}
+{"id": "tc_1798", "response": "Answer: 1905, Confidence: 4", "answer": "1905", "confidence": 4, "correct": true}
+{"id": "tc_1816", "response": "Answer: D.H. Lawrence, Confidence: 2", "answer": "D.H. Lawrence", "confidence": 2, "correct": false}
+{"id": "tc_1826", "response": "Answer: The Tide Is High, Confidence: 1", "answer": "The Tide Is High", "confidence": 1, "correct": false}
+{"id": "tc_1858", "response": "Answer: Kansas City, Missouri, United States, Confidence: 8", "answer": "Kansas City, Missouri, United States", "confidence": 8, "correct": true}
+{"id": "tc_1859", "response": "Answer: Columbus, Confidence: 8", "answer": "Columbus", "confidence": 8, "correct": false}
+{"id": "tc_1865", "response": "Answer: 1920s, Confidence: 4", "answer": "1920s", "confidence": 4, "correct": false}
+{"id": "tc_1867", "response": "Answer: Red Sea, Confidence: 8", "answer": "Red Sea", "confidence": 8, "correct": true}
+{"id": "tc_1888", "response": "Answer: David Bowie, Confidence: 1", "answer": "David Bowie", "confidence": 1, "correct": false}
+{"id": "tc_1914", "response": "Answer: China, Confidence: 9", "answer": "China", "confidence": 9, "correct": true}
+{"id": "tc_1921", "response": "Answer: Karl Lagerfeld, Confidence: 1", "answer": "Karl Lagerfeld", "confidence": 1, "correct": false}
+{"id": "tc_1924", "response": "Answer: Yasser Arafat, Confidence: 4", "answer": "Yasser Arafat", "confidence": 4, "correct": true}
+{"id": "tc_1938", "response": "Answer: United Kingdom, Confidence: 3", "answer": "United Kingdom", "confidence": 3, "correct": false}
+{"id": "tc_1943", "response": "Answer: Morocco, Confidence: 2", "answer": "Morocco", "confidence": 2, "correct": false}
+{"id": "tc_1944", "response": "Answer: Myanmar, Confidence: 8", "answer": "Myanmar", "confidence": 8, "correct": true}
+{"id": "tc_1945", "response": "Answer: Charles Chaplin, Confidence: 1", "answer": "Charles Chaplin", "confidence": 1, "correct": true}
+{"id": "tc_1968", "response": "Answer: A nightclub, a drag club, and a venue for the story's events, named after a French phrase meaning \"The Cage of Fools\", which", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_1973", "response": "Answer: New York City, specifically the Lower East Side, in the 1920s, as the story is set in a Jewish immigrant community.", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_1977", "response": "Answer: World War II, Confidence: 7", "answer": "World War II", "confidence": 7, "correct": true}
+{"id": "tc_2020", "response": "Answer: 4.4, Confidence: 1", "answer": "4.4", "confidence": 1, "correct": false}
+{"id": "tc_2031", "response": "Answer: Maastricht, Confidence: 7", "answer": "Maastricht", "confidence": 7, "correct": true}
+{"id": "tc_2032", "response": "Answer: Reims, Confidence: 3", "answer": "Reims", "confidence": 3, "correct": true}
+{"id": "tc_2063", "response": "Answer: London, UK, Confidence: 2", "answer": "London, UK", "confidence": 2, "correct": false}
+{"id": "tc_2090", "response": "Answer: Walt Disney, 1928, 1928, 1928, 1928, 19", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_2097", "response": "Answer: Madeleine L'Engle, Confidence: 0", "answer": "Madeleine L'Engle", "confidence": 0, "correct": false}
+{"id": "tc_2111", "response": "Answer: Jeannie C Riley, Confidence: 1", "answer": "Jeannie C Riley", "confidence": 1, "correct": false}
+{"id": "tc_2114", "response": "Answer: White, Confidence: 1", "answer": "White", "confidence": 1, "correct": false}
+{"id": "tc_2116", "response": "Answer: Polydor Records, Warner Bros. Records, and A&M Records, Confidence: 3", "answer": "Polydor Records, Warner Bros. Records, and A&M Records", "confidence": 3, "correct": false}
+{"id": "tc_2128", "response": "Answer: Chess, Confidence: 2", "answer": "Chess", "confidence": 2, "correct": true}
+{"id": "tc_2145", "response": "Answer: Debbie Rowe, Confidence: 3", "answer": "Debbie Rowe", "confidence": 3, "correct": true}
+{"id": "tc_2167", "response": "Answer: Washington, D.C., Confidence: 3", "answer": "Washington, D.C.", "confidence": 3, "correct": false}
+{"id": "tc_2182", "response": "Answer: Alexander Pope, Confidence: 1", "answer": "Alexander Pope", "confidence": 1, "correct": false}
+{"id": "tc_2191", "response": "Answer: The Beatles, Confidence: 1", "answer": "The Beatles", "confidence": 1, "correct": false}
+{"id": "tc_2202", "response": "Answer: IS, Confidence: 2", "answer": "IS", "confidence": 2, "correct": true}
+{"id": "tc_2208", "response": "Answer: Philadelphia, Pennsylvania, at the Veterans Stadium, and also in New York City at the Central Park Zoo, and in Washington, D.C. at the", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_2218", "response": "Answer: Apollo 11, Confidence: 1", "answer": "Apollo 11", "confidence": 1, "correct": false}
+{"id": "tc_2222", "response": "Answer: Theodore Roosevelt, Confidence: 1", "answer": "Theodore Roosevelt", "confidence": 1, "correct": false}
+{"id": "tc_2229", "response": "Answer: Yitzhak Rabin, Confidence: 2", "answer": "Yitzhak Rabin", "confidence": 2, "correct": false}
+{"id": "tc_2236", "response": "Answer: Heinrich Himmler, Confidence: 8", "answer": "Heinrich Himmler", "confidence": 8, "correct": false}
+{"id": "tc_2244", "response": "Answer: Ferdinand Marcos, Confidence: 8", "answer": "Ferdinand Marcos", "confidence": 8, "correct": true}
+{"id": "tc_2250", "response": "Answer: Earthquake, Confidence: 8", "answer": "Earthquake", "confidence": 8, "correct": true}
+{"id": "tc_2252", "response": "Answer: Florida, Confidence: 2", "answer": "Florida", "confidence": 2, "correct": false}
+{"id": "tc_2256", "response": "Answer: Wisconsin, Confidence: 3", "answer": "Wisconsin", "confidence": 3, "correct": true}
+{"id": "tc_2257", "response": "Answer: December, Confidence: 9", "answer": "December", "confidence": 9, "correct": true}
+{"id": "tc_2265", "response": "Answer: Mary Jane Crippen, Confidence: 3", "answer": "Mary Jane Crippen", "confidence": 3, "correct": false}
+{"id": "tc_2270", "response": "Answer: 14, Confidence: 2", "answer": "14", "confidence": 2, "correct": false}
+{"id": "tc_2280", "response": "Answer: Missouri and Cimarron, Confidence: 2", "answer": "Missouri and Cimarron", "confidence": 2, "correct": false}
+{"id": "tc_2287", "response": "Answer: 1927, Confidence: 2", "answer": "1927", "confidence": 2, "correct": false}
+{"id": "tc_2295", "response": "Answer: New York City, Confidence: 1", "answer": "New York City", "confidence": 1, "correct": true}
+{"id": "tc_2299", "response": "Answer: President Kennedy was assassinated by a lone gunman, Lee Harvey Oswald, who shot him while he was riding in a presidential motorcade in Dallas, Texas", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_2300", "response": "Answer: Batman, Confidence: 9", "answer": "Batman", "confidence": 9, "correct": true}
+{"id": "tc_2306", "response": "Answer: Lee Harvey Oswald, Confidence: 1", "answer": "Lee Harvey Oswald", "confidence": 1, "correct": true}
+{"id": "tc_2317", "response": "Answer: Chuck Yeager, Confidence: 3", "answer": "Chuck Yeager", "confidence": 3, "correct": true}
+{"id": "tc_2331", "response": "Answer: Jimmy Carter, Confidence: 1", "answer": "Jimmy Carter", "confidence": 1, "correct": false}
+{"id": "tc_2350", "response": "Answer: Leonard Bernstein, Confidence: 1", "answer": "Leonard Bernstein", "confidence": 1, "correct": false}
+{"id": "tc_2359", "response": "Answer: Robert Louis Stevenson, Confidence: 1", "answer": "Robert Louis Stevenson", "confidence": 1, "correct": false}
+{"id": "tc_2380", "response": "Answer: 1912, Confidence: 7", "answer": "1912", "confidence": 7, "correct": false}
+{"id": "tc_2400", "response": "Answer: France, Confidence: 3", "answer": "France", "confidence": 3, "correct": true}
+{"id": "tc_2417", "response": "Answer: Vladivostok, Confidence: 6", "answer": "Vladivostok", "confidence": 6, "correct": true}
+{"id": "tc_2454", "response": "Answer: Khyber Pass, Confidence: 5", "answer": "Khyber Pass", "confidence": 5, "correct": true}
+{"id": "tc_2457", "response": "Answer: Lakshadweep, Confidence: 2", "answer": "Lakshadweep", "confidence": 2, "correct": false}
+{"id": "tc_2481", "response": "Answer: Aleppo, Confidence: 3", "answer": "Aleppo", "confidence": 3, "correct": false}
+{"id": "tc_2496", "response": "Answer: Louis XVI, Confidence: 3", "answer": "Louis XVI", "confidence": 3, "correct": true}
+{"id": "tc_2499", "response": "Answer: Bulgarian, Confidence: 9", "answer": "Bulgarian", "confidence": 9, "correct": true}
+{"id": "tc_2505", "response": "Answer: Saint Basil's Cathedral, Confidence: 7", "answer": "Saint Basil's Cathedral", "confidence": 7, "correct": true}
+{"id": "tc_2506", "response": "Answer: Finland, Confidence: 9", "answer": "Finland", "confidence": 9, "correct": true}
+{"id": "tc_2524", "response": "Answer: Third Crusade, Confidence: 3", "answer": "Third Crusade", "confidence": 3, "correct": true}
+{"id": "tc_2544", "response": "Answer: The Hague, Confidence: 3", "answer": "The Hague", "confidence": 3, "correct": true}
+{"id": "tc_2556", "response": "Answer: Battle of Hastings, Confidence: 8", "answer": "Battle of Hastings", "confidence": 8, "correct": true}
+{"id": "tc_2564", "response": "Answer: Mao Zedong, Confidence: 8", "answer": "Mao Zedong", "confidence": 8, "correct": true}
+{"id": "tc_2573", "response": "Answer: Catherine of Aragon, Confidence: 1", "answer": "Catherine of Aragon", "confidence": 1, "correct": false}
+{"id": "tc_2580", "response": "Answer: Austria, Confidence: 7", "answer": "Austria", "confidence": 7, "correct": false}
+{"id": "tc_2622", "response": "Answer: UK Parliament, Confidence: 2", "answer": "UK Parliament", "confidence": 2, "correct": false}
+{"id": "tc_2644", "response": "Answer: The Green Party of England and Wales, Confidence: 1", "answer": "The Green Party of England and Wales", "confidence": 1, "correct": true}
+{"id": "tc_2669", "response": "Answer: First-past-the-post, Confidence: 6", "answer": "First-past-the-post", "confidence": 6, "correct": true}
+{"id": "tc_2677", "response": "Answer: Boche, Confidence: 2", "answer": "Boche", "confidence": 2, "correct": false}
+{"id": "tc_2687", "response": "Answer: James Watt, Confidence: 8", "answer": "James Watt", "confidence": 8, "correct": true}
+{"id": "tc_2699", "response": "Answer: La M\u00f4me, Confidence: 6", "answer": "La M\u00f4me", "confidence": 6, "correct": false}
+{"id": "tc_2701", "response": "Answer: Martin Luther King Jr., Confidence: 2", "answer": "Martin Luther King Jr.", "confidence": 2, "correct": true}
+{"id": "tc_2718", "response": "Answer: Lignite, Confidence: 7", "answer": "Lignite", "confidence": 7, "correct": true}
+{"id": "tc_2728", "response": "Answer: Sand, Confidence: 8", "answer": "Sand", "confidence": 8, "correct": true}
+{"id": "tc_2736", "response": "Answer: A type of fungus, specifically a sclerotium, Confidence: 3", "answer": "A type of fungus, specifically a sclerotium", "confidence": 3, "correct": false}
+{"id": "tc_2740", "response": "Answer: Cellulose, Confidence: 8", "answer": "Cellulose", "confidence": 8, "correct": true}
+{"id": "tc_2744", "response": "Answer: Vaporization, Confidence: 4", "answer": "Vaporization", "confidence": 4, "correct": false}
+{"id": "tc_2758", "response": "Answer: Arithmetic, Confidence: 6", "answer": "Arithmetic", "confidence": 6, "correct": true}
+{"id": "tc_2767", "response": "Answer: Friction, Confidence: 8", "answer": "Friction", "confidence": 8, "correct": true}
+{"id": "tc_2805", "response": "Answer: Ostrich, Confidence: 5", "answer": "Ostrich", "confidence": 5, "correct": true}
+{"id": "tc_2806", "response": "Answer: Chlorophyll, Confidence: 9", "answer": "Chlorophyll", "confidence": 9, "correct": true}
+{"id": "tc_2814", "response": "Answer: Ornithology, Confidence: 9", "answer": "Ornithology", "confidence": 9, "correct": true}
+{"id": "tc_2816", "response": "Answer: Alligator, Confidence: 1", "answer": "Alligator", "confidence": 1, "correct": true}
+{"id": "tc_2818", "response": "Answer: Kelp, Confidence: 8", "answer": "Kelp", "confidence": 8, "correct": true}
+{"id": "tc_2829", "response": "Answer: Muscle tissue, particularly in cardiac and skeletal muscles, Confidence: 8", "answer": "Muscle tissue, particularly in cardiac and skeletal muscles", "confidence": 8, "correct": false}
+{"id": "tc_2833", "response": "Answer: Cellulose, Confidence: 3", "answer": "Cellulose", "confidence": 3, "correct": true}
+{"id": "tc_2834", "response": "Answer: Webspinners, Confidence: 2", "answer": "Webspinners", "confidence": 2, "correct": false}
+{"id": "tc_2836", "response": "Answer: Ethology, Confidence: 8", "answer": "Ethology", "confidence": 8, "correct": true}
+{"id": "tc_2838", "response": "Answer: Bryophyta, Confidence: 4", "answer": "Bryophyta", "confidence": 4, "correct": true}
+{"id": "tc_2841", "response": "Answer: None, Confidence: 0", "answer": "None", "confidence": 0, "correct": false}
+{"id": "tc_2849", "response": "Answer: Leaf, Confidence: 6", "answer": "Leaf", "confidence": 6, "correct": true}
+{"id": "tc_2850", "response": "Answer: Beaver, Confidence: 3", "answer": "Beaver", "confidence": 3, "correct": true}
+{"id": "tc_2861", "response": "Answer: Hydrophytes, Confidence: 4", "answer": "Hydrophytes", "confidence": 4, "correct": true}
+{"id": "tc_2900", "response": "Answer: Wisdom teeth, Confidence: 8", "answer": "Wisdom teeth", "confidence": 8, "correct": true}
+{"id": "tc_2901", "response": "Answer: Insulin, Confidence: 8", "answer": "Insulin", "confidence": 8, "correct": true}
+{"id": "tc_2914", "response": "Answer: 4, Confidence: 7", "answer": "4", "confidence": 7, "correct": true}
+{"id": "tc_2926", "response": "Answer: Gluteus maximus, Confidence: 7", "answer": "Gluteus maximus", "confidence": 7, "correct": true}
+{"id": "tc_2930", "response": "Answer: Corpus luteum, Confidence: 7", "answer": "Corpus luteum", "confidence": 7, "correct": true}
+{"id": "tc_2956", "response": "Answer: Sinoatrial node, Confidence: 8", "answer": "Sinoatrial node", "confidence": 8, "correct": true}
+{"id": "tc_2957", "response": "Answer: Luteinizing Hormone (LH), Confidence: 7", "answer": "Luteinizing Hormone (LH)", "confidence": 7, "correct": true}
+{"id": "tc_2973", "response": "Answer: Argon, Confidence: 3", "answer": "Argon", "confidence": 3, "correct": false}
+{"id": "tc_3016", "response": "Answer: Eutrophication, Confidence: 8", "answer": "Eutrophication", "confidence": 8, "correct": true}
+{"id": "tc_3026", "response": "Answer: The Great Wall of China, Confidence: 1", "answer": "The Great Wall of China", "confidence": 1, "correct": false}
+{"id": "tc_3033", "response": "Answer: Radon, Confidence: 3", "answer": "Radon", "confidence": 3, "correct": true}
+{"id": "tc_3039", "response": "Answer: 40,075 kilometers, Confidence: 7", "answer": "40,075 kilometers", "confidence": 7, "correct": false}
+{"id": "tc_3070", "response": "Answer: Gypsum, Confidence: 8", "answer": "Gypsum", "confidence": 8, "correct": true}
+{"id": "tc_3086", "response": "Answer: Aether, Confidence: 3", "answer": "Aether", "confidence": 3, "correct": false}
+{"id": "tc_3119", "response": "Answer: Black holes, Confidence: 8", "answer": "Black holes", "confidence": 8, "correct": true}
+{"id": "tc_3120", "response": "Answer: Neil Armstrong, Confidence: 9", "answer": "Neil Armstrong", "confidence": 9, "correct": true}
+{"id": "tc_3129", "response": "Answer: Neptune, Confidence: 5", "answer": "Neptune", "confidence": 5, "correct": true}
+{"id": "tc_3130", "response": "Answer: The Milky Way is a barred spiral galaxy that contains our solar system, consisting of billions of stars, gas, and dust. Confidence: 3", "answer": null, "confidence": null, "correct": false}
+{"id": "tc_3155", "response": "Answer: Gravitational force, Confidence: 3", "answer": "Gravitational force", "confidence": 3, "correct": true}
+{"id": "tc_3156", "response": "Answer: Sirius, Confidence: 1", "answer": "Sirius", "confidence": 1, "correct": true}
+{"id": "qz_2", "response": "Answer: Red, Green, Blue, Confidence: 8", "answer": "Red, Green, Blue", "confidence": 8, "correct": true}
+{"id": "qz_63", "response": "Answer: The Color Purple, Confidence: 2", "answer": "The Color Purple", "confidence": 2, "correct": true}
+{"id": "qz_68", "response": "Answer: Helium, Confidence: 2", "answer": "Helium", "confidence": 2, "correct": true}
+{"id": "qz_74", "response": "Answer: 3.142, Confidence: 9", "answer": "3.142", "confidence": 9, "correct": true}
+{"id": "qz_76", "response": "Answer: White, Confidence: 1", "answer": "White", "confidence": 1, "correct": true}
+{"id": "qz_77", "response": "Answer: A brand of chocolate, specifically a type of candy bar, Confidence: 1", "answer": "A brand of chocolate, specifically a type of candy bar", "confidence": 1, "correct": false}
+{"id": "qz_78", "response": "Answer: 5, Confidence: 1", "answer": "5", "confidence": 1, "correct": false}
+{"id": "qz_107", "response": "Answer: Thierry Henry, Confidence: 2", "answer": "Thierry Henry", "confidence": 2, "correct": false}
+{"id": "qz_122", "response": "Answer: 4, Confidence: 2", "answer": "4", "confidence": 2, "correct": false}
+{"id": "qz_127", "response": "Answer: White, Confidence: 9", "answer": "White", "confidence": 9, "correct": true}
+{"id": "qz_135", "response": "Answer: Dwight D. Eisenhower, Confidence: 1", "answer": "Dwight D. Eisenhower", "confidence": 1, "correct": false}
+{"id": "qz_147", "response": "Answer: 3, Confidence: 1", "answer": "3", "confidence": 1, "correct": false}
+{"id": "qz_148", "response": "Answer: Liverpool, Confidence: 6", "answer": "Liverpool", "confidence": 6, "correct": false}
+{"id": "qz_186", "response": "Answer: Denali National Park and Preserve, Confidence: 4", "answer": "Denali National Park and Preserve", "confidence": 4, "correct": false}
+{"id": "qz_188", "response": "Answer: Citric acid, Confidence: 8", "answer": "Citric acid", "confidence": 8, "correct": true}
+{"id": "qz_196", "response": "Answer: 28, Confidence: 8", "answer": "28", "confidence": 8, "correct": true}
+{"id": "qz_204", "response": "Answer: INTERPOL, Confidence: 5", "answer": "INTERPOL", "confidence": 5, "correct": true}
+{"id": "qz_250", "response": "Answer: Dogs, Confidence: 3", "answer": "Dogs", "confidence": 3, "correct": false}
+{"id": "qz_256", "response": "Answer: 1921, Confidence: 2", "answer": "1921", "confidence": 2, "correct": false}
+{"id": "qz_267", "response": "Answer: 1768, Confidence: 5", "answer": "1768", "confidence": 5, "correct": true}
+{"id": "qz_298", "response": "Answer: Metropolitan Line, Confidence: 3", "answer": "Metropolitan Line", "confidence": 3, "correct": false}
+{"id": "qz_340", "response": "Answer: Oscar Wilde, Confidence: 8", "answer": "Oscar Wilde", "confidence": 8, "correct": true}
+{"id": "qz_347", "response": "Answer: No, Confidence: 1", "answer": "No", "confidence": 1, "correct": false}
+{"id": "qz_349", "response": "Answer: No, Confidence: 1", "answer": "No", "confidence": 1, "correct": false}
+{"id": "qz_351", "response": "Answer: No, Confidence: 2", "answer": "No", "confidence": 2, "correct": false}
+{"id": "qz_374", "response": "Answer: Dynamite, Confidence: 8", "answer": "Dynamite", "confidence": 8, "correct": true}
+{"id": "qz_385", "response": "Answer: New York City, Confidence: 8", "answer": "New York City", "confidence": 8, "correct": true}
+{"id": "qz_418", "response": "Answer: Q, Confidence: 2", "answer": "Q", "confidence": 2, "correct": true}
+{"id": "qz_429", "response": "Answer: Wannabe, Confidence: 8", "answer": "Wannabe", "confidence": 8, "correct": true}
+{"id": "qz_430", "response": "Answer: C and G, Confidence: 1", "answer": "C and G", "confidence": 1, "correct": true}
+{"id": "qz_438", "response": "Answer: Belgium, Confidence: 7", "answer": "Belgium", "confidence": 7, "correct": false}
+{"id": "qz_453", "response": "Answer: Harry Potter and the Philosopher's Stone, Confidence: 6", "answer": "Harry Potter and the Philosopher's Stone", "confidence": 6, "correct": false}
+{"id": "qz_547", "response": "Answer: QWERTY, Confidence: 1", "answer": "QWERTY", "confidence": 1, "correct": false}
+{"id": "qz_603", "response": "Answer: Chicago, Confidence: 9", "answer": "Chicago", "confidence": 9, "correct": true}
+{"id": "qz_608", "response": "Answer: Thailand, Confidence: 8", "answer": "Thailand", "confidence": 8, "correct": true}
+{"id": "qz_611", "response": "Answer: Huey, Dewey, and Louie, Confidence: 8", "answer": "Huey, Dewey, and Louie", "confidence": 8, "correct": true}
+{"id": "qz_620", "response": "Answer: The Shawshank Redemption, Confidence: 1", "answer": "The Shawshank Redemption", "confidence": 1, "correct": false}
+{"id": "qz_621", "response": "Answer: Shakin' Stevens, Confidence: 2", "answer": "Shakin' Stevens", "confidence": 2, "correct": false}
+{"id": "qz_644", "response": "Answer: the, Confidence: 2", "answer": "the", "confidence": 2, "correct": false}
+{"id": "qz_647", "response": "Answer: Pac-Man, Confidence: 8", "answer": "Pac-Man", "confidence": 8, "correct": true}
+{"id": "qz_664", "response": "Answer: Femur, Confidence: 9", "answer": "Femur", "confidence": 9, "correct": true}
+{"id": "qz_666", "response": "Answer: ambidextrous, Confidence: 8", "answer": "ambidextrous", "confidence": 8, "correct": true}
+{"id": "qz_685", "response": "Answer: Blade Runner, Confidence: 8", "answer": "Blade Runner", "confidence": 8, "correct": true}
+{"id": "qz_688", "response": "Answer: The Old Show, Confidence: 1", "answer": "The Old Show", "confidence": 1, "correct": false}
+{"id": "qz_690", "response": "Answer: Fox, Confidence: 1", "answer": "Fox", "confidence": 1, "correct": true}
+{"id": "qz_726", "response": "Answer: David Tennant, Confidence: 1", "answer": "David Tennant", "confidence": 1, "correct": false}
+{"id": "qz_735", "response": "Answer: Christopher Reeve, Confidence: 1", "answer": "Christopher Reeve", "confidence": 1, "correct": false}
+{"id": "qz_737", "response": "Answer: Ridley Scott, Confidence: 1", "answer": "Ridley Scott", "confidence": 1, "correct": true}
+{"id": "qz_755", "response": "Answer: Jack the Ripper, Confidence: 3", "answer": "Jack the Ripper", "confidence": 3, "correct": true}
+{"id": "qz_757", "response": "Answer: A golden duck, Confidence: 1", "answer": "A golden duck", "confidence": 1, "correct": false}
+{"id": "qz_832", "response": "Answer: Nick Hornby, Confidence: 7", "answer": "Nick Hornby", "confidence": 7, "correct": true}
+{"id": "qz_845", "response": "Answer: Joust, Confidence: 1", "answer": "Joust", "confidence": 1, "correct": false}
+{"id": "qz_847", "response": "Answer: Happy Birthday, Charlie, Confidence: 1", "answer": "Happy Birthday, Charlie", "confidence": 1, "correct": true}
+{"id": "qz_848", "response": "Answer: The Crown, Confidence: 1", "answer": "The Crown", "confidence": 1, "correct": false}
+{"id": "qz_860", "response": "Answer: Bernard, Confidence: 2", "answer": "Bernard", "confidence": 2, "correct": false}
+{"id": "qz_866", "response": "Answer: Radar, Confidence: 0", "answer": "Radar", "confidence": 0, "correct": false}
+{"id": "qz_871", "response": "Answer: pear, Confidence: 2", "answer": "pear", "confidence": 2, "correct": true}
+{"id": "qz_881", "response": "Answer: 0, Confidence: 1", "answer": "0", "confidence": 1, "correct": false}
+{"id": "qz_921", "response": "Answer: The Beatles, Confidence: 0", "answer": "The Beatles", "confidence": 0, "correct": false}
+{"id": "qz_941", "response": "Answer: The Office, Confidence: 1", "answer": "The Office", "confidence": 1, "correct": false}
+{"id": "qz_952", "response": "Answer: Let, Confidence: 2", "answer": "Let", "confidence": 2, "correct": true}
+{"id": "qz_1032", "response": "Answer: 13, Confidence: 3", "answer": "13", "confidence": 3, "correct": false}
+{"id": "qz_1046", "response": "Answer: Fred Perry, Confidence: 2", "answer": "Fred Perry", "confidence": 2, "correct": true}
+{"id": "qz_1047", "response": "Answer: Rembrandt, Confidence: 3", "answer": "Rembrandt", "confidence": 3, "correct": true}
+{"id": "qz_1064", "response": "Answer: Nadia Com\u0103neci, Confidence: 5", "answer": "Nadia Com\u0103neci", "confidence": 5, "correct": true}
+{"id": "qz_1074", "response": "Answer: 14 years and 10 days, Confidence: 1", "answer": "14 years and 10 days", "confidence": 1, "correct": true}
+{"id": "qz_1086", "response": "Answer: Martin Shaw, Confidence: 2", "answer": "Martin Shaw", "confidence": 2, "correct": false}
+{"id": "qz_1098", "response": "Answer: Bear, Confidence: 2", "answer": "Bear", "confidence": 2, "correct": false}
+{"id": "qz_1111", "response": "Answer: Duff Beer, Confidence: 5", "answer": "Duff Beer", "confidence": 5, "correct": true}
+{"id": "qz_1112", "response": "Answer: Sheep, Confidence: 5", "answer": "Sheep", "confidence": 5, "correct": true}
+{"id": "qz_1128", "response": "Answer: Poland, Confidence: 9", "answer": "Poland", "confidence": 9, "correct": true}
+{"id": "qz_1130", "response": "Answer: O, Confidence: 8", "answer": "O", "confidence": 8, "correct": true}
+{"id": "qz_1139", "response": "Answer: Pyrotechnics, Confidence: 4", "answer": "Pyrotechnics", "confidence": 4, "correct": true}
+{"id": "qz_1141", "response": "Answer: James I, Confidence: 7", "answer": "James I", "confidence": 7, "correct": true}
+{"id": "qz_1173", "response": "Answer: The Wizard of Oz, Confidence: 1", "answer": "The Wizard of Oz", "confidence": 1, "correct": false}
+{"id": "qz_1178", "response": "Answer: Leona Lewis, Confidence: 1", "answer": "Leona Lewis", "confidence": 1, "correct": false}
+{"id": "qz_1189", "response": "Answer: Benefits Street, Confidence: 1", "answer": "Benefits Street", "confidence": 1, "correct": false}
+{"id": "qz_1191", "response": "Answer: Violin bow, Confidence: 1", "answer": "Violin bow", "confidence": 1, "correct": true}
+{"id": "qz_1197", "response": "Answer: White, Confidence: 1", "answer": "White", "confidence": 1, "correct": false}
+{"id": "qz_1221", "response": "Answer: Queen, Confidence: 3", "answer": "Queen", "confidence": 3, "correct": true}
+{"id": "qz_1230", "response": "Answer: Serena Williams, Confidence: 3", "answer": "Serena Williams", "confidence": 3, "correct": false}
+{"id": "qz_1249", "response": "Answer: Irish whiskey, Confidence: 8", "answer": "Irish whiskey", "confidence": 8, "correct": true}
+{"id": "qz_1291", "response": "Answer: 249, Confidence: 3", "answer": "249", "confidence": 3, "correct": false}
+{"id": "qz_1345", "response": "Answer: Conquest, War, Famine, Death, Pestilence, and the Antichrist, but commonly referred to as Conquest, War,", "answer": null, "confidence": null, "correct": false}
+{"id": "qz_1354", "response": "Answer: Dick Cheney, Confidence: 8", "answer": "Dick Cheney", "confidence": 8, "correct": true}
+{"id": "qz_1357", "response": "Answer: The Right Stuff, Confidence: 3", "answer": "The Right Stuff", "confidence": 3, "correct": false}
+{"id": "qz_1380", "response": "Answer: 0, Confidence: 1", "answer": "0", "confidence": 1, "correct": false}
+{"id": "qz_1382", "response": "Answer: bright light, Confidence: 3", "answer": "bright light", "confidence": 3, "correct": true}
+{"id": "qz_1384", "response": "Answer: Dog, Confidence: 1", "answer": "Dog", "confidence": 1, "correct": true}
+{"id": "qz_1393", "response": "Answer: Prague, Confidence: 8", "answer": "Prague", "confidence": 8, "correct": true}
+{"id": "qz_1417", "response": "Answer: Jagger, Confidence: 1", "answer": "Jagger", "confidence": 1, "correct": false}
+{"id": "qz_1429", "response": "Answer: 1500 meters, Confidence: 2", "answer": "1500 meters", "confidence": 2, "correct": false}
+{"id": "qz_1430", "response": "Answer: Wimbledon, Confidence: 1", "answer": "Wimbledon", "confidence": 1, "correct": false}
+{"id": "qz_1453", "response": "Answer: Istanbul, Confidence: 9", "answer": "Istanbul", "confidence": 9, "correct": true}
+{"id": "qz_1516", "response": "Answer: Roman Abramovich, Confidence: 0", "answer": "Roman Abramovich", "confidence": 0, "correct": false}
+{"id": "qz_1545", "response": "Answer: James Cameron, Confidence: 1", "answer": "James Cameron", "confidence": 1, "correct": true}
+{"id": "qz_1572", "response": "Answer: Dutch, Confidence: 9", "answer": "Dutch", "confidence": 9, "correct": true}
+{"id": "qz_1603", "response": "Answer: When Harry Met Sally, Confidence: 4", "answer": "When Harry Met Sally", "confidence": 4, "correct": true}
+{"id": "qz_1631", "response": "Answer: 1998, Confidence: 2", "answer": "1998", "confidence": 2, "correct": false}
+{"id": "qz_1665", "response": "Answer: Vinegar, Confidence: 4", "answer": "Vinegar", "confidence": 4, "correct": true}
+{"id": "qz_1670", "response": "Answer: United States, Confidence: 1", "answer": "United States", "confidence": 1, "correct": true}
+{"id": "qz_1684", "response": "Answer: Gertie, Confidence: 1", "answer": "Gertie", "confidence": 1, "correct": false}
+{"id": "qz_1690", "response": "Answer: Elephant, Confidence: 4", "answer": "Elephant", "confidence": 4, "correct": true}
+{"id": "qz_1693", "response": "Answer: lodge, Confidence: 7", "answer": "lodge", "confidence": 7, "correct": true}
+{"id": "qz_1720", "response": "Answer: Joey, Confidence: 7", "answer": "Joey", "confidence": 7, "correct": true}
+{"id": "qz_1725", "response": "Answer: James Gandolfini, Confidence: 1", "answer": "James Gandolfini", "confidence": 1, "correct": false}
+{"id": "qz_1730", "response": "Answer: Horse, Confidence: 3", "answer": "Horse", "confidence": 3, "correct": false}
+{"id": "qz_1745", "response": "Answer: horse racing, Confidence: 8", "answer": "horse racing", "confidence": 8, "correct": true}
+{"id": "qz_1794", "response": "Answer: The Scotsman, Confidence: 1", "answer": "The Scotsman", "confidence": 1, "correct": false}
+{"id": "qz_1797", "response": "Answer: A Christmas Carol, Confidence: 8", "answer": "A Christmas Carol", "confidence": 8, "correct": true}
+{"id": "qz_1800", "response": "Answer: The Beatles, Confidence: 1", "answer": "The Beatles", "confidence": 1, "correct": true}
+{"id": "qz_1804", "response": "Answer: \"The Twelve Days of Christmas\", Confidence: 1", "answer": "\"The Twelve Days of Christmas\"", "confidence": 1, "correct": false}
+{"id": "qz_1821", "response": "Answer: Gary Lineker, Confidence: 1", "answer": "Gary Lineker", "confidence": 1, "correct": false}
+{"id": "qz_1825", "response": "Answer: John Lennon, Paul McCartney, George Harrison, and Ringo Starr, with additional musicians, including a trumpet player, but not specifically named, are featured", "answer": null, "confidence": null, "correct": false}
+{"id": "qz_1834", "response": "Answer: \"Taxman\" by The Beatles, Confidence: 6", "answer": "\"Taxman\" by The Beatles", "confidence": 6, "correct": false}
+{"id": "qz_1858", "response": "Answer: The Blind Pig, Confidence: 1", "answer": "The Blind Pig", "confidence": 1, "correct": false}
+{"id": "qz_1872", "response": "Answer: Henry Mancini, Confidence: 7", "answer": "Henry Mancini", "confidence": 7, "correct": true}
+{"id": "qz_1880", "response": "Answer: The Beano, Confidence: 1", "answer": "The Beano", "confidence": 1, "correct": false}
+{"id": "qz_1882", "response": "Answer: Jamie Lee Curtis, Confidence: 1", "answer": "Jamie Lee Curtis", "confidence": 1, "correct": false}
+{"id": "qz_1915", "response": "Answer: Denis Healey, Confidence: 3", "answer": "Denis Healey", "confidence": 3, "correct": false}
+{"id": "qz_1918", "response": "Answer: Ritchie Valens, Confidence: 8", "answer": "Ritchie Valens", "confidence": 8, "correct": true}
+{"id": "qz_1952", "response": "Answer: Crustacean, Confidence: 1", "answer": "Crustacean", "confidence": 1, "correct": false}
+{"id": "qz_1958", "response": "Answer: Milk, Confidence: 8", "answer": "Milk", "confidence": 8, "correct": true}
+{"id": "qz_2001", "response": "Answer: Pablo Neruda, Confidence: 3", "answer": "Pablo Neruda", "confidence": 3, "correct": true}
+{"id": "qz_2018", "response": "Answer: Albert Einstein, Confidence: 8", "answer": "Albert Einstein", "confidence": 8, "correct": true}
+{"id": "qz_2029", "response": "Answer: The Captain, Confidence: 1", "answer": "The Captain", "confidence": 1, "correct": false}
+{"id": "qz_2053", "response": "Answer: Bologna, Italy, Confidence: 7", "answer": "Bologna, Italy", "confidence": 7, "correct": true}
+{"id": "qz_2090", "response": "Answer: Everton, Confidence: 7", "answer": "Everton", "confidence": 7, "correct": true}
+{"id": "qz_2111", "response": "Answer: North Korea, Confidence: 6", "answer": "North Korea", "confidence": 6, "correct": true}
+{"id": "qz_2131", "response": "Answer: Jimmy Carr, Confidence: 3", "answer": "Jimmy Carr", "confidence": 3, "correct": true}
+{"id": "qz_2135", "response": "Answer: The Weakest Link, Confidence: 1", "answer": "The Weakest Link", "confidence": 1, "correct": false}
+{"id": "qz_2165", "response": "Answer: Les Dennis, Confidence: 0", "answer": "Les Dennis", "confidence": 0, "correct": false}
+{"id": "qz_2175", "response": "Answer: Photoelectric effect, Confidence: 3", "answer": "Photoelectric effect", "confidence": 3, "correct": true}
+{"id": "qz_2176", "response": "Answer: Uranus, Confidence: 3", "answer": "Uranus", "confidence": 3, "correct": true}
+{"id": "qz_2194", "response": "Answer: RoboCop, Confidence: 8", "answer": "RoboCop", "confidence": 8, "correct": true}
+{"id": "qz_2206", "response": "Answer: Carol Channing, Confidence: 1", "answer": "Carol Channing", "confidence": 1, "correct": false}
+{"id": "qz_2217", "response": "Answer: Robert Ludlum, Confidence: 8", "answer": "Robert Ludlum", "confidence": 8, "correct": true}
+{"id": "qz_2223", "response": "Answer: Matthew, Confidence: 3", "answer": "Matthew", "confidence": 3, "correct": true}
+{"id": "qz_2225", "response": "Answer: Aramis, Confidence: 3", "answer": "Aramis", "confidence": 3, "correct": true}
+{"id": "qz_2227", "response": "Answer: Clavus, Confidence: 1", "answer": "Clavus", "confidence": 1, "correct": false}
+{"id": "qz_2231", "response": "Answer: Aglet, Confidence: 8", "answer": "Aglet", "confidence": 8, "correct": true}
+{"id": "qz_2260", "response": "Answer: Black Sea, Confidence: 8", "answer": "Black Sea", "confidence": 8, "correct": true}
+{"id": "qz_2280", "response": "Answer: J. Howard Marshall II, Confidence: 6", "answer": "J. Howard Marshall II", "confidence": 6, "correct": true}
+{"id": "qz_2289", "response": "Answer: Manchester United, Confidence: 1", "answer": "Manchester United", "confidence": 1, "correct": false}
+{"id": "qz_2291", "response": "Answer: 6, Confidence: 3", "answer": "6", "confidence": 3, "correct": false}
+{"id": "qz_2309", "response": "Answer: Arthur Conan Doyle, Confidence: 7", "answer": "Arthur Conan Doyle", "confidence": 7, "correct": true}
+{"id": "qz_2324", "response": "Answer: Charles Dickens, Confidence: 8", "answer": "Charles Dickens", "confidence": 8, "correct": true}
+{"id": "qz_2349", "response": "Answer: Cricket, Confidence: 1", "answer": "Cricket", "confidence": 1, "correct": false}
+{"id": "qz_2355", "response": "Answer: Billiards, Confidence: 2", "answer": "Billiards", "confidence": 2, "correct": false}
+{"id": "qz_2379", "response": "Answer: 1825, Confidence: 3", "answer": "1825", "confidence": 3, "correct": false}
+{"id": "qz_2384", "response": "Answer: Tony Todd, Confidence: 7", "answer": "Tony Todd", "confidence": 7, "correct": false}
+{"id": "qz_2391", "response": "Answer: Elvis Presley, Confidence: 1", "answer": "Elvis Presley", "confidence": 1, "correct": false}
+{"id": "qz_2397", "response": "Answer: Elysium, Confidence: 5", "answer": "Elysium", "confidence": 5, "correct": false}
+{"id": "qz_2404", "response": "Answer: Camellia sinensis, Confidence: 7", "answer": "Camellia sinensis", "confidence": 7, "correct": true}
+{"id": "qz_2419", "response": "Answer: Maggie Smith, Confidence: 2", "answer": "Maggie Smith", "confidence": 2, "correct": false}
+{"id": "qz_2423", "response": "Answer: The Cure, Confidence: 1", "answer": "The Cure", "confidence": 1, "correct": false}
+{"id": "qz_2426", "response": "Answer: 1940s, Confidence: 3", "answer": "1940s", "confidence": 3, "correct": false}
+{"id": "qz_2428", "response": "Answer: Kitsune, Confidence: 8", "answer": "Kitsune", "confidence": 8, "correct": true}
+{"id": "qz_2430", "response": "Answer: Castor, Confidence: 3", "answer": "Castor", "confidence": 3, "correct": true}
+{"id": "qz_2440", "response": "Answer: The Godfather, Part II, Confidence: 1", "answer": "The Godfather, Part II", "confidence": 1, "correct": false}
+{"id": "qz_2444", "response": "Answer: Adrian Cronauer, Confidence: 3", "answer": "Adrian Cronauer", "confidence": 3, "correct": true}
+{"id": "qz_2458", "response": "Answer: Glenn Close, Confidence: 8", "answer": "Glenn Close", "confidence": 8, "correct": true}
+{"id": "qz_2466", "response": "Answer: Will Smith, Morgan Freeman, and Katee Sackhoff, Confidence: 3", "answer": "Will Smith, Morgan Freeman, and Katee Sackhoff", "confidence": 3, "correct": false}
+{"id": "qz_2471", "response": "Answer: Billy Wilder, Confidence: 7", "answer": "Billy Wilder", "confidence": 7, "correct": true}
+{"id": "qz_2478", "response": "Answer: Chris Tarrant, Confidence: 1", "answer": "Chris Tarrant", "confidence": 1, "correct": false}
+{"id": "qz_2532", "response": "Answer: Whitechapel, Confidence: 3", "answer": "Whitechapel", "confidence": 3, "correct": false}
+{"id": "qz_2537", "response": "Answer: 12, Confidence: 1", "answer": "12", "confidence": 1, "correct": false}
+{"id": "qz_2538", "response": "Answer: Marco Pantani, Confidence: 1", "answer": "Marco Pantani", "confidence": 1, "correct": false}
+{"id": "qz_2562", "response": "Answer: Captain America, Confidence: 3", "answer": "Captain America", "confidence": 3, "correct": true}
+{"id": "qz_2564", "response": "Answer: Penguin, Confidence: 8", "answer": "Penguin", "confidence": 8, "correct": true}
+{"id": "qz_2567", "response": "Answer: Columbo, Confidence: 3", "answer": "Columbo", "confidence": 3, "correct": false}
+{"id": "qz_2589", "response": "Answer: 3, Confidence: 2", "answer": "3", "confidence": 2, "correct": false}
+{"id": "qz_2594", "response": "Answer: Hopalong Cassidy, Confidence: 2", "answer": "Hopalong Cassidy", "confidence": 2, "correct": false}
+{"id": "qz_2601", "response": "Answer: 55, Confidence: 2", "answer": "55", "confidence": 2, "correct": true}
+{"id": "qz_2619", "response": "Answer: The French Connection, Confidence: 0", "answer": "The French Connection", "confidence": 0, "correct": false}
+{"id": "qz_2654", "response": "Answer: Eusebio, Confidence: 1", "answer": "Eusebio", "confidence": 1, "correct": false}
+{"id": "qz_2713", "response": "Answer: Adam Smith, Confidence: 9", "answer": "Adam Smith", "confidence": 9, "correct": true}
+{"id": "qz_2717", "response": "Answer: House of Duncan, Confidence: 1", "answer": "House of Duncan", "confidence": 1, "correct": true}
+{"id": "qz_2718", "response": "Answer: The Red King, Confidence: 1", "answer": "The Red King", "confidence": 1, "correct": false}
+{"id": "qz_2749", "response": "Answer: Hungarian Horntail, Confidence: 6", "answer": "Hungarian Horntail", "confidence": 6, "correct": true}
+{"id": "qz_2758", "response": "Answer: The Train Robbers, Confidence: 1", "answer": "The Train Robbers", "confidence": 1, "correct": false}
+{"id": "qz_2768", "response": "Answer: Culture Club, Confidence: 3", "answer": "Culture Club", "confidence": 3, "correct": false}
+{"id": "qz_2784", "response": "Answer: Bannerman, Confidence: 3", "answer": "Bannerman", "confidence": 3, "correct": false}
+{"id": "qz_2787", "response": "Answer: Michael Jackson, Confidence: 0", "answer": "Michael Jackson", "confidence": 0, "correct": false}
+{"id": "qz_2789", "response": "Answer: James K. Polk, Confidence: 5", "answer": "James K. Polk", "confidence": 5, "correct": false}
+{"id": "qz_2821", "response": "Answer: Venezuela, Confidence: 8", "answer": "Venezuela", "confidence": 8, "correct": true}
+{"id": "qz_2822", "response": "Answer: George Macready, Confidence: 1", "answer": "George Macready", "confidence": 1, "correct": false}
+{"id": "qz_2835", "response": "Answer: Richard Harris, Confidence: 8", "answer": "Richard Harris", "confidence": 8, "correct": true}
+{"id": "qz_2841", "response": "Answer: India, Confidence: 8", "answer": "India", "confidence": 8, "correct": true}
+{"id": "qz_2845", "response": "Answer: Colombia, Confidence: 7", "answer": "Colombia", "confidence": 7, "correct": true}
+{"id": "qz_2853", "response": "Answer: Casey Anthony, Confidence: 0", "answer": "Casey Anthony", "confidence": 0, "correct": false}
+{"id": "qz_2866", "response": "Answer: Lungs, Confidence: 8", "answer": "Lungs", "confidence": 8, "correct": true}
+{"id": "qz_2873", "response": "Answer: SpongeBob SquarePants, Confidence: 8", "answer": "SpongeBob SquarePants", "confidence": 8, "correct": true}
+{"id": "qz_2884", "response": "Answer: Dennis Nilsen, Confidence: 1", "answer": "Dennis Nilsen", "confidence": 1, "correct": false}
+{"id": "qz_2908", "response": "Answer: St. Paul's School, London, and Eton College, England, and Harrow School, England, and the Royal Military Academy Sandhurst,", "answer": null, "confidence": null, "correct": false}
+{"id": "qz_2933", "response": "Answer: K.J. Choi, Confidence: 1", "answer": "K.J. Choi", "confidence": 1, "correct": false}
+{"id": "qz_2968", "response": "Answer: Jamaica, Confidence: 3", "answer": "Jamaica", "confidence": 3, "correct": true}
+{"id": "qz_2977", "response": "Answer: Thomas Rickman, Confidence: 1", "answer": "Thomas Rickman", "confidence": 1, "correct": false}
+{"id": "qz_2980", "response": "Answer: The Persistence of Memory, Confidence: 9", "answer": "The Persistence of Memory", "confidence": 9, "correct": true}
+{"id": "qz_2999", "response": "Answer: 1936, Confidence: 8", "answer": "1936", "confidence": 8, "correct": true}
+{"id": "qz_3023", "response": "Answer: Diana, Princess of Wales and Prince Charles, Duke of Cornwall, Confidence: 2", "answer": "Diana, Princess of Wales and Prince Charles, Duke of Cornwall", "confidence": 2, "correct": false}
+{"id": "qz_3027", "response": "Answer: John Christie, Confidence: 3", "answer": "John Christie", "confidence": 3, "correct": true}
+{"id": "qz_3040", "response": "Answer: The assassination of Lee Harvey Oswald is a subject of much debate and speculation, with no definitive answer. Some believe he was killed by Jack Ruby, while", "answer": null, "confidence": null, "correct": false}
+{"id": "qz_3041", "response": "Answer: Sirhan Sirhan, Confidence: 3", "answer": "Sirhan Sirhan", "confidence": 3, "correct": true}
+{"id": "qz_3042", "response": "Answer: Charlotte Corday, Confidence: 3", "answer": "Charlotte Corday", "confidence": 3, "correct": true}
+{"id": "qz_3101", "response": "Answer: Buster, Confidence: 1", "answer": "Buster", "confidence": 1, "correct": false}
+{"id": "qz_3127", "response": "Answer: Switzerland, Confidence: 4", "answer": "Switzerland", "confidence": 4, "correct": false}
+{"id": "qz_3130", "response": "Answer: blackberry, Confidence: 1", "answer": "blackberry", "confidence": 1, "correct": true}
+{"id": "qz_3152", "response": "Answer: The Duke of Wellington, Confidence: 8", "answer": "The Duke of Wellington", "confidence": 8, "correct": true}
+{"id": "qz_3154", "response": "Answer: Battle, Confidence: 1", "answer": "Battle", "confidence": 1, "correct": true}
+{"id": "qz_3159", "response": "Answer: The Last of the Mohicans, Confidence: 1", "answer": "The Last of the Mohicans", "confidence": 1, "correct": false}
+{"id": "qz_3236", "response": "Answer: The Chronicles of Narnia, Confidence: 2", "answer": "The Chronicles of Narnia", "confidence": 2, "correct": true}
+{"id": "qz_3237", "response": "Answer: Numbers, Confidence: 3", "answer": "Numbers", "confidence": 3, "correct": false}
+{"id": "qz_3311", "response": "Answer: The statement is a generalization and not universally true. Confidence: 1", "answer": null, "confidence": null, "correct": false}
+{"id": "qz_3320", "response": "Answer: False, Confidence: 1", "answer": "False", "confidence": 1, "correct": false}
+{"id": "qz_3354", "response": "Answer: Bill Shoemaker, Confidence: 2", "answer": "Bill Shoemaker", "confidence": 2, "correct": false}
+{"id": "qz_3358", "response": "Answer: Saint Jude, Confidence: 5", "answer": "Saint Jude", "confidence": 5, "correct": true}
+{"id": "qz_3392", "response": "Answer: True, Confidence: 2", "answer": "True", "confidence": 2, "correct": true}
+{"id": "qz_3393", "response": "Answer: Bruce, Confidence: 1", "answer": "Bruce", "confidence": 1, "correct": true}
+{"id": "qz_3397", "response": "Answer: David J. Spade, Confidence: 1", "answer": "David J. Spade", "confidence": 1, "correct": false}
+{"id": "qz_3431", "response": "Answer: Gianni Versace, Confidence: 5", "answer": "Gianni Versace", "confidence": 5, "correct": true}
+{"id": "qz_3432", "response": "Answer: Coco Chanel, Confidence: 3", "answer": "Coco Chanel", "confidence": 3, "correct": true}
+{"id": "qz_3433", "response": "Answer: David Koma, Confidence: 2", "answer": "David Koma", "confidence": 2, "correct": false}
+{"id": "qz_3440", "response": "Answer: Vogue, Confidence: 1", "answer": "Vogue", "confidence": 1, "correct": true}
+{"id": "qz_3456", "response": "Answer: The Green family, specifically the protagonist, Colly Green, and his family, Confidence: 1", "answer": "The Green family, specifically the protagonist, Colly Green, and his family", "confidence": 1, "correct": false}
+{"id": "qz_3477", "response": "Answer: Pancreas, Confidence: 8", "answer": "Pancreas", "confidence": 8, "correct": true}
+{"id": "qz_3479", "response": "Answer: Anthony Edwards, Confidence: 2", "answer": "Anthony Edwards", "confidence": 2, "correct": false}
+{"id": "qz_3504", "response": "Answer: Mira Sorvino, Confidence: 4", "answer": "Mira Sorvino", "confidence": 4, "correct": false}
+{"id": "qz_3557", "response": "Answer: Doreen Wilson, Confidence: 2", "answer": "Doreen Wilson", "confidence": 2, "correct": false}
+{"id": "qz_3569", "response": "Answer: Norwegian, Confidence: 8", "answer": "Norwegian", "confidence": 8, "correct": true}
+{"id": "qz_3570", "response": "Answer: St. Moritz, Switzerland, Confidence: 3", "answer": "St. Moritz, Switzerland", "confidence": 3, "correct": true}
+{"id": "qz_3583", "response": "Answer: A type of beetle, specifically a larvae of the click beetle, Confidence: 3", "answer": "A type of beetle, specifically a larvae of the click beetle", "confidence": 3, "correct": false}
+{"id": "qz_3588", "response": "Answer: Pampas, Confidence: 8", "answer": "Pampas", "confidence": 8, "correct": true}
+{"id": "qz_3623", "response": "Answer: Linda Hamilton, Confidence: 1", "answer": "Linda Hamilton", "confidence": 1, "correct": false}
+{"id": "qz_3644", "response": "Answer: Team America: World Police, Confidence: 7", "answer": "Team America: World Police", "confidence": 7, "correct": true}
+{"id": "qz_3708", "response": "Answer: Euphrates, Confidence: 6", "answer": "Euphrates", "confidence": 6, "correct": true}
+{"id": "qz_3736", "response": "Answer: Conservative Party, Confidence: 2", "answer": "Conservative Party", "confidence": 2, "correct": false}
+{"id": "qz_3741", "response": "Answer: Modernization, Unity, and Reform, Confidence: 1", "answer": "Modernization, Unity, and Reform", "confidence": 1, "correct": false}
+{"id": "qz_3745", "response": "Answer: Ronnie O'Sullivan, Confidence: 3", "answer": "Ronnie O'Sullivan", "confidence": 3, "correct": false}
+{"id": "qz_3752", "response": "Answer: Malcolm Marshall, Confidence: 2", "answer": "Malcolm Marshall", "confidence": 2, "correct": false}
+{"id": "qz_3760", "response": "Answer: Phil Mitchell, Confidence: 1", "answer": "Phil Mitchell", "confidence": 1, "correct": false}
+{"id": "qz_3775", "response": "Answer: 1979, Confidence: 3", "answer": "1979", "confidence": 3, "correct": true}
+{"id": "qz_3777", "response": "Answer: Mabel, Confidence: 1", "answer": "Mabel", "confidence": 1, "correct": false}
+{"id": "qz_3780", "response": "Answer: The Likely Lads, Confidence: 2", "answer": "The Likely Lads", "confidence": 2, "correct": false}

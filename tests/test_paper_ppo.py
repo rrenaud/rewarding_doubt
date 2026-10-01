@@ -169,3 +169,17 @@ def test_matches_trl_0_8_6_on_padded_batches():
             ratio = math.exp(cur - old)
             tinker_loss -= min(ratio * a, min(max(ratio, 1 - cfg["cliprange"]), 1 + cfg["cliprange"]) * a)
     assert tinker_loss == pytest.approx(expected_loss.item(), abs=1e-5)
+
+
+def test_released_grading_and_metrics():
+    # handle_punc replaces punctuation with spaces (unlike the original TriviaQA script).
+    assert paper_ppo.normalize_answer("The U.S._Navy's") == "u s navy s"
+    assert paper_ppo.f1_score("Joan Molinsky is better known as Joan Rivers", "joan rivers") == pytest.approx(0.4)
+    assert paper_ppo.is_correct_f1("Joan Rivers", ["joan rivers", "joan molinsky"])
+    assert not paper_ppo.is_correct_f1(None, ["paris"])
+    records = [dict(confidence=10, correct=True), dict(confidence=10, correct=False),
+               dict(confidence=2, correct=False), dict(confidence=None, correct=False)]
+    m = paper_ppo.evaluation_metrics(records)
+    assert m["wrong_format_rate"] == 0.25 and m["accuracy"] == pytest.approx(1 / 3)
+    # Bins: {1.0: acc 0.5} and {0.2: acc 0} -> ECE = 2/3*0.5 + 1/3*0.2
+    assert m["ece"] == pytest.approx(2 / 3 * 0.5 + 1 / 3 * 0.2, abs=1e-6)

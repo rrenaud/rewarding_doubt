@@ -1,0 +1,74 @@
+{
+  "base-paper-prompt": {
+    "n": 512,
+    "wrong_format_rate": 0.03515625,
+    "ece": 0.4740891456604004,
+    "accuracy": 0.4979757085020243,
+    "auroc": 0.6397029897718332,
+    "brier": 0.46,
+    "model": "Qwen/Qwen3-8B",
+    "checkpoint": null,
+    "prompt": "paper",
+    "data_sha256": "d006b0f35c9f4dbcc13649c2de0da4c0bc0e4db2693a56f9a9fc37ab978271af"
+  },
+  "base-our-prompt": {
+    "n": 512,
+    "wrong_format_rate": 0.072265625,
+    "ece": 0.48399999737739563,
+    "accuracy": 0.4884210526315789,
+    "auroc": 0.5721938413509294,
+    "brier": 0.4726947368421053,
+    "model": "Qwen/Qwen3-8B",
+    "checkpoint": null,
+    "prompt": "ours",
+    "data_sha256": "d006b0f35c9f4dbcc13649c2de0da4c0bc0e4db2693a56f9a9fc37ab978271af"
+  },
+  "discrete-ppo-pilot": {
+    "n": 512,
+    "wrong_format_rate": 0.072265625,
+    "ece": 0.47999998927116394,
+    "accuracy": 0.4884210526315789,
+    "auroc": 0.5989162054775082,
+    "brier": 0.4656,
+    "model": "Qwen/Qwen3-8B",
+    "checkpoint": "tinker://3c28e973-f0b8-52b6-80e3-e1ebf0f69e69:train:0/sampler_weights/final",
+    "prompt": "ours",
+    "data_sha256": "d006b0f35c9f4dbcc13649c2de0da4c0bc0e4db2693a56f9a9fc37ab978271af"
+  },
+  "paper-ppo": {
+    "n": 512,
+    "wrong_format_rate": 0.029296875,
+    "ece": 0.299597829580307,
+    "accuracy": 0.49899396378269617,
+    "auroc": 0.8117550848555511,
+    "brier": 0.2739839034205231,
+    "model": "Qwen/Qwen3-8B",
+    "checkpoint": "tinker://00eb2e57-ec32-5262-aec1-6a20ee693fec:train:0/sampler_weights/final",
+    "prompt": "paper",
+    "data_sha256": "d006b0f35c9f4dbcc13649c2de0da4c0bc0e4db2693a56f9a9fc37ab978271af"
+  },
+  "discrete-exact-hinge": {
+    "n": 512,
+    "wrong_format_rate": 0.017578125,
+    "ece": 0.11650097370147705,
+    "accuracy": 0.48111332007952284,
+    "auroc": 0.8526566606503911,
+    "brier": 0.17165009940357853,
+    "model": "Qwen/Qwen3-8B",
+    "checkpoint": "tinker://bc734e23-4f9d-59ed-aa32-5c68864818c4:train:0/sampler_weights/final",
+    "prompt": "ours",
+    "data_sha256": "d006b0f35c9f4dbcc13649c2de0da4c0bc0e4db2693a56f9a9fc37ab978271af"
+  },
+  "fractional-hinge": {
+    "n": 512,
+    "wrong_format_rate": 0.033203125,
+    "ece": 0.12040412425994873,
+    "accuracy": 0.48484848484848486,
+    "auroc": 0.8456372549019608,
+    "brier": 0.17284848484848486,
+    "model": "Qwen/Qwen3-8B",
+    "checkpoint": "tinker://4795c250-4ea8-5bff-9c58-5c77fc66f8b1:train:0/sampler_weights/final",
+    "prompt": "ours",
+    "data_sha256": "d006b0f35c9f4dbcc13649c2de0da4c0bc0e4db2693a56f9a9fc37ab978271af"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "train_exit_code": 0,
+  "timings": {
+    "train": 3362.7514476776123,
+    "eval_base": 111.43181657791138,
+    "eval_model_finetuned_epoch1": 55.98798108100891,
+    "eval_model_finetuned_epoch2": 40.09193801879883,
+    "eval_model_finetuned_best": 39.16255497932434
+  },
+  "metrics": {
+    "base": {
+      "model": "unsloth/llama-3-8b-Instruct-bnb-4bit",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.33261311054229736,
+      "accuracy": 0.6326129666011788,
+      "auroc": 0.5598199754209985,
+      "brier": 0.3373084479371316
+    },
+    "model_finetuned_epoch1": {
+      "model": "/vol/outputs/stage2-20261001T082216Z/model_finetuned_epoch1",
+      "n": 512,
+      "wrong_format_rate": 0.0,
+      "ece": 0.14413970708847046,
+      "accuracy": 0.64453125,
+      "auroc": 0.6018648018648018,
+      "brier": 0.23824218750000004
+    },
+    "model_finetuned_epoch2": {
+      "model": "/vol/outputs/stage2-20261001T082216Z/model_finetuned_epoch2",
+      "n": 512,
+      "wrong_format_rate": 0.001953125,
+      "ece": 0.07416877150535583,
+      "accuracy": 0.6281800391389433,
+      "auroc": 0.7709460567306115,
+      "brier": 0.18823874755381603
+    },
+    "model_finetuned_best": {
+      "model": "/vol/outputs/stage2-20261001T082216Z/model_finetuned_best",
+      "n": 512,
+      "wrong_format_rate": 0.001953125,
+      "ece": 0.07416877150535583,
+      "accuracy": 0.6281800391389433,
+      "auroc": 0.7709460567306115,
+      "brier": 0.18823874755381603
+    }
+  },
+  "data_run": "runs/pilot-20261001T002945Z",
+  "gpu": "L40S",
+  "train_args": [
+    "--dataset",
+    "triviaqa",
+    "--is_unsloth",
+    "--model_dir",
+    "unsloth/llama-3-8b-Instruct-bnb-4bit",
+    "--tokenizer_dir",
+    "unsloth/llama-3-8b-Instruct-bnb-4bit",
+    "--epochs",
+    "2",
+    "--lr",
+    "1e-5",
+    "--batchsize",
+    "8",
+    "--log_with",
+    "tensorboard"
+  ]
+}

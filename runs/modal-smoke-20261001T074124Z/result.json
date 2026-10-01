@@ -1,0 +1,26 @@
+{
+  "command": [
+    "python",
+    "Train.py",
+    "--out_dir",
+    "/vol/outputs/smoke-20261001T074124Z",
+    "--dataset",
+    "triviaqa",
+    "--is_unsloth",
+    "--model_dir",
+    "unsloth/llama-3-8b-Instruct-bnb-4bit",
+    "--tokenizer_dir",
+    "unsloth/llama-3-8b-Instruct-bnb-4bit",
+    "--epochs",
+    "2",
+    "--lr",
+    "1e-5",
+    "--batchsize",
+    "2",
+    "--log_with",
+    "tensorboard"
+  ],
+  "gpu": "NVIDIA L40S, 46068 MiB",
+  "exit_code": null,
+  "elapsed_s": 1500.3219079971313
+}

@@ -1,0 +1,12 @@
+{
+  "n": 512,
+  "wrong_format_rate": 0.03515625,
+  "ece": 0.4740891456604004,
+  "accuracy": 0.4979757085020243,
+  "auroc": 0.6397029897718332,
+  "brier": 0.46,
+  "model": "Qwen/Qwen3-8B",
+  "checkpoint": null,
+  "prompt": "paper",
+  "data_sha256": "d006b0f35c9f4dbcc13649c2de0da4c0bc0e4db2693a56f9a9fc37ab978271af"
+}

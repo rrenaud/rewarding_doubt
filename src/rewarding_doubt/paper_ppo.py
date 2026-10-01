@@ -74,3 +74,55 @@ class AdaptiveKLController:
     def update(self, current_kl, n_steps):
         error = min(max(current_kl / self.target - 1, -0.2), 0.2)
         self.value *= 1 + error * n_steps / self.horizon
+
+
+# util/EvaluationMetrics.py (adapted from the official TriviaQA evaluation script).
+def normalize_answer(s):
+    import string
+    def remove_articles(text):
+        return re.sub(r'\b(a|an|the)\b', ' ', text)
+
+    def white_space_fix(text):
+        return ' '.join(text.split())
+
+    def handle_punc(text):
+        exclude = set(string.punctuation + "".join([u"‘", u"’", u"´", u"`"]))
+        return ''.join(ch if ch not in exclude else ' ' for ch in text)
+
+    return white_space_fix(remove_articles(handle_punc(s.replace('_', ' ').lower()))).strip()
+
+
+def f1_score(prediction, ground_truth):
+    from collections import Counter
+    prediction_tokens = normalize_answer(prediction).split()
+    ground_truth_tokens = normalize_answer(ground_truth).split()
+    common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
+    num_same = sum(common.values())
+    if num_same == 0:
+        return 0
+    precision = 1.0 * num_same / len(prediction_tokens)
+    recall = 1.0 * num_same / len(ground_truth_tokens)
+    return (2 * precision * recall) / (precision + recall)
+
+
+def is_correct_f1(prediction, aliases, threshold=0.5):
+    """is_answer_correct(..., Metric.F1, threshold): max F1 over aliases > threshold."""
+    return prediction is not None and max(f1_score(prediction, a) for a in aliases) > threshold
+
+
+def evaluation_metrics(records, max_confidence=10, n_bins=11):
+    """Evaluation.get_all_metrics on parsed records [{confidence, correct}], plus format rate.
+
+    Out-of-format responses are dropped before every metric, as in QAResults_to_labels_probs.
+    """
+    import torch
+    from sklearn.metrics import brier_score_loss, roc_auc_score
+    from torchmetrics.classification import BinaryCalibrationError
+
+    kept = [r for r in records if r["confidence"] is not None]
+    labels = [int(r["correct"]) for r in kept]
+    probs = [r["confidence"] / max_confidence for r in kept]
+    ece = BinaryCalibrationError(n_bins=n_bins, norm='l1')(torch.tensor(probs), torch.tensor(labels)).item()
+    return dict(n=len(records), wrong_format_rate=1 - len(kept) / len(records), ece=ece,
+                accuracy=sum(labels) / len(labels), auroc=roc_auc_score(labels, probs),
+                brier=brier_score_loss(labels, probs))

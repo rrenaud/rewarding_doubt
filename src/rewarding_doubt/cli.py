@@ -320,6 +320,40 @@ def evaluate(args):
     print(json.dumps(report, indent=2))
 
 
+def evaluate_generate(args):
+    """The released evaluation protocol (InferenceDatasetSplit.py + Evaluation.get_all_metrics).
+
+    The model generates answer and confidence together from the question alone; there are no
+    cached answers. Rows need `question` and `references` (TriviaQA normalized aliases, the
+    released code's gt_candidates).
+    """
+    rows = read_rows(args.data)
+    output = Path(args.output)
+    output.mkdir(parents=True, exist_ok=False)
+    service = tinker.ServiceClient()
+    sampler = (service.create_sampling_client(model_path=args.checkpoint) if args.checkpoint else
+               service.create_sampling_client(base_model=args.model))
+    tokenizer = sampler.get_tokenizer()
+    stop = [t for t in {tokenizer.eos_token_id, tokenizer.pad_token_id} if t is not None]
+    futures = [sampler.sample(tinker.ModelInput.from_ints(
+                   prompt_tokens(tokenizer, r["question"], system=PROMPTS[args.prompt])), 1,
+               tinker.SamplingParams(max_tokens=32, temperature=0.6, top_p=0.9, stop=stop, seed=args.seed + i))
+               for i, r in enumerate(rows)]
+    records = []
+    with (output / "predictions.jsonl").open("w") as stream:
+        for i, (row, future) in enumerate(zip(rows, futures)):
+            text = tokenizer.decode(future.result().sequences[0].tokens, skip_special_tokens=True)
+            answer, confidence = paper_ppo.parse_response(text)
+            record = dict(id=row.get("id", i), response=text, answer=answer, confidence=confidence,
+                          correct=paper_ppo.is_correct_f1(answer, row["references"]))
+            records.append(record)
+            stream.write(json.dumps(record) + "\n")
+    report = dict(paper_ppo.evaluation_metrics(records), model=args.model, checkpoint=args.checkpoint,
+                  prompt=args.prompt, data_sha256=hashlib.sha256(Path(args.data).read_bytes()).hexdigest())
+    write_json(output / "metrics.json", report)
+    print(json.dumps(report, indent=2))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -348,6 +382,9 @@ def main():
     p.add_argument("--checkpoint", help="tinker:// sampler weights path; omit for base model")
     p.add_argument("--bins", type=int, default=11)
     p.set_defaults(func=evaluate)
+    p = sub.add_parser("evaluate-generate", help="Released evaluation protocol: generate answer + confidence")
+    p.add_argument("--checkpoint", help="tinker:// sampler weights path; omit for base model")
+    p.set_defaults(func=evaluate_generate)
     for name, p in sub.choices.items():
         p.add_argument("--model", default="Qwen/Qwen3-8B")
         p.add_argument("--seed", type=int, default=2)

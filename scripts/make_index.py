@@ -23,9 +23,10 @@ def run_section(run):
     config = "; ".join(f"{k.replace('_', ' ')}: {fmt(args[k])}" for k in ["train_limit", "eval_limit", "seeds", "modes", "max_steps", "epochs"]
                        if k in args)
     lines.append(f"State: **{status.get('state', 'unknown')}**" + (f" · {config}" if config else ""))
-    summary = read_json(run / "summary.json")
-    if summary:
-        lines += ["", "| Checkpoint | ECE ↓ | Brier ↓ | NLL ↓ | AUROC ↑ | Valid mass | Invalid sampled |",
+    summary = read_json(run / "summary.json") or read_json(run / "result.json").get("metrics", {})
+    if summary and all("fractional" in m for m in summary.values()):
+        lines += ["", "Fixed-answer evaluation, fractional readout:", "",
+                  "| Checkpoint | ECE ↓ | Brier ↓ | NLL ↓ | AUROC ↑ | Valid mass | Invalid sampled |",
                   "|---|---:|---:|---:|---:|---:|---:|"]
         for name, m in summary.items():
             f = m["fractional"]
@@ -33,8 +34,14 @@ def run_section(run):
                          f"{f['auroc']:.3f} | {m['mean_valid_confidence_mass']:.3f} | "
                          f"{m['invalid_confidence_rate']:.1%} |")
         n = next(iter(summary.values()))
-        lines += ["", f"Fractional readout on {n['total_valid_answers']} held-out answers "
-                      f"(accuracy {n['fractional']['accuracy']:.1%})."]
+        lines += ["", f"{n['total_valid_answers']} held-out answers (accuracy {n['fractional']['accuracy']:.1%})."]
+    elif summary:
+        lines += ["", "Released evaluation protocol (generated answer + confidence):", "",
+                  "| Checkpoint | ECE ↓ | Brier ↓ | AUROC ↑ | Accuracy | Wrong format |",
+                  "|---|---:|---:|---:|---:|---:|"]
+        for name, m in summary.items():
+            lines.append(f"| {name} | {m['ece']:.3f} | {m['brier']:.3f} | {m['auroc']:.3f} | "
+                         f"{m['accuracy']:.1%} | {m['wrong_format_rate']:.1%} |")
     return lines + [""]
 
 

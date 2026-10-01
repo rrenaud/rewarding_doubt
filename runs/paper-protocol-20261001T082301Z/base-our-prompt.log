@@ -1,0 +1,13 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+{
+  "n": 512,
+  "wrong_format_rate": 0.072265625,
+  "ece": 0.48399999737739563,
+  "accuracy": 0.4884210526315789,
+  "auroc": 0.5721938413509294,
+  "brier": 0.4726947368421053,
+  "model": "Qwen/Qwen3-8B",
+  "checkpoint": null,
+  "prompt": "ours",
+  "data_sha256": "d006b0f35c9f4dbcc13649c2de0da4c0bc0e4db2693a56f9a9fc37ab978271af"
+}

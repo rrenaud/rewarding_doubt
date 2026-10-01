@@ -1,0 +1,41 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.392 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.10it/s]
+Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.06it/s]
+Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.05it/s]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:03<00:00,  1.38it/s]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:03<00:00,  1.24it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]
+Map:  55%|█████▌    | 282/512 [00:00<00:00, 2787.16 examples/s]
+Map: 100%|██████████| 512/512 [00:00<00:00, 2499.34 examples/s]
+
+  0%|          | 0/16 [00:00<?, ?it/s]
+  6%|▋         | 1/16 [00:01<00:29,  1.98s/it]
+ 12%|█▎        | 2/16 [00:03<00:20,  1.45s/it]
+ 19%|█▉        | 3/16 [00:04<00:16,  1.29s/it]
+ 25%|██▌       | 4/16 [00:05<00:14,  1.19s/it]
+ 31%|███▏      | 5/16 [00:06<00:13,  1.19s/it]
+ 38%|███▊      | 6/16 [00:08<00:13,  1.35s/it]
+ 44%|████▍     | 7/16 [00:09<00:13,  1.47s/it]
+ 50%|█████     | 8/16 [00:10<00:10,  1.37s/it]
+ 56%|█████▋    | 9/16 [00:12<00:10,  1.46s/it]
+ 62%|██████▎   | 10/16 [00:13<00:08,  1.37s/it]
+ 69%|██████▉   | 11/16 [00:14<00:06,  1.32s/it]
+ 75%|███████▌  | 12/16 [00:16<00:04,  1.25s/it]
+ 81%|████████▏ | 13/16 [00:17<00:04,  1.40s/it]
+ 88%|████████▊ | 14/16 [00:18<00:02,  1.28s/it]
+ 94%|█████████▍| 15/16 [00:19<00:01,  1.19s/it]
+100%|██████████| 16/16 [00:20<00:00,  1.13s/it]
+100%|██████████| 16/16 [00:20<00:00,  1.30s/it]
+{"model": "/vol/outputs/stage2-20261001T082216Z/model_finetuned_best", "n": 512, "wrong_format_rate": 0.001953125, "ece": 0.07416877150535583, "accuracy": 0.6281800391389433, "auroc": 0.7709460567306115, "brier": 0.18823874755381603}
