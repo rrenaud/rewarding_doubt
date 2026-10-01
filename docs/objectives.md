@@ -266,6 +266,15 @@ gains.
   released evaluation protocol, our exact objectives reach 0.117/0.120 ECE on Qwen, but
   cross-model comparisons are not valid. The decisive test is the exact objectives on Llama.
 
+- **Exact objectives on the released Llama setup** (only the update rule changed;
+  [report](../runs/modal-exact-20261001T171427Z/report.md)). ECE ties the released PPO: 0.076
+  (discrete-exact) and 0.062 (fractional) vs 0.074, with paired intervals of about ±0.04.
+  PPO is significantly better on AUROC (0.771 vs 0.718/0.701) and slightly better on Brier.
+  The exact methods trained in 34 min vs 56 min, but made 256 optimizer steps vs PPO's 2,048
+  (4 PPO epochs × 2 minibatches per batch), so a compute-matched comparison is pending. This
+  revises the Tinker result: the large Qwen gap (0.117 vs 0.300) came mainly from our
+  reimplementation (no value head), not from PPO itself.
+
 ## Caveat both exact objectives share: nothing anchors the format
 
 $\pi$ is renormalized over the eleven strings, so both exact objectives are invariant to

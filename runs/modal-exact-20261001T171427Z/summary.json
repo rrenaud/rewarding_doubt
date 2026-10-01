@@ -1,0 +1,38 @@
+{
+  "discrete-exact-model_finetuned_epoch1": {
+    "model": "/vol/outputs/exact-20261001T171427Z/discrete-exact/model_finetuned_epoch1",
+    "n": 512,
+    "wrong_format_rate": 0.005859375,
+    "ece": 0.13988132774829865,
+    "accuracy": 0.6404715127701375,
+    "auroc": 0.5932146568775354,
+    "brier": 0.23732809430255405
+  },
+  "discrete-exact-model_finetuned_epoch2": {
+    "model": "/vol/outputs/exact-20261001T171427Z/discrete-exact/model_finetuned_epoch2",
+    "n": 512,
+    "wrong_format_rate": 0.005859375,
+    "ece": 0.07642364501953125,
+    "accuracy": 0.6365422396856582,
+    "auroc": 0.7177927927927927,
+    "brier": 0.1989194499017682
+  },
+  "fractional-model_finetuned_epoch1": {
+    "model": "/vol/outputs/exact-20261001T171427Z/fractional/model_finetuned_epoch1",
+    "n": 512,
+    "wrong_format_rate": 0.005859375,
+    "ece": 0.14970502257347107,
+    "accuracy": 0.6365422396856582,
+    "auroc": 0.6181264597931265,
+    "brier": 0.23854616895874267
+  },
+  "fractional-model_finetuned_epoch2": {
+    "model": "/vol/outputs/exact-20261001T171427Z/fractional/model_finetuned_epoch2",
+    "n": 512,
+    "wrong_format_rate": 0.005859375,
+    "ece": 0.0618850402534008,
+    "accuracy": 0.6385068762278978,
+    "auroc": 0.7014799331103679,
+    "brier": 0.2026915520628684
+  }
+}

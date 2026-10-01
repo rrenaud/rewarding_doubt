@@ -1,0 +1,29 @@
+{
+  "mode": "fractional",
+  "train_exit_code": 0,
+  "timings": {
+    "train": 2009.4233615398407,
+    "eval_model_finetuned_epoch1": 51.42776155471802,
+    "eval_model_finetuned_epoch2": 43.610177755355835
+  },
+  "metrics": {
+    "model_finetuned_epoch1": {
+      "model": "/vol/outputs/exact-20261001T171427Z/fractional/model_finetuned_epoch1",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.14970502257347107,
+      "accuracy": 0.6365422396856582,
+      "auroc": 0.6181264597931265,
+      "brier": 0.23854616895874267
+    },
+    "model_finetuned_epoch2": {
+      "model": "/vol/outputs/exact-20261001T171427Z/fractional/model_finetuned_epoch2",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.0618850402534008,
+      "accuracy": 0.6385068762278978,
+      "auroc": 0.7014799331103679,
+      "brier": 0.2026915520628684
+    }
+  }
+}

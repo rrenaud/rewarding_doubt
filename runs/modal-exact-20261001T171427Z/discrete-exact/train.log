@@ -1,0 +1,520 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.392 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+{"step": 1, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 11.517518758773804, "loss": 0.0787201604394097, "confidence": 0.9057952593039729, "mass": 0.9992392063140869, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 2, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 7.231894254684448, "loss": -0.19576922479068262, "confidence": 0.8282756595407119, "mass": 0.9955617114901543, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 3, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 12.435839176177979, "loss": 3.3760031629407514, "confidence": 0.9491833996410414, "mass": 0.8737668842085209, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 4, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 7.001168727874756, "loss": -0.7540178899633938, "confidence": 0.8490091317531533, "mass": 0.9935171008110046, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 5, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.268486738204956, "loss": -0.6329381795863789, "confidence": 0.9639327742119294, "mass": 0.999617837369442, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 6, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.496951580047607, "loss": -0.4212063993744122, "confidence": 0.9564510736868586, "mass": 0.9994526132941246, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 7, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.514469146728516, "loss": -0.3396704796367085, "confidence": 0.9394264058558772, "mass": 0.9995817095041275, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 8, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.83050799369812, "loss": -0.2825836651949604, "confidence": 0.968296975433618, "mass": 0.9991444796323776, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 9, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.682491779327393, "loss": -0.8051615108079355, "confidence": 0.9430932600754408, "mass": 0.9996756762266159, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 10, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.558356285095215, "loss": -0.2931882789459599, "confidence": 0.9487145046402673, "mass": 0.9993838518857956, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 11, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.125, "seconds": 13.33100962638855, "loss": 9.324119554963131, "confidence": 0.8347928189603183, "mass": 0.6247846111808021, "hinge_active": 0.375}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 12, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.500318765640259, "loss": 2.4786569619504277, "confidence": 0.9180051003392042, "mass": 0.8746844083092442, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 13, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.492474317550659, "loss": -0.6342524611019611, "confidence": 0.9614703773093273, "mass": 0.9995943978428841, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 14, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.4079060554504395, "loss": -0.4966966813253113, "confidence": 0.9584874202594164, "mass": 0.999590240418911, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 15, "epoch": 0, "rows": 7, "skipped": 1, "answer_accuracy": 0.2857142857142857, "seconds": 5.988417387008667, "loss": 0.17621911315378644, "confidence": 0.965899606760654, "mass": 0.9994051371301924, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 16, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.260463237762451, "loss": 2.89606775948851, "confidence": 0.9380783817648252, "mass": 0.8747814148684383, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 17, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.645106792449951, "loss": -0.5908062515628955, "confidence": 0.9015278564961041, "mass": 0.9996770918369293, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 18, "epoch": 0, "rows": 7, "skipped": 1, "answer_accuracy": 0.42857142857142855, "seconds": 6.206493854522705, "loss": -0.21211422343248246, "confidence": 0.9351818366234359, "mass": 0.9993869151387895, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 19, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.597110033035278, "loss": 5.439682921796039, "confidence": 0.8758363023137871, "mass": 0.7497431785005177, "hinge_active": 0.25}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 20, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.387001276016235, "loss": -0.6607254080521519, "confidence": 0.9429719932106626, "mass": 0.9996401518583298, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 21, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 12.17375898361206, "loss": 2.8132122662720564, "confidence": 0.8969704087237088, "mass": 0.8730978220755861, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 22, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.401320934295654, "loss": -0.6471919558719652, "confidence": 0.9214771170138434, "mass": 0.9996912926435471, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 23, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.095869541168213, "loss": 2.177120695495924, "confidence": 0.9292807666319678, "mass": 0.8746871650394936, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 24, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.356380939483643, "loss": -0.2895006306952252, "confidence": 0.9515252258057492, "mass": 0.999609537422657, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 25, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.250015020370483, "loss": -0.5523725299710215, "confidence": 0.8418850410310947, "mass": 0.9989897459745407, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 26, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.769247531890869, "loss": -0.5507485893570869, "confidence": 0.9487892923814307, "mass": 0.99790458381176, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 27, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.420923233032227, "loss": -0.7470420219953936, "confidence": 0.9358864191457229, "mass": 0.9997805878520012, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 28, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.04355764389038, "loss": 2.3815839455500916, "confidence": 0.9050089590577639, "mass": 0.8747827112810068, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 29, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.176900863647461, "loss": -0.8502765460108697, "confidence": 0.928679570395025, "mass": 0.9997200518846512, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 30, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.266410827636719, "loss": -0.7039539751232436, "confidence": 0.8834879905945221, "mass": 0.999738909304142, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 31, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.17585825920105, "loss": -0.4918804740180951, "confidence": 0.8817567923007948, "mass": 0.9997979328036308, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 32, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 7.228128671646118, "loss": -0.5667980662356964, "confidence": 0.8838519947738369, "mass": 0.9971347749233246, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 33, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.633447885513306, "loss": -0.7084196204975206, "confidence": 0.8744431036774193, "mass": 0.9995409026741982, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 34, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.325129985809326, "loss": -0.7060465373161984, "confidence": 0.8633400050055594, "mass": 0.9996947571635246, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 35, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.612248659133911, "loss": -0.6055631017378711, "confidence": 0.9050429402412445, "mass": 0.9997471868991852, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 36, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.4074060916900635, "loss": -0.5205927522268629, "confidence": 0.8822355855930482, "mass": 0.9997505620121956, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 37, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.702484130859375, "loss": -0.7594946454815524, "confidence": 0.8752615243676176, "mass": 0.9996998533606529, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 38, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.576416969299316, "loss": 4.186557803738397, "confidence": 0.8339559826011673, "mass": 0.7485249499564235, "hinge_active": 0.25}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 39, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 12.140967845916748, "loss": 1.5728634709511122, "confidence": 0.8529584267624524, "mass": 0.8747643499248885, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 40, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.301830053329468, "loss": -0.7047731131573747, "confidence": 0.8478338335393187, "mass": 0.9997634142637253, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 41, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.264017343521118, "loss": -0.621491302041998, "confidence": 0.8538070567021812, "mass": 0.9997712001204491, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 42, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.321887493133545, "loss": -0.3944125356428114, "confidence": 0.8599201422370523, "mass": 0.9992482513189316, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 43, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.217413425445557, "loss": -0.7539949337751115, "confidence": 0.8520948331464459, "mass": 0.9997207149863243, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 44, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 1.0, "seconds": 6.296684503555298, "loss": -0.9530465259597829, "confidence": 0.8518920295387147, "mass": 0.9996310025453568, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 45, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.461848258972168, "loss": -0.6534047690046424, "confidence": 0.8042216675580494, "mass": 0.9981533214449883, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 46, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.206347703933716, "loss": 1.2823849323530256, "confidence": 0.8379785760437122, "mass": 0.8747591599731148, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 47, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.629628658294678, "loss": -0.6892535491633668, "confidence": 0.8431025276932784, "mass": 0.9996759593486786, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 48, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 1.0, "seconds": 6.361798524856567, "loss": -0.9580641787401803, "confidence": 0.8665754775651431, "mass": 0.9997904673218727, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 49, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.3161866664886475, "loss": -0.8110073565878441, "confidence": 0.856286014138467, "mass": 0.9997991994023323, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 50, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.40726637840271, "loss": -0.7365650551504869, "confidence": 0.8670499615569394, "mass": 0.9997121393680573, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 51, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.295454025268555, "loss": -0.7654127816096338, "confidence": 0.8490852994414496, "mass": 0.9997907727956772, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 52, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 12.251626014709473, "loss": 1.3192388491818658, "confidence": 0.8341217920948258, "mass": 0.8744703045516786, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 53, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.316430330276489, "loss": -0.8414934429730021, "confidence": 0.8571504613437061, "mass": 0.9997841566801071, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 54, "epoch": 0, "rows": 7, "skipped": 1, "answer_accuracy": 0.5714285714285714, "seconds": 6.419704914093018, "loss": -0.7277436868944458, "confidence": 0.8118969941564985, "mass": 0.9981785757201058, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 55, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 12.172598361968994, "loss": 0.9900521977223935, "confidence": 0.8472850788356512, "mass": 0.8747562122621169, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 56, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.125, "seconds": 12.316594123840332, "loss": 1.3691540738309547, "confidence": 0.8129640171582443, "mass": 0.8744423469414571, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 57, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.4577648639678955, "loss": -0.632936107741096, "confidence": 0.8408243033707001, "mass": 0.9995636492967606, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 58, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.542544603347778, "loss": -0.7054659280815325, "confidence": 0.8360162146704063, "mass": 0.9997866004705429, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 59, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.328532457351685, "loss": -0.8951127078259205, "confidence": 0.8546082279564683, "mass": 0.9997294917702675, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 60, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.3618223667144775, "loss": -0.7867110171968132, "confidence": 0.8276422518903903, "mass": 0.9997622966766357, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 61, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.4691407680511475, "loss": -0.7619455173831899, "confidence": 0.8316702111621166, "mass": 0.9997635558247566, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 62, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.218003511428833, "loss": 1.096081752703374, "confidence": 0.824445262612282, "mass": 0.8748065603314927, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 63, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.492730140686035, "loss": -0.6659721232330873, "confidence": 0.8201685218265617, "mass": 0.9997936189174652, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 64, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.078615188598633, "loss": 0.9728510823483938, "confidence": 0.8176682397352799, "mass": 0.8748397567611903, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 65, "epoch": 0, "rows": 6, "skipped": 2, "answer_accuracy": 0.8333333333333334, "seconds": 6.848283290863037, "loss": -0.8840567993668311, "confidence": 0.8143679541672592, "mass": 0.9998045265674592, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 66, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.629590034484863, "loss": -0.812103089171231, "confidence": 0.8507457046256611, "mass": 0.9997614398598671, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 67, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.475380182266235, "loss": -0.7649029792154458, "confidence": 0.8179030183313744, "mass": 0.9997832030057907, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 68, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 1.0, "seconds": 6.372312068939209, "loss": -0.9505692409812184, "confidence": 0.844864725031184, "mass": 0.9998173862695694, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 69, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.146406888961792, "loss": 0.9850227124740641, "confidence": 0.8203940432414003, "mass": 0.8748197767503427, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 70, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.103669881820679, "loss": 0.8315252808288383, "confidence": 0.8200921452113961, "mass": 0.874508881688655, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 71, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.238066673278809, "loss": 0.9157007072121697, "confidence": 0.8227195369289122, "mass": 0.8747818877017011, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 72, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 12.119330167770386, "loss": 0.9501389239836019, "confidence": 0.8015862491766553, "mass": 0.8747885385701011, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 73, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.526376485824585, "loss": -0.7467811240021951, "confidence": 0.7249312506356165, "mass": 0.996988520026207, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 74, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.335834980010986, "loss": 0.8433753058348131, "confidence": 0.8110205010665168, "mass": 0.8748007123812727, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 75, "epoch": 0, "rows": 7, "skipped": 1, "answer_accuracy": 0.2857142857142857, "seconds": 6.831477880477905, "loss": -0.699138364888517, "confidence": 0.736685267069348, "mass": 0.9975574612617493, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 76, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 12.247154951095581, "loss": 0.6094792681902964, "confidence": 0.8178000847683049, "mass": 0.8747211568490911, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 77, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.53060507774353, "loss": -0.783324342407444, "confidence": 0.8146461015125459, "mass": 0.9998003989458084, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 78, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.670969486236572, "loss": 1.9655381423136467, "confidence": 0.789140848282148, "mass": 0.7498321694149581, "hinge_active": 0.25}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 79, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.353171110153198, "loss": -0.8800994959049622, "confidence": 0.822343102384042, "mass": 0.999758318066597, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 80, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.236895561218262, "loss": 0.49990650150364657, "confidence": 0.8205669936405501, "mass": 0.874833946259514, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 81, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.247807264328003, "loss": 0.4397968297253285, "confidence": 0.8107526895632131, "mass": 0.874798192326125, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 82, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.483337640762329, "loss": -0.6690913163183961, "confidence": 0.7770110653158093, "mass": 0.9996367692947388, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 83, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.537560701370239, "loss": -0.7448932823051536, "confidence": 0.807897631085304, "mass": 0.9997580721974373, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 84, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.6162190437316895, "loss": -0.6679278832205021, "confidence": 0.8084372682108663, "mass": 0.9996793866157532, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 85, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.284396648406982, "loss": 0.3585899610097157, "confidence": 0.7685243723358658, "mass": 0.8745413899450796, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 86, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 7.190995931625366, "loss": -0.6803730300911852, "confidence": 0.8066572302513939, "mass": 0.9991183429956436, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 87, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.247640371322632, "loss": -0.7791200849324097, "confidence": 0.8127304945228228, "mass": 0.9996643736958504, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 88, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.240212440490723, "loss": -0.8912453112807669, "confidence": 0.8159964733251028, "mass": 0.9997649267315865, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 89, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.125, "seconds": 6.323898792266846, "loss": -0.5713433637288952, "confidence": 0.8024319296682598, "mass": 0.9996625334024429, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 90, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.246788263320923, "loss": -0.7374781180569132, "confidence": 0.7501032975206638, "mass": 0.997954785823822, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 91, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.474467515945435, "loss": -0.7152930268208624, "confidence": 0.7546503047283205, "mass": 0.9971374720335007, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 92, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.247722148895264, "loss": -0.591769820970413, "confidence": 0.797165986080093, "mass": 0.9996252283453941, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 93, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.365143299102783, "loss": -0.6901173264359235, "confidence": 0.794423207843791, "mass": 0.9996890053153038, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 94, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.379782199859619, "loss": -0.7950741331588462, "confidence": 0.7916251763830805, "mass": 0.9993849620223045, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 95, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.585565090179443, "loss": -0.8358120743458435, "confidence": 0.7873481545579172, "mass": 0.9996645152568817, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 96, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 7.2143824100494385, "loss": -0.7826007101132069, "confidence": 0.7109859594726579, "mass": 0.9959279298782349, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 97, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.424891710281372, "loss": -0.8352446445747634, "confidence": 0.8013034920567055, "mass": 0.9992508068680763, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 98, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.372676610946655, "loss": -0.8351028813264183, "confidence": 0.7908321278916606, "mass": 0.9997382462024689, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 99, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.4142796993255615, "loss": -0.8490497810786294, "confidence": 0.7605707197047649, "mass": 0.9994725212454796, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 100, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 12.167159795761108, "loss": -0.24932518780807703, "confidence": 0.7666252783528439, "mass": 0.8791910037398338, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 101, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.4275548458099365, "loss": -0.7390305999994066, "confidence": 0.7863334465406677, "mass": 0.9996148869395256, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 102, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.353048324584961, "loss": -0.8694964283530435, "confidence": 0.8122744606351395, "mass": 0.9997699335217476, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 103, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.151043891906738, "loss": -0.76429054462415, "confidence": 0.746646490899867, "mass": 0.9991229176521301, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 104, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.041494607925415, "loss": -0.4283027792938041, "confidence": 0.6736833274410361, "mass": 0.8777730711735785, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 105, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.5906713008880615, "loss": -0.8113916660328144, "confidence": 0.7354004017220392, "mass": 0.9896213412284851, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 106, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.082082509994507, "loss": -0.536081707023603, "confidence": 0.7926764999632032, "mass": 0.8907460775226355, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 107, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.120974063873291, "loss": -0.6931617580507621, "confidence": 0.7582394970479968, "mass": 0.942672923207283, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 108, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 7.466496706008911, "loss": -0.7814180699679034, "confidence": 0.7549131616227392, "mass": 0.9977463334798813, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 109, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.598907709121704, "loss": -0.7450587065648349, "confidence": 0.7972182754338929, "mass": 0.9997197762131691, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 110, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.182484149932861, "loss": -0.8771549456308159, "confidence": 0.7083431992648274, "mass": 0.9984580054879189, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 111, "epoch": 0, "rows": 7, "skipped": 1, "answer_accuracy": 0.5714285714285714, "seconds": 6.953522682189941, "loss": -0.7804217072075494, "confidence": 0.7802030616545468, "mass": 0.9996693645204817, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 112, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.393297910690308, "loss": -0.7330926282279867, "confidence": 0.7665403194291694, "mass": 0.9996964782476425, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 113, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.714306592941284, "loss": -0.7837223041208544, "confidence": 0.7953691378532993, "mass": 0.9997048676013947, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 114, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.4769065380096436, "loss": -0.8030993758752445, "confidence": 0.7439009546362115, "mass": 0.9996841475367546, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 115, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 12.367637395858765, "loss": -0.6422910293249364, "confidence": 0.7724873299388619, "mass": 0.979448139667511, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 116, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.27143383026123, "loss": -0.7259305205366627, "confidence": 0.6961422926128457, "mass": 0.968323640525341, "hinge_active": 0.25}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 117, "epoch": 0, "rows": 7, "skipped": 1, "answer_accuracy": 0.5714285714285714, "seconds": 6.746399402618408, "loss": -0.7910853978958138, "confidence": 0.7652087054381563, "mass": 0.9997021300452096, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 118, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.928490877151489, "loss": -0.7913704315413961, "confidence": 0.7984143526845685, "mass": 0.9997601360082626, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 119, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.323687791824341, "loss": -0.6797796521736246, "confidence": 0.7395527715161532, "mass": 0.9996689185500145, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 120, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.492165803909302, "loss": -0.7284383690682891, "confidence": 0.6665327369189202, "mass": 0.9969858080148697, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 121, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.302490472793579, "loss": -0.7786097446580126, "confidence": 0.8017647843492712, "mass": 0.9997439160943031, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 122, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.325937032699585, "loss": -0.750878247778876, "confidence": 0.7400474158124472, "mass": 0.9995236694812775, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 123, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.374690294265747, "loss": -0.8439146090274143, "confidence": 0.7816613105698451, "mass": 0.9997923076152802, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 124, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.278564691543579, "loss": -0.8010603920408594, "confidence": 0.7781670295316414, "mass": 0.9997325837612152, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 125, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 12.123796939849854, "loss": -0.6758478102126225, "confidence": 0.7549892521904156, "mass": 0.9893051013350487, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 126, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.314452648162842, "loss": -0.809299494617416, "confidence": 0.765592756099617, "mass": 0.9997358992695808, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 127, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.158236742019653, "loss": -0.6657203199090911, "confidence": 0.7719323771033663, "mass": 0.9919041320681572, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 128, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.355267524719238, "loss": -0.7593065031753766, "confidence": 0.7534002093352207, "mass": 0.9995500892400742, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 129, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.500959873199463, "loss": -0.7868834573992797, "confidence": 0.7034356864986296, "mass": 0.9982910379767418, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 130, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.254595756530762, "loss": -0.8802834324798652, "confidence": 0.7757093711691097, "mass": 0.9998013526201248, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 131, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.5026161670684814, "loss": -0.8430121122004279, "confidence": 0.7499122919393426, "mass": 0.9996708258986473, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 132, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.322832345962524, "loss": -0.6556348944562307, "confidence": 0.775720466888072, "mass": 0.9997882768511772, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 133, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.8209004402160645, "loss": -0.7903849867531826, "confidence": 0.7493082508445831, "mass": 0.9992513358592987, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 134, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.284332513809204, "loss": -0.8033145664009858, "confidence": 0.7624711532256384, "mass": 0.9997363090515137, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 135, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.474575519561768, "loss": -0.7551419526986393, "confidence": 0.7258068255616665, "mass": 0.9995613694190979, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 136, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.276553630828857, "loss": -0.7572815507057837, "confidence": 0.7689015092212531, "mass": 0.9997828006744385, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 137, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.528756141662598, "loss": -0.8157897583408654, "confidence": 0.7514662692041989, "mass": 0.9996647238731384, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 138, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.533728122711182, "loss": -0.7759508659849007, "confidence": 0.6725334105874974, "mass": 0.999267503619194, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 139, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.406401634216309, "loss": -0.8698511967025799, "confidence": 0.7596331779817791, "mass": 0.9996970519423485, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 140, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.454275608062744, "loss": -0.7015216059506604, "confidence": 0.7286335452743428, "mass": 0.9997449517250061, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 141, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.592657566070557, "loss": -0.8102215613531528, "confidence": 0.7434580740816528, "mass": 0.999538742005825, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 142, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.321812391281128, "loss": -0.7099609807942842, "confidence": 0.7435444551334646, "mass": 0.9997554868459702, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 143, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.239888668060303, "loss": -0.7351333508173714, "confidence": 0.7444405279506264, "mass": 0.9872599244117737, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 144, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.574023723602295, "loss": -0.7638614060850006, "confidence": 0.7256554624092479, "mass": 0.9995622485876083, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 145, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.799471616744995, "loss": -0.7297730224173914, "confidence": 0.7328153339756434, "mass": 0.9997014552354813, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 146, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 7.601182460784912, "loss": -0.7540418131029571, "confidence": 0.7677785893419015, "mass": 0.999761663377285, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 147, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.847312688827515, "loss": -0.7974631987577159, "confidence": 0.6369323863092925, "mass": 0.9982557520270348, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 148, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.390310049057007, "loss": -0.8069064695125358, "confidence": 0.7048329601343508, "mass": 0.9988522157073021, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 149, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.597963809967041, "loss": -0.8092708285870907, "confidence": 0.7069505290572082, "mass": 0.9990198314189911, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 150, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.660616159439087, "loss": -0.8323564260477253, "confidence": 0.7398997584196171, "mass": 0.9997138306498528, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 151, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.320776224136353, "loss": -0.8137566115724624, "confidence": 0.726220392939975, "mass": 0.9901293441653252, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 152, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 7.445894956588745, "loss": -0.7505371464577314, "confidence": 0.7017634883289784, "mass": 0.9988627731800079, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 153, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.300856828689575, "loss": -0.7608302742362199, "confidence": 0.7573559256870673, "mass": 0.9997494518756866, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 154, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.400359153747559, "loss": -0.7045456915264896, "confidence": 0.7263293569272212, "mass": 0.9993692561984062, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 155, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.667129278182983, "loss": -0.7793928569546944, "confidence": 0.7304805017188866, "mass": 0.9995479062199593, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 156, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.471561431884766, "loss": -0.841089794278493, "confidence": 0.7694882023048064, "mass": 0.9997571185231209, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 157, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.4219465255737305, "loss": -0.7631855488660084, "confidence": 0.7364271490926004, "mass": 0.9997316002845764, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 158, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.8691184520721436, "loss": -0.7899869041833701, "confidence": 0.7053119915123154, "mass": 0.9997053295373917, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 159, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.188012838363647, "loss": -0.7545928810824946, "confidence": 0.7078610006062047, "mass": 0.994045726954937, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 160, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.338228464126587, "loss": -0.774223197009826, "confidence": 0.6965539432964356, "mass": 0.9996838346123695, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 161, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.333245754241943, "loss": -0.8068125144880905, "confidence": 0.6961320954101224, "mass": 0.999709241092205, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 162, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.513190746307373, "loss": -0.8046023873189316, "confidence": 0.7050551262986883, "mass": 0.9997564479708672, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 163, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.713022947311401, "loss": -0.7763138979820705, "confidence": 0.7189940009140136, "mass": 0.9997119456529617, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 164, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.329333066940308, "loss": -0.8279087314500493, "confidence": 0.7274866850995825, "mass": 0.9997796639800072, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 165, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.494846343994141, "loss": -0.8474009448240993, "confidence": 0.6652431974192986, "mass": 0.9994608536362648, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 166, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.483688831329346, "loss": -0.8395962142722815, "confidence": 0.7201039220146633, "mass": 0.9996950775384903, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 167, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.489583730697632, "loss": -0.8412112917576285, "confidence": 0.6997058391814692, "mass": 0.9997442439198494, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 168, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.402796030044556, "loss": -0.7955027735852138, "confidence": 0.6138133771311785, "mass": 0.9987824708223343, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 169, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.456118583679199, "loss": -0.7913479905456738, "confidence": 0.6905340289583873, "mass": 0.9994852319359779, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 170, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.30355978012085, "loss": -0.8134534467485506, "confidence": 0.7029892396535845, "mass": 0.9892201647162437, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 171, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.487900257110596, "loss": -0.8321471124183074, "confidence": 0.7210067075326771, "mass": 0.999774232506752, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 172, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.718634605407715, "loss": -0.8061385226908565, "confidence": 0.7055873011585561, "mass": 0.999728225171566, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 173, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.679903984069824, "loss": -0.8536757499901946, "confidence": 0.736924652382331, "mass": 0.999827615916729, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 174, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.465941429138184, "loss": -0.7298865213106251, "confidence": 0.7078837981707845, "mass": 0.9997329637408257, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 175, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.648729562759399, "loss": -0.764814148986814, "confidence": 0.6099739192740178, "mass": 0.9916824549436569, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 176, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.302849769592285, "loss": -0.8167746341067098, "confidence": 0.7153844423464908, "mass": 0.9995140805840492, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 177, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.817811489105225, "loss": -0.8268203286990876, "confidence": 0.6874089561770051, "mass": 0.9996624141931534, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 178, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.470613718032837, "loss": -0.8240900208625702, "confidence": 0.7206252252626385, "mass": 0.9994616359472275, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 179, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.838005781173706, "loss": -0.7491387089903269, "confidence": 0.6467102493878671, "mass": 0.9986535832285881, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 180, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.5544984340667725, "loss": -0.831981978952143, "confidence": 0.6902388222604579, "mass": 0.9993434548377991, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 181, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.51588249206543, "loss": -0.8373738790346571, "confidence": 0.691603171657631, "mass": 0.9997345581650734, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 182, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.216405391693115, "loss": -0.8101465433985565, "confidence": 0.7007665984927479, "mass": 0.9938337057828903, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 183, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.0, "seconds": 12.095362186431885, "loss": -0.6631461711159745, "confidence": 0.6664993320820345, "mass": 0.9903811141848564, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 184, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.370946168899536, "loss": -0.7890454031641743, "confidence": 0.6583568040724324, "mass": 0.9996287077665329, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 185, "epoch": 1, "rows": 7, "skipped": 1, "answer_accuracy": 0.5714285714285714, "seconds": 6.1126792430877686, "loss": -0.779294034767538, "confidence": 0.72130531928414, "mass": 0.9995517304965428, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 186, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.262471914291382, "loss": -0.8551037138068078, "confidence": 0.7182046707817837, "mass": 0.9997879192233086, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 187, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.674010753631592, "loss": -0.7964429407542272, "confidence": 0.6626975347846724, "mass": 0.9996229186654091, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 188, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.4825592041015625, "loss": -0.8656059707302131, "confidence": 0.6826065920407746, "mass": 0.9994135424494743, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 189, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.404801845550537, "loss": -0.7172480370198469, "confidence": 0.6628202794567597, "mass": 0.999766156077385, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 190, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.125, "seconds": 6.383564233779907, "loss": -0.694342303522063, "confidence": 0.6757727293432612, "mass": 0.9983759894967079, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 191, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.650052309036255, "loss": -0.8622865478593895, "confidence": 0.6254575139767883, "mass": 0.9918815121054649, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 192, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.462751150131226, "loss": -0.771504213327806, "confidence": 0.658985108282047, "mass": 0.999481700360775, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 193, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.200458288192749, "loss": -0.7952604946942001, "confidence": 0.6095395776851729, "mass": 0.9879403039813042, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 194, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.621906995773315, "loss": -0.7563250474748319, "confidence": 0.6890459047193563, "mass": 0.9997827112674713, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 195, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.374921560287476, "loss": -0.7616799888017207, "confidence": 0.6710156809785291, "mass": 0.9997106194496155, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 196, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.420144319534302, "loss": -0.7274351106152133, "confidence": 0.6788161243932397, "mass": 0.9997663125395775, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 197, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.338649272918701, "loss": -0.7954672315527989, "confidence": 0.5914724594529948, "mass": 0.9973191171884537, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 198, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.044201850891113, "loss": -0.8251098161949842, "confidence": 0.6487188208402522, "mass": 0.9929318204522133, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 199, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.503489017486572, "loss": -0.8599510547499658, "confidence": 0.5930641671635493, "mass": 0.9981709346175194, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 200, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 1.0, "seconds": 6.162553071975708, "loss": -0.8859410438962396, "confidence": 0.6800494968721349, "mass": 0.9998028054833412, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 201, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.490881443023682, "loss": -0.8623528155542759, "confidence": 0.6917604658577288, "mass": 0.999782145023346, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 202, "epoch": 1, "rows": 7, "skipped": 1, "answer_accuracy": 0.5714285714285714, "seconds": 6.880370140075684, "loss": -0.722085641560092, "confidence": 0.7217079129229881, "mass": 0.9361837932041713, "hinge_active": 0.14285714285714285}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 203, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.578541994094849, "loss": -0.8061591045183399, "confidence": 0.6159343857199562, "mass": 0.9995912238955498, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 204, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.339511871337891, "loss": -0.8095195468171422, "confidence": 0.7007321017350597, "mass": 0.9997806772589684, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 205, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.584342956542969, "loss": -0.8117571226120086, "confidence": 0.6503874699321359, "mass": 0.999736413359642, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 206, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 12.162911415100098, "loss": -0.757967160140189, "confidence": 0.6291121390502775, "mass": 0.9910794347524643, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 207, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.555556058883667, "loss": -0.8517533101606517, "confidence": 0.6820429156032405, "mass": 0.9997561126947403, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 208, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.246293306350708, "loss": -0.827329436799852, "confidence": 0.5965364577023882, "mass": 0.9910548999905586, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 209, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.281348943710327, "loss": -0.764745943549982, "confidence": 0.6845323701847522, "mass": 0.9890505000948906, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 210, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.569377422332764, "loss": -0.8147653383615462, "confidence": 0.6613170833928549, "mass": 0.9997949004173279, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 211, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.347102880477905, "loss": -0.7829634987226888, "confidence": 0.6298991227413625, "mass": 0.9998192712664604, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 212, "epoch": 1, "rows": 7, "skipped": 1, "answer_accuracy": 0.42857142857142855, "seconds": 9.561120748519897, "loss": -0.7899152419690372, "confidence": 0.6528263746375694, "mass": 0.9997650640351432, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 213, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.652454853057861, "loss": -0.8468740833855504, "confidence": 0.6269241434968195, "mass": 0.9997011199593544, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 214, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.489872217178345, "loss": -0.8152473716567584, "confidence": 0.580765300740231, "mass": 0.9997474104166031, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 215, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.476829767227173, "loss": -0.8250408859069058, "confidence": 0.592200717696446, "mass": 0.9996812343597412, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 216, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.444119453430176, "loss": -0.8410743277103352, "confidence": 0.6668614999480286, "mass": 0.9998192861676216, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 217, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.230611801147461, "loss": -0.7709428825297048, "confidence": 0.691070009896354, "mass": 0.999788910150528, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 218, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.413030385971069, "loss": -0.7772402559555486, "confidence": 0.6498741321199263, "mass": 0.9992074146866798, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 219, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.2428038120269775, "loss": -0.8095130088693653, "confidence": 0.6825927304904724, "mass": 0.9998346865177155, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 220, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.31884765625, "loss": -0.7750936574482064, "confidence": 0.6264266482934029, "mass": 0.9995996877551079, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 221, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.340304374694824, "loss": -0.797135419325938, "confidence": 0.6516002587236203, "mass": 0.9919499829411507, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 222, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.345541954040527, "loss": -0.7557426265974385, "confidence": 0.6457281703740112, "mass": 0.9997641444206238, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 223, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.292541027069092, "loss": -0.7799436422029868, "confidence": 0.6548378277697338, "mass": 0.9997674375772476, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 224, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 7.140606641769409, "loss": -0.7314047213923766, "confidence": 0.6729658444796027, "mass": 0.9995529279112816, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 225, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.309192895889282, "loss": -0.8086421254957409, "confidence": 0.5826857525804638, "mass": 0.9926808550953865, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 226, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.364384889602661, "loss": -0.8225367069073672, "confidence": 0.6170985496432957, "mass": 0.9997701346874237, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 227, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.533456563949585, "loss": -0.8407485356488462, "confidence": 0.6553471122190471, "mass": 0.9997865781188011, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 228, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.264162063598633, "loss": -0.8491755525652184, "confidence": 0.6431556564275024, "mass": 0.999775193631649, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 229, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.261966228485107, "loss": -0.8153105173591114, "confidence": 0.5783350443968903, "mass": 0.9990120977163315, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 230, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.317049503326416, "loss": -0.778360589868229, "confidence": 0.6342350069854827, "mass": 0.9997441619634628, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 231, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.256995916366577, "loss": -0.7849757847127932, "confidence": 0.6072177932695848, "mass": 0.9997861087322235, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 232, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.349792242050171, "loss": -0.7749915802105065, "confidence": 0.6323860047312226, "mass": 0.9997455924749374, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 233, "epoch": 1, "rows": 7, "skipped": 1, "answer_accuracy": 0.5714285714285714, "seconds": 11.500395059585571, "loss": -0.790097821174548, "confidence": 0.6580718368251237, "mass": 0.9900537133216858, "hinge_active": 0.14285714285714285}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 234, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.190290451049805, "loss": -0.7895457325249562, "confidence": 0.5410113310318686, "mass": 0.9923349022865295, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 235, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 12.58106517791748, "loss": -0.7686593606780252, "confidence": 0.6170167539458833, "mass": 0.9892580658197403, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 236, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.0, "seconds": 6.286482334136963, "loss": -0.7293662559420645, "confidence": 0.5790101224281183, "mass": 0.9989566802978516, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 237, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.22501802444458, "loss": -0.7939963790419179, "confidence": 0.6416012437961156, "mass": 0.9942301735281944, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 238, "epoch": 1, "rows": 7, "skipped": 1, "answer_accuracy": 0.2857142857142857, "seconds": 7.3281848430633545, "loss": -0.7871530438958861, "confidence": 0.6185773791966862, "mass": 0.9998199599129813, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 239, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.125, "seconds": 6.653955936431885, "loss": -0.8130457788116076, "confidence": 0.4854557218932069, "mass": 0.996877945959568, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 240, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "seconds": 6.476224660873413, "loss": -0.800615696300799, "confidence": 0.5252062968276549, "mass": 0.9964549019932747, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 241, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.35248327255249, "loss": -0.8478535854953616, "confidence": 0.6250790918587752, "mass": 0.9997678101062775, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 242, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 12.203248023986816, "loss": -0.8222039423305323, "confidence": 0.6629611327230385, "mass": 0.9910720214247704, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 243, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 6.4267778396606445, "loss": -0.8067638309385023, "confidence": 0.6048137760382364, "mass": 0.9997204467654228, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 244, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.226312160491943, "loss": -0.7821784559683318, "confidence": 0.6308947184510929, "mass": 0.9940579384565353, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 245, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 7.662106990814209, "loss": -0.7845637868697025, "confidence": 0.6123121289047523, "mass": 0.999713733792305, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 246, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.392082452774048, "loss": -0.8306105063253332, "confidence": 0.6192604433169486, "mass": 0.9997293055057526, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 247, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.747592210769653, "loss": -0.7775382683445718, "confidence": 0.6537738318622975, "mass": 0.9998308792710304, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 248, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.465709686279297, "loss": -0.8168831283176641, "confidence": 0.6214646334509584, "mass": 0.994539201259613, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 249, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "seconds": 6.358703851699829, "loss": -0.8538784382064059, "confidence": 0.6049123391539888, "mass": 0.9997851476073265, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 250, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 12.2400062084198, "loss": -0.8020025312173595, "confidence": 0.6326063192260942, "mass": 0.9942758604884148, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 251, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "seconds": 6.525144100189209, "loss": -0.8234518307424591, "confidence": 0.6080915029019753, "mass": 0.9997909516096115, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 252, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 13.2179536819458, "loss": -0.769662524229227, "confidence": 0.6368896922977086, "mass": 0.9821885153651237, "hinge_active": 0.125}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 253, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "seconds": 6.701079845428467, "loss": -0.7793894992595702, "confidence": 0.6400245274014397, "mass": 0.9994867816567421, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 254, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "seconds": 6.18855357170105, "loss": -0.8306704457690387, "confidence": 0.6064848525249741, "mass": 0.9997933059930801, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 255, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "seconds": 12.238094568252563, "loss": -0.8088034426094403, "confidence": 0.639855546695697, "mass": 0.9944450482726097, "hinge_active": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 256, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.125, "seconds": 6.527458190917969, "loss": -0.7420059001215693, "confidence": 0.5727408152528276, "mass": 0.9997474849224091, "hinge_active": 0.0}

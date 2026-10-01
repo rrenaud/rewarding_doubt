@@ -1,0 +1,37 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.392 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:08,  2.75s/it]
+Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.82s/it]
+Loading checkpoint shards:  75%|███████▌  | 3/4 [00:08<00:02,  2.83s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.06s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.33s/it]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+
+  0%|          | 0/16 [00:00<?, ?it/s]
+  6%|▋         | 1/16 [00:02<00:38,  2.56s/it]
+ 12%|█▎        | 2/16 [00:03<00:23,  1.71s/it]
+ 19%|█▉        | 3/16 [00:04<00:18,  1.44s/it]
+ 25%|██▌       | 4/16 [00:05<00:15,  1.29s/it]
+ 31%|███▏      | 5/16 [00:07<00:15,  1.44s/it]
+ 38%|███▊      | 6/16 [00:08<00:13,  1.34s/it]
+ 44%|████▍     | 7/16 [00:10<00:13,  1.48s/it]
+ 50%|█████     | 8/16 [00:11<00:11,  1.38s/it]
+ 56%|█████▋    | 9/16 [00:13<00:10,  1.48s/it]
+ 62%|██████▎   | 10/16 [00:14<00:08,  1.45s/it]
+ 69%|██████▉   | 11/16 [00:16<00:06,  1.40s/it]
+ 75%|███████▌  | 12/16 [00:17<00:05,  1.30s/it]
+ 81%|████████▏ | 13/16 [00:18<00:03,  1.22s/it]
+ 88%|████████▊ | 14/16 [00:19<00:02,  1.16s/it]
+ 94%|█████████▍| 15/16 [00:20<00:01,  1.13s/it]
+100%|██████████| 16/16 [00:21<00:00,  1.10s/it]
+100%|██████████| 16/16 [00:21<00:00,  1.33s/it]
+{"model": "/vol/outputs/exact-20261001T171427Z/discrete-exact/model_finetuned_epoch1", "n": 512, "wrong_format_rate": 0.005859375, "ece": 0.13988132774829865, "accuracy": 0.6404715127701375, "auroc": 0.5932146568775354, "brier": 0.23732809430255405}
