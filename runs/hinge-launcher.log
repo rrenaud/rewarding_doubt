@@ -1,0 +1,10 @@
+Run: /home/rrenaud/rewarding_doubt/runs/hinge-20261001T023959Z
+Starting discrete-exact-s1
+Starting fractional-s1
+Completed discrete-exact-s1
+Starting discrete-exact-s1-eval
+Completed fractional-s1
+Starting fractional-s1-eval
+Completed fractional-s1-eval
+Completed discrete-exact-s1-eval
+Finished: /home/rrenaud/rewarding_doubt/runs/hinge-20261001T023959Z/aggregate.json

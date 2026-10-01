@@ -1,0 +1,7 @@
+{
+  "run": "/home/rrenaud/rewarding_doubt_codex/runs/smoke-20260930T222647Z",
+  "completed": [],
+  "state": "failed",
+  "current_stage": "prepare-train",
+  "exit_code": 1
+}

@@ -1,0 +1,6 @@
+{
+  "state_path": "tinker://94e0c1ad-12bc-5252-a199-b50e0aa19ff1:train:0/weights/final",
+  "sampler_path": "tinker://94e0c1ad-12bc-5252-a199-b50e0aa19ff1:train:0/sampler_weights/final",
+  "steps": 240,
+  "model": "Qwen/Qwen3-8B"
+}

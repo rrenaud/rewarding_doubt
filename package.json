@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "description": "Build-time KaTeX rendering for scripts/render_reports.sh",
+  "type": "module",
+  "devDependencies": {
+    "katex": "0.18.10"
+  }
+}

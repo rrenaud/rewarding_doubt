@@ -1,0 +1,37 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/rrenaud/rewarding_doubt_codex/src/rewarding_doubt/cli.py", line 230, in <module>
+    main()
+  File "/home/rrenaud/rewarding_doubt_codex/src/rewarding_doubt/cli.py", line 226, in main
+    args.func(args)
+  File "/home/rrenaud/rewarding_doubt_codex/src/rewarding_doubt/cli.py", line 37, in prepare
+    sampler = tinker.ServiceClient().create_sampling_client(base_model=args.model)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rrenaud/miniconda3/lib/python3.11/site-packages/tinker/lib/public_interfaces/service_client.py", line 68, in __init__
+    self.holder = InternalClientHolder(
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rrenaud/miniconda3/lib/python3.11/site-packages/tinker/lib/internal_client_holder.py", line 259, in __init__
+    ).result()
+      ^^^^^^^^
+  File "/home/rrenaud/miniconda3/lib/python3.11/site-packages/tinker/lib/public_interfaces/api_future.py", line 127, in result
+    return self._future.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rrenaud/miniconda3/lib/python3.11/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/rrenaud/miniconda3/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/rrenaud/miniconda3/lib/python3.11/site-packages/tinker/lib/internal_client_holder.py", line 419, in _create_session
+    result = await client.service.create_session(request=request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rrenaud/miniconda3/lib/python3.11/site-packages/tinker/resources/service.py", line 156, in create_session
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+  File "/home/rrenaud/miniconda3/lib/python3.11/site-packages/tinker/_base_client.py", line 1232, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rrenaud/miniconda3/lib/python3.11/site-packages/tinker/_base_client.py", line 1033, in request
+    raise self._make_status_error_from_response(err.response) from None
+tinker.BadRequestError: Error code: 400 - {'detail': 'Your Tinker SDK version is no longer supported. Please upgrade to the latest version.'}

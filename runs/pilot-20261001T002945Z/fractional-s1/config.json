@@ -1,0 +1,19 @@
+{
+  "command": "train",
+  "mode": "fractional",
+  "reward": "paper",
+  "rank": 16,
+  "epochs": 2,
+  "max_steps": 0,
+  "lr": 1e-05,
+  "group_size": 8,
+  "model": "Qwen/Qwen3-8B",
+  "seed": 1,
+  "output": "/home/rrenaud/rewarding_doubt/runs/pilot-20261001T002945Z/fractional-s1",
+  "data": "/home/rrenaud/rewarding_doubt/runs/pilot-20261001T002945Z/data/train.jsonl",
+  "grading": "f1",
+  "batch_size": 8,
+  "data_sha256": "984afac30b9ad94f84d29f4de17f1b04fd4b788cdeafde6be9d5c14ade74bdf7",
+  "excluded_invalid_answers": 67,
+  "tinker_version": "0.31.0"
+}

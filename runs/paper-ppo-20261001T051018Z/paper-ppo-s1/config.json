@@ -1,0 +1,23 @@
+{
+  "command": "train",
+  "mode": "paper-ppo",
+  "reward": "released",
+  "rank": 8,
+  "epochs": 2,
+  "max_steps": 0,
+  "lr": 1e-05,
+  "group_size": 8,
+  "format_weight": 1.0,
+  "format_threshold": 0.95,
+  "save_every": 40,
+  "model": "Qwen/Qwen3-8B",
+  "seed": 1,
+  "output": "/home/rrenaud/rewarding_doubt/runs/paper-ppo-20261001T051018Z/paper-ppo-s1",
+  "data": "/home/rrenaud/rewarding_doubt/runs/paper-ppo-20261001T051018Z/data/train.jsonl",
+  "prompt": "paper",
+  "grading": "f1",
+  "batch_size": 8,
+  "data_sha256": "984afac30b9ad94f84d29f4de17f1b04fd4b788cdeafde6be9d5c14ade74bdf7",
+  "excluded_invalid_answers": 0,
+  "tinker_version": "0.31.0"
+}

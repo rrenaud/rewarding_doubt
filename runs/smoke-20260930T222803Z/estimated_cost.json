@@ -1,0 +1,11 @@
+{
+  "usd": {
+    "answer_generation": 0.006399390000000002,
+    "ppo": 0.04187827999999999,
+    "discrete_exact": 0.051257835,
+    "fractional": 0.051257835,
+    "evaluation": 0.10297229999999985,
+    "total": 0.25376563999999985
+  },
+  "assumptions": "No cache discounts; full context billed per branch; 8-token bound for confidence generation; generation token counts reconstructed from text. This is not an invoice. Storage excluded."
+}

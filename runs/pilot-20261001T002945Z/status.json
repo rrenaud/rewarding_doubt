@@ -1,0 +1,27 @@
+{
+  "run": "/home/rrenaud/rewarding_doubt/runs/pilot-20261001T002945Z",
+  "args": {
+    "name": "pilot",
+    "train_limit": 1024,
+    "eval_limit": 512,
+    "seeds": [
+      1
+    ],
+    "max_steps": 0,
+    "epochs": 2,
+    "parallel": 9
+  },
+  "completed": [
+    "prepare-eval",
+    "prepare-train",
+    "base-eval",
+    "discrete-exact-s1",
+    "fractional-s1",
+    "discrete-exact-s1-eval",
+    "fractional-s1-eval",
+    "discrete-ppo-s1",
+    "discrete-ppo-s1-eval"
+  ],
+  "running": [],
+  "state": "complete"
+}

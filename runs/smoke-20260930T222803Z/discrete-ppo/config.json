@@ -1,0 +1,19 @@
+{
+  "command": "train",
+  "mode": "discrete-ppo",
+  "reward": "paper",
+  "rank": 16,
+  "epochs": 2,
+  "max_steps": 10,
+  "lr": 1e-05,
+  "group_size": 8,
+  "model": "Qwen/Qwen3-8B",
+  "seed": 2,
+  "output": "/home/rrenaud/rewarding_doubt_codex/runs/smoke-20260930T222803Z/discrete-ppo",
+  "data": "/home/rrenaud/rewarding_doubt_codex/runs/smoke-20260930T222803Z/data/train.jsonl",
+  "grading": "f1",
+  "batch_size": 8,
+  "data_sha256": "ab053b6005f77005230e7381269d3d52d760fb8048be8355abbbf59a5ff766d4",
+  "excluded_invalid_answers": 9,
+  "tinker_version": "0.31.0"
+}

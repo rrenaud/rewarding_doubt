@@ -1,0 +1,28 @@
+{
+  "run": "/home/rrenaud/rewarding_doubt/runs/paper-ppo-20261001T051018Z",
+  "args": {
+    "name": "paper-ppo",
+    "train_limit": 1024,
+    "eval_limit": 512,
+    "seeds": [
+      1
+    ],
+    "max_steps": 0,
+    "epochs": 2,
+    "parallel": 9,
+    "modes": [
+      "paper-ppo"
+    ],
+    "data_from": "runs/pilot-20261001T002945Z",
+    "skip_base": false,
+    "train_args": "--prompt paper --rank 8 --reward released",
+    "eval_args": "--prompt paper"
+  },
+  "completed": [
+    "base-eval"
+  ],
+  "running": [
+    "paper-ppo-s1"
+  ],
+  "state": "running"
+}
