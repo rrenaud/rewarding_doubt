@@ -11,8 +11,13 @@ Train.py except the update rule:
   F1 > 0.5 code; then all 11 continuations ": k<eot>" are teacher-forced and the loss is
   rewarding_doubt.core.objective (the same function as the Tinker runs), averaged over rows
 * optimizer: torch.optim.Adam(lr), as TRL uses; batch 8; 2 epochs; torch.manual_seed(2)
+* --passes P --minibatch M reuse each sampled batch like TRL's ppo_epochs / mini_batch_size:
+  P passes over the batch in minibatches of M, one Adam step per minibatch. The exact loss is a
+  deterministic function of (question, answer, label), so reuse needs no importance weights.
+  --passes 4 --minibatch 4 matches PPO's 8 optimizer steps per batch of 8.
 
-    python exact_llama.py IDS_JSON OUT_DIR --mode discrete-exact|fractional [--max-steps N]
+    python exact_llama.py IDS_JSON OUT_DIR --mode discrete-exact|fractional [--passes 4 --minibatch 4]
+                          [--save-every 32] [--max-steps N]
 """
 import argparse
 import json
@@ -33,6 +38,24 @@ from util.ResponseHandling import parse_answer_confidence
 MODEL = "unsloth/llama-3-8b-Instruct-bnb-4bit"
 
 
+def row_loss(model, query, label, candidates, eot, args):
+    """Teacher-force the 11 continuations after one query; return (loss, confidence, valid mass)."""
+    seqs = [query + c for c in candidates]
+    width = max(map(len, seqs))
+    input_ids = torch.tensor([s + [eot] * (width - len(s)) for s in seqs]).cuda()
+    mask = torch.tensor([[1] * len(s) + [0] * (width - len(s)) for s in seqs]).cuda()
+    logits = model(input_ids=input_ids, attention_mask=mask).logits.float()
+    logps = []
+    for k, c in enumerate(candidates):
+        positions = torch.arange(len(query) - 1, len(query) - 1 + len(c), device=logits.device)
+        token_logps = logits[k, positions].log_softmax(-1).gather(-1, torch.tensor(c, device=logits.device)[:, None])
+        logps.append(token_logps.sum())
+    logps = torch.stack(logps)[None].double()
+    loss, confidence = objective(logps, logps.new_tensor([label]), args.mode, args.reward,
+                                 args.format_weight, args.format_threshold)
+    return loss, confidence, logps.detach().logsumexp(-1).exp().item()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("ids")
@@ -45,6 +68,9 @@ def main():
     parser.add_argument("--batchsize", type=int, default=8)
     parser.add_argument("--epochs", type=int, default=2)
     parser.add_argument("--max-steps", type=int, default=0)
+    parser.add_argument("--passes", type=int, default=1)
+    parser.add_argument("--minibatch", type=int, default=0, help="default: the whole batch")
+    parser.add_argument("--save-every", type=int, default=0, help="also save adapters every N steps")
     parser.add_argument("--seed", type=int, default=2)
     args = parser.parse_args()
     torch.manual_seed(args.seed)
@@ -74,7 +100,8 @@ def main():
     optimizer = torch.optim.Adam([p for p in model.parameters() if p.requires_grad], lr=args.lr)
     generation = dict(max_new_tokens=256, eos_token_id=[tokenizer.eos_token_id, eot, confidence_token],
                       do_sample=True, temperature=0.6, top_p=0.9, pad_token_id=tokenizer.eos_token_id)
-    rng = random.Random(args.seed)
+    rng = random.Random(args.seed)  # question order: identical for every --passes setting
+    row_rng = random.Random(args.seed + 1)
     step = 0
     log = open(os.path.join(args.out_dir, "metrics.jsonl"), "w")
     for epoch in range(args.epochs):
@@ -102,34 +129,34 @@ def main():
                 correct = is_answer_correct(prediction, batch["gt_candidates"][i], Metric.F1, 0.5)
                 rows.append((prompt + answer, float(correct)))
             FastLanguageModel.for_training(model)
-            optimizer.zero_grad()
             stats = dict(loss=0., confidence=0., mass=0., hinge_active=0.)
-            for query, label in rows:
-                seqs = [query + c for c in candidates]
-                width = max(map(len, seqs))
-                input_ids = torch.tensor([s + [eot] * (width - len(s)) for s in seqs]).cuda()
-                mask = torch.tensor([[1] * len(s) + [0] * (width - len(s)) for s in seqs]).cuda()
-                logits = model(input_ids=input_ids, attention_mask=mask).logits.float()
-                logps = []
-                for k, c in enumerate(candidates):
-                    positions = torch.arange(len(query) - 1, len(query) - 1 + len(c), device=logits.device)
-                    token_logps = logits[k, positions].log_softmax(-1).gather(-1, torch.tensor(c, device=logits.device)[:, None])
-                    logps.append(token_logps.sum())
-                logps = torch.stack(logps)[None]
-                loss, confidence = objective(logps.double(), logps.new_tensor([label]).double(), args.mode,
-                                             args.reward, args.format_weight, args.format_threshold)
-                (loss / len(rows)).backward()
-                mass = logps.detach().logsumexp(-1).exp().item()
-                stats["loss"] += loss.item() / len(rows)
-                stats["confidence"] += confidence.item() / len(rows)
-                stats["mass"] += mass / len(rows)
-                stats["hinge_active"] += (mass < args.format_threshold) / len(rows)
-            if rows:
-                optimizer.step()
+            minibatch = args.minibatch or args.batchsize
+            updates = 0
+            for epoch_pass in range(args.passes):
+                order_rows = list(range(len(rows)))
+                row_rng.shuffle(order_rows)
+                for mb_start in range(0, len(order_rows), minibatch):
+                    mb = [rows[i] for i in order_rows[mb_start:mb_start + minibatch]]
+                    optimizer.zero_grad()
+                    for query, label in mb:
+                        loss, confidence, mass = row_loss(model, query, label, candidates, eot, args)
+                        (loss / len(mb)).backward()
+                        if epoch_pass == 0:  # log pre-update statistics, once per row
+                            stats["loss"] += loss.item() / len(rows)
+                            stats["confidence"] += confidence.item() / len(rows)
+                            stats["mass"] += mass / len(rows)
+                            stats["hinge_active"] += (mass < args.format_threshold) / len(rows)
+                    optimizer.step()
+                    updates += 1
             step += 1
             record = dict(step=step, epoch=epoch, rows=len(rows), skipped=len(out) - len(rows),
-                          answer_accuracy=sum(l for _, l in rows) / max(1, len(rows)),
-                          seconds=time.time() - t0, **stats)
+                          answer_accuracy=sum(l for _, l in rows) / max(1, len(rows)), updates=updates,
+                          seconds=time.time() - t0, time=time.time(), **stats)
+            if args.save_every and step % args.save_every == 0:
+                t_save = time.time()
+                model.save_pretrained(os.path.join(args.out_dir, f"snapshot-step{step:05d}"))
+                tokenizer.save_pretrained(os.path.join(args.out_dir, f"snapshot-step{step:05d}"))
+                record["save_seconds"] = time.time() - t_save
             log.write(json.dumps(record) + "\n")
             log.flush()
             print(json.dumps(record), flush=True)

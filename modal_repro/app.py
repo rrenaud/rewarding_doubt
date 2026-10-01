@@ -5,6 +5,7 @@
     modal run modal_repro/app.py::stage2 --data-run runs/pilot-20261001T002945Z   # our subset
     modal run modal_repro/app.py::exact --max-steps 3                                # smoke
     modal run modal_repro/app.py::exact                                              # both objectives
+    modal run modal_repro/app.py::curves                     # PPO + exact (1 and 8 updates/batch), snapshots
 
 The image clones pasta99/RewardingDoubt at a pinned commit and installs its full pinned
 requirements.txt (torch 2.5.1, transformers 4.48.0, trl 0.8.6, unsloth @ d6982c1). The Hugging
@@ -178,6 +179,53 @@ def train_and_evaluate_exact(ids_by_split: dict, mode: str, run_name: str, max_s
                 logs=logs, train_metrics=train_metrics.read_text() if train_metrics.exists() else "")
 
 
+@app.function(volumes={VOL: volume}, timeout=8 * HOUR)
+def train_with_snapshots(ids_by_split: dict, label: str, command: list[str], run_name: str) -> dict:
+    """Train one configuration, saving snapshots; return snapshot dirs and per-step timing.
+
+    `command` is the script invocation after `python`, with OUT_DIR as a placeholder.
+    Declared without a GPU; callers attach one with `.with_options(gpu=...)`.
+    """
+    import subprocess
+
+    out_dir = f"{VOL}/outputs/{run_name}/{label}"
+    Path(out_dir).mkdir(parents=True, exist_ok=True)
+    ids_path = f"{out_dir}/ids.json"
+    Path(ids_path).write_text(json.dumps(ids_by_split))
+    command = [arg.replace("OUT_DIR", out_dir).replace("IDS_JSON", ids_path) for arg in command]
+    gpu = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+                         capture_output=True, text=True).stdout.strip()
+    with open(f"{out_dir}/train.log", "w") as log:
+        code = subprocess.run(["python", *command], cwd=CODE, stdout=log, stderr=subprocess.STDOUT).returncode
+    volume.commit()
+    timing = next((Path(out_dir) / name for name in ["metrics.jsonl", "steps.jsonl"]
+                   if (Path(out_dir) / name).exists()), None)
+    snapshots = sorted(str(p) for p in Path(out_dir).iterdir() if p.name.startswith("snapshot-step"))
+    return dict(label=label, exit_code=code, gpu=gpu, snapshots=snapshots,
+                timing=timing.read_text() if timing else "", log=Path(f"{out_dir}/train.log").read_text())
+
+
+@app.function(volumes={VOL: volume}, timeout=HOUR)
+def evaluate_checkpoint(ids_by_split: dict, model_dir: str) -> dict:
+    """The released evaluation (subset.py evaluate) on one checkpoint directory.
+
+    Declared without a GPU; callers attach one with `.with_options(gpu=...)`.
+    """
+    import subprocess
+
+    volume.reload()
+    ids_path = "/tmp/ids.json"
+    Path(ids_path).write_text(json.dumps(ids_by_split))
+    out_json = f"{model_dir}/eval.json"
+    proc = subprocess.run(["python", "subset.py", "evaluate", ids_path, model_dir, out_json], cwd=CODE,
+                          capture_output=True, text=True)
+    volume.commit()
+    if proc.returncode:
+        return dict(model_dir=model_dir, error=proc.stdout[-3000:] + proc.stderr[-3000:])
+    return dict(model_dir=model_dir, metrics=json.loads(Path(out_json.replace(".json", "_metrics.json")).read_text()),
+                results=json.loads(Path(out_json).read_text()))
+
+
 def summarize(scalars: dict[str, list[tuple[int, float]]]) -> list[str]:
     lines = []
     for tag in ["env/reward_mean", "objective/kl", "objective/kl_coef", "ppo/policy/clipfrac",
@@ -285,4 +333,63 @@ def exact(data_run: str = "runs/pilot-20261001T002945Z", gpu: str = "L40S", max_
         print(json.dumps(result, indent=2))
     (local / "summary.json").write_text(json.dumps(
         {f"{mode}-{name}": m for mode, r in summary.items() for name, m in r["metrics"].items()}, indent=2) + "\n")
+    print(f"Saved to {local}")
+
+
+@app.local_entrypoint()
+def curves(data_run: str = "runs/pilot-20261001T002945Z", gpu: str = "L40S", save_every: int = 32,
+           labels: str = "ppo,discrete-exact-1x,fractional-1x,discrete-exact-8x,fractional-8x",
+           train_limit: int = 0, eval_limit: int = 0):
+    """Learning curves on the released Llama setup: PPO vs exact objectives at 1 and 8 updates/batch.
+
+    Every configuration saves a snapshot every `save_every` steps and timestamps each step; every
+    snapshot is then scored with the released evaluation, in parallel containers.
+    """
+    root = Path(__file__).resolve().parents[1]
+    ids = {split: [json.loads(line)["id"] for line in (root / data_run / "data" / f"{name}.jsonl").read_text().splitlines()]
+           for split, name in [("train", "train"), ("validation", "eval")]}
+    if train_limit or eval_limit:  # smoke tests
+        ids = {"train": ids["train"][:train_limit or None], "validation": ids["validation"][:eval_limit or None]}
+    configs = {
+        "ppo": ["subset.py", "train", "IDS_JSON", "--save-every", str(save_every), "--",
+                "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", MODEL,
+                "--tokenizer_dir", MODEL, "--epochs", "2", "--lr", "1e-5", "--batchsize", "8",
+                "--log_with", "tensorboard"],
+    }
+    for mode in ["discrete-exact", "fractional"]:
+        configs[f"{mode}-1x"] = ["exact_llama.py", "IDS_JSON", "OUT_DIR", "--mode", mode, "--save-every", str(save_every)]
+        configs[f"{mode}-8x"] = [*configs[f"{mode}-1x"], "--passes", "4", "--minibatch", "4"]
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run_name = f"curves-{'smoke-' if train_limit or eval_limit else ''}{stamp}"
+    local = root / "runs" / f"modal-{run_name}"
+    local.mkdir(parents=True)
+    (local / "ids.json").write_text(json.dumps(ids) + "\n")
+    (local / "configs.json").write_text(json.dumps(configs, indent=2) + "\n")
+    chosen = labels.split(",")
+    trained = {}
+    for result in train_with_snapshots.with_options(gpu=gpu).starmap(
+            [(ids, label, configs[label], run_name) for label in chosen], return_exceptions=True):
+        if isinstance(result, Exception):
+            print(f"TRAINING FAILED: {result!r}")
+            continue
+        label_dir = local / result["label"]
+        label_dir.mkdir()
+        (label_dir / "train.log").write_text(result.pop("log"))
+        (label_dir / "timing.jsonl").write_text(result.pop("timing"))
+        (label_dir / "train.json").write_text(json.dumps(result, indent=2) + "\n")
+        trained[result["label"]] = result
+        print(f"trained {result['label']}: exit {result['exit_code']}, {len(result['snapshots'])} snapshots")
+    jobs = [(ids, snap) for result in trained.values() for snap in result["snapshots"]]
+    curve = {}
+    for result in evaluate_checkpoint.with_options(gpu=gpu).starmap(jobs, return_exceptions=True):
+        if isinstance(result, Exception) or "error" in result:
+            print(f"EVAL FAILED: {result if isinstance(result, Exception) else result['error'][-500:]}")
+            continue
+        label, snap = result["model_dir"].split("/")[-2:]
+        step = int(snap.removeprefix("snapshot-step"))
+        (local / label / f"eval_step{step:05d}.json").write_text(json.dumps(result["results"]) + "\n")
+        curve.setdefault(label, {})[step] = result["metrics"]
+    (local / "curve.json").write_text(json.dumps(curve, indent=2) + "\n")
+    for label, points in curve.items():
+        print(label, {step: round(m["ece"], 3) for step, m in sorted(points.items())})
     print(f"Saved to {local}")

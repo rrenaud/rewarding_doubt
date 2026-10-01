@@ -7,13 +7,14 @@ question IDs before normalization (which drops `question_id`). Each epoch's
 `model_finetuned` checkpoint is also copied to `model_finetuned_epoch<k>`, because Train.py
 overwrites it every epoch.
 
-    python subset.py train IDS_JSON -- <Train.py args>
+    python subset.py train IDS_JSON [--save-every N] -- <Train.py args>
     python subset.py evaluate IDS_JSON MODEL_DIR OUT_JSON
 """
 import json
 import os
 import shutil
 import sys
+import time
 
 from datasets import load_dataset
 
@@ -56,6 +57,26 @@ def main():
 
         PPOTrainerNoCache.save_pretrained = save_pretrained
         args = Train.setup_parser().parse_args(sys.argv[sys.argv.index("--") + 1:])
+        save_every = int(sys.argv[sys.argv.index("--save-every") + 1]) if "--save-every" in sys.argv else 0
+        # Timestamp every PPO step (and save periodic snapshots) without touching Train.py.
+        os.makedirs(args.out_dir, exist_ok=True)
+        timing = open(os.path.join(args.out_dir, "steps.jsonl"), "w")
+        original_step = PPOTrainerNoCache.step
+        count = [0]
+
+        def step(self, *step_args, **step_kwargs):
+            entered = time.time()
+            stats = original_step(self, *step_args, **step_kwargs)
+            count[0] += 1
+            record = dict(step=count[0], enter=entered, exit=time.time())
+            if save_every and count[0] % save_every == 0:
+                original_save(self, os.path.join(args.out_dir, f"snapshot-step{count[0]:05d}"))
+                record["save_seconds"] = time.time() - record["exit"]
+            timing.write(json.dumps(record) + "\n")
+            timing.flush()
+            return stats
+
+        PPOTrainerNoCache.step = step
         Train.train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize,
                     model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset,
                     log_with=args.log_with, is_unsloth=args.is_unsloth)
