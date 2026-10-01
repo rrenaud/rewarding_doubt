@@ -251,6 +251,13 @@ gains.
   0.123; NLL is 0.512 vs 0.538. The arms are tied within run-to-run noise: discrete-exact
   alone moved 0.173 → 0.123 between two same-seed runs. The hinge fired on only 7 early steps.
 
+- **Paper-faithful PPO** (TRL 0.8.6 loop with on-policy answers and KL to base, verified against
+  TRL's code; [report](../runs/paper-ppo-20261001T051018Z/report.md)). It does learn: ECE fell
+  from 0.473 to 0.308 and NLL from 2.40 to 1.04 at the final checkpoint, which the paper's
+  best-training-reward rule selects. That is still about 2.5× the exact arms' ECE. Its held-out
+  learning curve swings between 0.12 and 0.41 ECE across snapshots, so it can reach the exact
+  arms' level (step 200) but does not stay there. Training took 1 h 55 min, against 34 min.
+
 ## Caveat both exact objectives share: nothing anchors the format
 
 $\pi$ is renormalized over the eleven strings, so both exact objectives are invariant to

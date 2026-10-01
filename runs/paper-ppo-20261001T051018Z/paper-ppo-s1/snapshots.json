@@ -18,5 +18,9 @@
   {
     "step": 200,
     "sampler_path": "tinker://00eb2e57-ec32-5262-aec1-6a20ee693fec:train:0/sampler_weights/step-00200"
+  },
+  {
+    "step": 240,
+    "sampler_path": "tinker://00eb2e57-ec32-5262-aec1-6a20ee693fec:train:0/sampler_weights/step-00240"
   }
 ]

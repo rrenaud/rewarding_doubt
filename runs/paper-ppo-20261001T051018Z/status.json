@@ -19,10 +19,10 @@
     "eval_args": "--prompt paper"
   },
   "completed": [
-    "base-eval"
+    "base-eval",
+    "paper-ppo-s1",
+    "paper-ppo-s1-eval"
   ],
-  "running": [
-    "paper-ppo-s1"
-  ],
-  "state": "running"
+  "running": [],
+  "state": "complete"
 }

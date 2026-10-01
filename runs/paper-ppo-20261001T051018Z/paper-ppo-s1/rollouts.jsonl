@@ -1726,3 +1726,323 @@
 {"step": 216, "id": "tc_1483", "text": "Answer: Handball, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
 {"step": 216, "id": "tc_523", "text": "Answer: MC Hammer, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
 {"step": 216, "id": "tc_736", "text": "Answer: Oliver, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 217, "id": "tc_9", "text": "Answer: London, England, UK, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 217, "id": "tc_1198", "text": "Answer: Chico, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 217, "id": "tc_1580", "text": "Answer: Roy Emerson, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 217, "id": "tc_27", "text": "Answer: 1874, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 217, "id": "tc_1167", "text": "Answer: Frank Langella, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 217, "id": "tc_1153", "text": "Answer: Julie Christie, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 217, "id": "tc_553", "text": "Answer: The Four Seasons, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 217, "id": "tc_764", "text": "Answer: Russia, Confidence: 2", "correct": true, "confidence": 2, "score": 7.841747339168339}
+{"step": 218, "id": "tc_789", "text": "Answer: Thomas Jefferson, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 218, "id": "tc_711", "text": "Answer: China, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 218, "id": "tc_55", "text": "Answer: Gerald Ford, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 218, "id": "tc_1017", "text": "Answer: Diana Ross, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 218, "id": "tc_1158", "text": "Answer: Cliff Robertson, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 218, "id": "tc_1672", "text": "Answer: Franklin D. Roosevelt, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 218, "id": "tc_17", "text": "Answer: William Golding, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 218, "id": "tc_1122", "text": "Answer: 2001: A Space Odyssey, Confidence: 8", "correct": true, "confidence": 8, "score": 11.856643627827342}
+{"step": 219, "id": "tc_486", "text": "Answer: 28, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 219, "id": "tc_275", "text": "Answer: Apollo, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 219, "id": "tc_991", "text": "Answer: Herbert Marcuse, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 219, "id": "tc_243", "text": "Answer: Togo, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 219, "id": "tc_1046", "text": "Answer: Italy, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 219, "id": "tc_825", "text": "Answer: Georgia, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 219, "id": "tc_921", "text": "Answer: M*A*S*H, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 219, "id": "tc_231", "text": "Answer: Portugal, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 220, "id": "tc_1258", "text": "Answer: Isaac Asimov, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 220, "id": "tc_1316", "text": "Answer: Geneva, Switzerland, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 220, "id": "tc_600", "text": "Answer: Medusa, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 220, "id": "tc_1519", "text": "Answer: November, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 220, "id": "tc_1113", "text": "Answer: The Big Lebowski, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 220, "id": "tc_1071", "text": "Answer: David Bowie, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 220, "id": "tc_773", "text": "Answer: William Bruce Rose Jr., Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 220, "id": "tc_936", "text": "Answer: B.J. Hunnicutt, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 221, "id": "tc_976", "text": "Answer: Photographer, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 221, "id": "tc_776", "text": "Answer: Australia, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 221, "id": "tc_1448", "text": "Answer: Helsinki, Finland, 1983, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 221, "id": "tc_555", "text": "Answer: United States, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 221, "id": "tc_992", "text": "Answer: 46,055,000 acres, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 221, "id": "tc_1026", "text": "Answer: The Beatles, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 221, "id": "tc_1135", "text": "Answer: Meryl Streep, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 221, "id": "tc_978", "text": "Answer: 68, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 222, "id": "tc_620", "text": "Answer: Superman, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 222, "id": "tc_928", "text": "Answer: Jack Crabb, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 222, "id": "tc_1574", "text": "Answer: Germany, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 222, "id": "tc_212", "text": "Answer: Anwar Sadat, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 222, "id": "tc_973", "text": "Answer: \"You've Got a Lot of Nerve\" by The Beatles, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 222, "id": "tc_10", "text": "Answer: The Chicago Bears, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 222, "id": "tc_1132", "text": "Answer: Tokyo, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 222, "id": "tc_1199", "text": "Answer: The Jerk, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 223, "id": "tc_1205", "text": "Answer: The Music Man, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 223, "id": "tc_582", "text": "Answer: William, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 223, "id": "tc_315", "text": "Answer: Nevada, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 223, "id": "tc_11", "text": "Answer: Netherlands, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 223, "id": "tc_851", "text": "Answer: Art historian, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 223, "id": "tc_680", "text": "Answer: Joseph Papp, Confidence: 4", "correct": true, "confidence": 4, "score": 9.84919548349784}
+{"step": 223, "id": "tc_1607", "text": "Answer: Bob Barker, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 223, "id": "tc_1317", "text": "Answer: Turkey, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 224, "id": "tc_1536", "text": "Answer: Israeli, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 224, "id": "tc_1417", "text": "Answer: 0, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 224, "id": "tc_926", "text": "Answer: Oscar Wilde, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 224, "id": "tc_1092", "text": "Answer: The 1999 Star Wars movie was not a menace; it was a film in the Star Wars franchise. Confidence: 1", "correct": null, "confidence": null, "score": -30.0}
+{"step": 224, "id": "tc_767", "text": "Answer: ...to be courageous, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 224, "id": "tc_114", "text": "Answer: United Kingdom, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 224, "id": "tc_1329", "text": "Answer: Martin, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 224, "id": "tc_930", "text": "Answer: Herself, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 225, "id": "tc_1423", "text": "Answer: Perth, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 225, "id": "tc_1384", "text": "Answer: Dylan Thomas, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 225, "id": "tc_1401", "text": "Answer: Winston Churchill, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 225, "id": "tc_1634", "text": "Answer: Randy Couture, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 225, "id": "tc_331", "text": "Answer: The Fr\u00e9d\u00e9ric Auguste Bartholdi, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 225, "id": "tc_772", "text": "Answer: 1946, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 225, "id": "tc_494", "text": "Answer: Calvin, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 225, "id": "tc_1344", "text": "Answer: Hubble Space Telescope, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 226, "id": "tc_1253", "text": "Answer: Robert Gates, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 226, "id": "tc_882", "text": "Answer: Alan Freed, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 226, "id": "tc_314", "text": "Answer: 1, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 226, "id": "tc_979", "text": "Answer: Diane Hall, Confidence: 3", "correct": true, "confidence": 3, "score": 9.016029225743369}
+{"step": 226, "id": "tc_709", "text": "Answer: Robert De Niro, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 226, "id": "tc_1174", "text": "Answer: The Godfather, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 226, "id": "tc_842", "text": "Answer: 80, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 226, "id": "tc_1551", "text": "Answer: The America's Cup, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 227, "id": "tc_418", "text": "Answer: The Emerald City, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 227, "id": "tc_901", "text": "Answer: Matthew Perry, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 227, "id": "tc_1388", "text": "Answer: Banjo, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 227, "id": "tc_330", "text": "Answer: Maryland, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 227, "id": "tc_370", "text": "Answer: The Longest War, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 227, "id": "tc_560", "text": "Answer: Cannonball Adderley, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 227, "id": "tc_1226", "text": "Answer: The Pink Panther Returns, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 227, "id": "tc_889", "text": "Answer: Gianni Versace, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 228, "id": "tc_710", "text": "Answer: Henry Cabot Lodge, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 228, "id": "tc_1050", "text": "Answer: Pisces, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 228, "id": "tc_32", "text": "Answer: Jock died in a car accident in Dallas, Texas, on November 22, 1963, the same day President John F. Kennedy was assassinated. Confidence: 2", "correct": null, "confidence": null, "score": -30.0}
+{"step": 228, "id": "tc_806", "text": "Answer: Anwar Sadat, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 228, "id": "tc_927", "text": "Answer: DeFazio, Confidence: 8", "correct": false, "confidence": 8, "score": 5.341747339168338}
+{"step": 228, "id": "tc_294", "text": "Answer: IOMA, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 228, "id": "tc_1396", "text": "Answer: 92,000,000, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 228, "id": "tc_360", "text": "Answer: Minnehaha, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 229, "id": "tc_1652", "text": "Answer: Leopold II, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 229, "id": "tc_1418", "text": "Answer: TIROS-1, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 229, "id": "tc_1130", "text": "Answer: The Shawshank Redemption, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 229, "id": "tc_951", "text": "Answer: 1930s, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 229, "id": "tc_1025", "text": "Answer: David, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 229, "id": "tc_1117", "text": "Answer: Michael Keaton, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 229, "id": "tc_102", "text": "Answer: 9000000, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 229, "id": "tc_1567", "text": "Answer: Durham, New Hampshire, United States, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 230, "id": "tc_334", "text": "Answer: Austria, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 230, "id": "tc_184", "text": "Answer: 0, 0, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 230, "id": "tc_1231", "text": "Answer: *42nd Street*, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 230, "id": "tc_514", "text": "Answer: Walter Cronkite, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 230, "id": "tc_1184", "text": "Answer: Tim Rice, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 230, "id": "tc_983", "text": "Answer: Ballet Russe, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 230, "id": "tc_1612", "text": "Answer: A hammer, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 230, "id": "tc_80", "text": "Answer: 1985, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 231, "id": "tc_1100", "text": "Answer: Alien: Resurrection, Confidence: 3", "correct": true, "confidence": 3, "score": 9.016029225743369}
+{"step": 231, "id": "tc_1257", "text": "Answer: Dionne Warwick, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 231, "id": "tc_775", "text": "Answer: Mark Twain, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 231, "id": "tc_1318", "text": "Answer: Las Vegas, Nevada, United States, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 231, "id": "tc_308", "text": "Answer: 10, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 231, "id": "tc_199", "text": "Answer: TV Dinner, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 231, "id": "tc_235", "text": "Answer: Freetown, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 231, "id": "tc_1014", "text": "Answer: Bob Hawke, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 232, "id": "tc_374", "text": "Answer: chuckle and snort, Confidence: 3", "correct": true, "confidence": 3, "score": 9.016029225743369}
+{"step": 232, "id": "tc_1192", "text": "Answer: Roy Scheider, Confidence: 3", "correct": true, "confidence": 3, "score": 9.016029225743369}
+{"step": 232, "id": "tc_1579", "text": "Answer: Minnesota, Confidence: 8", "correct": false, "confidence": 8, "score": 5.341747339168338}
+{"step": 232, "id": "tc_257", "text": "Answer: The Beatles, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 232, "id": "tc_45", "text": "Answer: Federico Fellini, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 232, "id": "tc_285", "text": "Answer: Exxon, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 232, "id": "tc_922", "text": "Answer: Michael Jackson, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 232, "id": "tc_1601", "text": "Answer: World's Largest Rubber Chicken, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 233, "id": "tc_654", "text": "Answer: Grant Wood, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 233, "id": "tc_1061", "text": "Answer: Donna Gaines, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 233, "id": "tc_858", "text": "Answer: Lebanon, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 233, "id": "tc_599", "text": "Answer: Olive, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 233, "id": "tc_765", "text": "Answer: 30, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 233, "id": "tc_1506", "text": "Answer: Baseball, Confidence: 4", "correct": true, "confidence": 4, "score": 9.84919548349784}
+{"step": 233, "id": "tc_1133", "text": "Answer: Ted Danson, Confidence: 3", "correct": true, "confidence": 3, "score": 9.016029225743369}
+{"step": 233, "id": "tc_1362", "text": "Answer: Berlin, Germany, specifically the Reichstag building, , Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 234, "id": "tc_702", "text": "Answer: Frank Sinatra, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 234, "id": "tc_1544", "text": "Answer: Cycling, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 234, "id": "tc_1286", "text": "Answer: The Iron Lady, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 234, "id": "tc_1030", "text": "Answer: RMS Lusitania, Confidence: 8", "correct": true, "confidence": 8, "score": 11.856643627827342}
+{"step": 234, "id": "tc_1215", "text": "Answer: 11, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 234, "id": "tc_1624", "text": "Answer: Henry Winkler, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 234, "id": "tc_1541", "text": "Answer: Australia, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 234, "id": "tc_1651", "text": "Answer: William McKinley, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 235, "id": "tc_1032", "text": "Answer: Mario Puzo, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 235, "id": "tc_898", "text": "Answer: David Bowie, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 235, "id": "tc_1538", "text": "Answer: Chantilly, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 235, "id": "tc_77", "text": "Answer: Thursday, Confidence: 3", "correct": true, "confidence": 3, "score": 9.016029225743369}
+{"step": 235, "id": "tc_236", "text": "Answer: Tanzania, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 235, "id": "tc_87", "text": "Answer: Sydney, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 235, "id": "tc_1368", "text": "Answer: London, England, at the Rainbow Theatre, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 235, "id": "tc_1038", "text": "Answer: The Misfits, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 236, "id": "tc_117", "text": "Answer: The Osmonds, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 236, "id": "tc_1390", "text": "Answer: Go Your Own Way, Confidence: 8", "correct": false, "confidence": 8, "score": 5.341747339168338}
+{"step": 236, "id": "tc_1558", "text": "Answer: Jack Dempsey, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 236, "id": "tc_1275", "text": "Answer: Rod Laver, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 236, "id": "tc_706", "text": "Answer: The first successful demonstration of the radio telegraph, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 236, "id": "tc_845", "text": "Answer: Thomas Kuhn, Confidence: 8", "correct": true, "confidence": 8, "score": 11.856643627827342}
+{"step": 236, "id": "tc_878", "text": "Answer: Les Paul, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 236, "id": "tc_547", "text": "Answer: Mississippi, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 237, "id": "tc_839", "text": "Answer: Naomi Osaka, Confidence: 8", "correct": false, "confidence": 8, "score": 5.341747339168338}
+{"step": 237, "id": "tc_104", "text": "Answer: Live and Let Die, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 237, "id": "tc_1027", "text": "Answer: Kansas, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 237, "id": "tc_637", "text": "Answer: Oliver Stone, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 237, "id": "tc_1349", "text": "Answer: Theodore Maiman, Confidence: 8", "correct": true, "confidence": 8, "score": 11.856643627827342}
+{"step": 237, "id": "tc_1572", "text": "Answer: World Canoe Slalom Championships, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 237, "id": "tc_1256", "text": "Answer: Anastasia, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 237, "id": "tc_621", "text": "Answer: The Eagles, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 238, "id": "tc_258", "text": "Answer: 1980, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 238, "id": "tc_1689", "text": "Answer: Alexander Haig, Confidence: 6", "correct": true, "confidence": 6, "score": 11.023477370072872}
+{"step": 238, "id": "tc_950", "text": "Answer: 1964, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 238, "id": "tc_16", "text": "Answer: Bruce, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 238, "id": "tc_1615", "text": "Answer: Saturday Night Live, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 238, "id": "tc_1515", "text": "Answer: Kinshasa, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 238, "id": "tc_1461", "text": "Answer: John Bertrand, Confidence: 8", "correct": false, "confidence": 8, "score": 5.341747339168338}
+{"step": 238, "id": "tc_1291", "text": "Answer: The Monkees, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 239, "id": "tc_1576", "text": "Answer: Chicago, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 239, "id": "tc_528", "text": "Answer: 1920s, Confidence: 4", "correct": true, "confidence": 4, "score": 9.84919548349784}
+{"step": 239, "id": "tc_1687", "text": "Answer: Geraldine Ferraro, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 239, "id": "tc_624", "text": "Answer: James Newell Osterberg Jr., Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 239, "id": "tc_581", "text": "Answer: BRN, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 239, "id": "tc_785", "text": "Answer: Law, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 239, "id": "tc_618", "text": "Answer: 75, Confidence: 6", "correct": false, "confidence": 6, "score": 7.34919548349784}
+{"step": 239, "id": "tc_964", "text": "Answer: Charles Babbage, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 240, "id": "tc_1141", "text": "Answer: Nellie Bly, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 240, "id": "tc_1364", "text": "Answer: Argentina, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 240, "id": "tc_1528", "text": "Answer: 9, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 240, "id": "tc_584", "text": "Answer: Mexico, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 240, "id": "tc_66", "text": "Answer: Dragon, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 240, "id": "tc_100", "text": "Answer: Florida, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 240, "id": "tc_1031", "text": "Answer: The role of Amy Gardner in \"The Big Chill\" (1983), Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 240, "id": "tc_1603", "text": "Answer: Philip Johnson, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 241, "id": "tc_671", "text": "Answer: John Alcock, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 241, "id": "tc_774", "text": "Answer: Deafness, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 241, "id": "tc_146", "text": "Answer: Nitrous oxide, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 241, "id": "tc_631", "text": "Answer: Marcus Garvey, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 241, "id": "tc_941", "text": "Answer: Rodan, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 241, "id": "tc_745", "text": "Answer: D W Griffith's first names were D.W. Griffith, which is typically written as D.W. Griffith, but his full first name is not widely documented beyond \"D.W.\" Confidence: 2", "correct": null, "confidence": null, "score": -30.0}
+{"step": 241, "id": "tc_1614", "text": "Answer: Robert C. O'Brien, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 241, "id": "tc_1676", "text": "Answer: Dwight D. Eisenhower, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 242, "id": "tc_269", "text": "Answer: L. P. Hartley, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 242, "id": "tc_1664", "text": "Answer: Henry Kissinger, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 242, "id": "tc_572", "text": "Answer: The Panic in Needle Park, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 242, "id": "tc_1413", "text": "Answer: 1, Confidence: 8", "correct": false, "confidence": 8, "score": 5.341747339168338}
+{"step": 242, "id": "tc_46", "text": "Answer: Ecuador, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 242, "id": "tc_966", "text": "Answer: Rope, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 242, "id": "tc_939", "text": "Answer: Gomez's octopus is not a character in the Addams Family, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 242, "id": "tc_1214", "text": "Answer: Joe Gideon, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 243, "id": "tc_1041", "text": "Answer: John F. Kennedy, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 243, "id": "tc_1416", "text": "Answer: 1780s, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 243, "id": "tc_1432", "text": "Answer: Japan, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 243, "id": "tc_1238", "text": "Answer: Hillary Clinton, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 243, "id": "tc_1010", "text": "Answer: Montana, Confidence: 4", "correct": true, "confidence": 4, "score": 9.84919548349784}
+{"step": 243, "id": "tc_944", "text": "Answer: Midsomer Murders, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 243, "id": "tc_835", "text": "Answer: 1942, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 243, "id": "tc_1389", "text": "Answer: *Blood on the Tracks*, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 244, "id": "tc_1143", "text": "Answer: Tom Hanks, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 244, "id": "tc_229", "text": "Answer: Alan Paton, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 244, "id": "tc_175", "text": "Answer: 0, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 244, "id": "tc_879", "text": "Answer: Sam Ervin, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 244, "id": "tc_1044", "text": "Answer: Again, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 244, "id": "tc_1525", "text": "Answer: Running back, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 244, "id": "tc_748", "text": "Answer: Howard Hawks, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 244, "id": "tc_1346", "text": "Answer: Heathrow, Confidence: 3", "correct": true, "confidence": 3, "score": 9.016029225743369}
+{"step": 245, "id": "tc_924", "text": "Answer: The Golden Girls, Confidence: 1", "correct": false, "confidence": 1, "score": 9.697759256647899}
+{"step": 245, "id": "tc_651", "text": "Answer: Colombia, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 245, "id": "tc_640", "text": "Answer: 1900s, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 245, "id": "tc_335", "text": "Answer: The Human League, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 245, "id": "tc_1005", "text": "Answer: The Full Monty, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 245, "id": "tc_917", "text": "Answer: Robert Zemeckis, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 245, "id": "tc_474", "text": "Answer: King David and Bathsheba, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 245, "id": "tc_1426", "text": "Answer: Mary J. Blige, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 246, "id": "tc_796", "text": "Answer: 1982, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 246, "id": "tc_140", "text": "Answer: Friendship 7, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 246, "id": "tc_594", "text": "Answer: Natalie Wood, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 246, "id": "tc_1178", "text": "Answer: Olivia Newton-John, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 246, "id": "tc_1450", "text": "Answer: Jim Plunkett, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 246, "id": "tc_209", "text": "Answer: South Africa, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 246, "id": "tc_1376", "text": "Answer: Crude oil, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 246, "id": "tc_732", "text": "Answer: Bolivia, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 247, "id": "tc_1359", "text": "Answer: Michael Jackson, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 247, "id": "tc_504", "text": "Answer: Winston Churchill, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 247, "id": "tc_230", "text": "Answer: Nairobi, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 247, "id": "tc_1265", "text": "Answer: Sinclair C5, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 247, "id": "tc_1610", "text": "Answer: Timothy Dalton, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 247, "id": "tc_505", "text": "Answer: Stalag Luft III, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 247, "id": "tc_1263", "text": "Answer: William C. Durant, Confidence: 8", "correct": true, "confidence": 8, "score": 11.856643627827342}
+{"step": 247, "id": "tc_90", "text": "Answer: The Great Train Robbery, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 248, "id": "tc_738", "text": "Answer: None, Confidence: 0", "correct": false, "confidence": 0, "score": 10.0}
+{"step": 248, "id": "tc_1463", "text": "Answer: Chris Evert, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 248, "id": "tc_53", "text": "Answer: Tacoma, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 248, "id": "tc_591", "text": "Answer: Lynn Anderson, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 248, "id": "tc_128", "text": "Answer: REO Speedwagon, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 248, "id": "tc_632", "text": "Answer: Magellan, Confidence: 2", "correct": true, "confidence": 2, "score": 7.841747339168339}
+{"step": 248, "id": "tc_1367", "text": "Answer: Amoco Cadiz, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 248, "id": "tc_483", "text": "Answer: Sebastian Melmoth, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 249, "id": "tc_135", "text": "Answer: Life magazine, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 249, "id": "tc_524", "text": "Answer: Kakadu National Park, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 249, "id": "tc_949", "text": "Answer: Emiliano Zapata, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 249, "id": "tc_1269", "text": "Answer: Cynthia Lennon, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 249, "id": "tc_39", "text": "Answer: Fiji, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 249, "id": "tc_830", "text": "Answer: Ivory, Confidence: 4", "correct": false, "confidence": 4, "score": 8.52347737007287}
+{"step": 249, "id": "tc_1507", "text": "Answer: Eric Dickerson, Confidence: 6", "correct": false, "confidence": 6, "score": 7.34919548349784}
+{"step": 249, "id": "tc_1529", "text": "Answer: The Masters Tournament, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 250, "id": "tc_1223", "text": "Answer: Glenwood High School, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 250, "id": "tc_1315", "text": "Answer: Chile, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 250, "id": "tc_753", "text": "Answer: 1960s, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 250, "id": "tc_1524", "text": "Answer: Zimbabwe, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 250, "id": "tc_228", "text": "Answer: Humphrey Bogart, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 250, "id": "tc_1161", "text": "Answer: Titanic, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 250, "id": "tc_824", "text": "Answer: Millard, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 250, "id": "tc_50", "text": "Answer: Boxing, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 251, "id": "tc_960", "text": "Answer: 1908, Confidence: 8", "correct": true, "confidence": 8, "score": 11.856643627827342}
+{"step": 251, "id": "tc_225", "text": "Answer: Zambia and Zimbabwe, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 251, "id": "tc_61", "text": "Answer: Sony, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 251, "id": "tc_617", "text": "Answer: Mandela, Confidence: 2", "correct": true, "confidence": 2, "score": 7.841747339168339}
+{"step": 251, "id": "tc_154", "text": "Answer: 11, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 251, "id": "tc_713", "text": "Answer: Joseph, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 251, "id": "tc_915", "text": "Answer: William Paley, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 251, "id": "tc_864", "text": "Answer: Red Brigades, Confidence: 8", "correct": true, "confidence": 8, "score": 11.856643627827342}
+{"step": 252, "id": "tc_929", "text": "Answer: Bob Saget, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 252, "id": "tc_1385", "text": "Answer: Jennifer Leigh, Confidence: 2", "correct": false, "confidence": 2, "score": 9.356643627827342}
+{"step": 252, "id": "tc_1549", "text": "Answer: Jackson State University, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 252, "id": "tc_136", "text": "Answer: TR, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 252, "id": "tc_1125", "text": "Answer: Michael Keaton, Confidence: 3", "correct": false, "confidence": 3, "score": 8.969918623597668}
+{"step": 252, "id": "tc_84", "text": "Answer: St. Lucia, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 252, "id": "tc_67", "text": "Answer: 2, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 252, "id": "tc_1445", "text": "Answer: Jim Plunkett, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 253, "id": "tc_800", "text": "Answer: Mercury, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 253, "id": "tc_1449", "text": "Answer: Green Bay Packers, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 253, "id": "tc_333", "text": "Answer: Exxon, Confidence: 8", "correct": true, "confidence": 8, "score": 11.856643627827342}
+{"step": 253, "id": "tc_1555", "text": "Answer: Fiji, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 253, "id": "tc_91", "text": "Answer: Goldie Hawn, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 253, "id": "tc_260", "text": "Answer: Sylvester Stallone, Confidence: 8", "correct": false, "confidence": 8, "score": 5.341747339168338}
+{"step": 253, "id": "tc_145", "text": "Answer: The Iron Triangle was a term used to describe the relationship between the U.S. Department of Defense, the U.S. Congress, and the U.S. military-industrial complex. Confidence: 3", "correct": null, "confidence": null, "score": -30.0}
+{"step": 253, "id": "tc_1647", "text": "Answer: Nguyen Tat Thanh, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 254, "id": "tc_299", "text": "Answer: \"Wake Me Up Before You Go-Go\", Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 254, "id": "tc_484", "text": "Answer: Margaret, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 254, "id": "tc_110", "text": "Answer: RMS Lusitania, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 254, "id": "tc_1295", "text": "Answer: Billy Ocean, Confidence: 2", "correct": true, "confidence": 2, "score": 7.841747339168339}
+{"step": 254, "id": "tc_1639", "text": "Answer: Mel Blanc, Confidence: 7", "correct": false, "confidence": 7, "score": 6.5160292257433685}
+{"step": 254, "id": "tc_1240", "text": "Answer: Chess, Confidence: 9", "correct": true, "confidence": 9, "score": 12.197759256647899}
+{"step": 254, "id": "tc_1086", "text": "Answer: Bahrain, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 254, "id": "tc_1279", "text": "Answer: Margaret Tuttle, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 255, "id": "tc_521", "text": "Answer: Oscar Wilde, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 255, "id": "tc_1230", "text": "Answer: David Cassidy, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 255, "id": "tc_107", "text": "Answer: 1965, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 255, "id": "tc_1159", "text": "Answer: Rex Harrison, Confidence: 9", "correct": false, "confidence": 9, "score": 3.3342991948388354}
+{"step": 255, "id": "tc_1556", "text": "Answer: wrestler, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 255, "id": "tc_794", "text": "Answer: Operation Rolling Thunder, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 255, "id": "tc_967", "text": "Answer: High Street, Confidence: 7", "correct": true, "confidence": 7, "score": 11.469918623597666}
+{"step": 255, "id": "tc_1505", "text": "Answer: Football, Confidence: 5", "correct": true, "confidence": 5, "score": 10.495449440187008}
+{"step": 256, "id": "tc_1227", "text": "Answer: Ted Neeley, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 256, "id": "tc_329", "text": "Answer: Norway, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 256, "id": "tc_970", "text": "Answer: Oslo, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 256, "id": "tc_777", "text": "Answer: New York, New York, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 256, "id": "tc_986", "text": "Answer: Indian, Confidence: 10", "correct": false, "confidence": 10, "score": -10.002897584516507}
+{"step": 256, "id": "tc_681", "text": "Answer: Pan American World Airways, Confidence: 5", "correct": false, "confidence": 5, "score": 7.9954494401870075}
+{"step": 256, "id": "tc_1539", "text": "Answer: 1960s, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
+{"step": 256, "id": "tc_218", "text": "Answer: Tutankhamun, Confidence: 10", "correct": true, "confidence": 10, "score": 12.5}
