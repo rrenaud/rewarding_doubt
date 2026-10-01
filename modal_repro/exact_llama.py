@@ -17,6 +17,11 @@ Train.py except the update rule:
   objective on the 11 numbers, the hinge on their total mass, and a stop hinge
   format_weight * relu(log threshold - log P(<eot> | k)). `shared` and `full` score the 11
   complete strings ": k<eot>" instead.
+* --regularization baseline (with --scoring single) replaces the hinges with the released PPO's
+  own terms, computed from the same pass: the expected reward without renormalizing, invalid
+  outcomes scored --invalid-reward (-30 with --reward released), and beta * KL to the base
+  model (adapter disabled, one no-grad pass per question per step) with TRL's adaptive
+  controller (beta 0.05, target 6, horizon 10000). See core.baseline_matched_objective.
 * --passes P --minibatch M reuse each sampled batch like TRL's ppo_epochs / mini_batch_size:
   P passes over the batch in minibatches of M, one Adam step per minibatch. The exact loss is a
   deterministic function of (question, answer, label), so reuse needs no importance weights.
@@ -36,7 +41,8 @@ import torch
 from unsloth import FastLanguageModel  # must precede transformers imports
 import trl
 
-from rewarding_doubt.core import objective
+from rewarding_doubt.core import baseline_matched_objective, objective
+from rewarding_doubt.paper_ppo import AdaptiveKLController
 from shared_prefix import candidate_logps, full_sequence_logps, single_pass_logps, split_candidates
 from subset import subset_loader
 from util.DataHelper import DataCollatorForTokenizedQueries
@@ -46,23 +52,41 @@ from util.ResponseHandling import parse_answer_confidence
 MODEL = "unsloth/llama-3-8b-Instruct-bnb-4bit"
 
 
-def row_loss(model, row, candidates, eot, args):
-    """Loss for one (query, label, sampled number) row: (loss, confidence, valid mass, stop prob)."""
-    query, label, k_star = row
-    stop_prob = None
+def reference_scores(model, query, k_star, candidates):
+    """The base model's number log-probs and stop log-prob for this row (adapter disabled)."""
+    common, numbers, stop = split_candidates(candidates)
+    with torch.no_grad(), model.disable_adapter():
+        logq, stop_logp = single_pass_logps(model, query, common, numbers, stop, k_star)
+    return logq.double(), (stop_logp.double() if stop_logp is not None else None)
+
+
+def row_loss(model, row, candidates, eot, args, beta=0.):
+    """Loss for one row: (loss, confidence, valid mass, stop prob, KL)."""
+    query, label, k_star, ref = row
+    stop_prob, kl = None, None
     if args.scoring == "single":
         common, numbers, stop = split_candidates(candidates)
         logps, stop_logp = single_pass_logps(model, query, common, numbers, stop, k_star)
+        if stop_logp is not None:
+            stop_prob = stop_logp.exp().item()
     else:
         logps, stop_logp = (candidate_logps(model, query, candidates) if args.scoring == "shared"
                             else full_sequence_logps(model, query, candidates, eot)), None
+    if args.regularization == "baseline":
+        logq = logps.double()
+        J, kl_term = baseline_matched_objective(
+            logq, label, args.mode, args.reward, args.invalid_reward,
+            stop_logp.double() if stop_logp is not None else None, k_star, ref[0],
+            ref[1] if stop_logp is not None else None)
+        mass = logq.detach().exp().sum()
+        confidence = (logq.detach().exp() / mass * logq.new_tensor([k / 10 for k in range(11)])).sum()
+        return -J + beta * kl_term, confidence, mass.item(), stop_prob, kl_term.item()
     logps = logps[None].double()
     loss, confidence = objective(logps, logps.new_tensor([label]), args.mode, args.reward,
                                  args.format_weight, args.format_threshold)
     if stop_logp is not None:
         loss = loss + args.format_weight * (math.log(args.format_threshold) - stop_logp.double()).clamp(min=0)
-        stop_prob = stop_logp.exp().item()
-    return loss, confidence, logps.detach().logsumexp(-1).exp().item(), stop_prob
+    return loss, confidence, logps.detach().logsumexp(-1).exp().item(), stop_prob, kl
 
 
 def sample_numbers(model, tokenizer, queries, candidates, eot):
@@ -100,12 +124,21 @@ def main():
     parser.add_argument("--passes", type=int, default=1)
     parser.add_argument("--minibatch", type=int, default=0, help="default: the whole batch")
     parser.add_argument("--save-every", type=int, default=0, help="also save adapters every N steps")
+    parser.add_argument("--regularization", choices=["hinge", "baseline"], default="hinge")
+    parser.add_argument("--invalid-reward", type=float, default=None, help="default: -30 released, -3 paper")
+    parser.add_argument("--kl-coef", type=float, default=0.05)
+    parser.add_argument("--kl-target", type=float, default=6.)
+    parser.add_argument("--kl-horizon", type=float, default=10000.)
     parser.add_argument("--scoring", choices=["single", "shared", "full"], default="single",
                         help="single: one pass, 11 number probabilities + stop check on a sampled number; "
                              "shared: prefix pass + 11 cached continuations; full: 11 full sequences "
                              "(the runs before 2026-10-01T20Z)")
     parser.add_argument("--seed", type=int, default=2)
     args = parser.parse_args()
+    if args.regularization == "baseline" and args.scoring != "single":
+        parser.error("--regularization baseline needs --scoring single")
+    if args.invalid_reward is None:
+        args.invalid_reward = -30. if args.reward == "released" else -3.
     torch.manual_seed(args.seed)
     os.makedirs(args.out_dir, exist_ok=True)
 
@@ -133,6 +166,7 @@ def main():
     optimizer = torch.optim.Adam([p for p in model.parameters() if p.requires_grad], lr=args.lr)
     generation = dict(max_new_tokens=256, eos_token_id=[tokenizer.eos_token_id, eot, confidence_token],
                       do_sample=True, temperature=0.6, top_p=0.9, pad_token_id=tokenizer.eos_token_id)
+    kl_controller = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon)
     rng = random.Random(args.seed)  # question order: identical for every --passes setting
     row_rng = random.Random(args.seed + 1)
     step = 0
@@ -160,12 +194,15 @@ def main():
                 if prediction is None:
                     continue
                 correct = is_answer_correct(prediction, batch["gt_candidates"][i], Metric.F1, 0.5)
-                rows.append((prompt + answer, float(correct), None))
+                rows.append((prompt + answer, float(correct), None, None))
             if args.scoring == "single" and rows:
-                picks = sample_numbers(model, tokenizer, [q for q, _, _ in rows], candidates, eot)
-                rows = [(q, label, k) for (q, label, _), k in zip(rows, picks)]
+                picks = sample_numbers(model, tokenizer, [r[0] for r in rows], candidates, eot)
+                rows = [(q, label, k, None) for (q, label, _, _), k in zip(rows, picks)]
             FastLanguageModel.for_training(model)
-            stats = dict(loss=0., confidence=0., mass=0., hinge_active=0., stop_prob=0., sampled_number_rate=0.)
+            if args.regularization == "baseline":  # reference scores are fixed for the whole step
+                rows = [(q, label, k, reference_scores(model, q, k, candidates)) for q, label, k, _ in rows]
+            stats = dict(loss=0., confidence=0., mass=0., hinge_active=0., stop_prob=0., sampled_number_rate=0.,
+                         kl=0., kl_coef=kl_controller.value)
             stop_checks = 0
             minibatch = args.minibatch or args.batchsize
             updates = 0
@@ -176,7 +213,8 @@ def main():
                     mb = [rows[i] for i in order_rows[mb_start:mb_start + minibatch]]
                     optimizer.zero_grad()
                     for row in mb:
-                        loss, confidence, mass, stop_prob = row_loss(model, row, candidates, eot, args)
+                        loss, confidence, mass, stop_prob, kl = row_loss(model, row, candidates, eot, args,
+                                                                         kl_controller.value)
                         (loss / len(mb)).backward()
                         if epoch_pass == 0:  # log pre-update statistics, once per row
                             stats["loss"] += loss.item() / len(rows)
@@ -187,9 +225,13 @@ def main():
                             if stop_prob is not None:
                                 stats["stop_prob"] += stop_prob
                                 stop_checks += 1
+                            if kl is not None:
+                                stats["kl"] += kl / len(rows)
                     optimizer.step()
                     updates += 1
             stats["stop_prob"] = stats["stop_prob"] / stop_checks if stop_checks else None
+            if args.regularization == "baseline":  # TRL updates after each batch, n_steps = batch size
+                kl_controller.update(stats["kl"], args.batchsize)
             step += 1
             record = dict(step=step, epoch=epoch, rows=len(rows), skipped=len(out) - len(rows),
                           answer_accuracy=sum(r[1] for r in rows) / max(1, len(rows)), updates=updates,

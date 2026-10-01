@@ -125,3 +125,48 @@ def test_format_hinge_only_penalizes_low_valid_mass():
         z = collapsed.clone().requires_grad_()
         objective(z, labels, mode, format_weight=1.)[0].backward()
         assert float(z.grad.sum()) < 0  # descent raises every candidate's log-probability
+
+
+def test_baseline_matched_objective_reduces_to_exact_when_format_is_perfect():
+    from rewarding_doubt.core import baseline_matched_objective
+    pi = torch.tensor([0.] * 8 + [.2, .3, .5], dtype=torch.float64)
+    logq = torch.where(pi > 0, pi.log(), torch.full_like(pi, -40.))
+    perfect_stop = torch.tensor(0., dtype=torch.float64)
+    for mode in ["discrete-exact", "fractional"]:
+        J, kl = baseline_matched_objective(logq, 1., mode, "released", -30., perfect_stop, 9, logq, perfect_stop)
+        expected = -objective(logq[None], torch.tensor([1.], dtype=torch.float64), mode, "released")[0]
+        assert float(J) == pytest.approx(float(expected), abs=1e-4)
+        assert float(kl) == pytest.approx(0., abs=1e-6)
+
+
+def test_baseline_matched_objective_penalizes_invalid_mass_and_not_stopping():
+    from rewarding_doubt.core import baseline_matched_objective
+    pi = torch.tensor([0.] * 8 + [.2, .3, .5], dtype=torch.float64)
+    logq = torch.where(pi > 0, pi.log(), torch.full_like(pi, -40.))
+    stop = torch.tensor(0., dtype=torch.float64)
+    base, _ = baseline_matched_objective(logq, 0., "discrete-exact", "released", -30., stop, 10)
+    # 10% of the mass becomes invalid: J drops by 0.1 * (E[R] - R_invalid).
+    leaky, _ = baseline_matched_objective(logq + math.log(.9), 0., "discrete-exact", "released", -30., stop, 10)
+    assert float(base - leaky) == pytest.approx(0.1 * (float(base) + 30.), rel=1e-4)
+    # Not stopping after the sampled 10 with probability 0.2 costs 0.2 * (R(1.0) - R_invalid).
+    slow, _ = baseline_matched_objective(logq, 0., "discrete-exact", "released", -30., torch.tensor(math.log(.8), dtype=torch.float64), 10)
+    r10 = float(reward(1.0, 0., "released"))
+    assert float(base - slow) == pytest.approx(0.2 * (r10 + 30.), rel=1e-4)
+    # Gradient raises the stop probability and the valid mass.
+    l = logq.clone().requires_grad_(); s = torch.tensor(math.log(.8), dtype=torch.float64, requires_grad=True)
+    J, _ = baseline_matched_objective(l + math.log(.9), 0., "discrete-exact", "released", -30., s, 10)
+    J.backward()
+    assert float(s.grad) > 0 and float(l.grad.sum()) > 0
+
+
+def test_baseline_matched_kl_matches_brute_force():
+    from rewarding_doubt.core import baseline_matched_objective
+    q = torch.tensor([.01] * 8 + [.1, .2, .5], dtype=torch.float64)  # mass 0.88
+    r = torch.tensor([.02] * 8 + [.2, .2, .4], dtype=torch.float64)  # mass 0.96
+    s, s_ref = .9, .99
+    _, kl = baseline_matched_objective(q.log(), 1., "discrete-exact", "released", -30.,
+                                       torch.tensor(math.log(s), dtype=torch.float64), 10,
+                                       r.log(), torch.tensor(math.log(s_ref), dtype=torch.float64))
+    numbers = float((q * (q / r).log()).sum()) + (1 - .88) * math.log((1 - .88) / (1 - .96))
+    stop = s * math.log(s / s_ref) + (1 - s) * math.log((1 - s) / (1 - s_ref))
+    assert float(kl) == pytest.approx(numbers + stop, rel=1e-6)

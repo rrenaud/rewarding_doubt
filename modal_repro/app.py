@@ -377,11 +377,16 @@ def curves(data_run: str = "runs/pilot-20261001T002945Z", gpu: str = "L40S", sav
         configs[f"{mode}-8x"] = [*configs[f"{mode}-1x"], "--passes", "4", "--minibatch", "4"]
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     run_name = f"curves-{'smoke-' if train_limit or eval_limit else ''}{stamp}"
+    _train_and_evaluate(configs, labels.split(","), ids, run_name, gpu)
+
+
+def _train_and_evaluate(configs: dict, chosen: list, ids: dict, run_name: str, gpu: str):
+    """Train each chosen configuration in its own container, then score every snapshot."""
+    root = Path(__file__).resolve().parents[1]
     local = root / "runs" / f"modal-{run_name}"
     local.mkdir(parents=True)
     (local / "ids.json").write_text(json.dumps(ids) + "\n")
-    (local / "configs.json").write_text(json.dumps(configs, indent=2) + "\n")
-    chosen = labels.split(",")
+    (local / "configs.json").write_text(json.dumps({k: configs[k] for k in chosen}, indent=2) + "\n")
     trained = {}
     for result in train_with_snapshots.with_options(gpu=gpu).starmap(
             [(ids, label, configs[label], run_name) for label in chosen], return_exceptions=True):
@@ -482,3 +487,23 @@ def evaluate_dirs(dirs: str, data_run: str = "runs/pilot-20261001T002945Z", gpu:
             print("FAILED", result if isinstance(result, Exception) else result["error"][-3000:])
         else:
             print(json.dumps({k: (round(v, 4) if isinstance(v, float) else v) for k, v in result["metrics"].items()}))
+
+
+@app.local_entrypoint()
+def baseline_matched(data_run: str = "runs/pilot-20261001T002945Z", gpu: str = "L40S", seeds: str = "1,2,3",
+                     modes: str = "discrete-exact,fractional", save_every: int = 64,
+                     train_limit: int = 0, eval_limit: int = 0):
+    """Single-pass exact objectives with the released PPO's own reward, invalid penalty and KL,
+    8 updates per batch, several seeds."""
+    root = Path(__file__).resolve().parents[1]
+    ids = {split: [json.loads(line)["id"] for line in (root / data_run / "data" / f"{name}.jsonl").read_text().splitlines()]
+           for split, name in [("train", "train"), ("validation", "eval")]}
+    if train_limit or eval_limit:  # smoke tests
+        ids = {"train": ids["train"][:train_limit or None], "validation": ids["validation"][:eval_limit or None]}
+    configs = {f"{mode}-baseline-s{seed}": [
+        "exact_llama.py", "IDS_JSON", "OUT_DIR", "--mode", mode, "--seed", seed, "--scoring", "single",
+        "--regularization", "baseline", "--reward", "released", "--passes", "4", "--minibatch", "4",
+        "--save-every", str(save_every)] for mode in modes.split(",") for seed in seeds.split(",")}
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run_name = f"baseline-matched-{'smoke-' if train_limit or eval_limit else ''}{stamp}"
+    _train_and_evaluate(configs, list(configs), ids, run_name, gpu)

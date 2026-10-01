@@ -94,3 +94,48 @@ def calibration_metrics(confidences, labels, bins=10):
                 nll=float(-np.mean(y * np.log(clipped) + (1 - y) * np.log1p(-clipped))),
                 auroc=float(roc_auc_score(y, p)) if len(set(y)) == 2 else None,
                 reliability=reliability)
+
+
+def baseline_matched_objective(logq, label, mode, variant, invalid_reward, stop_logp=None, k_star=None,
+                               ref_logq=None, ref_stop_logp=None):
+    """The released PPO's expected reward and KL, computed from one forward pass.
+
+    logq: [11] unnormalized log-probabilities of ": " followed by number k (not renormalized, so
+    the remaining mass 1 - M is the chance of writing something other than a number).
+    stop_logp: log P(<eot> | k_star) for the number k_star the policy sampled this step.
+
+    Expected reward, with every invalid outcome scored `invalid_reward` as in the released code:
+        J = sum_k q_k R(k/10, y) + (1 - M) R_invalid + (1 - s) (R_invalid - R(k*/10, y))
+    The last term is a one-sample estimate of sum_k q_k (1 - s_k)(R_invalid - R_k), the cost of
+    not stopping after the number, unbiased because k* is sampled with probability q_k.
+    For "fractional", the valid part is M * R(mean of q/M, y) and R(k*/10) becomes that reward.
+
+    KL to the reference model over the same outcomes: the number distribution with the invalid
+    bucket, plus the stop distribution at k* (a one-sample estimate of its q-weighted average).
+    Returns (J, KL); the training loss is -J + beta * KL.
+    """
+    eps = 1e-6
+    levels = logq.new_tensor(LEVELS)
+    q = logq.exp()
+    mass = q.sum().clamp(max=1 - eps)
+    rewards = reward(levels, label, variant)
+    if mode == "discrete-exact":
+        J = (q * rewards).sum()
+        sampled_reward = rewards[k_star] if k_star is not None else None
+    elif mode == "fractional":
+        mean_reward = reward((q / mass * levels).sum(), label, variant)
+        J = mass * mean_reward
+        sampled_reward = mean_reward
+    else:
+        raise ValueError(f"Unknown exact objective: {mode}")
+    J = J + (1 - mass) * invalid_reward
+    if stop_logp is not None:
+        J = J + (1 - stop_logp.exp()) * (invalid_reward - sampled_reward)
+    if ref_logq is None:
+        return J, logq.new_zeros(())
+    ref_mass = ref_logq.exp().sum().clamp(max=1 - eps)
+    kl = (q * (logq - ref_logq)).sum() + (1 - mass) * (torch.log1p(-mass) - torch.log1p(-ref_mass))
+    if stop_logp is not None:
+        s, s_ref = stop_logp.exp().clamp(max=1 - eps), ref_stop_logp.exp().clamp(max=1 - eps)
+        kl = kl + s * (stop_logp - ref_stop_logp) + (1 - s) * (torch.log1p(-s) - torch.log1p(-s_ref))
+    return J, kl
