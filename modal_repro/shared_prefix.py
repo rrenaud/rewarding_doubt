@@ -1,4 +1,9 @@
-"""Score the 11 confidence strings with one pass over the shared prefix.
+"""Score the 11 confidence strings without recomputing the shared prefix 11 times.
+
+Two methods live here. `single_pass_logps` (the default in exact_llama.py) reads all 11 number
+probabilities from one softmax in one ordinary forward pass, and checks that the model stops
+after one sampled number. `candidate_logps` scores all 11 complete strings, including the stop
+token, with a KV cache; it is described below.
 
 The strings ": k<eot>" share every token up to the number. Llama-3 tokenizes them as
 [":", " ", k, <eot>], with "10" a single token. So:
@@ -115,3 +120,33 @@ def full_sequence_logps(model, query, candidates, pad):
         positions = torch.arange(len(query) - 1, len(query) - 1 + len(c), device=device)
         out.append(logits[k, positions].log_softmax(-1).gather(-1, torch.tensor(c, device=device)[:, None]).sum())
     return torch.stack(out)
+
+
+def split_candidates(candidates):
+    """Split ": k<eot>"-style candidates into (common prefix, one number token per k, stop token).
+
+    Single-pass scoring needs every candidate to be common + [number] + [stop] with a distinct
+    single-token number (true for Llama-3, where "10" is one token).
+    """
+    common = _common_prefix(candidates)
+    rests = [c[len(common):] for c in candidates]
+    if any(len(r) != 2 for r in rests) or len({r[1] for r in rests}) != 1 or len({r[0] for r in rests}) != len(rests):
+        raise ValueError("single-pass scoring needs candidates of the form common + [number] + [stop]")
+    return common, [r[0] for r in rests], rests[0][1]
+
+
+def single_pass_logps(model, query, common, numbers, stop, k_star=None):
+    """One ordinary forward pass over query + common (+ the sampled number k_star).
+
+    Returns ([len(numbers)] log P(common) + log P(number_k), log P(stop | ..., number_{k_star}) or None).
+    The number distribution comes from one softmax at the position after `common`; the stop check
+    rides along as one extra position when a sampled k_star is given.
+    """
+    device = model.base_model.model.lm_head.weight.device
+    tokens = query + common + ([numbers[k_star]] if k_star is not None else [])
+    logits = model(input_ids=torch.tensor([tokens], device=device)).logits[0]
+    n = len(query) + len(common)
+    common_logp = sum(logits[len(query) - 1 + i].float().log_softmax(-1)[t] for i, t in enumerate(common)) if common else 0.
+    number_logps = common_logp + logits[n - 1].float().log_softmax(-1)[torch.tensor(numbers, device=device)]
+    stop_logp = logits[n].float().log_softmax(-1)[stop] if k_star is not None else None
+    return number_logps, stop_logp

@@ -1,0 +1,71 @@
+{
+  "ppo": [
+    "subset.py",
+    "train",
+    "IDS_JSON",
+    "--save-every",
+    "32",
+    "--",
+    "--out_dir",
+    "OUT_DIR",
+    "--dataset",
+    "triviaqa",
+    "--is_unsloth",
+    "--model_dir",
+    "unsloth/llama-3-8b-Instruct-bnb-4bit",
+    "--tokenizer_dir",
+    "unsloth/llama-3-8b-Instruct-bnb-4bit",
+    "--epochs",
+    "2",
+    "--lr",
+    "1e-5",
+    "--batchsize",
+    "8",
+    "--log_with",
+    "tensorboard"
+  ],
+  "discrete-exact-1x": [
+    "exact_llama.py",
+    "IDS_JSON",
+    "OUT_DIR",
+    "--mode",
+    "discrete-exact",
+    "--save-every",
+    "32"
+  ],
+  "discrete-exact-8x": [
+    "exact_llama.py",
+    "IDS_JSON",
+    "OUT_DIR",
+    "--mode",
+    "discrete-exact",
+    "--save-every",
+    "32",
+    "--passes",
+    "4",
+    "--minibatch",
+    "4"
+  ],
+  "fractional-1x": [
+    "exact_llama.py",
+    "IDS_JSON",
+    "OUT_DIR",
+    "--mode",
+    "fractional",
+    "--save-every",
+    "32"
+  ],
+  "fractional-8x": [
+    "exact_llama.py",
+    "IDS_JSON",
+    "OUT_DIR",
+    "--mode",
+    "fractional",
+    "--save-every",
+    "32",
+    "--passes",
+    "4",
+    "--minibatch",
+    "4"
+  ]
+}

@@ -11,6 +11,12 @@ Train.py except the update rule:
   F1 > 0.5 code; then all 11 continuations ": k<eot>" are teacher-forced and the loss is
   rewarding_doubt.core.objective (the same function as the Tinker runs), averaged over rows
 * optimizer: torch.optim.Adam(lr), as TRL uses; batch 8; 2 epochs; torch.manual_seed(2)
+* --scoring single (default): after the answer, the policy samples its confidence continuation at
+  T=1 (as Train.py's second generate does); one forward pass over query + ": " + sampled number
+  gives log P(k) for all 11 numbers (one softmax) and log P(<eot> | sampled k). The loss is the
+  objective on the 11 numbers, the hinge on their total mass, and a stop hinge
+  format_weight * relu(log threshold - log P(<eot> | k)). `shared` and `full` score the 11
+  complete strings ": k<eot>" instead.
 * --passes P --minibatch M reuse each sampled batch like TRL's ppo_epochs / mini_batch_size:
   P passes over the batch in minibatches of M, one Adam step per minibatch. The exact loss is a
   deterministic function of (question, answer, label), so reuse needs no importance weights.
@@ -21,6 +27,7 @@ Train.py except the update rule:
 """
 import argparse
 import json
+import math
 import os
 import random
 import time
@@ -30,7 +37,7 @@ from unsloth import FastLanguageModel  # must precede transformers imports
 import trl
 
 from rewarding_doubt.core import objective
-from shared_prefix import candidate_logps, full_sequence_logps
+from shared_prefix import candidate_logps, full_sequence_logps, single_pass_logps, split_candidates
 from subset import subset_loader
 from util.DataHelper import DataCollatorForTokenizedQueries
 from util.EvaluationMetrics import Metric, is_answer_correct
@@ -39,13 +46,43 @@ from util.ResponseHandling import parse_answer_confidence
 MODEL = "unsloth/llama-3-8b-Instruct-bnb-4bit"
 
 
-def row_loss(model, query, label, candidates, eot, args):
-    """Score the 11 continuations after one query; return (loss, confidence, valid mass)."""
-    logps = (candidate_logps(model, query, candidates) if args.scoring == "shared"
-             else full_sequence_logps(model, query, candidates, eot))[None].double()
+def row_loss(model, row, candidates, eot, args):
+    """Loss for one (query, label, sampled number) row: (loss, confidence, valid mass, stop prob)."""
+    query, label, k_star = row
+    stop_prob = None
+    if args.scoring == "single":
+        common, numbers, stop = split_candidates(candidates)
+        logps, stop_logp = single_pass_logps(model, query, common, numbers, stop, k_star)
+    else:
+        logps, stop_logp = (candidate_logps(model, query, candidates) if args.scoring == "shared"
+                            else full_sequence_logps(model, query, candidates, eot)), None
+    logps = logps[None].double()
     loss, confidence = objective(logps, logps.new_tensor([label]), args.mode, args.reward,
                                  args.format_weight, args.format_threshold)
-    return loss, confidence, logps.detach().logsumexp(-1).exp().item()
+    if stop_logp is not None:
+        loss = loss + args.format_weight * (math.log(args.format_threshold) - stop_logp.double()).clamp(min=0)
+        stop_prob = stop_logp.exp().item()
+    return loss, confidence, logps.detach().logsumexp(-1).exp().item(), stop_prob
+
+
+def sample_numbers(model, tokenizer, queries, candidates, eot):
+    """Sample each query's confidence continuation at T=1 and return the sampled number index.
+
+    None when the continuation is not ": <number>" (the mass hinge covers that case).
+    """
+    common, numbers, _ = split_candidates(candidates)
+    width = max(map(len, queries))
+    input_ids = torch.tensor([[tokenizer.eos_token_id] * (width - len(q)) + q for q in queries]).cuda()
+    mask = torch.tensor([[0] * (width - len(q)) + [1] * len(q) for q in queries]).cuda()
+    with torch.no_grad():
+        out = model.generate(input_ids=input_ids, attention_mask=mask, max_new_tokens=len(common) + 2,
+                             do_sample=True, temperature=1.0, top_p=1.0, top_k=0,
+                             eos_token_id=[tokenizer.eos_token_id, eot], pad_token_id=tokenizer.eos_token_id)
+    picks = []
+    for row in out[:, width:].tolist():
+        ok = row[:len(common)] == common and len(row) > len(common) and row[len(common)] in numbers
+        picks.append(numbers.index(row[len(common)]) if ok else None)
+    return picks
 
 
 def main():
@@ -63,9 +100,10 @@ def main():
     parser.add_argument("--passes", type=int, default=1)
     parser.add_argument("--minibatch", type=int, default=0, help="default: the whole batch")
     parser.add_argument("--save-every", type=int, default=0, help="also save adapters every N steps")
-    parser.add_argument("--scoring", choices=["shared", "full"], default="shared",
-                        help="shared: one prefix pass + 11 cached continuations (verified equal to full within "
-                             "bf16 noise, ~1.9x faster); full: 11 full sequences (runs before 2026-10-01T20Z)")
+    parser.add_argument("--scoring", choices=["single", "shared", "full"], default="single",
+                        help="single: one pass, 11 number probabilities + stop check on a sampled number; "
+                             "shared: prefix pass + 11 cached continuations; full: 11 full sequences "
+                             "(the runs before 2026-10-01T20Z)")
     parser.add_argument("--seed", type=int, default=2)
     args = parser.parse_args()
     torch.manual_seed(args.seed)
@@ -122,9 +160,13 @@ def main():
                 if prediction is None:
                     continue
                 correct = is_answer_correct(prediction, batch["gt_candidates"][i], Metric.F1, 0.5)
-                rows.append((prompt + answer, float(correct)))
+                rows.append((prompt + answer, float(correct), None))
+            if args.scoring == "single" and rows:
+                picks = sample_numbers(model, tokenizer, [q for q, _, _ in rows], candidates, eot)
+                rows = [(q, label, k) for (q, label, _), k in zip(rows, picks)]
             FastLanguageModel.for_training(model)
-            stats = dict(loss=0., confidence=0., mass=0., hinge_active=0.)
+            stats = dict(loss=0., confidence=0., mass=0., hinge_active=0., stop_prob=0., sampled_number_rate=0.)
+            stop_checks = 0
             minibatch = args.minibatch or args.batchsize
             updates = 0
             for epoch_pass in range(args.passes):
@@ -133,19 +175,24 @@ def main():
                 for mb_start in range(0, len(order_rows), minibatch):
                     mb = [rows[i] for i in order_rows[mb_start:mb_start + minibatch]]
                     optimizer.zero_grad()
-                    for query, label in mb:
-                        loss, confidence, mass = row_loss(model, query, label, candidates, eot, args)
+                    for row in mb:
+                        loss, confidence, mass, stop_prob = row_loss(model, row, candidates, eot, args)
                         (loss / len(mb)).backward()
                         if epoch_pass == 0:  # log pre-update statistics, once per row
                             stats["loss"] += loss.item() / len(rows)
                             stats["confidence"] += confidence.item() / len(rows)
                             stats["mass"] += mass / len(rows)
                             stats["hinge_active"] += (mass < args.format_threshold) / len(rows)
+                            stats["sampled_number_rate"] += (row[2] is not None) / len(rows)
+                            if stop_prob is not None:
+                                stats["stop_prob"] += stop_prob
+                                stop_checks += 1
                     optimizer.step()
                     updates += 1
+            stats["stop_prob"] = stats["stop_prob"] / stop_checks if stop_checks else None
             step += 1
             record = dict(step=step, epoch=epoch, rows=len(rows), skipped=len(out) - len(rows),
-                          answer_accuracy=sum(l for _, l in rows) / max(1, len(rows)), updates=updates,
+                          answer_accuracy=sum(r[1] for r in rows) / max(1, len(rows)), updates=updates,
                           seconds=time.time() - t0, time=time.time(), **stats)
             if args.save_every and step % args.save_every == 0:
                 t_save = time.time()

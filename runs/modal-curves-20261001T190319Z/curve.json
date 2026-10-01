@@ -1,0 +1,372 @@
+{
+  "ppo": {
+    "32": {
+      "model": "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00032",
+      "n": 512,
+      "wrong_format_rate": 0.00390625,
+      "ece": 0.15039180219173431,
+      "accuracy": 0.6313725490196078,
+      "auroc": 0.6184171402140874,
+      "brier": 0.23786274509803929
+    },
+    "64": {
+      "model": "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00064",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.15107980370521545,
+      "accuracy": 0.6267190569744597,
+      "auroc": 0.6218775779574327,
+      "brier": 0.2384086444007859
+    },
+    "96": {
+      "model": "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00096",
+      "n": 512,
+      "wrong_format_rate": 0.001953125,
+      "ece": 0.08238827437162399,
+      "accuracy": 0.6360078277886497,
+      "auroc": 0.7004880066170389,
+      "brier": 0.20409001956947168
+    },
+    "128": {
+      "model": "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.00390625,
+      "ece": 0.1015687882900238,
+      "accuracy": 0.6431372549019608,
+      "auroc": 0.6626742160278746,
+      "brier": 0.2154901960784314
+    },
+    "160": {
+      "model": "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00160",
+      "n": 512,
+      "wrong_format_rate": 0.00390625,
+      "ece": 0.10666537284851074,
+      "accuracy": 0.6411764705882353,
+      "auroc": 0.7128139569860129,
+      "brier": 0.2108627450980392
+    },
+    "192": {
+      "model": "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00192",
+      "n": 512,
+      "wrong_format_rate": 0.00390625,
+      "ece": 0.06137164309620857,
+      "accuracy": 0.6333333333333333,
+      "auroc": 0.7446234333868644,
+      "brier": 0.19150980392156866
+    },
+    "224": {
+      "model": "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00224",
+      "n": 512,
+      "wrong_format_rate": 0.001953125,
+      "ece": 0.060079462826251984,
+      "accuracy": 0.649706457925636,
+      "auroc": 0.7170778084404658,
+      "brier": 0.19622309197651666
+    },
+    "256": {
+      "model": "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00256",
+      "n": 512,
+      "wrong_format_rate": 0.00390625,
+      "ece": 0.08117526769638062,
+      "accuracy": 0.6333333333333333,
+      "auroc": 0.731560735749408,
+      "brier": 0.20039215686274514
+    }
+  },
+  "discrete-exact-1x": {
+    "32": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-1x/snapshot-step00032",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.26443877816200256,
+      "accuracy": 0.6365422396856582,
+      "auroc": 0.6369703036369704,
+      "brier": 0.2880550098231827
+    },
+    "64": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-1x/snapshot-step00064",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.1964641958475113,
+      "accuracy": 0.6365422396856582,
+      "auroc": 0.6441107774441107,
+      "brier": 0.2555206286836935
+    },
+    "96": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-1x/snapshot-step00096",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.16620808839797974,
+      "accuracy": 0.6385068762278978,
+      "auroc": 0.6261204013377926,
+      "brier": 0.24341846758349706
+    },
+    "128": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-1x/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.13988137245178223,
+      "accuracy": 0.6404715127701375,
+      "auroc": 0.6013024238157498,
+      "brier": 0.23563850687622792
+    },
+    "160": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-1x/snapshot-step00160",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.11198443174362183,
+      "accuracy": 0.6365422396856582,
+      "auroc": 0.6434184184184183,
+      "brier": 0.22369351669941065
+    },
+    "192": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-1x/snapshot-step00192",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.09076474606990814,
+      "accuracy": 0.6345776031434185,
+      "auroc": 0.7197226938313527,
+      "brier": 0.20719056974459726
+    },
+    "224": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-1x/snapshot-step00224",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.07720894366502762,
+      "accuracy": 0.6404715127701375,
+      "auroc": 0.7221998726071945,
+      "brier": 0.19797642436149315
+    },
+    "256": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-1x/snapshot-step00256",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.06640367954969406,
+      "accuracy": 0.6365422396856582,
+      "auroc": 0.7082165498832165,
+      "brier": 0.2002357563850688
+    }
+  },
+  "fractional-1x": {
+    "32": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-1x/snapshot-step00032",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.27622684836387634,
+      "accuracy": 0.6385068762278978,
+      "auroc": 0.6486371237458194,
+      "brier": 0.2917485265225933
+    },
+    "64": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-1x/snapshot-step00064",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.21728846430778503,
+      "accuracy": 0.6345776031434185,
+      "auroc": 0.645402643230467,
+      "brier": 0.26546168958742633
+    },
+    "96": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-1x/snapshot-step00096",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.17190660536289215,
+      "accuracy": 0.6385068762278978,
+      "auroc": 0.6342224080267558,
+      "brier": 0.24363457760314342
+    },
+    "128": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-1x/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.14086410403251648,
+      "accuracy": 0.6404715127701375,
+      "auroc": 0.6270910858560462,
+      "brier": 0.23188605108055013
+    },
+    "160": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-1x/snapshot-step00160",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.10903812199831009,
+      "accuracy": 0.6345776031434185,
+      "auroc": 0.6594593694863344,
+      "brier": 0.221434184675835
+    },
+    "192": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-1x/snapshot-step00192",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.07328175753355026,
+      "accuracy": 0.6385068762278978,
+      "auroc": 0.6986538461538461,
+      "brier": 0.20654223968565819
+    },
+    "224": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-1x/snapshot-step00224",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.04852695018053055,
+      "accuracy": 0.6345776031434185,
+      "auroc": 0.6966443623289722,
+      "brier": 0.20371316306483303
+    },
+    "256": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-1x/snapshot-step00256",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.042435258626937866,
+      "accuracy": 0.6326129666011788,
+      "auroc": 0.7081492676121832,
+      "brier": 0.19968565815324169
+    }
+  },
+  "discrete-exact-8x": {
+    "32": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-8x/snapshot-step00032",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.10648393630981445,
+      "accuracy": 0.6345776031434185,
+      "auroc": 0.6733246779187056,
+      "brier": 0.2191355599214146
+    },
+    "64": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-8x/snapshot-step00064",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.07917463779449463,
+      "accuracy": 0.630648330058939,
+      "auroc": 0.7480198183866905,
+      "brier": 0.19161100196463657
+    },
+    "96": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-8x/snapshot-step00096",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.07603175938129425,
+      "accuracy": 0.6326129666011788,
+      "auroc": 0.7742800677583287,
+      "brier": 0.18351669941060905
+    },
+    "128": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-8x/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.06404728442430496,
+      "accuracy": 0.6345776031434185,
+      "auroc": 0.7723459502646559,
+      "brier": 0.18271119842829076
+    },
+    "160": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-8x/snapshot-step00160",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.04675745591521263,
+      "accuracy": 0.6326129666011788,
+      "auroc": 0.7725611983924003,
+      "brier": 0.1789390962671906
+    },
+    "192": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-8x/snapshot-step00192",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.058349139988422394,
+      "accuracy": 0.6385068762278978,
+      "auroc": 0.7822240802675585,
+      "brier": 0.17817288801571712
+    },
+    "224": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-8x/snapshot-step00224",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.051865607500076294,
+      "accuracy": 0.630648330058939,
+      "auroc": 0.805229667926029,
+      "brier": 0.16801571709233792
+    },
+    "256": {
+      "model": "/vol/outputs/curves-20261001T190319Z/discrete-exact-8x/snapshot-step00256",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.05461614578962326,
+      "accuracy": 0.6365422396856582,
+      "auroc": 0.8090423757090424,
+      "brier": 0.16487229862475444
+    }
+  },
+  "fractional-8x": {
+    "32": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-8x/snapshot-step00032",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.06601257622241974,
+      "accuracy": 0.6345776031434185,
+      "auroc": 0.7021954792103599,
+      "brier": 0.20424361493123774
+    },
+    "64": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-8x/snapshot-step00064",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.03143373504281044,
+      "accuracy": 0.6345776031434185,
+      "auroc": 0.7362345617364093,
+      "brier": 0.1883300589390963
+    },
+    "96": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-8x/snapshot-step00096",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.0400780625641346,
+      "accuracy": 0.6326129666011788,
+      "auroc": 0.7345301757066462,
+      "brier": 0.19115913555992145
+    },
+    "128": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-8x/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.033987466245889664,
+      "accuracy": 0.6345776031434185,
+      "auroc": 0.7601118545890341,
+      "brier": 0.18166994106090376
+    },
+    "160": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-8x/snapshot-step00160",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.048920389264822006,
+      "accuracy": 0.6365422396856582,
+      "auroc": 0.755296963630297,
+      "brier": 0.1833595284872299
+    },
+    "192": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-8x/snapshot-step00192",
+      "n": 512,
+      "wrong_format_rate": 0.00390625,
+      "ece": 0.0990203395485878,
+      "accuracy": 0.6392156862745098,
+      "auroc": 0.7404557882101893,
+      "brier": 0.20076470588235293
+    },
+    "224": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-8x/snapshot-step00224",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.048723477870225906,
+      "accuracy": 0.6345776031434185,
+      "auroc": 0.7802523386264523,
+      "brier": 0.17646365422396856
+    },
+    "256": {
+      "model": "/vol/outputs/curves-20261001T190319Z/fractional-8x/snapshot-step00256",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.0724959671497345,
+      "accuracy": 0.6326129666011788,
+      "auroc": 0.78308200750656,
+      "brier": 0.17730844793713166
+    }
+  }
+}

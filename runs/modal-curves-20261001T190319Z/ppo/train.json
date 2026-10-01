@@ -1,0 +1,15 @@
+{
+  "label": "ppo",
+  "exit_code": 0,
+  "gpu": "NVIDIA L40S",
+  "snapshots": [
+    "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00032",
+    "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00064",
+    "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00096",
+    "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00128",
+    "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00160",
+    "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00192",
+    "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00224",
+    "/vol/outputs/curves-20261001T190319Z/ppo/snapshot-step00256"
+  ]
+}

@@ -39,6 +39,7 @@ image = (
     .add_local_file(Path(__file__).parent / "exact_llama.py", f"{CODE}/exact_llama.py", copy=True)
     .add_local_file(Path(__file__).parent / "shared_prefix.py", f"{CODE}/shared_prefix.py", copy=True)
     .add_local_file(Path(__file__).parent / "verify_shared_prefix.py", f"{CODE}/verify_shared_prefix.py", copy=True)
+    .add_local_file(Path(__file__).parent / "verify_single_pass.py", f"{CODE}/verify_single_pass.py", copy=True)
     # Our package, so the exact objectives use the very same core.objective as the Tinker runs.
     .add_local_dir(Path(__file__).parents[1] / "src" / "rewarding_doubt", "/opt/rd/rewarding_doubt", copy=True,
                    ignore=["__pycache__"])
@@ -437,5 +438,34 @@ def verify_shared_prefix(data_run: str = "runs/pilot-20261001T002945Z"):
             print({k: (round(v, 6) if isinstance(v, float) else v) for k, v in c.items() if k != "logp_full"})
         print(result["report"]["seconds_per_question_fwd_bwd"])
     else:
+        print(result["log"][-4000:])
+    print(f"Saved to {local}")
+
+
+@app.function(volumes={VOL: volume}, timeout=HOUR, gpu="L40S")
+def verify_single_pass_remote(ids_by_split: dict, adapter: str) -> dict:
+    import subprocess
+
+    Path("/tmp/ids.json").write_text(json.dumps(ids_by_split))
+    proc = subprocess.run(["python", "verify_single_pass.py", "/tmp/ids.json", adapter], cwd=CODE,
+                          capture_output=True, text=True)
+    path = Path("/tmp/verify_single_report.json")
+    return dict(exit_code=proc.returncode, log=proc.stdout[-20000:] + proc.stderr[-8000:],
+                report=json.loads(path.read_text()) if path.exists() else None)
+
+
+@app.local_entrypoint()
+def verify_single_pass(data_run: str = "runs/pilot-20261001T002945Z",
+                       adapter: str = f"{VOL}/outputs/exact-20261001T171427Z/discrete-exact/model_finetuned_epoch2"):
+    root = Path(__file__).resolve().parents[1]
+    ids = {"train": [json.loads(l)["id"] for l in (root / data_run / "data" / "train.jsonl").read_text().splitlines()]}
+    result = verify_single_pass_remote.remote(ids, adapter)
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    local = root / "runs" / f"modal-verify-single-pass-{stamp}"
+    local.mkdir(parents=True)
+    (local / "log.txt").write_text(result["log"])
+    (local / "report.json").write_text(json.dumps(result["report"], indent=1) + "\n")
+    print("exit", result["exit_code"])
+    if not result["report"]:
         print(result["log"][-4000:])
     print(f"Saved to {local}")
