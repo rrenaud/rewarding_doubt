@@ -469,3 +469,16 @@ def verify_single_pass(data_run: str = "runs/pilot-20261001T002945Z",
     if not result["report"]:
         print(result["log"][-4000:])
     print(f"Saved to {local}")
+
+
+@app.local_entrypoint()
+def evaluate_dirs(dirs: str, data_run: str = "runs/pilot-20261001T002945Z", gpu: str = "L40S"):
+    """Released evaluation (+ unsampled columns) on checkpoint directories already on the Volume."""
+    root = Path(__file__).resolve().parents[1]
+    ids = {"validation": [json.loads(l)["id"] for l in (root / data_run / "data" / "eval.jsonl").read_text().splitlines()]}
+    for result in evaluate_checkpoint.with_options(gpu=gpu).starmap([(ids, d) for d in dirs.split(",")],
+                                                                    return_exceptions=True):
+        if isinstance(result, Exception) or "error" in result:
+            print("FAILED", result if isinstance(result, Exception) else result["error"][-3000:])
+        else:
+            print(json.dumps({k: (round(v, 4) if isinstance(v, float) else v) for k, v in result["metrics"].items()}))

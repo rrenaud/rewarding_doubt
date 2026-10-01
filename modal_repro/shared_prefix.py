@@ -142,7 +142,7 @@ def single_pass_logps(model, query, common, numbers, stop, k_star=None):
     The number distribution comes from one softmax at the position after `common`; the stop check
     rides along as one extra position when a sampled k_star is given.
     """
-    device = model.base_model.model.lm_head.weight.device
+    device = next(model.parameters()).device  # works for PEFT-wrapped and plain models
     tokens = query + common + ([numbers[k_star]] if k_star is not None else [])
     logits = model(input_ids=torch.tensor([tokens], device=device)).logits[0]
     n = len(query) + len(common)

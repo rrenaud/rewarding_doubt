@@ -9,6 +9,12 @@ overwrites it every epoch.
 
     python subset.py train IDS_JSON [--save-every N] -- <Train.py args>
     python subset.py evaluate IDS_JSON MODEL_DIR OUT_JSON
+
+`evaluate` reports the released metrics unchanged (sampled integer confidence) and adds
+unsampled columns at no extra cost: generate() also returns the raw logits of every step, and
+the softmax at the step that emitted the confidence number is pi over the 11 levels. ECE /
+AUROC / Brier are computed from the mean confidence sum_k pi_k k/10 (and ECE from the most
+likely level) on the same rows and labels. Requesting logits does not change sampling.
 """
 import json
 import os
@@ -35,6 +41,42 @@ def subset_loader(ids_by_split):
         system_prompt = get_prompt(descriptor.type)
         return data.map(lambda x: DataHelper.prepare_queries(x, tokenizer, system_prompt, tokenize=True))
     return load_prepared_dataset
+
+
+def unsampled_metrics(tokenizer, captured, results):
+    """Confidence read from the 11-level softmax at the step that emitted the number."""
+    import torch
+    from sklearn.metrics import brier_score_loss, roc_auc_score
+    from torchmetrics.classification import BinaryCalibrationError
+    from util.EvaluationMetrics import Metric, is_answer_correct
+
+    numbers = [tokenizer.encode(f": {k}", add_special_tokens=False)[-1] for k in range(11)]
+    assert len(set(numbers)) == 11, "each level 0..10 must be a single token"
+    confidence_token = tokenizer.convert_tokens_to_ids("ĠConfidence")
+    rows = [(seq, logits) for tokens, step_logits in captured for seq, logits in zip(tokens, step_logits)]
+    if len(rows) != len(results):
+        raise ValueError(f"captured {len(rows)} generations for {len(results)} results")
+    means, argmaxes, masses, labels, missing = [], [], [], [], 0
+    for (seq, logits), result in zip(rows, results):
+        if result.is_wrong_format:  # same rows as the released metrics
+            continue
+        seq = seq.tolist()
+        start = max((i for i, t in enumerate(seq) if t == confidence_token), default=None)
+        step = next((i for i in range(start + 1, min(start + 4, len(seq))) if seq[i] in numbers), None) if start is not None else None
+        if step is None:
+            missing += 1
+            continue
+        probs = logits[step].softmax(-1)[numbers]
+        pi = probs / probs.sum()
+        means.append(float((pi * torch.arange(11)).sum()) / 10)
+        argmaxes.append(int(pi.argmax()) / 10)
+        masses.append(float(probs.sum()))
+        labels.append(int(is_answer_correct(result.prediction, result.gt_candidates, Metric.F1, 0.5)))
+    ece = lambda p: BinaryCalibrationError(n_bins=11, norm="l1")(torch.tensor(p), torch.tensor(labels)).item()
+    return dict(ece_unsampled=ece(means), auroc_unsampled=roc_auc_score(labels, means),
+                brier_unsampled=brier_score_loss(labels, means), ece_unsampled_argmax=ece(argmaxes),
+                number_mass_unsampled=sum(masses) / len(masses), unsampled_rows=len(labels),
+                unsampled_missing=missing)
 
 
 def main():
@@ -97,6 +139,25 @@ def main():
             shutil.copytree(model_dir, policy_dir, ignore=shutil.ignore_patterns("config.json", "pytorch_model.bin"))
             model_dir = policy_dir
         InferenceDatasetSplit.load_prepared_dataset = loader
+        # Capture generate()'s raw per-step logits; inference_dataset still receives the sequences.
+        loaded, captured = {}, []
+        original_loader = InferenceDatasetSplit.load_model_tokenizer
+
+        def keep_model(*load_args, **load_kwargs):
+            model, tokenizer = original_loader(*load_args, **load_kwargs)
+            original_generate = model.generate
+
+            def generate(*gen_args, **gen_kwargs):
+                out = original_generate(*gen_args, output_logits=True, return_dict_in_generate=True, **gen_kwargs)
+                prompt_len = gen_kwargs["input_ids"].shape[1]
+                captured.append((out.sequences[:, prompt_len:].cpu(), torch.stack(out.logits, 1).float().cpu()))
+                return out.sequences
+
+            model.generate = generate
+            loaded["tokenizer"] = tokenizer
+            return model, tokenizer
+
+        InferenceDatasetSplit.load_model_tokenizer = keep_model
         torch.manual_seed(0)
         # Evaluation.py / EvaluateModel.ipynb settings: is_unsloth=True, batch 32, 32 new tokens.
         InferenceDatasetSplit.inference_dataset(model_dir, True, "triviaqa", "validation", out_path)
@@ -108,6 +169,7 @@ def main():
                        accuracy=QAResults_to_accuracy(results, **settings),
                        auroc=QAResults_to_auroc_score(results, **settings),
                        brier=QAResults_to_brier_score(results, **settings))
+        metrics.update(unsampled_metrics(loaded["tokenizer"], captured, results))
         json.dump(metrics, open(out_path.replace(".json", "_metrics.json"), "w"), indent=2)
         print(json.dumps(metrics))
     else:

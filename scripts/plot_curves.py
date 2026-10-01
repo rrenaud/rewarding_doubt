@@ -21,6 +21,10 @@ SERIES = {  # label: (display name, objective color slot, dashed?, optimizer upd
 }
 
 
+# Released metrics, plus the unsampled readout (mean of the 11-level distribution) when present.
+KEYS = ["ece", "auroc", "brier", "accuracy", "ece_unsampled", "auroc_unsampled", "ece_unsampled_argmax"]
+
+
 def step_minutes(label_dir: Path, label: str) -> dict[int, float]:
     """Cumulative training minutes at the end of each step."""
     rows = [json.loads(line) for line in (label_dir / "timing.jsonl").read_text().splitlines() if line.strip()]
@@ -48,11 +52,11 @@ def collect(run: Path, base: dict) -> list[dict]:
         if label not in curve:
             continue
         minutes = step_minutes(run / label, label)
-        points = [dict(step=0, updates=0, minutes=0., **{k: base[k] for k in ["ece", "auroc", "brier", "accuracy"]})]
+        points = [dict(step=0, updates=0, minutes=0., **{k: base.get(k) for k in KEYS})]
         for step, m in sorted(curve[label].items(), key=lambda kv: int(kv[0])):
             step = int(step)
             points.append(dict(step=step, updates=step * updates, minutes=round(minutes[step], 2),
-                               **{k: m[k] for k in ["ece", "auroc", "brier", "accuracy"]}))
+                               **{k: m.get(k) for k in KEYS}))
         series.append(dict(label=label, name=name, slot=slot, dashed=dashed, points=points))
     return series
 
@@ -131,7 +135,7 @@ Only the update rule differs between lines.</p>
 <div class="controls" role="group" aria-label="Chart controls">
   <div><span class="seg-label">Metric</span>
     <span class="seg" id="metric">
-      <button data-v="ece" aria-pressed="true">ECE ↓</button><button data-v="auroc" aria-pressed="false">AUROC ↑</button><button data-v="brier" aria-pressed="false">Brier ↓</button>
+      <button data-v="ece" aria-pressed="true">ECE ↓</button><button data-v="auroc" aria-pressed="false">AUROC ↑</button><button data-v="brier" aria-pressed="false">Brier ↓</button><button data-v="ece_unsampled" aria-pressed="false" data-optional>ECE, unsampled ↓</button><button data-v="auroc_unsampled" aria-pressed="false" data-optional>AUROC, unsampled ↑</button>
     </span></div>
   <div><span class="seg-label">X axis</span>
     <span class="seg" id="xaxis">
@@ -163,7 +167,11 @@ __EXPLAIN__
 const SERIES = __DATA__;
 const COLORS = {1: "var(--series-1)", 2: "var(--series-2)", 3: "var(--series-3)"};
 const XLABEL = {step: "Training steps (batches of 8 questions)", updates: "Optimizer updates", minutes: "Training minutes (excl. loading, saving, evaluation)"};
-const MLABEL = {ece: "ECE (lower is better)", auroc: "AUROC (higher is better)", brier: "Brier (lower is better)"};
+const MLABEL = {ece: "ECE (lower is better)", auroc: "AUROC (higher is better)", brier: "Brier (lower is better)",
+  ece_unsampled: "ECE from the mean of the 11-level distribution", auroc_unsampled: "AUROC from the mean of the 11-level distribution"};
+for (const b of document.querySelectorAll("[data-optional]"))
+  if (!SERIES.some(s => s.points.some(p => p[b.dataset.v] != null))) b.hidden = true;
+const pts = s => s.points.filter(p => p[metric] != null);
 let metric = "ece", xkey = "step";
 const svg = document.getElementById("chart"), tip = document.getElementById("tip"), wrap = document.getElementById("wrap");
 const W = 960, H = 420, M = {l: 64, r: 24, t: 16, b: 56};
@@ -192,7 +200,7 @@ function draw() {
   svg.querySelectorAll("g").forEach(g => g.remove());
   const all = SERIES.flatMap(s => s.points);
   const xmax = Math.max(...all.map(p => p[xkey]));
-  const ys = all.map(p => p[metric]);
+  const ys = all.map(p => p[metric]).filter(v => v != null);
   let ylo = Math.min(...ys), yhi = Math.max(...ys);
   const pad = (yhi - ylo) * 0.08; ylo = Math.max(0, ylo - pad); yhi = yhi + pad;
   const yt = niceTicks(ylo, yhi, 5); ylo = Math.min(ylo, yt[0]); yhi = Math.max(yhi, yt[yt.length - 1]);
@@ -209,14 +217,14 @@ function draw() {
   el("text", {x: (M.l + W - M.r) / 2, y: H - 10, "text-anchor": "middle", class: "axis-title"}, g).textContent = XLABEL[xkey];
   el("text", {x: 16, y: (M.t + H - M.b) / 2, transform: `rotate(-90 16 ${(M.t + H - M.b) / 2})`, "text-anchor": "middle", class: "axis-title"}, g).textContent = MLABEL[metric];
   for (const s of SERIES) {
-    const d = s.points.map((p, i) => `${i ? "L" : "M"}${X(p[xkey]).toFixed(1)},${Y(p[metric]).toFixed(1)}`).join("");
+    const d = pts(s).map((p, i) => `${i ? "L" : "M"}${X(p[xkey]).toFixed(1)},${Y(p[metric]).toFixed(1)}`).join("");
     el("path", {d, fill: "none", stroke: COLORS[s.slot], "stroke-width": 2, "stroke-linejoin": "round", "stroke-dasharray": s.dashed ? "6 5" : "none"}, g);
-    for (const p of s.points.slice(1))
+    for (const p of pts(s).filter(p => p.step > 0))
       el("circle", {cx: X(p[xkey]), cy: Y(p[metric]), r: 4, fill: s.dashed ? "var(--surface-1)" : COLORS[s.slot], stroke: COLORS[s.slot], "stroke-width": 2}, g);
   }
   const base = SERIES[0].points[0];
-  el("circle", {cx: X(0), cy: Y(base[metric]), r: 5, fill: "var(--text-secondary)", stroke: "var(--surface-1)", "stroke-width": 2}, g);
-  el("text", {x: X(0) + 10, y: Y(base[metric]) + (metric === "auroc" ? 16 : -10), class: "tick"}, g).textContent = "base model";
+  if (base[metric] != null) el("circle", {cx: X(0), cy: Y(base[metric]), r: 5, fill: "var(--text-secondary)", stroke: "var(--surface-1)", "stroke-width": 2}, g);
+  if (base[metric] != null) el("text", {x: X(0) + 10, y: Y(base[metric]) + (metric === "auroc" ? 16 : -10), class: "tick"}, g).textContent = "base model";
   const cross = el("line", {y1: M.t, y2: H - M.b, stroke: "var(--axis)", "stroke-width": 1, visibility: "hidden"}, g);
   const hit = el("rect", {x: M.l, y: M.t, width: W - M.l - M.r, height: H - M.t - M.b, fill: "transparent", tabindex: 0}, g);
   function show(px) {
@@ -227,7 +235,8 @@ function draw() {
     head.textContent = `Nearest snapshot to ${fmt(xv, xkey)} ${xkey === "minutes" ? "min" : xkey === "step" ? "steps" : "updates"}`;
     tip.appendChild(head);
     for (const s of SERIES) {
-      const p = s.points.reduce((a, b) => Math.abs(b[xkey] - xv) < Math.abs(a[xkey] - xv) ? b : a);
+      if (!pts(s).length) continue;
+      const p = pts(s).reduce((a, b) => Math.abs(b[xkey] - xv) < Math.abs(a[xkey] - xv) ? b : a);
       const row = document.createElement("div"); row.className = "row";
       const sw = document.createElementNS(NS, "svg"); sw.setAttribute("width", "16"); sw.setAttribute("height", "8");
       el("line", {x1: 0, y1: 4, x2: 16, y2: 4, stroke: COLORS[s.slot], "stroke-width": 2, "stroke-dasharray": s.dashed ? "4 3" : "none"}, sw);
@@ -272,10 +281,11 @@ function tables() {
   cap.textContent = "Cells: ECE / AUROC. — means no snapshot fits within the budget.";
   const a = document.getElementById("all"); a.textContent = "";
   const hr = a.insertRow();
-  for (const c of ["Configuration", "Step", "Updates", "Minutes", "ECE", "AUROC", "Brier", "Accuracy"]) { const th = document.createElement("th"); th.textContent = c; hr.appendChild(th); }
+  for (const c of ["Configuration", "Step", "Updates", "Minutes", "ECE", "AUROC", "Brier", "Accuracy", "ECE unsampled", "AUROC unsampled"]) { const th = document.createElement("th"); th.textContent = c; hr.appendChild(th); }
   for (const s of SERIES) for (const p of s.points) {
     const r = a.insertRow();
-    for (const v of [s.name, p.step, p.updates, p.minutes.toFixed(1), p.ece.toFixed(3), p.auroc.toFixed(3), p.brier.toFixed(3), (100 * p.accuracy).toFixed(1) + "%"]) r.insertCell().textContent = v;
+    const f = v => v == null ? "—" : v.toFixed(3);
+    for (const v of [s.name, p.step, p.updates, p.minutes.toFixed(1), f(p.ece), f(p.auroc), f(p.brier), (100 * p.accuracy).toFixed(1) + "%", f(p.ece_unsampled), f(p.auroc_unsampled)]) r.insertCell().textContent = v;
   }
 }
 for (const [id, set] of [["metric", v => metric = v], ["xaxis", v => xkey = v]])
