@@ -37,6 +37,8 @@ image = (
     )
     .add_local_file(Path(__file__).parent / "subset.py", f"{CODE}/subset.py", copy=True)
     .add_local_file(Path(__file__).parent / "exact_llama.py", f"{CODE}/exact_llama.py", copy=True)
+    .add_local_file(Path(__file__).parent / "shared_prefix.py", f"{CODE}/shared_prefix.py", copy=True)
+    .add_local_file(Path(__file__).parent / "verify_shared_prefix.py", f"{CODE}/verify_shared_prefix.py", copy=True)
     # Our package, so the exact objectives use the very same core.objective as the Tinker runs.
     .add_local_dir(Path(__file__).parents[1] / "src" / "rewarding_doubt", "/opt/rd/rewarding_doubt", copy=True,
                    ignore=["__pycache__"])
@@ -226,6 +228,19 @@ def evaluate_checkpoint(ids_by_split: dict, model_dir: str) -> dict:
                 results=json.loads(Path(out_json).read_text()))
 
 
+@app.function(timeout=600)
+def shell(command: str) -> str:
+    """Run a shell command in the pinned image (CPU only); for inspecting installed code."""
+    import subprocess
+    proc = subprocess.run(command, shell=True, capture_output=True, text=True)
+    return proc.stdout + proc.stderr
+
+
+@app.local_entrypoint()
+def inspect(command: str):
+    print(shell.remote(command))
+
+
 def summarize(scalars: dict[str, list[tuple[int, float]]]) -> list[str]:
     lines = []
     for tag in ["env/reward_mean", "objective/kl", "objective/kl_coef", "ppo/policy/clipfrac",
@@ -392,4 +407,35 @@ def curves(data_run: str = "runs/pilot-20261001T002945Z", gpu: str = "L40S", sav
     (local / "curve.json").write_text(json.dumps(curve, indent=2) + "\n")
     for label, points in curve.items():
         print(label, {step: round(m["ece"], 3) for step, m in sorted(points.items())})
+    print(f"Saved to {local}")
+
+
+@app.function(volumes={VOL: volume}, timeout=HOUR, gpu="L40S")
+def verify_shared_prefix_remote(ids_by_split: dict) -> dict:
+    import subprocess
+
+    Path("/tmp/ids.json").write_text(json.dumps(ids_by_split))
+    proc = subprocess.run(["python", "verify_shared_prefix.py", "/tmp/ids.json"], cwd=CODE,
+                          capture_output=True, text=True)
+    report = json.loads(Path("/tmp/verify_report.json").read_text()) if Path("/tmp/verify_report.json").exists() else None
+    return dict(exit_code=proc.returncode, log=proc.stdout[-20000:] + proc.stderr[-8000:], report=report)
+
+
+@app.local_entrypoint()
+def verify_shared_prefix(data_run: str = "runs/pilot-20261001T002945Z"):
+    root = Path(__file__).resolve().parents[1]
+    ids = {"train": [json.loads(l)["id"] for l in (root / data_run / "data" / "train.jsonl").read_text().splitlines()]}
+    result = verify_shared_prefix_remote.remote(ids)
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    local = root / "runs" / f"modal-verify-shared-prefix-{stamp}"
+    local.mkdir(parents=True)
+    (local / "log.txt").write_text(result["log"])
+    (local / "report.json").write_text(json.dumps(result["report"], indent=1) + "\n")
+    print("exit", result["exit_code"])
+    if result["report"]:
+        for c in result["report"]["cases"]:
+            print({k: (round(v, 6) if isinstance(v, float) else v) for k, v in c.items() if k != "logp_full"})
+        print(result["report"]["seconds_per_question_fwd_bwd"])
+    else:
+        print(result["log"][-4000:])
     print(f"Saved to {local}")

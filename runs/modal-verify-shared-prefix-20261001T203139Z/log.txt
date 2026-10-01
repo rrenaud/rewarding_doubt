@@ -1,0 +1,127 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.392 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+/87622 [00:13<00:21, 2675.54 examples/s]
+Filter:  34%|███▍      | 30000/87622 [00:13<00:23, 2492.90 examples/s]
+Filter:  35%|███▌      | 31000/87622 [00:14<00:22, 2498.22 examples/s]
+Filter:  37%|███▋      | 32000/87622 [00:15<00:27, 2032.93 examples/s]
+Filter:  38%|███▊      | 33000/87622 [00:15<00:25, 2157.22 examples/s]
+Filter:  39%|███▉      | 34000/87622 [00:15<00:24, 2225.09 examples/s]
+Filter:  40%|███▉      | 35000/87622 [00:16<00:21, 2400.77 examples/s]
+Filter:  41%|████      | 36000/87622 [00:16<00:21, 2423.75 examples/s]
+Filter:  42%|████▏     | 37000/87622 [00:16<00:20, 2460.78 examples/s]
+Filter:  43%|████▎     | 38000/87622 [00:17<00:19, 2505.59 examples/s]
+Filter:  45%|████▍     | 39000/87622 [00:17<00:18, 2620.56 examples/s]
+Filter:  46%|████▌     | 40000/87622 [00:18<00:17, 2719.04 examples/s]
+Filter:  47%|████▋     | 41000/87622 [00:18<00:16, 2869.83 examples/s]
+Filter:  48%|████▊     | 42000/87622 [00:18<00:15, 2996.49 examples/s]
+Filter:  49%|████▉     | 43000/87622 [00:18<00:14, 3091.80 examples/s]
+Filter:  50%|█████     | 44000/87622 [00:19<00:13, 3137.58 examples/s]
+Filter:  51%|█████▏    | 45000/87622 [00:19<00:13, 3060.40 examples/s]
+Filter:  52%|█████▏    | 46000/87622 [00:19<00:13, 3076.62 examples/s]
+Filter:  54%|█████▎    | 47000/87622 [00:20<00:13, 3063.67 examples/s]
+Filter:  55%|█████▍    | 48000/87622 [00:20<00:15, 2507.90 examples/s]
+Filter:  56%|█████▌    | 49000/87622 [00:21<00:14, 2684.75 examples/s]
+Filter:  57%|█████▋    | 50000/87622 [00:21<00:13, 2740.82 examples/s]
+Filter:  58%|█████▊    | 51000/87622 [00:21<00:12, 2832.60 examples/s]
+Filter:  59%|█████▉    | 52000/87622 [00:22<00:12, 2941.56 examples/s]
+Filter:  60%|██████    | 53000/87622 [00:22<00:11, 3004.36 examples/s]
+Filter:  62%|██████▏   | 54000/87622 [00:22<00:11, 3030.67 examples/s]
+Filter:  63%|██████▎   | 55000/87622 [00:23<00:10, 3037.76 examples/s]
+Filter:  64%|██████▍   | 56000/87622 [00:23<00:10, 2947.14 examples/s]
+Filter:  65%|██████▌   | 57000/87622 [00:23<00:10, 3009.27 examples/s]
+Filter:  66%|██████▌   | 58000/87622 [00:24<00:09, 2995.63 examples/s]
+Filter:  67%|██████▋   | 59000/87622 [00:24<00:09, 2986.83 examples/s]
+Filter:  68%|██████▊   | 60000/87622 [00:24<00:09, 3015.49 examples/s]
+Filter:  70%|██████▉   | 61000/87622 [00:25<00:08, 3012.35 examples/s]
+Filter:  71%|███████   | 62000/87622 [00:25<00:08, 2994.31 examples/s]
+Filter:  72%|███████▏  | 63000/87622 [00:25<00:08, 3048.28 examples/s]
+Filter:  73%|███████▎  | 64000/87622 [00:26<00:09, 2506.16 examples/s]
+Filter:  74%|███████▍  | 65000/87622 [00:26<00:09, 2272.73 examples/s]
+Filter:  75%|███████▌  | 66000/87622 [00:27<00:10, 2012.75 examples/s]
+Filter:  76%|███████▋  | 67000/87622 [00:27<00:09, 2214.61 examples/s]
+Filter:  78%|███████▊  | 68000/87622 [00:28<00:08, 2408.90 examples/s]
+Filter:  79%|███████▊  | 69000/87622 [00:28<00:07, 2534.68 examples/s]
+Filter:  80%|███████▉  | 70000/87622 [00:28<00:06, 2718.90 examples/s]
+Filter:  81%|████████  | 71000/87622 [00:29<00:06, 2750.24 examples/s]
+Filter:  82%|████████▏ | 72000/87622 [00:29<00:05, 2834.88 examples/s]
+Filter:  83%|████████▎ | 73000/87622 [00:29<00:04, 2980.80 examples/s]
+Filter:  84%|████████▍ | 74000/87622 [00:30<00:04, 2968.59 examples/s]
+Filter:  86%|████████▌ | 75000/87622 [00:30<00:04, 3047.71 examples/s]
+Filter:  87%|████████▋ | 76000/87622 [00:30<00:03, 2975.49 examples/s]
+Filter:  88%|████████▊ | 77000/87622 [00:31<00:03, 2954.85 examples/s]
+Filter:  89%|████████▉ | 78000/87622 [00:31<00:03, 3067.79 examples/s]
+Filter:  90%|█████████ | 79000/87622 [00:31<00:02, 3295.77 examples/s]
+Filter:  91%|█████████▏| 80000/87622 [00:32<00:02, 2772.87 examples/s]
+Filter:  92%|█████████▏| 81000/87622 [00:32<00:02, 3013.07 examples/s]
+Filter:  94%|█████████▎| 82000/87622 [00:32<00:01, 3211.51 examples/s]
+Filter:  95%|█████████▍| 83000/87622 [00:32<00:01, 3377.81 examples/s]
+Filter:  96%|█████████▌| 84000/87622 [00:33<00:01, 3424.57 examples/s]
+Filter:  97%|█████████▋| 85000/87622 [00:33<00:00, 2729.25 examples/s]
+Filter:  98%|█████████▊| 86000/87622 [00:34<00:00, 2693.12 examples/s]
+Filter:  99%|█████████▉| 87000/87622 [00:34<00:00, 2572.48 examples/s]
+Filter: 100%|██████████| 87622/87622 [00:34<00:00, 2640.00 examples/s]
+Filter: 100%|██████████| 87622/87622 [00:34<00:00, 2518.37 examples/s]
+
+Map:   0%|          | 0/6 [00:00<?, ? examples/s]
+Map: 100%|██████████| 6/6 [00:00<00:00, 277.11 examples/s]
+
+Map:   0%|          | 0/6 [00:00<?, ? examples/s]
+Map: 100%|██████████| 6/6 [00:00<00:00, 566.50 examples/s]
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/verify_shared_prefix.py", line 105, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/verify_shared_prefix.py", line 79, in main
+    ls, gs = grads(shared, query, mode, label)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/verify_shared_prefix.py", line 65, in grads
+    logps = fn(query)
+            ^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/verify_shared_prefix.py", line 72, in <lambda>
+    shared = lambda q: candidate_logps(model, q, candidates)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/shared_prefix.py", line 69, in candidate_logps
+    out2 = inner(input_ids=inputs, causal_mask=mask, past_key_values=expanded, position_ids=positions,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 817, in LlamaModel_fast_forward
+    hidden_states = Unsloth_Offloaded_Gradient_Checkpointer.apply(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/autograd/function.py", line 575, in apply
+    return super().apply(*args, **kwargs)  # type: ignore[misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/amp/autocast_mode.py", line 465, in decorate_fwd
+    return fwd(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth_zoo/gradient_checkpointing.py", line 147, in forward
+    output = forward_function(hidden_states, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 508, in LlamaDecoderLayer_fast_forward
+    hidden_states, self_attn_weights, present_key_value = self.self_attn(
+                                                          ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 378, in LlamaAttention_fast_forward
+    kv_seq_len += past_key_value[0].shape[-2]
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'shape'

@@ -30,6 +30,7 @@ from unsloth import FastLanguageModel  # must precede transformers imports
 import trl
 
 from rewarding_doubt.core import objective
+from shared_prefix import candidate_logps, full_sequence_logps
 from subset import subset_loader
 from util.DataHelper import DataCollatorForTokenizedQueries
 from util.EvaluationMetrics import Metric, is_answer_correct
@@ -39,18 +40,9 @@ MODEL = "unsloth/llama-3-8b-Instruct-bnb-4bit"
 
 
 def row_loss(model, query, label, candidates, eot, args):
-    """Teacher-force the 11 continuations after one query; return (loss, confidence, valid mass)."""
-    seqs = [query + c for c in candidates]
-    width = max(map(len, seqs))
-    input_ids = torch.tensor([s + [eot] * (width - len(s)) for s in seqs]).cuda()
-    mask = torch.tensor([[1] * len(s) + [0] * (width - len(s)) for s in seqs]).cuda()
-    logits = model(input_ids=input_ids, attention_mask=mask).logits.float()
-    logps = []
-    for k, c in enumerate(candidates):
-        positions = torch.arange(len(query) - 1, len(query) - 1 + len(c), device=logits.device)
-        token_logps = logits[k, positions].log_softmax(-1).gather(-1, torch.tensor(c, device=logits.device)[:, None])
-        logps.append(token_logps.sum())
-    logps = torch.stack(logps)[None].double()
+    """Score the 11 continuations after one query; return (loss, confidence, valid mass)."""
+    logps = (candidate_logps(model, query, candidates) if args.scoring == "shared"
+             else full_sequence_logps(model, query, candidates, eot))[None].double()
     loss, confidence = objective(logps, logps.new_tensor([label]), args.mode, args.reward,
                                  args.format_weight, args.format_threshold)
     return loss, confidence, logps.detach().logsumexp(-1).exp().item()
@@ -71,6 +63,9 @@ def main():
     parser.add_argument("--passes", type=int, default=1)
     parser.add_argument("--minibatch", type=int, default=0, help="default: the whole batch")
     parser.add_argument("--save-every", type=int, default=0, help="also save adapters every N steps")
+    parser.add_argument("--scoring", choices=["shared", "full"], default="shared",
+                        help="shared: one prefix pass + 11 cached continuations (verified equal to full within "
+                             "bf16 noise, ~1.9x faster); full: 11 full sequences (runs before 2026-10-01T20Z)")
     parser.add_argument("--seed", type=int, default=2)
     args = parser.parse_args()
     torch.manual_seed(args.seed)
