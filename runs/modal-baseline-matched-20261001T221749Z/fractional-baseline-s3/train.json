@@ -1,0 +1,11 @@
+{
+  "label": "fractional-baseline-s3",
+  "exit_code": 0,
+  "gpu": "NVIDIA L40S",
+  "snapshots": [
+    "/vol/outputs/baseline-matched-20261001T221749Z/fractional-baseline-s3/snapshot-step00064",
+    "/vol/outputs/baseline-matched-20261001T221749Z/fractional-baseline-s3/snapshot-step00128",
+    "/vol/outputs/baseline-matched-20261001T221749Z/fractional-baseline-s3/snapshot-step00192",
+    "/vol/outputs/baseline-matched-20261001T221749Z/fractional-baseline-s3/snapshot-step00256"
+  ]
+}

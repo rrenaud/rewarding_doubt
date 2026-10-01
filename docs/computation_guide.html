@@ -118,19 +118,19 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 <rect class="box" x="345" y="172" width="270" height="48" rx="8"/><text class="t" x="480" y="193" text-anchor="middle">Sample one string</text><text class="d" x="480" y="211" text-anchor="middle">&quot;: 9&lt;eot&gt;&quot; at T 1 → k* = 9</text>
 <rect class="box" x="345" y="240" width="270" height="48" rx="8"/><text class="t" x="480" y="261" text-anchor="middle">One forward pass</text><text class="d" x="480" y="279" text-anchor="middle">P(k) for all 11 + P(&lt;eot&gt; | k*)</text>
 <rect class="box-diff-exact" x="345" y="308" width="270" height="48" rx="8"/><text class="t" x="480" y="329" text-anchor="middle">Expected reward</text><text class="d" x="480" y="347" text-anchor="middle">Σ π_k · R(k/10, y)</text>
-<rect class="box" x="345" y="376" width="270" height="48" rx="8"/><text class="t" x="480" y="397" text-anchor="middle">+ two format hinges</text><text class="d" x="480" y="415" text-anchor="middle">number mass · stop after k*</text>
+<rect class="box" x="345" y="376" width="270" height="48" rx="8"/><text class="t" x="480" y="397" text-anchor="middle">+ format and KL terms</text><text class="d" x="480" y="415" text-anchor="middle">hinges, or −30 and KL as PPO</text>
 <rect class="box" x="345" y="444" width="270" height="48" rx="8"/><text class="t" x="480" y="465" text-anchor="middle">8 Adam updates per batch</text><text class="d" x="480" y="483" text-anchor="middle">4 passes × 2 minibatches, as PPO</text>
 <rect class="box" x="655" y="172" width="270" height="48" rx="8"/><text class="t" x="790" y="193" text-anchor="middle">Sample one string</text><text class="d" x="790" y="211" text-anchor="middle">&quot;: 9&lt;eot&gt;&quot; at T 1 → k* = 9</text>
 <rect class="box" x="655" y="240" width="270" height="48" rx="8"/><text class="t" x="790" y="261" text-anchor="middle">One forward pass</text><text class="d" x="790" y="279" text-anchor="middle">P(k) for all 11 + P(&lt;eot&gt; | k*)</text>
 <rect class="box-diff-frac" x="655" y="308" width="270" height="48" rx="8"/><text class="t" x="790" y="329" text-anchor="middle">Reward of the mean</text><text class="d" x="790" y="347" text-anchor="middle">R(Σ π_k · k/10, y)</text>
-<rect class="box" x="655" y="376" width="270" height="48" rx="8"/><text class="t" x="790" y="397" text-anchor="middle">+ two format hinges</text><text class="d" x="790" y="415" text-anchor="middle">number mass · stop after k*</text>
+<rect class="box" x="655" y="376" width="270" height="48" rx="8"/><text class="t" x="790" y="397" text-anchor="middle">+ format and KL terms</text><text class="d" x="790" y="415" text-anchor="middle">hinges, or −30 and KL as PPO</text>
 <rect class="box" x="655" y="444" width="270" height="48" rx="8"/><text class="t" x="790" y="465" text-anchor="middle">8 Adam updates per batch</text><text class="d" x="790" y="483" text-anchor="middle">4 passes × 2 minibatches, as PPO</text>
 <text class="neq" x="635" y="340" text-anchor="middle">≠</text>
 <g class="wire"><line x1="170" y1="222" x2="170" y2="236" marker-end="url(#arr)"/><line x1="170" y1="290" x2="170" y2="304" marker-end="url(#arr)"/><line x1="170" y1="358" x2="170" y2="372" marker-end="url(#arr)"/><line x1="170" y1="426" x2="170" y2="440" marker-end="url(#arr)"/><line x1="480" y1="222" x2="480" y2="236" marker-end="url(#arr)"/><line x1="480" y1="290" x2="480" y2="304" marker-end="url(#arr)"/><line x1="480" y1="358" x2="480" y2="372" marker-end="url(#arr)"/><line x1="480" y1="426" x2="480" y2="440" marker-end="url(#arr)"/><line x1="790" y1="222" x2="790" y2="236" marker-end="url(#arr)"/><line x1="790" y1="290" x2="790" y2="304" marker-end="url(#arr)"/><line x1="790" y1="358" x2="790" y2="372" marker-end="url(#arr)"/><line x1="790" y1="426" x2="790" y2="440" marker-end="url(#arr)"/></g>
 <text class="s" x="170" y="522" text-anchor="middle">The sampled string is the training signal.</text>
 <text class="s" x="170" y="540" text-anchor="middle">Also needs a reference pass, a value head and β.</text>
-<text class="s" x="635" y="522" text-anchor="middle">The sampled string only checks the stop. No reference model,</text>
-<text class="s" x="635" y="540" text-anchor="middle">value head or KL; the two differ only in the outlined row.</text>
+<text class="s" x="635" y="522" text-anchor="middle">The sampled string only checks the stop. No value head; KL needs</text>
+<text class="s" x="635" y="540" text-anchor="middle">one no-grad reference pass. They differ only in the outlined row.</text>
 </svg>
 </div>
 <figcaption><b>One training step for one question.</b> PPO turns its one sampled string into the whole training signal, and needs a reference model, a value head and clipping to keep that signal steady. The variants read the probability of every confidence level from one forward pass, so their calibration signal involves no sampling; the sampled string is used only to check that the model stops after the number. Discrete-exact and fractional differ only in the outlined row.</figcaption>
@@ -183,6 +183,7 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 
 <h2>One question, worked through</h2>
 <p>Take a question the model got wrong (<span class="m">y = 0</span>), where it still puts most of its probability on high confidence. The left side shows that distribution over the eleven levels and the reward each level would earn on its own. The right side shows the single number each method computes from it.</p>
+<p>The reward R is the log score, y·log p + (1 − y)·log(1 − p), stretched onto [−1, +1]: the worst possible statement (confidence 1.0 on a wrong answer) scores −1 and a perfect one scores +1. Its sign means nothing. Saying 0.9 on a wrong answer earns +0.33 because it is far less bad than saying 1.0, not because it is good. Only the differences between levels drive training. The released code uses a different stretch (×10, plus 2.5 for a correct answer), with the same ordering.</p>
 </div>
 <figure>
 <div class="fig-scroll">
@@ -243,7 +244,7 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
   <text class="s" x="486" y="332">Higher than −0.35: spreading out is not penalized.</text>
 </svg>
 </div>
-<figcaption><b>The same distribution, three different numbers.</b> PPO's number depends on which string it happened to draw. The two variants are deterministic. Fractional's score is always at least discrete-exact's, because the log score is concave: the reward of the mean beats the mean of the rewards. That gap is the penalty discrete-exact puts on hedging across levels.</figcaption>
+<figcaption><b>The same distribution, three different numbers.</b> PPO's number depends on which string it happened to draw, and PPO does not train on it directly: it trains on the reward minus its value head's prediction for this question, normalized across the batch. The two variants are deterministic. Fractional's score is always at least discrete-exact's, because the log score is concave: the reward of the mean beats the mean of the rewards. That gap is the penalty discrete-exact puts on hedging across levels.</figcaption>
 </figure>
 
 <div class="prose">
@@ -306,7 +307,7 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 <rect class="pill" x="250" y="146" width="72" height="18" rx="9"/><text class="d" x="286" y="159" text-anchor="middle">answer</text>
 <rect class="exact" x="332" y="150" width="10" height="10" rx="2"/><rect class="exact" x="345" y="150" width="10" height="10" rx="2"/><rect class="exact" x="358" y="150" width="10" height="10" rx="2"/><rect class="exact" x="371" y="150" width="10" height="10" rx="2"/><rect class="exact" x="384" y="150" width="10" height="10" rx="2"/><rect class="exact" x="397" y="150" width="10" height="10" rx="2"/><rect class="exact" x="410" y="150" width="10" height="10" rx="2"/><rect class="exact" x="423" y="150" width="10" height="10" rx="2"/><rect class="exact" x="436" y="150" width="10" height="10" rx="2"/><rect class="exact" x="449" y="150" width="10" height="10" rx="2"/><rect class="exact" x="462" y="150" width="10" height="10" rx="2"/><rect class="exact" x="483" y="150" width="10" height="10" rx="2"/><rect class="exact" x="496" y="150" width="10" height="10" rx="2"/><rect class="exact" x="509" y="150" width="10" height="10" rx="2"/><rect class="exact" x="522" y="150" width="10" height="10" rx="2"/><rect class="exact" x="535" y="150" width="10" height="10" rx="2"/><rect class="exact" x="548" y="150" width="10" height="10" rx="2"/><rect class="exact" x="561" y="150" width="10" height="10" rx="2"/><rect class="exact" x="574" y="150" width="10" height="10" rx="2"/><rect class="exact" x="587" y="150" width="10" height="10" rx="2"/><rect class="exact" x="600" y="150" width="10" height="10" rx="2"/><rect class="exact" x="613" y="150" width="10" height="10" rx="2"/><rect class="exact" x="634" y="150" width="10" height="10" rx="2"/><rect class="exact" x="647" y="150" width="10" height="10" rx="2"/><rect class="exact" x="660" y="150" width="10" height="10" rx="2"/><rect class="exact" x="673" y="150" width="10" height="10" rx="2"/><rect class="exact" x="686" y="150" width="10" height="10" rx="2"/><rect class="exact" x="699" y="150" width="10" height="10" rx="2"/><rect class="exact" x="712" y="150" width="10" height="10" rx="2"/><rect class="exact" x="725" y="150" width="10" height="10" rx="2"/><rect class="exact" x="738" y="150" width="10" height="10" rx="2"/><rect class="exact" x="751" y="150" width="10" height="10" rx="2"/><rect class="exact" x="764" y="150" width="10" height="10" rx="2"/><rect class="exact" x="785" y="150" width="10" height="10" rx="2"/><rect class="exact" x="798" y="150" width="10" height="10" rx="2"/><rect class="exact" x="811" y="150" width="10" height="10" rx="2"/><rect class="exact" x="824" y="150" width="10" height="10" rx="2"/><rect class="exact" x="837" y="150" width="10" height="10" rx="2"/><rect class="exact" x="850" y="150" width="10" height="10" rx="2"/><rect class="exact" x="863" y="150" width="10" height="10" rx="2"/><rect class="exact" x="876" y="150" width="10" height="10" rx="2"/><rect class="exact" x="889" y="150" width="10" height="10" rx="2"/><rect class="exact" x="902" y="150" width="10" height="10" rx="2"/><rect class="exact" x="915" y="150" width="10" height="10" rx="2"/>
 <g class="s" text-anchor="middle"><text x="402" y="141">pass 1</text><text x="553" y="141">pass 2</text><text x="704" y="141">pass 3</text><text x="855" y="141">pass 4</text></g>
-<text class="hd" x="20" y="234">Exact 8×, single pass</text><text class="s" x="20" y="252">≈12 s/step · estimated</text>
+<text class="hd" x="20" y="234">Exact 8×, single pass</text><text class="s" x="20" y="252">10 s/step · measured, with KL pass</text>
 <rect class="pill" x="250" y="231" width="72" height="18" rx="9"/><text class="d" x="286" y="244" text-anchor="middle">answer</text>
 <rect class="pill" x="328" y="231" width="56" height="18" rx="9"/><text class="d" x="356" y="244" text-anchor="middle">conf.</text>
 <rect class="exact" x="394" y="235" width="10" height="10" rx="2"/><rect class="exact" x="416" y="235" width="10" height="10" rx="2"/><rect class="exact" x="438" y="235" width="10" height="10" rx="2"/><rect class="exact" x="460" y="235" width="10" height="10" rx="2"/>
@@ -317,7 +318,7 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 <rect class="dot" x="460" y="302" width="10" height="10" rx="2"/><text class="s" x="478" y="311">forward + backward over one ~160-token sequence</text>
 </svg>
 </div>
-<figcaption><b>Passes per question per step,</b> with times for a batch of 8 on one L40S. PPO and the 11-string exact run are measured over full runs. The single-pass time is estimated from measured per-question scoring cost (0.26 s instead of 0.67 s) and has not yet been run end to end. All three rows make 8 Adam updates per batch.</figcaption>
+<figcaption><b>Passes per question per step,</b> with times for a batch of 8 on one L40S. All three are measured over full 256-step runs and make 8 Adam updates per batch. The single-pass time includes sampling the confidence and the no-grad reference pass for the KL term (7–11 s across six runs).</figcaption>
 </figure>
 
 <div class="prose">
@@ -336,6 +337,25 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 <div class="prose">
 <p class="note">Time columns use the last snapshot within the budget; the exact runs here used the slower 11-string scorer, so their time results are conservative. One seed per row; evaluation noise is about ±0.04 on both metrics, and two identical PPO runs ended at 0.074 / 0.771 and 0.081 / 0.732. With one update per batch the variants matched PPO's calibration but not its AUROC; with the same 8 updates per batch they lead on both.</p>
 
+<h2>Matched to the baseline, three seeds</h2>
+<p>The runs above used format hinges and no KL. The final runs remove that difference too: the exact objectives use the released code's reward scale, its −30 for invalid output (computed exactly instead of by sampling) and its KL penalty toward the base model with the same adaptive controller. With 8 updates per batch, the only remaining difference from PPO is scoring all 11 levels in one pass versus one sampled string with a value head.</p>
+<p>Each checkpoint is scored two ways on the same questions. <b>Sampled</b> is the released evaluation: the integer the model writes at temperature 0.6. <b>Unsampled</b> reads the mean of the 11-level softmax at the step where the model wrote that integer. It comes from the same generation, with no extra pass.</p>
+</div>
+<div class="tbl"><table>
+<thead><tr><th>End of training</th><th>ECE ↓ sampled</th><th>AUROC ↑ sampled</th><th>ECE ↓ unsampled</th><th>AUROC ↑ unsampled</th></tr></thead>
+<tbody>
+<tr><th><span class="colhead"><i class="sw" style="background:var(--ppo)"></i>Released PPO (2 runs)</span></th><td class="num">0.074, 0.081</td><td class="num">0.771, 0.732</td><td class="num">0.085</td><td class="num">0.785</td></tr>
+<tr><th><span class="colhead"><i class="sw" style="background:var(--exact)"></i>Discrete-exact (3 seeds)</span></th><td class="num">0.085 ± 0.013</td><td class="num"><b>0.808 ± 0.017</b></td><td class="num"><b>0.082 ± 0.011</b></td><td class="num">0.833 ± 0.014</td></tr>
+<tr><th><span class="colhead"><i class="sw" style="background:var(--frac)"></i>Fractional (3 seeds)</span></th><td class="num">0.170 ± 0.023</td><td class="num">0.783 ± 0.004</td><td class="num">0.090 ± 0.005</td><td class="num"><b>0.840 ± 0.009</b></td></tr>
+</tbody></table></div>
+<div class="prose">
+<ul class="tight">
+<li><b>Discrete-exact matches PPO's calibration and ranks better.</b> Its sampled ECE sits within the PPO runs' spread. Its AUROC is higher in every seed (0.793–0.826 against 0.732–0.771), with the same reward, penalty, KL and update count.</li>
+<li><b>Fractional calibrates its mean, not the integer it writes.</b> Read from the mean of its distribution, its ECE equals discrete-exact's and its AUROC is the best of all. The integer it samples at temperature 0.6 is badly calibrated. That fits its objective, which only pins down the mean and lets the distribution stay spread.</li>
+<li><b>The sampled integer hides ranking information.</b> Every method gains AUROC when read from the full distribution (+0.014 for PPO, +0.025 for discrete-exact, +0.057 for fractional).</li>
+</ul>
+<p class="note">One PPO run has unsampled columns, and two PPO runs differ by 0.039 AUROC on their own, so a 3-seed PPO set would make the comparison symmetric. During training about 5% of the confidence samples at temperature 1 were not ": &lt;number&gt;". The −30 penalty and KL hold the format less tightly than the hinges did. The released evaluation, at temperature 0.6, saw at most 0.6% wrong-format replies.</p>
+
 <h2>The trade-offs</h2>
 </div>
 <div class="tbl"><table>
@@ -347,11 +367,11 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 <tr><th>Calibration signal</th><td>Reward of one sampled string</td><td>Exact expected reward over all 11 levels</td><td>Exact reward of the mean confidence</td></tr>
 <tr><th>What sampling is for</th><td>The training signal itself</td><td>Only the stop check</td><td>Only the stop check</td></tr>
 <tr><th>Noise in the update</th><td>High; a learned value baseline and batch whitening reduce it</td><td>None in the calibration term. The answer and the stop check are sampled.</td><td>Same as discrete-exact</td></tr>
-<tr><th>Extra machinery</th><td>Reference model pass, value head, adaptive KL coefficient, GAE</td><td>Two hinges: number mass and stop after the sampled number</td><td>Same as discrete-exact</td></tr>
+<tr><th>Extra machinery</th><td>Reference model pass, value head, adaptive KL coefficient, GAE</td><td>Either two format hinges, or PPO's −30 and KL (one no-grad reference pass); no value head</td><td>Same as discrete-exact</td></tr>
 <tr><th>What it converges to</th><td>One confidence level per kind of question, held near the base model by the KL penalty</td><td>One level per kind of question: the grid point with the best expected score</td><td>A mean confidence equal to the true chance of being right, between grid points if needed</td></tr>
 <tr><th>Works when</th><td>Any output can be sampled, including free text</td><td>The levels can be listed and each is one token (or a short branch)</td><td>Same, and the levels are numeric</td></tr>
-<tr><th>Step time, 8 updates (L40S, batch 8)</th><td class="num">12 s</td><td class="num">25 s with 11 strings<br>≈12 s single pass (est.)</td><td class="num">same as discrete-exact</td></tr>
-<tr><th>End of training (ECE / AUROC)</th><td class="num">0.081 / 0.732</td><td class="num">0.055 / 0.809</td><td class="num">0.072 / 0.783</td></tr>
+<tr><th>Step time, 8 updates (L40S, batch 8)</th><td class="num">12 s</td><td class="num">25 s with 11 strings<br>10 s single pass</td><td class="num">same as discrete-exact</td></tr>
+<tr><th>Baseline-matched, end (ECE / AUROC, sampled)</th><td class="num">0.074–0.081 / 0.732–0.771</td><td class="num">0.085 / 0.808 (3 seeds)</td><td class="num">0.170 / 0.783; unsampled 0.090 / 0.840</td></tr>
 </tbody></table></div>
 <div class="prose">
 <h3>In practice</h3>
@@ -360,7 +380,7 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 <li><b>Choose an exact variant when the confidence comes from a short list of single tokens.</b> At the same number of updates it calibrated as well as the released PPO and ranked answers better, without a reference model, value head or KL tuning.</li>
 <li><b>Give the exact variants the same number of updates.</b> With one update per batch they trailed PPO on AUROC; the gap closed and reversed at 8.</li>
 <li><b>Discrete-exact is the steadier of the two.</b> Fractional reached the lowest ECE early (0.031) but drifted up to 0.099 before recovering; discrete-exact improved almost monotonically.</li>
-<li><b>Discrete-exact vs fractional is also a choice about the output.</b> Discrete-exact commits to one level, so a sampled reply prints the calibrated number. Fractional's target is the mean, best read from the 11 probabilities.</li>
+<li><b>Discrete-exact vs fractional is a choice about the readout.</b> Discrete-exact commits to one level, so the integer the model writes is calibrated. Fractional's target is the mean, so read its confidence from the 11 probabilities. Read that way it ranks answers best of all methods tested.</li>
 </ul>
 
 <h2>Symbols</h2>
