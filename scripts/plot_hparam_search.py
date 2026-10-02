@@ -88,6 +88,8 @@ tr.sel td { font-weight:600; } tr.bad td { color:var(--faint); }
 <div class="cards" id="cards"></div>
 
 <div class="controls">
+  <span class="note">Arms</span>
+  <span class="seg" id="arms"><button data-v="both" aria-pressed="true">Both</button><button data-v="exact" aria-pressed="false">Exact</button><button data-v="ppo" aria-pressed="false">PPO</button></span>
   <span class="note">Metric</span>
   <span class="seg" id="metric"><button data-v="brier" aria-pressed="true">Brier ↓</button><button data-v="ece" aria-pressed="false">ECE ↓</button><button data-v="auroc" aria-pressed="false">AUROC ↑</button><button data-v="accuracy" aria-pressed="false">Accuracy</button></span>
   <span class="legend">
@@ -122,6 +124,9 @@ const COLOR = {exact: "var(--exact)", ppo: "var(--ppo)"};
 const NAME = {exact: "Exact + hinge", ppo: "PPO + hinge"};
 const LABEL = {brier: "Brier (dev)", ece: "ECE (dev)", auroc: "AUROC (dev)", accuracy: "Answer accuracy (dev)"};
 let metric = "brier";
+let armFilter = ["exact", "ppo"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "both";
+const shownArms = () => armFilter === "both" ? ["exact", "ppo"] : [armFilter];
+const shown = r => shownArms().includes(r.arm);
 const NS = "http://www.w3.org/2000/svg", tip = document.getElementById("tip");
 const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
 const fmt = v => v == null ? "—" : (Math.abs(v) < 1e-3 && v !== 0 ? v.toExponential(2) : (+v).toFixed(3));
@@ -169,7 +174,7 @@ function axes(svg, scale, x0, x1) {
 
 function cards() {
   const box = document.getElementById("cards"); box.textContent = "";
-  for (const arm of ["exact", "ppo"]) {
+  for (const arm of shownArms()) {
     const sel = D.runs.filter(r => r.arm === arm && r.selected).pop(), p = D.current[arm];
     const c = document.createElement("div"); c.className = "card";
     const h = document.createElement("h3"); const s = document.createElement("i"); s.className = "sw"; s.style.background = COLOR[arm];
@@ -181,7 +186,7 @@ function cards() {
     for (const [k, v] of rows) { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd); }
     c.append(h, dl); box.appendChild(c);
   }
-  const n = D.runs.length, bad = D.runs.filter(r => !r.eligible).length;
+  const n = D.runs.filter(shown).length, bad = D.runs.filter(r => shown(r) && !r.eligible).length;
   const c = document.createElement("div"); c.className = "card";
   const h = document.createElement("h3"); h.textContent = "Search so far"; c.appendChild(h);
   const dl = document.createElement("dl"); dl.className = "kv";
@@ -195,12 +200,12 @@ function pathChart() {
   const stages = D.stages.filter(([s]) => D.runs.some(r => r.stage === s));
   const x0 = 70, x1 = 960, top = 20, bottom = 210, X = i => x0 + 40 + i * (x1 - x0 - 80) / Math.max(1, stages.length - 1);
   const pts = {exact: [], ppo: []};
-  stages.forEach(([s], i) => { for (const arm of ["exact", "ppo"]) { const r = D.runs.find(r => r.stage === s && r.arm === arm && r.selected); if (r) pts[arm].push([i, r]); } });
-  const sc = yScale([...pts.exact, ...pts.ppo].map(([, r]) => r[metric]), top, bottom), Y = sc.Y;
+  stages.forEach(([s], i) => { for (const arm of shownArms()) { const r = D.runs.find(r => r.stage === s && r.arm === arm && r.selected); if (r) pts[arm].push([i, r]); } });
+  const sc = yScale(shownArms().flatMap(a => pts[a]).map(([, r]) => r[metric]), top, bottom), Y = sc.Y;
   axes(svg, sc, x0, x1);
   stages.forEach(([s, name], i) => el("text", {x: X(i), y: bottom + 24, "text-anchor": "middle", class: "tick"}, svg).textContent = name.split(":")[0]);
   el("text", {x: 14, y: (top + bottom) / 2, transform: `rotate(-90 14 ${(top + bottom) / 2})`, "text-anchor": "middle", class: "axt"}, svg).textContent = LABEL[metric];
-  for (const arm of ["exact", "ppo"]) {
+  for (const arm of shownArms()) {
     if (!pts[arm].length) continue;
     el("path", {d: pts[arm].map(([i, r], j) => `${j ? "L" : "M"}${X(i)},${Y(r[metric])}`).join(""), fill: "none", stroke: COLOR[arm], "stroke-width": 2}, svg);
     for (const [i, r] of pts[arm]) dot(svg, X(i), Y(r[metric]), r);
@@ -209,7 +214,7 @@ function pathChart() {
 
 function round1() {
   const svg = document.getElementById("round1"); svg.textContent = "";
-  const rows = D.runs.filter(r => r.stage === "round1" && r.status !== "failed" && r[metric] != null && !isNaN(r[metric]));
+  const rows = D.runs.filter(r => r.stage === "round1" && shown(r) && r.status !== "failed" && r[metric] != null && !isNaN(r[metric]));
   const x0 = 70, x1 = 960, top = 20, bottom = 270;
   const lo = Math.log10(2e-6), hi = Math.log10(4e-4), X = v => x0 + (Math.log10(v) - lo) / (hi - lo) * (x1 - x0);
   const sc = yScale(scaleValues(rows), top, bottom), Y = sc.Y;
@@ -231,7 +236,7 @@ function sweeps() {
   const box = document.getElementById("sweeps"); box.textContent = "";
   for (const [stage, name] of D.stages.slice(1)) {
     const prev = D.history[D.history.findIndex(h => h.stage === stage) - 1];
-    for (const arm of ["exact", "ppo"]) {
+    for (const arm of shownArms()) {
       const rows = D.runs.filter(r => r.stage === stage && r.arm === arm);
       if (!rows.length) continue;
       const current = prev ? prev.current[arm] : null;
@@ -265,9 +270,26 @@ function sweeps() {
 function finalSection() {
   const box = document.getElementById("final"); box.textContent = "";
   if (!D.final) { const p = document.createElement("p"); p.textContent = "Running: each arm's chosen configuration with 3 fresh seeds for 256 steps, scored on dev and once on test. This page refreshes from the run directory when it finishes."; box.appendChild(p); return; }
+  const summary = document.createElement("div"); summary.className = "cards";
+  for (const arm of shownArms()) for (const split of ["dev", "test"]) {
+    const ms = Object.entries(D.final).filter(([l]) => l.startsWith(arm)).map(([, v]) => v[split]).filter(Boolean);
+    if (!ms.length) continue;
+    const mean = k => ms.reduce((s, m) => s + m[k], 0) / ms.length;
+    const sd = k => Math.sqrt(ms.reduce((s, m) => s + (m[k] - mean(k)) ** 2, 0) / Math.max(1, ms.length - 1));
+    const c = document.createElement("div"); c.className = "card";
+    const h = document.createElement("h3"); const s = document.createElement("i"); s.className = "sw"; s.style.background = COLOR[arm];
+    h.append(s, document.createTextNode(`${NAME[arm]} · ${split} · ${ms.length} seeds`)); c.appendChild(h);
+    const dl = document.createElement("dl"); dl.className = "kv";
+    for (const [k, name] of [["brier", "Brier"], ["ece", "ECE"], ["auroc", "AUROC"], ["ece_unsampled", "ECE unsampled"], ["auroc_unsampled", "AUROC unsampled"], ["accuracy", "accuracy"]]) {
+      const dt = document.createElement("dt"); dt.textContent = name; const dd = document.createElement("dd");
+      dd.textContent = `${fmt(mean(k))} ± ${fmt(sd(k))}`; dl.append(dt, dd); }
+    c.appendChild(dl); summary.appendChild(c);
+  }
+  box.appendChild(summary);
   const wrap = document.createElement("div"); wrap.className = "panel scroll"; const t = document.createElement("table");
   const hr = t.insertRow(); for (const c of ["run", "split", "Brier", "ECE", "AUROC", "accuracy", "format failures"]) { const th = document.createElement("th"); th.textContent = c; hr.appendChild(th); }
   for (const [label, v] of Object.entries(D.final)) for (const [split, m] of [["dev", v.dev], ["test", v.test]]) {
+    if (!shownArms().some(a => label.startsWith(a))) continue;
     if (!m) continue; const r = t.insertRow();
     for (const x of [label, split, fmt(m.brier), fmt(m.ece), fmt(m.auroc), (100 * m.accuracy).toFixed(1) + "%", (100 * m.wrong_format_rate).toFixed(1) + "%"]) r.insertCell().textContent = x;
   }
@@ -281,7 +303,7 @@ function table() {
   const hr = t.insertRow();
   for (const [k, name] of cols) { const th = document.createElement("th"); th.textContent = name + (sortKey === k ? (sortDir > 0 ? " ▲" : " ▼") : ""); th.addEventListener("click", () => { sortDir = sortKey === k ? -sortDir : 1; sortKey = k; table(); }); hr.appendChild(th); }
   const stageIndex = s => D.stages.findIndex(([x]) => x === s);
-  const rows = [...D.runs].sort((a, b) => {
+  const rows = D.runs.filter(shown).sort((a, b) => {
     const va = sortKey === "stage" ? stageIndex(a.stage) : sortKey === "params" ? a.label : a[sortKey], vb = sortKey === "stage" ? stageIndex(b.stage) : sortKey === "params" ? b.label : b[sortKey];
     if (va == null) return 1; if (vb == null) return -1; return (va > vb ? 1 : va < vb ? -1 : 0) * sortDir; });
   for (const r of rows) {
@@ -290,6 +312,10 @@ function table() {
   }
 }
 function render() { cards(); pathChart(); round1(); sweeps(); finalSection(); table(); }
+for (const b of document.querySelectorAll("#arms button")) {
+  b.setAttribute("aria-pressed", b.dataset.v === armFilter);
+  b.addEventListener("click", () => { document.querySelectorAll("#arms button").forEach(x => x.setAttribute("aria-pressed", x === b)); armFilter = b.dataset.v; history.replaceState(null, "", armFilter === "both" ? location.pathname : "#" + armFilter); render(); });
+}
 for (const b of document.querySelectorAll("#metric button")) b.addEventListener("click", () => { document.querySelectorAll("#metric button").forEach(x => x.setAttribute("aria-pressed", x === b)); metric = b.dataset.v; render(); });
 render();
 </script></body></html>
