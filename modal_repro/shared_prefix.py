@@ -150,3 +150,26 @@ def single_pass_logps(model, query, common, numbers, stop, k_star=None):
     number_logps = common_logp + logits[n - 1].float().log_softmax(-1)[torch.tensor(numbers, device=device)]
     stop_logp = logits[n].float().log_softmax(-1)[stop] if k_star is not None else None
     return number_logps, stop_logp
+
+
+def single_pass_logps_batch(model, queries, common, numbers, stop, k_stars):
+    """`single_pass_logps` for several rows in one forward pass.
+
+    Rows are right-padded with the stop token. Unsloth's training forward uses no attention mask,
+    which is safe here: attention is causal and every position read precedes the padding.
+    Returns a list of (number log-probs, stop log-prob or None), one per row.
+    """
+    device = next(model.parameters()).device
+    seqs = [q + common + ([numbers[k]] if k is not None else []) for q, k in zip(queries, k_stars)]
+    width = max(map(len, seqs))
+    input_ids = torch.tensor([s + [stop] * (width - len(s)) for s in seqs], device=device)
+    logits = model(input_ids=input_ids).logits
+    number_index = torch.tensor(numbers, device=device)
+    out = []
+    for b, (q, k) in enumerate(zip(queries, k_stars)):
+        n = len(q) + len(common)
+        common_logp = sum(logits[b, len(q) - 1 + i].float().log_softmax(-1)[t] for i, t in enumerate(common)) if common else 0.
+        number_logps = common_logp + logits[b, n - 1].float().log_softmax(-1)[number_index]
+        stop_logp = logits[b, n].float().log_softmax(-1)[stop] if k is not None else None
+        out.append((number_logps, stop_logp))
+    return out

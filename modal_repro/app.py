@@ -40,6 +40,7 @@ image = (
     .add_local_file(Path(__file__).parent / "shared_prefix.py", f"{CODE}/shared_prefix.py", copy=True)
     .add_local_file(Path(__file__).parent / "verify_shared_prefix.py", f"{CODE}/verify_shared_prefix.py", copy=True)
     .add_local_file(Path(__file__).parent / "verify_single_pass.py", f"{CODE}/verify_single_pass.py", copy=True)
+    .add_local_file(Path(__file__).parent / "bench_batching.py", f"{CODE}/bench_batching.py", copy=True)
     # Our package, so the exact objectives use the very same core.objective as the Tinker runs.
     .add_local_dir(Path(__file__).parents[1] / "src" / "rewarding_doubt", "/opt/rd/rewarding_doubt", copy=True,
                    ignore=["__pycache__"])
@@ -534,3 +535,31 @@ def exact_variants(variants: str = "de-kl-vh,de-hinge", seeds: str = "1,2,3", gp
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     run_name = f"exact-variants-{tag + '-' if tag else ''}{'smoke-' if train_limit or eval_limit else ''}{stamp}"
     _train_and_evaluate(configs, list(configs), ids, run_name, gpu)
+
+
+@app.function(volumes={VOL: volume}, timeout=HOUR)
+def bench_batching_remote(ids_by_split: dict) -> dict:
+    """Declared without a GPU; callers attach one with `.with_options(gpu=...)`."""
+    import subprocess
+
+    Path("/tmp/ids.json").write_text(json.dumps(ids_by_split))
+    proc = subprocess.run(["python", "bench_batching.py", "/tmp/ids.json"], cwd=CODE, capture_output=True, text=True)
+    path = Path("/tmp/bench_batching.json")
+    return dict(exit_code=proc.returncode, log=proc.stdout[-20000:] + proc.stderr[-8000:],
+                report=json.loads(path.read_text()) if path.exists() else None)
+
+
+@app.local_entrypoint()
+def bench_batching(gpus: str = "L40S", data_run: str = "runs/pilot-20261001T002945Z"):
+    root = Path(__file__).resolve().parents[1]
+    ids = {"train": [json.loads(l)["id"] for l in (root / data_run / "data" / "train.jsonl").read_text().splitlines()]}
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    local = root / "runs" / f"modal-bench-batching-{stamp}"
+    local.mkdir(parents=True)
+    calls = [(gpu, bench_batching_remote.with_options(gpu=gpu).spawn(ids)) for gpu in gpus.split(",")]
+    for gpu, call in calls:
+        result = call.get()
+        (local / f"{gpu}.log").write_text(result["log"])
+        (local / f"{gpu}.json").write_text(json.dumps(result["report"], indent=1) + "\n")
+        print(gpu, "exit", result["exit_code"], "saved")
+    print(f"Saved to {local}")

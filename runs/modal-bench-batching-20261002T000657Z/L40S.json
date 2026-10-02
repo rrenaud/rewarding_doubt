@@ -1,0 +1,51 @@
+{
+ "answer_sampling_s": 3.0025534629821777,
+ "confidence_sampling_s": 0.2989017963409424,
+ "reference_per_row_s": 1.1717655658721924,
+ "reference_batched_s": 0.18354082107543945,
+ "rows": 8,
+ "equivalence": {
+  "repeat_1": {
+   "cos": 0.9999513626098633,
+   "rel": 0.0099387988448143,
+   "max_loss_diff": 0.0
+  },
+  "rows_per_call_2": {
+   "cos": 0.9989669919013977,
+   "rel": 0.04889706149697304,
+   "max_loss_diff": 0.6299278736114502
+  },
+  "rows_per_call_4": {
+   "cos": 0.9987422227859497,
+   "rel": 0.05639039725065231,
+   "max_loss_diff": 0.4407167434692383
+  }
+ },
+ "update_part_timings": {
+  "ckpt_on_rows_per_call_1": {
+   "update_part_s": 8.408640225728353,
+   "peak_gb": 6.314870272
+  },
+  "ckpt_on_rows_per_call_2": {
+   "update_part_s": 4.240383227666219,
+   "peak_gb": 6.385071104
+  },
+  "ckpt_on_rows_per_call_4": {
+   "update_part_s": 2.6404402256011963,
+   "peak_gb": 6.523569664
+  },
+  "ckpt_off_rows_per_call_1": {
+   "update_part_s": 5.928257306416829,
+   "peak_gb": 6.931290624
+  },
+  "ckpt_off_rows_per_call_2": {
+   "update_part_s": 3.0312019983927407,
+   "peak_gb": 7.65891072
+  },
+  "ckpt_off_rows_per_call_4": {
+   "update_part_s": 1.7998372713724773,
+   "peak_gb": 9.071248896
+  }
+ },
+ "gpu": "NVIDIA L40S"
+}

@@ -48,7 +48,8 @@ import trl
 
 from rewarding_doubt.core import baseline_matched_objective, objective
 from rewarding_doubt.paper_ppo import AdaptiveKLController
-from shared_prefix import candidate_logps, full_sequence_logps, single_pass_logps, split_candidates
+from shared_prefix import (candidate_logps, full_sequence_logps, single_pass_logps, single_pass_logps_batch,
+                           split_candidates)
 from subset import subset_loader
 from util.DataHelper import DataCollatorForTokenizedQueries
 from util.EvaluationMetrics import Metric, is_answer_correct
@@ -57,12 +58,12 @@ from util.ResponseHandling import parse_answer_confidence
 MODEL = "unsloth/llama-3-8b-Instruct-bnb-4bit"
 
 
-def reference_scores(model, query, k_star, candidates):
-    """The base model's number log-probs and stop log-prob for this row (adapter disabled)."""
+def reference_scores(model, rows, candidates):
+    """The base model's number log-probs and stop log-prob per row (adapter disabled, one batch)."""
     common, numbers, stop = split_candidates(candidates)
     with torch.no_grad(), model.disable_adapter():
-        logq, stop_logp = single_pass_logps(model, query, common, numbers, stop, k_star)
-    return logq.double(), (stop_logp.double() if stop_logp is not None else None)
+        scored = single_pass_logps_batch(model, [r[0] for r in rows], common, numbers, stop, [r[2] for r in rows])
+    return [(logq.double(), stop_logp.double() if stop_logp is not None else None) for logq, stop_logp in scored]
 
 
 class ValueHead(torch.nn.Module):
@@ -83,18 +84,22 @@ def capture_final_hidden(model, store):
     return lm_head.register_forward_hook(lambda module, inputs, output: store.__setitem__("hidden", inputs[0]))
 
 
-def row_loss(model, row, candidates, eot, args, beta=0., value_head=None, store=None):
-    """Loss for one row: (loss, confidence, valid mass, stop prob, KL, value loss)."""
-    query, label, k_star, ref = row
-    stop_prob, kl = None, None
+def score_rows(model, rows, candidates, eot, args):
+    """(number log-probs, stop log-prob or None) per row; single-pass rows share one forward call."""
     if args.scoring == "single":
         common, numbers, stop = split_candidates(candidates)
-        logps, stop_logp = single_pass_logps(model, query, common, numbers, stop, k_star)
-        if stop_logp is not None:
-            stop_prob = stop_logp.exp().item()
-    else:
-        logps, stop_logp = (candidate_logps(model, query, candidates) if args.scoring == "shared"
-                            else full_sequence_logps(model, query, candidates, eot)), None
+        return single_pass_logps_batch(model, [r[0] for r in rows], common, numbers, stop, [r[2] for r in rows])
+    score = candidate_logps if args.scoring == "shared" else lambda m, q, c: full_sequence_logps(m, q, c, eot)
+    return [(score(model, r[0], candidates), None) for r in rows]
+
+
+def row_objective(row, logps, stop_logp, args, beta=0., value_head=None, hidden=None):
+    """Loss for one scored row: (loss, confidence, valid mass, stop prob, KL, value loss).
+
+    `hidden` is this row's final hidden states [sequence, hidden], needed for the value head.
+    """
+    query, label, k_star, ref = row
+    stop_prob = stop_logp.exp().item() if stop_logp is not None else None
     if args.regularization == "baseline":
         logq = logps.double()
         J, kl_term = baseline_matched_objective(
@@ -105,8 +110,9 @@ def row_loss(model, row, candidates, eot, args, beta=0., value_head=None, store=
         confidence = (logq.detach().exp() / mass * logq.new_tensor([k / 10 for k in range(11)])).sum()
         loss, value_loss = -J + beta * kl_term, None
         if value_head is not None:
-            hidden = store["hidden"][0]  # [sequence, hidden] from the forward pass above
-            positions = torch.arange(len(query) - 1, hidden.shape[0], device=hidden.device)
+            # States after " Confidence", each common token (": "), and the sampled number if any.
+            positions = torch.arange(len(query) - 1, len(query) + args.n_common + (k_star is not None),
+                                     device=hidden.device)
             values = value_head(hidden[positions])
             value_loss = 0.5 * ((values.double() - J.detach()) ** 2).mean()
             loss = loss + args.vf_coef * value_loss
@@ -117,7 +123,7 @@ def row_loss(model, row, candidates, eot, args, beta=0., value_head=None, store=
                                  args.format_weight, args.format_threshold)
     if stop_logp is not None:
         loss = loss + args.format_weight * (math.log(args.format_threshold) - stop_logp.double()).clamp(min=0)
-    return loss, confidence, logps.detach().logsumexp(-1).exp().item(), stop_prob, kl, None
+    return loss, confidence, logps.detach().logsumexp(-1).exp().item(), stop_prob, None, None
 
 
 def sample_numbers(model, tokenizer, queries, candidates, eot):
@@ -161,6 +167,10 @@ def main():
     parser.add_argument("--kl-target", type=float, default=6.)
     parser.add_argument("--kl-horizon", type=float, default=10000.)
     parser.add_argument("--value-head", action="store_true")
+    parser.add_argument("--forward-batch", type=int, default=0,
+                        help="rows per forward call within a minibatch (0: the whole minibatch); same math")
+    parser.add_argument("--grad-ckpt", choices=["unsloth", "off"], default="off",
+                        help="off is 1.4x faster at batch 4 and needs ~9 GB (bench_batching.py)")
     parser.add_argument("--vf-coef", type=float, default=0.1)
     parser.add_argument("--scoring", choices=["single", "shared", "full"], default="single",
                         help="single: one pass, 11 number probabilities + stop check on a sampled number; "
@@ -179,7 +189,8 @@ def main():
     model, tokenizer = FastLanguageModel.from_pretrained(model_name=MODEL, max_seq_length=1048,
                                                          dtype=None, load_in_4bit=True)
     model = FastLanguageModel.get_peft_model(model, r=8, lora_alpha=8, lora_dropout=0, bias="none",
-                                             use_gradient_checkpointing="unsloth", random_state=3407,
+                                             use_gradient_checkpointing="unsloth" if args.grad_ckpt == "unsloth" else False,
+                                             random_state=3407,
                                              use_rslora=False, loftq_config=None)
     # ModelLoader applies this (via the value-head wrapper) so LoRA weights are bf16, which
     # Unsloth's fused LoRA backward requires.
@@ -190,6 +201,7 @@ def main():
     confidence_token = tokenizer.convert_tokens_to_ids("ĠConfidence")
     # The continuation PPO trains on after " Confidence": ": k" then end of turn.
     candidates = [tokenizer.encode(f": {k}", add_special_tokens=False) + [eot] for k in range(11)]
+    args.n_common = len(split_candidates(candidates)[0]) if args.scoring == "single" else 0
     assert len({tuple(c) for c in candidates}) == 11
     assert not any(a != b and b[:len(a)] == a for a in candidates for b in candidates)
 
@@ -240,10 +252,11 @@ def main():
                 rows = [(q, label, k, None) for (q, label, _, _), k in zip(rows, picks)]
             FastLanguageModel.for_training(model)
             if args.regularization == "baseline":  # reference scores are fixed for the whole step
-                rows = [(q, label, k, reference_scores(model, q, k, candidates)) for q, label, k, _ in rows]
+                refs = reference_scores(model, rows, candidates)
+                rows = [(q, label, k, ref) for (q, label, k, _), ref in zip(rows, refs)]
             stats = dict(loss=0., confidence=0., mass=0., hinge_active=0., stop_prob=0., sampled_number_rate=0.,
                          kl=0., kl_coef=kl_controller.value, value_loss=0.)
-            stop_checks = 0
+            stop_checks, stats_rows = 0, []
             minibatch = args.minibatch or args.batchsize
             updates = 0
             for epoch_pass in range(args.passes):
@@ -252,25 +265,35 @@ def main():
                 for mb_start in range(0, len(order_rows), minibatch):
                     mb = [rows[i] for i in order_rows[mb_start:mb_start + minibatch]]
                     optimizer.zero_grad()
-                    for row in mb:
-                        loss, confidence, mass, stop_prob, kl, value_loss = row_loss(
-                            model, row, candidates, eot, args, kl_controller.value, value_head, store)
-                        (loss / len(mb)).backward()
-                        if epoch_pass == 0:  # log pre-update statistics, once per row
-                            stats["loss"] += loss.item() / len(rows)
-                            stats["confidence"] += confidence.item() / len(rows)
-                            stats["mass"] += mass / len(rows)
-                            stats["hinge_active"] += (mass < args.format_threshold) / len(rows)
-                            stats["sampled_number_rate"] += (row[2] is not None) / len(rows)
-                            if stop_prob is not None:
-                                stats["stop_prob"] += stop_prob
-                                stop_checks += 1
-                            if kl is not None:
-                                stats["kl"] += kl / len(rows)
-                            if value_loss is not None:
-                                stats["value_loss"] += value_loss / len(rows)
+                    chunk = args.forward_batch or len(mb)
+                    for c_start in range(0, len(mb), chunk):
+                        rows_in = mb[c_start:c_start + chunk]
+                        scored = score_rows(model, rows_in, candidates, eot, args)
+                        hidden = store.get("hidden")
+                        total = 0.
+                        for b, (row, (logps, stop_logp)) in enumerate(zip(rows_in, scored)):
+                            loss, confidence, mass, stop_prob, kl, value_loss = row_objective(
+                                row, logps, stop_logp, args, kl_controller.value, value_head,
+                                hidden[b] if value_head is not None else None)
+                            total = total + loss / len(mb)
+                            if epoch_pass == 0:
+                                stats_rows.append((row, loss.item(), confidence.item(), mass, stop_prob, kl, value_loss))
+                        total.backward()
                     optimizer.step()
                     updates += 1
+            for row, loss, confidence, mass, stop_prob, kl, value_loss in stats_rows:
+                stats["loss"] += loss / len(rows)
+                stats["confidence"] += confidence / len(rows)
+                stats["mass"] += mass / len(rows)
+                stats["hinge_active"] += (mass < args.format_threshold) / len(rows)
+                stats["sampled_number_rate"] += (row[2] is not None) / len(rows)
+                if stop_prob is not None:
+                    stats["stop_prob"] += stop_prob
+                    stop_checks += 1
+                if kl is not None:
+                    stats["kl"] += kl / len(rows)
+                if value_loss is not None:
+                    stats["value_loss"] += value_loss / len(rows)
             stats["stop_prob"] = stats["stop_prob"] / stop_checks if stop_checks else None
             if args.regularization == "baseline":  # TRL updates after each batch, n_steps = batch size
                 kl_controller.update(stats["kl"], args.batchsize)
