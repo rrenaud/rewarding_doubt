@@ -337,36 +337,41 @@ function seedStrips(groups, box) {
   for (const [k, name] of [["brier", "Brier ↓"], ["ece", "ECE ↓"], ["auroc", "AUROC ↑"], ["accuracy", "Answer accuracy"]]) {
     const panel = document.createElement("div"); panel.className = "panel";
     const h = document.createElement("h4"); h.textContent = name; panel.appendChild(h);
-    const rowH = 30, top = 8, x0 = 112, x1 = 288, H = top + rows.length * rowH + 26;
+    // Vertical: higher values sit higher, so the arrow in the title points the way the eye reads.
+    const top = 10, bottom = 190, x0 = 44, x1 = 292, H = 236, colW = (x1 - x0) / rows.length;
     const svg = el("svg", {class: "chart", viewBox: `0 0 300 ${H}`, role: "img", "aria-label": `${name} of every seed, by arm and split`});
     panel.appendChild(svg);
     const vals = rows.flatMap(r => r.pts.map(p => p.m[k])); let lo = Math.min(...vals), hi = Math.max(...vals);
     const pad = (hi - lo) * 0.1 || 0.01; lo -= pad; hi += pad;
-    const X = v => x0 + (v - lo) / (hi - lo) * (x1 - x0), ticks = niceTicks(lo, hi, 3), bottom = top + rows.length * rowH;
-    const digits = ticks.length > 1 && ticks[1] - ticks[0] < 0.01 ? 3 : 2;
-    for (const tv of ticks) { el("line", {x1: X(tv), x2: X(tv), y1: top, y2: bottom, stroke: "var(--grid)"}, svg);
-      el("text", {x: X(tv), y: bottom + 16, "text-anchor": "middle", class: "tick"}, svg).textContent = k === "accuracy" ? (100 * tv).toFixed(0) + "%" : tv.toFixed(digits); }
+    const Y = v => bottom - (v - lo) / (hi - lo) * (bottom - top), ticks = niceTicks(lo, hi, 4);
+    // Enough decimals to print every tick exactly (0.175, not 0.17; 62.5%, not 63%).
+    const decimals = (v, s) => { for (let d = 0; d < 6; d++) if (Math.abs(Math.round(v * 10 ** d) - v * 10 ** d) < 1e-6) return d; return 6; };
+    const digits = Math.max(...ticks.map(tv => decimals(tv))), pctDigits = Math.max(...ticks.map(tv => decimals(100 * tv)));
+    for (const tv of ticks) { el("line", {x1: x0, x2: x1, y1: Y(tv), y2: Y(tv), stroke: "var(--grid)"}, svg);
+      el("text", {x: x0 - 6, y: Y(tv) + 4, "text-anchor": "end", class: "tick"}, svg).textContent = k === "accuracy" ? (100 * tv).toFixed(pctDigits) + "%" : tv.toFixed(digits); }
     rows.forEach((r, i) => {
-      const y = top + i * rowH + rowH / 2, color = COLOR[r.g.arm];
-      if (i && rows[i - 1].g !== r.g) el("line", {x1: 0, x2: 300, y1: top + i * rowH, y2: top + i * rowH, stroke: "var(--line)"}, svg);
-      const lab = el("text", {x: 0, y: y + 4, class: "tick"}, svg); lab.textContent = `${NAME[r.g.arm].split(" ")[0]} · ${r.split}`;
+      const cx = x0 + (i + 0.5) * colW, color = COLOR[r.g.arm];
+      if (i && rows[i - 1].g !== r.g) el("line", {x1: x0 + i * colW, x2: x0 + i * colW, y1: top, y2: bottom + 40, stroke: "var(--line)"}, svg);
+      el("text", {x: cx, y: bottom + 18, "text-anchor": "middle", class: "tick"}, svg).textContent = NAME[r.g.arm].split(" ")[0];
+      el("text", {x: cx, y: bottom + 32, "text-anchor": "middle", class: "tick"}, svg).textContent = r.split;
       const mean = r.pts.reduce((s, p) => s + p.m[k], 0) / r.pts.length;
-      el("line", {x1: X(mean), x2: X(mean), y1: y - 10, y2: y + 10, stroke: "var(--fg)", "stroke-width": 2}, svg);
-      for (const p of r.pts) {
-        const c = el("circle", {cx: X(p.m[k]), cy: y, r: 5, fill: color, stroke: "var(--surface)", "stroke-width": 1.5, tabindex: 0}, svg);
-        const hit = el("circle", {cx: X(p.m[k]), cy: y, r: 10, fill: "transparent"}, svg);
+      el("line", {x1: cx - 16, x2: cx + 16, y1: Y(mean), y2: Y(mean), stroke: "var(--fg)", "stroke-width": 2}, svg);
+      r.pts.forEach((p, j) => {
+        const x = cx + (j - (r.pts.length - 1) / 2) * 6;  // small spread so equal values stay visible
+        const c = el("circle", {cx: x, cy: Y(p.m[k]), r: 5, fill: color, stroke: "var(--surface)", "stroke-width": 1.5, tabindex: 0}, svg);
+        const hit = el("circle", {cx: x, cy: Y(p.m[k]), r: 9, fill: "transparent"}, svg);
         const show = e => { tip.textContent = ""; const a = document.createElement("div"); a.style.fontWeight = 600; a.textContent = `${p.label} · ${r.split}`;
           const b = document.createElement("div"); b.textContent = `${name.replace(/ [↓↑]/, "")} ${k === "accuracy" ? (100 * p.m[k]).toFixed(1) + "%" : fmt(p.m[k])} (mean ${k === "accuracy" ? (100 * mean).toFixed(1) + "%" : fmt(mean)})`;
           tip.append(a, b); tip.style.display = "block"; tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = (e.clientY + 14) + "px"; };
         for (const t of [c, hit]) { t.addEventListener("pointermove", show); t.addEventListener("pointerleave", hideTip); }
         c.addEventListener("focus", () => { const bb = c.getBoundingClientRect(); show({clientX: bb.right, clientY: bb.bottom}); });
         c.addEventListener("blur", hideTip);
-      }
+      });
     });
     grid.appendChild(panel);
   }
   const note = document.createElement("p"); note.className = "note";
-  note.textContent = "Each dot is one seed; rows are labelled with arm and split. The bar marks the mean. Hover a dot for its run.";
+  note.textContent = "Each dot is one seed; columns are labelled with arm and split. Higher is higher on every axis. The bar marks the mean. Hover a dot for its run.";
   box.append(grid, note);
 }
 function finalSection() {
