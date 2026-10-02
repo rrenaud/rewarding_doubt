@@ -85,9 +85,9 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 </style>
 <main class="page">
 <div class="prose">
-<div class="eyebrow">Rewarding Doubt · TriviaQA · Llama-3-8B · 3 seeds per arm</div>
+<div class="eyebrow">Rewarding Doubt · TriviaQA · Llama-3-8B · 3–5 seeds per arm</div>
 <h1>Rewarding doubt without KL</h1>
-<p class="lede">The released Rewarding Doubt recipe trains the confidence a model states after its answer with PPO and a KL penalty toward the base model. Two independent changes improve it. Replacing the KL penalty with a format hinge gives most of the calibration gain. Scoring all eleven confidence levels exactly, instead of one sampled level, gives most of the ranking gain and makes training far more repeatable.</p>
+<p class="lede">The released Rewarding Doubt recipe trains the confidence a model states after its answer with PPO and a KL penalty toward the base model. Two independent changes improve it. Replacing the KL penalty with a format hinge gives most of the calibration gain. Scoring all eleven confidence levels exactly, instead of one sampled level, gives most of the ranking gain and makes training far more repeatable. With both methods tuned on the same budget and trained on the same answer labels, discrete-exact with the hinge reaches test ECE 0.052, AUROC 0.839 and Brier 0.155, against 0.114, 0.721 and 0.203 for PPO with the hinge.</p>
 <div class="key" aria-label="Method colors">
   <span><i class="sw" style="background:var(--ppo)"></i>Released PPO</span>
   <span><i class="sw" style="background:var(--exact)"></i>Discrete-exact</span>
@@ -167,6 +167,16 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 </div>
 <figcaption><b>All four combinations, end of training.</b> Lower ECE is better calibrated; higher AUROC ranks right answers above wrong ones better; Brier combines both. Moving right (hinge instead of KL) lowers ECE for both methods: −0.057 for PPO, −0.028 for discrete-exact. Moving down (all 11 levels instead of one sample) raises AUROC by +0.10 with KL and +0.045 with the hinge, and shrinks the seed-to-seed spread of ECE three- to five-fold. Answer accuracy is 63.4–64.1% in every cell, the same as the base model.</figcaption>
 </figure>
+<div class="prose">
+<div class="callout">
+<p><b>How firm is this 2×2?</b> Two later checks qualify it.</p>
+<ul class="tight">
+<li><b>Training labels differed.</b> The released PPO code grades answers by exact match during training, while discrete-exact (and every evaluation) uses word-overlap F1 &gt; 0.5, as the paper describes. Exact match rejects about 5% of correct answers. Re-grading the saved outputs by exact match flips the ECE ordering between the two methods, so <b>the ECE gap between PPO and discrete-exact in this figure is confounded by the label</b>. The hinge-vs-KL effect within each method, and discrete-exact's AUROC and stability advantages, hold under both graders. The grading report (<code>docs/grading.md</code> in the repository) lists every disagreement.</li>
+<li><b>PPO's seeds were not really seeded.</b> TRL resets the random seed to its config default, so these three PPO runs differed only through GPU nondeterminism. They are still independent runs, and their wide spread is real run-to-run variation.</li>
+</ul>
+<p>The tuned comparison below fixes both: every arm trains on F1 labels and PPO is properly seeded.</p>
+</div>
+</div>
 <div class="prose">
 <h2>Why the hinge helps</h2>
 <p>The base model is the thing being fixed. It says "10" for most answers, right or wrong. A KL penalty charges the trained model for every departure from the base model's distribution, including the departure calibration requires, so it keeps pulling probability back toward high confidence. The hinge only asks that the output stay well formed: at least 95% of the probability goes to <code>: </code> followed by a number, and the model stops after the number. Within that, it leaves the choice of number entirely to the calibration objective.</p>
@@ -271,6 +281,26 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 <p>The exact gradient pushes each level by π<sub>k</sub>·(R<sub>k</sub> − J): its reward relative to the expected reward J. That has the ideal baseline built in, which is the job PPO's value head does approximately. The payoff shows in the 2×2: higher AUROC in both columns and a three- to five-fold smaller spread across seeds.</p>
 <p>A value head still helps as an auxiliary task. Trained on top of discrete-exact (with KL), it raised AUROC to 0.826 ± 0.002, the most consistent arm, at a small calibration cost (ECE 0.097 ± 0.017). Combining it with the hinge has not been run yet.</p>
 
+<h2>Tuned and matched</h2>
+<p>Every run above used the paper's learning rate, 1e-5. Both methods were then tuned on the same budget: a separate 512-question dev split (disjoint from test), 16 random configurations per method, then four one-at-a-time sweeps (learning rate, updates per batch, learning rate again, regularization settings), always keeping the configuration with the lowest dev Brier. The winners were rerun with fresh seeds and scored once on test.</p>
+<p>The search turned up a failure mode the earlier runs never reached: <b>at high learning rates the adapter damages the answers themselves</b>, not just the confidence, because it applies to every token. Some configurations dropped answer accuracy to 0–30% or broke the output format, and plain Brier ranked them highly because a model that is mostly wrong and says "low" scores well. Selection therefore only considered runs whose format failures stayed under 2% and whose accuracy stayed within 2 points of the base model. The hinge guards the format, not the answers.</p>
+</div>
+<div class="tbl"><table>
+<thead><tr><th>Test, 512 questions, F1 labels everywhere</th><th>Seeds</th><th>Brier ↓</th><th>ECE ↓</th><th>AUROC ↑</th><th>Accuracy</th></tr></thead>
+<tbody>
+<tr><th><span class="colhead"><i class="sw" style="background:var(--exact)"></i>Discrete-exact + hinge, tuned</span></th><td class="num">3</td><td class="num"><b>0.155 ± 0.010</b></td><td class="num"><b>0.052 ± 0.028</b></td><td class="num"><b>0.839 ± 0.016</b></td><td class="num">63.1%</td></tr>
+<tr><th><span class="colhead"><i class="sw" style="background:var(--ppo)"></i>PPO + hinge, tuned</span></th><td class="num">5</td><td class="num">0.203 ± 0.018</td><td class="num">0.114 ± 0.052</td><td class="num">0.721 ± 0.047</td><td class="num">63.9%</td></tr>
+<tr><th>Base model</th><td class="num"></td><td class="num">0.337</td><td class="num">0.333</td><td class="num">0.560</td><td class="num">63.3%</td></tr>
+</tbody></table></div>
+<div class="prose">
+<ul class="tight">
+<li><b>Tuned settings.</b> Discrete-exact: learning rate 4e-5 (4× the paper's), 2 updates per batch, hinge threshold 0.95. PPO: learning rate 2.3e-5, 2 PPO epochs, clip 0.1. Both preferred fewer updates per batch than the paper's 8, and discrete-exact tolerated a learning rate nearly twice PPO's before its answers degraded.</li>
+<li><b>Discrete-exact wins on all three metrics.</b> The AUROC gap (0.12) is more than five standard errors; the ECE gap (0.06) is about two.</li>
+<li><b>PPO's problem is variance.</b> Its five seeds range from 0.044 to 0.163 ECE. Its best seed matches discrete-exact's typical run; its average does not. The search itself was misled by this: PPO's tuning seed happened to be a good one (dev ECE 0.025), and fresh seeds did not reproduce it.</li>
+<li><b>The label was not the cause.</b> The same tuned PPO trained on exact-match labels gave test ECE 0.128 and AUROC 0.757, within noise of the F1-trained runs.</li>
+<li><b>Tuning helped discrete-exact mainly on ranking.</b> Against its untuned three seeds (ECE 0.057, AUROC 0.789, Brier 0.174), calibration barely moved while AUROC and Brier improved.</li>
+</ul>
+
 <h2>Cost</h2>
 </div>
 <div class="tbl"><table>
@@ -283,13 +313,13 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 <div class="prose">
 <p class="note">PPO's original cost was implementation, not algorithm. TRL computes a full-vocabulary log-softmax at every position, logs an entropy statistic over the same logits, keeps gradient checkpointing on and clears the GPU cache every step. Patching those from outside the released code changes nothing numerically: over six steps on the same seed, rewards, losses, KL, clip fraction and value predictions matched to four decimals. At equal speed, any comparison can give both methods the same budget.</p>
 
-<h2>Open questions</h2>
+<h2>Next</h2>
 <ul class="tight">
-<li><b>Learning rate.</b> Every run used the paper's 1e-5. Discrete-exact's steadier gradient may tolerate much larger steps; a search on a separate dev split is planned, with PPO tuned on the same budget.</li>
+<li><b>Mixing in the Brier score (running).</b> The log score punishes a confident mistake so hard that discrete-exact never says 9 or 10, even where it is right 82–88% of the time at 7–8. A reward of half log score and half Brier score, both proper, let it use 9 at 94% accuracy and nearly halved dev ECE in an exploratory sweep (2 seeds, half the training set). A finer sweep and a full three-seed comparison against the pure log score are running.</li>
 <li><b>Hinge plus value head</b> for discrete-exact.</li>
-<li><b>Answer generation with the adapter off</b>, so only the confidence can change.</li>
+<li><b>Answer generation with the adapter off</b>, so only the confidence can change and high learning rates cannot damage the answers.</li>
 </ul>
-<p class="note">Setup: 4-bit Llama-3-8B-Instruct, LoRA r=8, on-policy answers, batch 8, 2 epochs, lr 1e-5, released evaluation (F1 &gt; 0.5, 11-bin ECE) on 512 held-out TriviaQA questions. PPO is the released Train.py; its hinge variant adds the same two hinges to its loss and turns KL off.</p>
+<p class="note">Setup: 4-bit Llama-3-8B-Instruct, LoRA r=8, on-policy answers, batch 8, 2 epochs, released evaluation (F1 &gt; 0.5, 11-bin ECE) on 512 held-out TriviaQA questions. The 2×2 used learning rate 1e-5; the tuned comparison used the settings above. PPO is the released Train.py, patched from outside for speed (numerically identical), seeding, F1 labels and, in its hinge variant, the same two hinges with KL turned off.</p>
 
 <h2>Appendix: the fractional reward</h2>
 <p>We also tried scoring the <i>mean</i> confidence, R(Σ<sub>k</sub> π<sub>k</sub>·k/10, y), instead of the expected reward. It is a principled target: its optimum makes the mean equal the true chance of being right, between grid points if needed. We dropped it for three reasons.</p>
