@@ -1,0 +1,70 @@
+{
+  "exact-final-s7": {
+    "128": {
+      "model": "/vol/outputs/hparam-final_exact_extra-20261002T202022Z/exact-final-s7/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.001953125,
+      "ece": 0.08042990416288376,
+      "accuracy": 0.6594911937377691,
+      "auroc": 0.7919608445035643,
+      "brier": 0.16933463796477496,
+      "ece_unsampled": 0.07842695713043213,
+      "auroc_unsampled": 0.805944950373478,
+      "brier_unsampled": 0.1692675223327774,
+      "ece_unsampled_argmax": 0.07769027352333069,
+      "number_mass_unsampled": 0.9999974498310201,
+      "unsampled_rows": 511,
+      "unsampled_missing": 0
+    },
+    "256": {
+      "model": "/vol/outputs/hparam-final_exact_extra-20261002T202022Z/exact-final-s7/snapshot-step00256",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.03359578922390938,
+      "accuracy": 0.6895874263261297,
+      "auroc": 0.7989649825092864,
+      "brier": 0.15365422396856582,
+      "ece_unsampled": 0.032966986298561096,
+      "auroc_unsampled": 0.8124075877240434,
+      "brier_unsampled": 0.1516856615744754,
+      "ece_unsampled_argmax": 0.02612965740263462,
+      "number_mass_unsampled": 0.9999998317251974,
+      "unsampled_rows": 509,
+      "unsampled_missing": 0
+    }
+  },
+  "exact-final-s8": {
+    "128": {
+      "model": "/vol/outputs/hparam-final_exact_extra-20261002T202022Z/exact-final-s8/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.0078125,
+      "ece": 0.04586534947156906,
+      "accuracy": 0.6673228346456693,
+      "auroc": 0.7854375032727654,
+      "brier": 0.15809055118110238,
+      "ece_unsampled": 0.04372883588075638,
+      "auroc_unsampled": 0.7952557993402106,
+      "brier_unsampled": 0.1591679678015545,
+      "ece_unsampled_argmax": 0.04645594581961632,
+      "number_mass_unsampled": 0.9999992665578061,
+      "unsampled_rows": 508,
+      "unsampled_missing": 0
+    },
+    "256": {
+      "model": "/vol/outputs/hparam-final_exact_extra-20261002T202022Z/exact-final-s8/snapshot-step00256",
+      "n": 512,
+      "wrong_format_rate": 0.017578125,
+      "ece": 0.2890663743019104,
+      "accuracy": 0.48906560636182905,
+      "auroc": 0.5,
+      "brier": 0.3334393638170975,
+      "ece_unsampled": 0.28906041383743286,
+      "auroc_unsampled": 0.7985748631805384,
+      "brier_unsampled": 0.3334343001344254,
+      "ece_unsampled_argmax": 0.2890663743019104,
+      "number_mass_unsampled": 0.9999999755893503,
+      "unsampled_rows": 503,
+      "unsampled_missing": 0
+    }
+  }
+}

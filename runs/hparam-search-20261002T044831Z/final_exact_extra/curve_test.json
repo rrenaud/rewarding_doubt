@@ -1,0 +1,34 @@
+{
+  "exact-final-s7": {
+    "model": "/vol/outputs/hparam-final_exact_extra-20261002T202022Z/exact-final-s7/snapshot-step00256",
+    "n": 512,
+    "wrong_format_rate": 0.00390625,
+    "ece": 0.051764946430921555,
+    "accuracy": 0.6450980392156863,
+    "auroc": 0.8372768644309728,
+    "brier": 0.1512549019607843,
+    "ece_unsampled": 0.05364617705345154,
+    "auroc_unsampled": 0.8561856622277453,
+    "brier_unsampled": 0.14960956657175745,
+    "ece_unsampled_argmax": 0.06901980936527252,
+    "number_mass_unsampled": 0.9999998535595688,
+    "unsampled_rows": 510,
+    "unsampled_missing": 0
+  },
+  "exact-final-s8": {
+    "model": "/vol/outputs/hparam-final_exact_extra-20261002T202022Z/exact-final-s8/snapshot-step00256",
+    "n": 512,
+    "wrong_format_rate": 0.005859375,
+    "ece": 0.25972574949264526,
+    "accuracy": 0.45972495088408644,
+    "auroc": 0.5,
+    "brier": 0.31583497053045195,
+    "ece_unsampled": 0.25971871614456177,
+    "auroc_unsampled": 0.7829526029526029,
+    "brier_unsampled": 0.3158282178380782,
+    "ece_unsampled_argmax": 0.25972574949264526,
+    "number_mass_unsampled": 0.9999999741205766,
+    "unsampled_rows": 509,
+    "unsampled_missing": 0
+  }
+}

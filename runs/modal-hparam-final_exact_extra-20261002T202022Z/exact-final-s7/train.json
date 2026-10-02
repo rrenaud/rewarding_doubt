@@ -1,0 +1,11 @@
+{
+  "label": "exact-final-s7",
+  "exit_code": 0,
+  "gpu": "NVIDIA L40S",
+  "runs_on_gpu": 1,
+  "scalars": {},
+  "snapshots": [
+    "/vol/outputs/hparam-final_exact_extra-20261002T202022Z/exact-final-s7/snapshot-step00128",
+    "/vol/outputs/hparam-final_exact_extra-20261002T202022Z/exact-final-s7/snapshot-step00256"
+  ]
+}

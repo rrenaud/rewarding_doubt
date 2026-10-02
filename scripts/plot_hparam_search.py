@@ -47,8 +47,12 @@ def load(search: Path):
 
     # PPO's final is shown only as the F1-label rerun (final_ppo_f1). The exact-match-label finals
     # ("final", with TRL resetting every seed to 0, and its seeded rerun "final_ppo") are left out.
+    exact = group("final", "exact", "exact", "Exact + hinge", "tuned; F1 training labels")
+    extra = group("final_exact_extra", "exact", "exact", "", "")  # seeds 7-8, added for parity with PPO's 5
+    if exact and extra:
+        exact["rows"].update(extra["rows"])
     final = [g for g in [
-        group("final", "exact", "exact", "Exact + hinge", "tuned; F1 training labels"),
+        exact,
         group("final_ppo_f1", "ppo", "ppo", "PPO + hinge", "tuned; F1 training labels"),
     ] if g] or None
     brier = None
