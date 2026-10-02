@@ -1,0 +1,182 @@
+{
+  "exact-brier0.00-s1": {
+    "128": {
+      "model": "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier0.00-s1/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.0,
+      "ece": 0.07753823697566986,
+      "accuracy": 0.66796875,
+      "auroc": 0.7935758513931888,
+      "brier": 0.15880859375,
+      "ece_unsampled": 0.07624483853578568,
+      "auroc_unsampled": 0.8082129342965256,
+      "brier_unsampled": 0.1572219978713812,
+      "ece_unsampled_argmax": 0.07753817737102509,
+      "number_mass_unsampled": 0.9999996600672603,
+      "unsampled_rows": 512,
+      "unsampled_missing": 0
+    }
+  },
+  "exact-brier0.00-s2": {
+    "128": {
+      "model": "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier0.00-s2/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.00390625,
+      "ece": 0.09941234439611435,
+      "accuracy": 0.6705882352941176,
+      "auroc": 0.7957915622389307,
+      "brier": 0.1673529411764706,
+      "ece_unsampled": 0.1028430163860321,
+      "auroc_unsampled": 0.8051552492341966,
+      "brier_unsampled": 0.16638402080379552,
+      "ece_unsampled_argmax": 0.0970594733953476,
+      "number_mass_unsampled": 0.9999993852540559,
+      "unsampled_rows": 510,
+      "unsampled_missing": 0
+    }
+  },
+  "exact-brier0.25-s1": {
+    "128": {
+      "model": "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier0.25-s1/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.00390625,
+      "ece": 0.0970582589507103,
+      "accuracy": 0.6215686274509804,
+      "auroc": 0.8082166031938021,
+      "brier": 0.17900000000000002,
+      "ece_unsampled": 0.1002604141831398,
+      "auroc_unsampled": 0.8347035844461518,
+      "brier_unsampled": 0.17276078144255566,
+      "ece_unsampled_argmax": 0.10490138083696365,
+      "number_mass_unsampled": 0.9999988460073284,
+      "unsampled_rows": 510,
+      "unsampled_missing": 0
+    }
+  },
+  "exact-brier0.25-s2": {
+    "128": {
+      "model": "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier0.25-s2/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.00390625,
+      "ece": 0.09215594083070755,
+      "accuracy": 0.6588235294117647,
+      "auroc": 0.7860050629447182,
+      "brier": 0.1704313725490196,
+      "ece_unsampled": 0.08436833322048187,
+      "auroc_unsampled": 0.8106013957307059,
+      "brier_unsampled": 0.16713838873263365,
+      "ece_unsampled_argmax": 0.08725402504205704,
+      "number_mass_unsampled": 0.9999822365302665,
+      "unsampled_rows": 510,
+      "unsampled_missing": 0
+    }
+  },
+  "exact-brier0.50-s1": {
+    "128": {
+      "model": "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier0.50-s1/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.013671875,
+      "ece": 0.06673234701156616,
+      "accuracy": 0.6633663366336634,
+      "auroc": 0.8123353819139596,
+      "brier": 0.15891089108910894,
+      "ece_unsampled": 0.06767813861370087,
+      "auroc_unsampled": 0.8197629499561019,
+      "brier_unsampled": 0.15784737021567147,
+      "ece_unsampled_argmax": 0.06396016478538513,
+      "number_mass_unsampled": 0.9999997639420009,
+      "unsampled_rows": 505,
+      "unsampled_missing": 0
+    }
+  },
+  "exact-brier0.50-s2": {
+    "128": {
+      "model": "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier0.50-s2/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.0,
+      "ece": 0.03417901694774628,
+      "accuracy": 0.67578125,
+      "auroc": 0.7908280520927641,
+      "brier": 0.15548828125000003,
+      "ece_unsampled": 0.038438837975263596,
+      "auroc_unsampled": 0.7982624138171183,
+      "brier_unsampled": 0.15580545621269215,
+      "ece_unsampled_argmax": 0.02910088561475277,
+      "number_mass_unsampled": 0.9999979401472956,
+      "unsampled_rows": 512,
+      "unsampled_missing": 0
+    }
+  },
+  "exact-brier0.75-s1": {
+    "128": {
+      "model": "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier0.75-s1/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.0,
+      "ece": 0.0376945436000824,
+      "accuracy": 0.6484375,
+      "auroc": 0.7719210174029452,
+      "brier": 0.17103515625,
+      "ece_unsampled": 0.04431731998920441,
+      "auroc_unsampled": 0.7887884872824631,
+      "brier_unsampled": 0.170520068744496,
+      "ece_unsampled_argmax": 0.035546109080314636,
+      "number_mass_unsampled": 0.9999937103129923,
+      "unsampled_rows": 512,
+      "unsampled_missing": 0
+    }
+  },
+  "exact-brier0.75-s2": {
+    "128": {
+      "model": "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier0.75-s2/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.005859375,
+      "ece": 0.312180757522583,
+      "accuracy": 0.3143418467583497,
+      "auroc": 0.516144340974212,
+      "brier": 0.3118074656188605,
+      "ece_unsampled": 0.3122806251049042,
+      "auroc_unsampled": 0.8582020057306591,
+      "brier_unsampled": 0.3116320117449868,
+      "ece_unsampled_argmax": 0.31316307187080383,
+      "number_mass_unsampled": 0.9999999067872353,
+      "unsampled_rows": 509,
+      "unsampled_missing": 0
+    }
+  },
+  "exact-brier1.00-s1": {
+    "128": {
+      "model": "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier1.00-s1/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.0,
+      "ece": 0.06913942843675613,
+      "accuracy": 0.654296875,
+      "auroc": 0.7541023695083903,
+      "brier": 0.17980468750000003,
+      "ece_unsampled": 0.06824623048305511,
+      "auroc_unsampled": 0.7883632684037438,
+      "brier_unsampled": 0.17917599716275595,
+      "ece_unsampled_argmax": 0.07011598348617554,
+      "number_mass_unsampled": 0.9999974786769599,
+      "unsampled_rows": 512,
+      "unsampled_missing": 0
+    }
+  },
+  "exact-brier1.00-s2": {
+    "128": {
+      "model": "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier1.00-s2/snapshot-step00128",
+      "n": 512,
+      "wrong_format_rate": 0.001953125,
+      "ece": 0.18277855217456818,
+      "accuracy": 0.639921722113503,
+      "auroc": 0.7734676239861721,
+      "brier": 0.22340508806262233,
+      "ece_unsampled": 0.18062569200992584,
+      "auroc_unsampled": 0.7847526924611089,
+      "brier_unsampled": 0.22075180575905368,
+      "ece_unsampled_argmax": 0.18140867352485657,
+      "number_mass_unsampled": 0.9999879275516055,
+      "unsampled_rows": 511,
+      "unsampled_missing": 0
+    }
+  }
+}

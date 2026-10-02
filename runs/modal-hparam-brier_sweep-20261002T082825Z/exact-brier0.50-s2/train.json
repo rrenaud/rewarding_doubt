@@ -1,0 +1,10 @@
+{
+  "label": "exact-brier0.50-s2",
+  "exit_code": 0,
+  "gpu": "NVIDIA L40S",
+  "runs_on_gpu": 1,
+  "scalars": {},
+  "snapshots": [
+    "/vol/outputs/hparam-brier_sweep-20261002T082825Z/exact-brier0.50-s2/snapshot-step00128"
+  ]
+}
