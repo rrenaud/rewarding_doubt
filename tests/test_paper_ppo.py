@@ -183,3 +183,10 @@ def test_released_grading_and_metrics():
     assert m["wrong_format_rate"] == 0.25 and m["accuracy"] == pytest.approx(1 / 3)
     # Bins: {1.0: acc 0.5} and {0.2: acc 0} -> ECE = 2/3*0.5 + 1/3*0.2
     assert m["ece"] == pytest.approx(2 / 3 * 0.5 + 1 / 3 * 0.2, abs=1e-6)
+
+
+def test_exact_match_grading():
+    assert paper_ppo.is_correct_exact("The Beatles", ["beatles"])
+    assert not paper_ppo.is_correct_exact("Joan Rivers, comedian", ["joan rivers"])
+    assert paper_ppo.is_correct_f1("Joan Rivers, comedian", ["joan rivers"])
+    assert not paper_ppo.is_correct_exact(None, ["x"])

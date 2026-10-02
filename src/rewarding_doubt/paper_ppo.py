@@ -126,3 +126,8 @@ def evaluation_metrics(records, max_confidence=10, n_bins=11):
     return dict(n=len(records), wrong_format_rate=1 - len(kept) / len(records), ece=ece,
                 accuracy=sum(labels) / len(labels), auroc=roc_auc_score(labels, probs),
                 brier=brier_score_loss(labels, probs))
+
+
+def is_correct_exact(prediction, aliases):
+    """is_answer_correct(..., Metric.EXACT, 0.5): normalized prediction equals a normalized alias."""
+    return prediction is not None and any(normalize_answer(prediction) == normalize_answer(a) for a in aliases)
