@@ -170,3 +170,57 @@ def test_baseline_matched_kl_matches_brute_force():
     numbers = float((q * (q / r).log()).sum()) + (1 - .88) * math.log((1 - .88) / (1 - .96))
     stop = s * math.log(s / s_ref) + (1 - s) * math.log((1 - s) / (1 - s_ref))
     assert float(kl) == pytest.approx(numbers + stop, rel=1e-6)
+
+
+def test_brier_mix_endpoints_and_scales():
+    for p in LEVELS:
+        for y in (0., 1.):
+            for variant in ("paper", "released"):
+                assert float(reward(p, y, variant, 0.0)) == pytest.approx(float(reward(p, y, variant)))
+            brier = 1 - 2 * (p - y) ** 2
+            assert float(reward(p, y, "paper", 1.0)) == pytest.approx(brier)
+            assert float(reward(p, y, "released", 1.0)) == pytest.approx(10 * brier + 2.5 * y)
+            assert float(reward(p, y, "paper", 0.5)) == pytest.approx(0.5 * float(reward(p, y)) + 0.5 * brier)
+    with pytest.raises(ValueError):
+        reward(0.5, 1., "paper", 1.5)
+
+
+@pytest.mark.parametrize("mix", [0.0, 0.5, 1.0])
+@pytest.mark.parametrize("variant", ["paper", "released"])
+def test_brier_mix_stays_proper(mix, variant):
+    grid = torch.linspace(0.01, 0.99, 99, dtype=torch.float64)
+    for p_true in (0.2, 0.5, 0.8):
+        expected = p_true * reward(grid, 1., variant, mix) + (1 - p_true) * reward(grid, 0., variant, mix)
+        assert float(grid[expected.argmax()]) == pytest.approx(p_true, abs=0.011)
+
+
+def test_objectives_accept_brier_mix():
+    from rewarding_doubt.core import baseline_matched_objective
+    pi = torch.tensor([0.] * 8 + [.2, .3, .5], dtype=torch.float64)
+    logq = torch.where(pi > 0, pi.log(), torch.full_like(pi, -40.)).requires_grad_()
+    for mode in ("discrete-exact", "fractional"):
+        base, _ = objective(logq[None], torch.tensor([0.], dtype=torch.float64), mode)
+        same, _ = objective(logq[None], torch.tensor([0.], dtype=torch.float64), mode, brier_mix=0.0)
+        mixed, _ = objective(logq[None], torch.tensor([0.], dtype=torch.float64), mode, brier_mix=0.5)
+        assert float(same) == pytest.approx(float(base)) and float(mixed) != pytest.approx(float(base))
+        mixed.backward()
+        assert torch.isfinite(logq.grad).all()
+        logq.grad = None
+    stop = torch.tensor(0., dtype=torch.float64)
+    J0, _ = baseline_matched_objective(logq.detach(), 0., "discrete-exact", "released", -30., stop, 10)
+    J1, _ = baseline_matched_objective(logq.detach(), 0., "discrete-exact", "released", -30., stop, 10, brier_mix=1.0)
+    brier = sum(float(pi[k]) * (10 * (1 - 2 * (k / 10) ** 2)) for k in range(11))
+    # abs 1e-4: the mass clamp (<= 1 - 1e-6) charges 1e-6 x the -30 invalid reward
+    assert float(J1) == pytest.approx(brier, abs=1e-4) and float(J0) != pytest.approx(float(J1))
+
+
+def test_released_reward_matches_the_released_helper():
+    # util/RLHelper.reward_function from the released code, verbatim logic.
+    def reward_function(confidence, is_correct):
+        normalized = min(0.999, max(0.001, confidence / 10))
+        score = math.log(normalized) if is_correct else math.log(1 - normalized)
+        norm = (score - (-6.907755278982137 / 2)) / (-0.0010005003335835344 - (-6.907755278982137 / 2))
+        return 10.0 * (norm + (0.25 if is_correct else 0))
+    for c in range(11):
+        for y in (False, True):
+            assert float(reward(c / 10, float(y), "released", 0.0)) == pytest.approx(reward_function(c, y), abs=1e-6)

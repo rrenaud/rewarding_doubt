@@ -16,6 +16,8 @@ Options before "--" change PPO from outside Train.py, which stays unmodified:
              positions, no entropy statistic, no gradient checkpointing, no per-step empty_cache
   --ppo KEY=VALUE  override a PPOConfig field (repeatable), e.g. --ppo cliprange=0.1 --ppo ppo_epochs=2
   --hinge-threshold T  threshold for --hinge (default 0.95)
+  --reward-mix M  mix the Brier score into Train.py's reward: (1 - M) log + M Brier on the released
+             scale (rewarding_doubt.core.reward); parsing, exact-match grading and -30 unchanged
   --hinge W  add discrete-exact's format hinges to PPO's policy loss, from the logits PPO already
              computes for its sampled response ": k<eot>":
              W * [relu(log 0.95 - log M) + relu(log 0.95 - log P(<eot> | k))], with
@@ -39,6 +41,20 @@ from datasets import load_dataset
 
 from util import DataHelper
 from util.Prompts import get_prompt
+
+
+def mixed_reward(brier_mix):
+    """util.RLHelper.QAResult_to_reward with the Brier score mixed in (same parse, grading and -30)."""
+    from rewarding_doubt.core import reward
+    from util.EvaluationMetrics import Metric, is_answer_correct
+    from util.RLHelper import wrong_format_penalty
+
+    def QAResult_to_reward(result, metric=Metric.EXACT, threshold=0.5):
+        if result.confidence is None or not 0 <= result.confidence <= 10:
+            return wrong_format_penalty
+        correct = is_answer_correct(result.prediction, result.gt_candidates, metric, threshold)
+        return float(reward(result.confidence / 10, float(correct), "released", brier_mix))
+    return QAResult_to_reward
 
 
 def add_ppo_speedups(trainer_class):
@@ -231,6 +247,9 @@ def main():
         seed = option("--seed", int, None)
         hinge_weight = option("--hinge", float, 0.)
         hinge_threshold = option("--hinge-threshold", float, 0.95)
+        reward_mix = option("--reward-mix", float, 0.0)
+        if reward_mix:
+            Train.QAResult_to_reward = mixed_reward(reward_mix)
         if seed is not None:
             import random
             import numpy as np

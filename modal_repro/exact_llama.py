@@ -105,7 +105,7 @@ def row_objective(row, logps, stop_logp, args, beta=0., value_head=None, hidden=
         J, kl_term = baseline_matched_objective(
             logq, label, args.mode, args.reward, args.invalid_reward,
             stop_logp.double() if stop_logp is not None else None, k_star, ref[0],
-            ref[1] if stop_logp is not None else None)
+            ref[1] if stop_logp is not None else None, args.reward_mix)
         mass = logq.detach().exp().sum()
         confidence = (logq.detach().exp() / mass * logq.new_tensor([k / 10 for k in range(11)])).sum()
         loss, value_loss = -J + beta * kl_term, None
@@ -120,7 +120,7 @@ def row_objective(row, logps, stop_logp, args, beta=0., value_head=None, hidden=
         return loss, confidence, mass.item(), stop_prob, kl_term.item(), value_loss
     logps = logps[None].double()
     loss, confidence = objective(logps, logps.new_tensor([label]), args.mode, args.reward,
-                                 args.format_weight, args.format_threshold)
+                                 args.format_weight, args.format_threshold, args.reward_mix)
     if stop_logp is not None:
         loss = loss + args.format_weight * (math.log(args.format_threshold) - stop_logp.double()).clamp(min=0)
     return loss, confidence, logps.detach().logsumexp(-1).exp().item(), stop_prob, None, None
@@ -152,6 +152,8 @@ def main():
     parser.add_argument("out_dir")
     parser.add_argument("--mode", choices=["discrete-exact", "fractional"], required=True)
     parser.add_argument("--reward", default="paper")
+    parser.add_argument("--reward-mix", type=float, default=0.0,
+                        help="weight of the Brier score mixed into the log-score reward (core.reward brier_mix)")
     parser.add_argument("--format-weight", type=float, default=1.0)
     parser.add_argument("--format-threshold", type=float, default=0.95)
     parser.add_argument("--lr", type=float, default=1e-5)

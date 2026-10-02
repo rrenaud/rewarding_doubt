@@ -31,19 +31,29 @@ def grade(prediction: str, references: list[str], multiple_choice=False) -> bool
     return max((token_f1(prediction, r) for r in references), default=0.0) > 0.5
 
 
-def reward(confidence, correct, variant="paper"):
-    """Tensor-valued clipped score; paper affine normalization or released code."""
+def reward(confidence, correct, variant="paper", brier_mix=0.0):
+    """Tensor-valued clipped log score, paper or released normalization, optionally mixed with Brier.
+
+    brier_mix m returns (1 - m) * log reward + m * Brier reward, both proper scoring rules, so the mix
+    is too. The Brier reward 1 - 2 (p - y)^2 lies in [-1, 1] like the paper-scale log reward; for
+    "released" both parts get the same x10 scale and +2.5 bonus for a correct answer.
+    """
     if variant not in {"paper", "released"}:
         raise ValueError(f"Unknown reward variant: {variant}")
-    p = (confidence if isinstance(confidence, torch.Tensor) else
-         torch.tensor(confidence, dtype=torch.float64)).clamp(EPS, 1 - EPS)
+    if not 0 <= brier_mix <= 1:
+        raise ValueError("brier_mix must be in [0, 1]")
+    raw = confidence if isinstance(confidence, torch.Tensor) else torch.tensor(confidence, dtype=torch.float64)
+    p = raw.clamp(EPS, 1 - EPS)
     y = torch.as_tensor(correct, device=p.device, dtype=p.dtype)
     score = y * p.log() + (1 - y) * torch.log1p(-p)
     if variant == "released":
         lo, hi = math.log(EPS) / 2, math.log(1 - EPS)
-        return 10 * ((score - lo) / (hi - lo) + 0.25 * y)
-    lo, hi = math.log(EPS), math.log(1 - EPS)
-    return 2 * (score - lo) / (hi - lo) - 1
+        log_part = (score - lo) / (hi - lo)
+    else:
+        lo, hi = math.log(EPS), math.log(1 - EPS)
+        log_part = 2 * (score - lo) / (hi - lo) - 1
+    mixed = log_part if brier_mix == 0 else (1 - brier_mix) * log_part + brier_mix * (1 - 2 * (raw - y) ** 2)
+    return 10 * (mixed + 0.25 * y) if variant == "released" else mixed
 
 
 def parse_confidence(text: str) -> float | None:
@@ -52,7 +62,7 @@ def parse_confidence(text: str) -> float | None:
 
 
 def objective(logps: torch.Tensor, labels: torch.Tensor, mode: str, variant="paper",
-              format_weight=0.0, format_threshold=0.95):
+              format_weight=0.0, format_threshold=0.95, brier_mix=0.0):
     """logps has shape [batch, 11]; normalize over complete confidence sequences.
 
     Renormalizing makes the score blind to total valid mass M = sum(exp(logps)), so a
@@ -63,9 +73,9 @@ def objective(logps: torch.Tensor, labels: torch.Tensor, mode: str, variant="pap
     levels = logps.new_tensor(LEVELS)
     confidence = (probs * levels).sum(-1)
     if mode == "fractional":
-        scores = reward(confidence, labels, variant)
+        scores = reward(confidence, labels, variant, brier_mix)
     elif mode == "discrete-exact":
-        scores = (probs * reward(levels, labels[:, None], variant)).sum(-1)
+        scores = (probs * reward(levels, labels[:, None], variant, brier_mix)).sum(-1)
     else:
         raise ValueError(f"Unknown exact objective: {mode}")
     hinge = (math.log(format_threshold) - logps.logsumexp(-1)).clamp(min=0)
@@ -97,7 +107,7 @@ def calibration_metrics(confidences, labels, bins=10):
 
 
 def baseline_matched_objective(logq, label, mode, variant, invalid_reward, stop_logp=None, k_star=None,
-                               ref_logq=None, ref_stop_logp=None):
+                               ref_logq=None, ref_stop_logp=None, brier_mix=0.0):
     """The released PPO's expected reward and KL, computed from one forward pass.
 
     logq: [11] unnormalized log-probabilities of ": " followed by number k (not renormalized, so
@@ -118,12 +128,12 @@ def baseline_matched_objective(logq, label, mode, variant, invalid_reward, stop_
     levels = logq.new_tensor(LEVELS)
     q = logq.exp()
     mass = q.sum().clamp(max=1 - eps)
-    rewards = reward(levels, label, variant)
+    rewards = reward(levels, label, variant, brier_mix)
     if mode == "discrete-exact":
         J = (q * rewards).sum()
         sampled_reward = rewards[k_star] if k_star is not None else None
     elif mode == "fractional":
-        mean_reward = reward((q / mass * levels).sum(), label, variant)
+        mean_reward = reward((q / mass * levels).sum(), label, variant, brier_mix)
         J = mass * mean_reward
         sampled_reward = mean_reward
     else:
