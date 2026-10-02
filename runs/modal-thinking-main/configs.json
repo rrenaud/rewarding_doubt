@@ -1,0 +1,70 @@
+{
+ "none-s1": [
+  "--arm",
+  "none",
+  "--seed",
+  "1"
+ ],
+ "none-s2": [
+  "--arm",
+  "none",
+  "--seed",
+  "2"
+ ],
+ "filler-s1": [
+  "--arm",
+  "filler",
+  "--seed",
+  "1"
+ ],
+ "filler-s2": [
+  "--arm",
+  "filler",
+  "--seed",
+  "2"
+ ],
+ "frozen-s1": [
+  "--arm",
+  "frozen",
+  "--seed",
+  "1"
+ ],
+ "frozen-s2": [
+  "--arm",
+  "frozen",
+  "--seed",
+  "2"
+ ],
+ "trained-kl0.05-s1": [
+  "--arm",
+  "trained",
+  "--kl-beta",
+  "0.05",
+  "--seed",
+  "1"
+ ],
+ "trained-kl0.05-s2": [
+  "--arm",
+  "trained",
+  "--kl-beta",
+  "0.05",
+  "--seed",
+  "2"
+ ],
+ "trained-kl0.005-s1": [
+  "--arm",
+  "trained",
+  "--kl-beta",
+  "0.005",
+  "--seed",
+  "1"
+ ],
+ "trained-kl0.005-s2": [
+  "--arm",
+  "trained",
+  "--kl-beta",
+  "0.005",
+  "--seed",
+  "2"
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "n": 512,
+ "wrong_format_rate": 0.7421875,
+ "ece": 0.11136409640312195,
+ "accuracy": 0.6439393939393939,
+ "auroc": 0.6350438047559449,
+ "brier": 0.2135606060606061,
+ "ece_unsampled": 0.12745004892349243,
+ "auroc_unsampled": 0.7221526908635795,
+ "brier_unsampled": 0.20938494134950597,
+ "answer_format_rate": 0.2578125,
+ "number_mass": 0.9999956077698505,
+ "check_tokens_mean": 0.0,
+ "short_check_rate": 1.0,
+ "arm": "none",
+ "kl_beta": 0.05,
+ "eval_only": false,
+ "train_minutes": 3.580586489041646,
+ "eval_minutes": 0.4764321486155192
+}

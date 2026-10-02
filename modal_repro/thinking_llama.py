@@ -11,6 +11,7 @@ and each response is built in three stages by the harness:
    token that contains a newline (a newline is appended if the check ran out of tokens or reached
    the word "Confidence"). Source by arm: the policy ("trained"), the base model with the adapter
    off ("frozen"), a fixed filler text ("filler"), or nothing ("none": no "Check:" line).
+   Arm "none" uses a prompt that asks for 'Answer: <answer>\nConfidence: <confidence>'.
 3. confidence: "Confidence: " is appended and scored exactly as in discrete-exact single-pass:
    one forward gives the 11 number log-probs (including the forced "Confidence: ", so the mass
    hinge is unchanged) and, after a sampled k*, the stop probability.
@@ -49,7 +50,11 @@ THINK_PROMPT = get_prompt("open").replace(
     RELEASED_FORMAT,
     "Before giving the confidence, briefly check whether your answer is correct. The output should have the "
     "format 'Answer: <answer>\nCheck: <a brief check of the answer>\nConfidence: <confidence>' and nothing else.")
-assert THINK_PROMPT != get_prompt("open")
+# Arm "none" is asked for the same layout without the check line. (With THINK_PROMPT the base model
+# puts almost no mass on "Confidence" right after the answer, and the mass hinge wrecks the answers.)
+NONE_PROMPT = get_prompt("open").replace(
+    RELEASED_FORMAT, "The output should have the format 'Answer: <answer>\nConfidence: <confidence>' and nothing else.")
+assert THINK_PROMPT != get_prompt("open") != NONE_PROMPT
 FILLER = " Let me check the answer." * 6
 FREE_FORMAT = re.compile(r"^\s*Answer:\s*(.+?)\s*\n+\s*Check:(.+?)\n+\s*Confidence:\s*(\d+)\s*$", re.DOTALL)
 
@@ -381,7 +386,8 @@ def main():
     tokenizer.pad_token_id = tokenizer.eos_token_id
     h = Harness(tokenizer, args.check_tokens)
     ids = json.load(open(args.ids))
-    dev = subset_loader(ids, THINK_PROMPT)("triviaqa", "validation", "verbalize", tokenizer)
+    prompt = NONE_PROMPT if args.arm == "none" else THINK_PROMPT
+    dev = subset_loader(ids, prompt)("triviaqa", "validation", "verbalize", tokenizer)
     if args.eval_limit:
         dev = dev.select(range(args.eval_limit))
     extra = {}
@@ -389,7 +395,7 @@ def main():
         extra = free_format_compliance(model, h, dev)
         print(json.dumps(extra), flush=True)
     else:
-        data = subset_loader(ids, THINK_PROMPT)("triviaqa", "train", "verbalize", tokenizer)
+        data = subset_loader(ids, prompt)("triviaqa", "train", "verbalize", tokenizer)
         with open(os.path.join(args.out_dir, "metrics.jsonl"), "w") as log, \
                 open(os.path.join(args.out_dir, "check_samples.jsonl"), "w") as samples:
             train(model, h, data, args, log, samples)
