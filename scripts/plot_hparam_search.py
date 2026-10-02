@@ -34,18 +34,32 @@ def load(search: Path):
                 row.update({k: None for k in KEYS}, eligible=False, status="failed")
             row["selected"] = bool(selected and row["eligible"] and selected[cfg["arm"]] == cfg["params"])
             runs.append(row)
-    final = None
-    if (search / "final" / "curve.json").exists():
-        curve = json.loads((search / "final" / "curve.json").read_text())
-        test = json.loads((search / "final" / "curve_test.json").read_text()) if (search / "final" / "curve_test.json").exists() else {}
-        final = {label: dict(dev=points[max(points, key=int)], test=test.get(label)) for label, points in curve.items()}
-        # The first PPO final ran with TRL resetting every seed to 0 (identical runs); final_ppo reran it seeded.
-        if (search / "final_ppo" / "curve.json").exists():
-            final = {k: v for k, v in final.items() if not k.startswith("ppo")}
-            curve = json.loads((search / "final_ppo" / "curve.json").read_text())
-            test = json.loads((search / "final_ppo" / "curve_test.json").read_text())
-            final.update({label: dict(dev=points[max(points, key=int)], test=test.get(label)) for label, points in curve.items()})
-    return dict(base_accuracy=base_acc, runs=runs, history=history, final=final,
+    def group(directory, prefix, arm, name, note):
+        curve_path = search / directory / "curve.json"
+        if not curve_path.exists():
+            return None
+        curve = json.loads(curve_path.read_text())
+        test_path = search / directory / "curve_test.json"
+        test = json.loads(test_path.read_text()) if test_path.exists() else {}
+        rows = {label: dict(dev=points[max(points, key=int)], test=test.get(label))
+                for label, points in curve.items() if label.startswith(prefix)}
+        return dict(arm=arm, name=name, note=note, rows=rows) if rows else None
+
+    # The first PPO final ("final") ran with TRL resetting every seed to 0: three identical runs.
+    # final_ppo reran it seeded; only its rows are shown.
+    final = [g for g in [
+        group("final", "exact", "exact", "Exact + hinge", "tuned; F1 training labels"),
+        group("final_ppo", "ppo", "ppo", "PPO + hinge, exact-match labels", "tuned; released Train.py reward grading"),
+        group("final_ppo_f1", "ppo", "ppo", "PPO + hinge, F1 labels", "same tuned config, F1 training labels (label-matched)"),
+    ] if g] or None
+    brier = None
+    if (search / "brier_choice.json").exists():
+        brier = dict(sweep=json.loads((search / "brier_choice.json").read_text()),
+                     full=[g for g in [
+                         group("brier_full", "exact-brier0.00", "exact", "Exact + hinge, log score (m = 0)", "full scale, seeds 6-8"),
+                         group("brier_full", "exact-brier0.50", "exact", "Exact + hinge, 50/50 log/Brier (m = 0.5)", "full scale, seeds 6-8"),
+                     ] if g])
+    return dict(base_accuracy=base_acc, runs=runs, history=history, final=final, brier=brier,
                 current=json.loads((search / "current.json").read_text()), stages=STAGES)
 
 
@@ -118,7 +132,12 @@ tr.sel td { font-weight:600; } tr.bad td { color:var(--faint); }
 <div class="grid2" id="sweeps"></div>
 
 <h2 id="final-h">Final round</h2>
+<p>Each arm's chosen configuration with fresh seeds, 256 steps, scored on dev and once on test. PPO's first final round is not shown: TRL reset every seed to 0, so its three runs were identical. The F1-label PPO row removes the training-label confound (exact + hinge always trained on F1 labels).</p>
 <div id="final"></div>
+
+<h2 id="brier-h">Follow-up: mixing the Brier score into the reward</h2>
+<p>Exact + hinge at the chosen configuration, with reward (1 − m)·log score + m·Brier score. A small sweep (512 training questions, 128 steps, dev only, 2–4 seeds per value) picked m = 0.5 by mean dev Brier; a value is out if any seed damaged answers or format. The full-scale rerun against m = 0 did not confirm it.</p>
+<div id="brier"></div>
 
 <h2>Every run</h2>
 <div class="panel scroll"><table id="table"></table></div>
@@ -273,33 +292,57 @@ function sweeps() {
   }
 }
 
-function finalSection() {
-  const box = document.getElementById("final"); box.textContent = "";
-  if (!D.final) { const p = document.createElement("p"); p.textContent = "Running: each arm's chosen configuration with 3 fresh seeds for 256 steps, scored on dev and once on test. This page refreshes from the run directory when it finishes."; box.appendChild(p); return; }
+function groupCards(groups, box) {
   const summary = document.createElement("div"); summary.className = "cards";
-  for (const arm of shownArms()) for (const split of ["dev", "test"]) {
-    const ms = Object.entries(D.final).filter(([l]) => l.startsWith(arm)).map(([, v]) => v[split]).filter(Boolean);
-    if (!ms.length) continue;
-    const mean = k => ms.reduce((s, m) => s + m[k], 0) / ms.length;
-    const sd = k => Math.sqrt(ms.reduce((s, m) => s + (m[k] - mean(k)) ** 2, 0) / Math.max(1, ms.length - 1));
-    const c = document.createElement("div"); c.className = "card";
-    const h = document.createElement("h3"); const s = document.createElement("i"); s.className = "sw"; s.style.background = COLOR[arm];
-    h.append(s, document.createTextNode(`${NAME[arm]} · ${split} · ${ms.length} seeds`)); c.appendChild(h);
-    const dl = document.createElement("dl"); dl.className = "kv";
-    for (const [k, name] of [["brier", "Brier"], ["ece", "ECE"], ["auroc", "AUROC"], ["ece_unsampled", "ECE unsampled"], ["auroc_unsampled", "AUROC unsampled"], ["accuracy", "accuracy"]]) {
-      const dt = document.createElement("dt"); dt.textContent = name; const dd = document.createElement("dd");
-      dd.textContent = `${fmt(mean(k))} ± ${fmt(sd(k))}`; dl.append(dt, dd); }
-    c.appendChild(dl); summary.appendChild(c);
-  }
-  box.appendChild(summary);
   const wrap = document.createElement("div"); wrap.className = "panel scroll"; const t = document.createElement("table");
   const hr = t.insertRow(); for (const c of ["run", "split", "Brier", "ECE", "AUROC", "accuracy", "format failures"]) { const th = document.createElement("th"); th.textContent = c; hr.appendChild(th); }
-  for (const [label, v] of Object.entries(D.final)) for (const [split, m] of [["dev", v.dev], ["test", v.test]]) {
-    if (!shownArms().some(a => label.startsWith(a))) continue;
-    if (!m) continue; const r = t.insertRow();
-    for (const x of [label, split, fmt(m.brier), fmt(m.ece), fmt(m.auroc), (100 * m.accuracy).toFixed(1) + "%", (100 * m.wrong_format_rate).toFixed(1) + "%"]) r.insertCell().textContent = x;
+  for (const g of groups) {
+    if (!shownArms().includes(g.arm)) continue;
+    for (const split of ["dev", "test"]) {
+      const ms = Object.values(g.rows).map(v => v[split]).filter(Boolean);
+      if (!ms.length) continue;
+      const mean = k => ms.reduce((s, m) => s + m[k], 0) / ms.length;
+      const sd = k => Math.sqrt(ms.reduce((s, m) => s + (m[k] - mean(k)) ** 2, 0) / Math.max(1, ms.length - 1));
+      const c = document.createElement("div"); c.className = "card";
+      const h = document.createElement("h3"); const s = document.createElement("i"); s.className = "sw"; s.style.background = COLOR[g.arm];
+      h.append(s, document.createTextNode(`${g.name} · ${split} · ${ms.length} seeds`)); c.appendChild(h);
+      const note = document.createElement("div"); note.className = "note"; note.textContent = g.note; c.appendChild(note);
+      const dl = document.createElement("dl"); dl.className = "kv";
+      for (const [k, name] of [["brier", "Brier"], ["ece", "ECE"], ["auroc", "AUROC"], ["ece_unsampled", "ECE unsampled"], ["auroc_unsampled", "AUROC unsampled"], ["accuracy", "accuracy"]]) {
+        if (ms.some(m => m[k] == null)) continue;
+        const dt = document.createElement("dt"); dt.textContent = name; const dd = document.createElement("dd");
+        dd.textContent = `${fmt(mean(k))} ± ${fmt(sd(k))}`; dl.append(dt, dd); }
+      c.appendChild(dl); summary.appendChild(c);
+    }
+    for (const [label, v] of Object.entries(g.rows)) for (const [split, m] of [["dev", v.dev], ["test", v.test]]) {
+      if (!m) continue; const r = t.insertRow();
+      for (const x of [label, split, fmt(m.brier), fmt(m.ece), fmt(m.auroc), (100 * m.accuracy).toFixed(1) + "%", (100 * m.wrong_format_rate).toFixed(1) + "%"]) r.insertCell().textContent = x;
+    }
+  }
+  box.appendChild(summary); wrap.appendChild(t); box.appendChild(wrap);
+}
+function finalSection() {
+  const box = document.getElementById("final"); box.textContent = "";
+  if (!D.final) { const p = document.createElement("p"); p.textContent = "Running: each arm's chosen configuration with 3 fresh seeds for 256 steps, scored on dev and once on test."; box.appendChild(p); return; }
+  groupCards(D.final, box);
+}
+function brierSection() {
+  const box = document.getElementById("brier"); box.textContent = "";
+  const show = !!D.brier && shownArms().includes("exact");
+  document.getElementById("brier-h").hidden = !show; box.previousElementSibling.hidden = !show;
+  if (!show) return;
+  const h = document.createElement("h3"); h.textContent = "Small sweep (dev, mean over seeds)"; box.appendChild(h);
+  const wrap = document.createElement("div"); wrap.className = "panel scroll"; const t = document.createElement("table");
+  const hr = t.insertRow(); for (const c of ["m", "seeds", "status", "Brier", "ECE", "AUROC"]) { const th = document.createElement("th"); th.textContent = c; hr.appendChild(th); }
+  for (const r of D.brier.sweep.table) {
+    const tr = t.insertRow(); if (r.mix === D.brier.sweep.best) tr.className = "sel"; else if (!r.all_eligible) tr.className = "bad";
+    for (const x of [r.mix.toFixed(2), r.seeds, r.mix === D.brier.sweep.best ? "chosen" : r.all_eligible ? "ok" : "out (a seed damaged answers)", fmt(r.brier), fmt(r.ece), fmt(r.auroc)]) tr.insertCell().textContent = x;
   }
   wrap.appendChild(t); box.appendChild(wrap);
+  if (D.brier.full.length) {
+    const h2 = document.createElement("h3"); h2.textContent = "Full scale: m = 0.5 against m = 0 (1,024 questions, 256 steps)"; box.appendChild(h2);
+    groupCards(D.brier.full, box);
+  }
 }
 
 let sortKey = "stage", sortDir = 1;
@@ -317,7 +360,7 @@ function table() {
     for (const v of [r.stage, NAME[r.arm], paramsText(r.params), fmt(r.brier), fmt(r.ece), fmt(r.auroc), r.accuracy == null ? "—" : (100 * r.accuracy).toFixed(1) + "%", r.wrong_format == null ? "—" : (100 * r.wrong_format).toFixed(1) + "%", r.selected ? "selected" : r.status]) tr.insertCell().textContent = v;
   }
 }
-function render() { cards(); pathChart(); round1(); sweeps(); finalSection(); table(); }
+function render() { cards(); pathChart(); round1(); sweeps(); finalSection(); brierSection(); table(); }
 for (const b of document.querySelectorAll("#arms button")) {
   b.setAttribute("aria-pressed", b.dataset.v === armFilter);
   b.addEventListener("click", () => { document.querySelectorAll("#arms button").forEach(x => x.setAttribute("aria-pressed", x === b)); armFilter = b.dataset.v; history.replaceState(null, "", armFilter === "both" ? location.pathname : "#" + armFilter); render(); });
