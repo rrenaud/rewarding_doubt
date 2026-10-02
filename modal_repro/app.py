@@ -631,3 +631,29 @@ def bench_batching(gpus: str = "L40S", data_run: str = "runs/pilot-20261001T0029
         (local / f"{gpu}.json").write_text(json.dumps(result["report"], indent=1) + "\n")
         print(gpu, "exit", result["exit_code"], "saved")
     print(f"Saved to {local}")
+
+
+PPO_VARIANTS = {
+    "ppo-kl": [],                                      # the released configuration, seeded
+    "ppo-nokl-hinge": ["--no-kl", "--hinge", "1.0"],   # baseline - KL + discrete-exact's hinges
+}
+
+
+@app.local_entrypoint()
+def ppo_variants(variants: str = "ppo-kl,ppo-nokl-hinge", seeds: str = "1,2,3", gpu: str = "L40S",
+                 data_run: str = "runs/pilot-20261001T002945Z", save_every: int = 64,
+                 train_limit: int = 0, eval_limit: int = 0):
+    """Seeded runs of the released PPO (Train.py unmodified) with and without KL / with the hinge."""
+    root = Path(__file__).resolve().parents[1]
+    ids = {split: [json.loads(line)["id"] for line in (root / data_run / "data" / f"{name}.jsonl").read_text().splitlines()]
+           for split, name in [("train", "train"), ("validation", "eval")]}
+    if train_limit or eval_limit:
+        ids = {"train": ids["train"][:train_limit or None], "validation": ids["validation"][:eval_limit or None]}
+    train_args = ["--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", MODEL,
+                  "--tokenizer_dir", MODEL, "--epochs", "2", "--lr", "1e-5", "--batchsize", "8", "--log_with", "tensorboard"]
+    configs = {f"{v}-s{s}": ["subset.py", "train", "IDS_JSON", "--save-every", str(save_every), "--seed", s,
+                             *PPO_VARIANTS[v], "--", *train_args]
+               for v in variants.split(",") for s in seeds.split(",")}
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run_name = f"ppo-variants-{'smoke-' if train_limit or eval_limit else ''}{stamp}"
+    _train_and_evaluate(configs, list(configs), ids, run_name, gpu)

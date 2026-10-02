@@ -7,7 +7,16 @@ question IDs before normalization (which drops `question_id`). Each epoch's
 `model_finetuned` checkpoint is also copied to `model_finetuned_epoch<k>`, because Train.py
 overwrites it every epoch.
 
-    python subset.py train IDS_JSON [--save-every N] -- <Train.py args>
+    python subset.py train IDS_JSON [--save-every N] [--seed S] [--no-kl] [--hinge W] -- <Train.py args>
+
+Options before "--" change PPO from outside Train.py, which stays unmodified:
+  --seed S   reseed torch/numpy/random after importing Train.py (which hard-codes manual_seed(2))
+  --no-kl    PPOConfig(init_kl_coef=0, adap_kl_ctrl=False): no KL penalty toward the base model
+  --hinge W  add discrete-exact's format hinges to PPO's policy loss, from the logits PPO already
+             computes for its sampled response ": k<eot>":
+             W * [relu(log 0.95 - log M) + relu(log 0.95 - log P(<eot> | k))], with
+             M = P(":") P(" ") sum_k P(k) at the confidence position; rows whose sampled response
+             does not start with ": " are left to the -30 format reward.
     python subset.py evaluate IDS_JSON MODEL_DIR OUT_JSON
 
 `evaluate` reports the released metrics unchanged (sampled integer confidence) and adds
@@ -26,6 +35,55 @@ from datasets import load_dataset
 
 from util import DataHelper
 from util.Prompts import get_prompt
+
+
+def add_ppo_hinge(trainer_class, weight, log_path, threshold=0.95):
+    """Add discrete-exact's two format hinges to TRL 0.8.6 PPO's policy loss (see module docstring).
+
+    batched_forward_pass(return_logits=True) is the training forward of each minibatch; its
+    queries, responses and attention mask are kept so that loss() can locate, per row, the
+    confidence position in the logits TRL passes it (logits[:, t] predicts input token t + 1).
+    """
+    import math
+    import torch
+
+    original_forward, original_loss = trainer_class.batched_forward_pass, trainer_class.loss
+    stash, log = {}, open(log_path, "w")
+
+    def batched_forward_pass(self, model, queries, responses, model_inputs, return_logits=False, response_masks=None):
+        if return_logits:
+            stash.update(queries=queries, responses=responses, attention_mask=model_inputs["attention_mask"])
+        return original_forward(self, model, queries, responses, model_inputs, return_logits, response_masks)
+
+    def loss(self, old_logprobs, values, logits, vpreds, logprobs, mask, advantages, returns):
+        pg_loss, vf_loss, stats = original_loss(self, old_logprobs, values, logits, vpreds, logprobs, mask, advantages, returns)
+        tok = self.tokenizer
+        colon, space = tok.encode(": 0", add_special_tokens=False)[:2]
+        numbers = torch.tensor([tok.encode(f": {k}", add_special_tokens=False)[-1] for k in range(11)], device=logits.device)
+        stop = tok.convert_tokens_to_ids("<|eot_id|>")
+        terms, masses, stops = [], [], []
+        for j, (query, response) in enumerate(zip(stash["queries"], stash["responses"])):
+            response = response.tolist()
+            if response[:2] != [colon, space]:
+                continue
+            o = int(stash["attention_mask"][j].nonzero()[0]) + len(query)  # first response position
+            lp = lambda index: logits[j, index].float().log_softmax(-1)
+            log_mass = lp(o - 1)[colon] + lp(o)[space] + lp(o + 1)[numbers].logsumexp(-1)
+            term = (math.log(threshold) - log_mass).clamp(min=0)
+            masses.append(log_mass.exp().item())
+            if len(response) > 2 and response[2] in numbers.tolist():
+                log_stop = lp(o + 2)[stop]
+                term = term + (math.log(threshold) - log_stop).clamp(min=0)
+                stops.append(log_stop.exp().item())
+            terms.append(term)
+        if terms:
+            pg_loss = pg_loss + weight * torch.stack(terms).mean()
+        log.write(json.dumps(dict(rows=len(stash["queries"]), hinged=len(terms),
+                                  mass=sum(masses) / max(1, len(masses)), stop=sum(stops) / max(1, len(stops)))) + "\n")
+        log.flush()
+        return pg_loss, vf_loss, stats
+
+    trainer_class.batched_forward_pass, trainer_class.loss = batched_forward_pass, loss
 
 
 def subset_loader(ids_by_split):
@@ -99,7 +157,23 @@ def main():
 
         PPOTrainerNoCache.save_pretrained = save_pretrained
         args = Train.setup_parser().parse_args(sys.argv[sys.argv.index("--") + 1:])
-        save_every = int(sys.argv[sys.argv.index("--save-every") + 1]) if "--save-every" in sys.argv else 0
+        ours = sys.argv[:sys.argv.index("--")]
+        option = lambda name, cast, default: cast(ours[ours.index(name) + 1]) if name in ours else default
+        save_every = option("--save-every", int, 0)
+        seed = option("--seed", int, None)
+        hinge_weight = option("--hinge", float, 0.)
+        if seed is not None:
+            import random
+            import numpy as np
+            import torch
+            torch.manual_seed(seed)
+            np.random.seed(seed)
+            random.seed(seed)
+        if "--no-kl" in ours:
+            original_config = Train.PPOConfig
+            Train.PPOConfig = lambda **kwargs: original_config(**{**kwargs, "init_kl_coef": 0.0, "adap_kl_ctrl": False})
+        if hinge_weight:
+            add_ppo_hinge(PPOTrainerNoCache, hinge_weight, os.path.join(args.out_dir, "hinge.jsonl"))
         # Timestamp every PPO step (and save periodic snapshots) without touching Train.py.
         os.makedirs(args.out_dir, exist_ok=True)
         timing = open(os.path.join(args.out_dir, "steps.jsonl"), "w")
