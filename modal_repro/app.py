@@ -660,3 +660,54 @@ def ppo_variants(variants: str = "ppo-kl,ppo-nokl-hinge", seeds: str = "1,2,3", 
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     run_name = f"ppo-variants-{'smoke-' if train_limit or eval_limit else ''}{stamp}"
     _train_and_evaluate(configs, list(configs), ids, run_name, gpu)
+
+
+@app.local_entrypoint()
+def hparam_round(search_dir: str, round: str, score_test: bool = False, gpu: str = "L40S",
+                 train_limit: int = 0, eval_limit: int = 0):
+    """Train and score one round of scripts/hparam_search.py on the dev split (and test if asked)."""
+    import shutil
+
+    root = Path(__file__).resolve().parents[1]
+    search = Path(search_dir).resolve()
+    configs = json.loads((search / f"{round}_configs.json").read_text())
+    data = root / "runs/pilot-20261001T002945Z/data"
+    ids = {"train": [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()],
+           "validation": json.loads((search / "dev_ids.json").read_text())}
+    if train_limit or eval_limit:  # smoke tests
+        ids = {"train": ids["train"][:train_limit or None], "validation": ids["validation"][:eval_limit or None]}
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run_name = f"hparam-{round}-{stamp}"
+    _train_and_evaluate({k: v["command"] for k, v in configs.items()}, list(configs), ids, run_name, gpu)
+    out = search / round
+    out.mkdir(exist_ok=True)
+    shutil.copy(root / "runs" / f"modal-{run_name}" / "curve.json", out / "curve.json")
+    (out / "run.txt").write_text(f"runs/modal-{run_name}\n")
+    if score_test:
+        test_ids = {"validation": [json.loads(l)["id"] for l in (data / "eval.jsonl").read_text().splitlines()]}
+        dirs = [f"{VOL}/outputs/{run_name}/{label}/snapshot-step00256" for label in configs]
+        # evaluate_group writes eval.json next to each checkpoint; test results go to a sibling copy.
+        test = {}
+        for result in evaluate_test.with_options(gpu=gpu).starmap([(test_ids, d) for d in dirs], return_exceptions=True):
+            if isinstance(result, Exception) or "error" in result:
+                print("TEST EVAL FAILED", result if isinstance(result, Exception) else result["error"][-500:])
+                continue
+            test[result["model_dir"].split("/")[-2]] = result["metrics"]
+        (out / "curve_test.json").write_text(json.dumps(test, indent=2) + "\n")
+    print(f"Round {round} done: {out}")
+
+
+@app.function(volumes={VOL: volume}, timeout=HOUR)
+def evaluate_test(ids_by_split: dict, model_dir: str) -> dict:
+    """The released evaluation on the test questions, writing to eval_test*.json beside the checkpoint."""
+    import subprocess
+
+    volume.reload()
+    Path("/tmp/ids.json").write_text(json.dumps(ids_by_split))
+    out_json = f"{model_dir}/eval_test.json"
+    proc = subprocess.run(["python", "subset.py", "evaluate", "/tmp/ids.json", model_dir, out_json], cwd=CODE,
+                          capture_output=True, text=True)
+    volume.commit()
+    if proc.returncode:
+        return dict(model_dir=model_dir, error=proc.stdout[-3000:] + proc.stderr[-3000:])
+    return dict(model_dir=model_dir, metrics=json.loads(Path(out_json.replace(".json", "_metrics.json")).read_text()))

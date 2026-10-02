@@ -1,0 +1,150 @@
+"""Successive-halving hyperparameter search: exact + hinge vs PPO (fast, no KL) + hinge.
+
+    python scripts/hparam_search.py init                 # dev split, protocol, round-1 configs
+    modal run modal_repro/app.py::hparam_round --search-dir DIR --round round1
+    python scripts/hparam_search.py select DIR round1    # rank on dev Brier, write round-2 configs
+    modal run modal_repro/app.py::hparam_round --search-dir DIR --round round2
+    python scripts/hparam_search.py select DIR round2    # pick finalists, write final configs
+    modal run modal_repro/app.py::hparam_round --search-dir DIR --round final --score-test
+
+The protocol (PROTOCOL.md, written by `init`) is fixed before any result is seen.
+"""
+import datetime
+import json
+import math
+import random
+import statistics
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+DATA_RUN = ROOT / "runs/pilot-20261001T002945Z"
+MODEL = "unsloth/llama-3-8b-Instruct-bnb-4bit"
+ROUND1_PER_ARM, ROUND2_KEEP, ROUND2_SEEDS, FINAL_SEEDS = 16, 4, (1, 2), (4, 5, 6)
+DEFAULTS = {"exact": dict(lr=1e-5, updates=4, hinge_weight=1.0, hinge_threshold=0.95),
+            "ppo": dict(lr=1e-5, updates=4, hinge_weight=1.0, hinge_threshold=0.95, cliprange=0.2, vf_coef=0.1)}
+
+PROTOCOL = """# Hyperparameter search protocol (fixed before any result)
+
+Arms, batch 8, one L40S per run, the same 1,024 training questions:
+- exact: discrete-exact, single pass, format hinge (number mass + stop after the sampled number), paper-scale reward, no KL.
+- ppo: released Train.py with --fast (numerically identical speedups), KL off, the same two hinges.
+
+Selection: dev Brier score of the sampled confidence (released evaluation), at the round's last snapshot,
+averaged over seeds. Dev = 512 TriviaQA `unfiltered` validation questions disjoint from the 512 test
+questions. Test is scored once, in the final round.
+
+Search spaces (random, seeded):
+- both: lr log-uniform [3e-6, 3e-4]; updates per batch via passes / ppo_epochs in {1, 2, 4, 8}
+  (x 2 minibatches of 4); hinge weight log-uniform [0.1, 10]; hinge threshold in {0.9, 0.95, 0.99}.
+- ppo only: cliprange in {0.1, 0.2, 0.3}; vf_coef log-uniform [0.03, 0.3].
+Each arm's round 1 includes its current default (lr 1e-5, 4 passes/epochs, weight 1, threshold 0.95).
+
+Successive halving, equal budget per arm:
+1. round1: 16 configs per arm, 1 epoch (128 steps), seed 1.
+2. round2: top 4 per arm by dev Brier, 2 epochs (256 steps), seeds 1 and 2.
+3. final: best per arm by mean dev Brier, 2 epochs, fresh seeds 4, 5, 6; scored on dev and test.
+"""
+
+
+def command(arm, params, seed, epochs):
+    save_every = 128  # end of each epoch
+    if arm == "exact":
+        return ["exact_llama.py", "IDS_JSON", "OUT_DIR", "--mode", "discrete-exact", "--scoring", "single",
+                "--regularization", "hinge", "--reward", "paper", "--passes", str(params["updates"]), "--minibatch", "4",
+                "--lr", repr(params["lr"]), "--format-weight", repr(params["hinge_weight"]),
+                "--format-threshold", repr(params["hinge_threshold"]), "--seed", str(seed), "--epochs", str(epochs),
+                "--save-every", str(save_every)]
+    return ["subset.py", "train", "IDS_JSON", "--save-every", str(save_every), "--seed", str(seed), "--fast", "--no-kl",
+            "--hinge", repr(params["hinge_weight"]), "--hinge-threshold", repr(params["hinge_threshold"]),
+            "--ppo", f"ppo_epochs={params['updates']}", "--ppo", f"cliprange={params['cliprange']}",
+            "--ppo", f"vf_coef={params['vf_coef']}", "--",
+            "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", MODEL,
+            "--tokenizer_dir", MODEL, "--epochs", str(epochs), "--lr", repr(params["lr"]), "--batchsize", "8",
+            "--log_with", "tensorboard"]
+
+
+def sample(arm, rng):
+    log_uniform = lambda lo, hi: float(f"{math.exp(rng.uniform(math.log(lo), math.log(hi))):.3g}")
+    params = dict(lr=log_uniform(3e-6, 3e-4), updates=rng.choice([1, 2, 4, 8]),
+                  hinge_weight=log_uniform(0.1, 10), hinge_threshold=rng.choice([0.9, 0.95, 0.99]))
+    if arm == "ppo":
+        params.update(cliprange=rng.choice([0.1, 0.2, 0.3]), vf_coef=log_uniform(0.03, 0.3))
+    return params
+
+
+def write_round(search, name, entries, epochs, ids_note):
+    configs = {e["label"]: dict(arm=e["arm"], params=e["params"], seed=e["seed"], epochs=epochs,
+                                command=command(e["arm"], e["params"], e["seed"], epochs)) for e in entries}
+    (search / f"{name}_configs.json").write_text(json.dumps(configs, indent=1) + "\n")
+    print(f"wrote {len(configs)} configs to {search / f'{name}_configs.json'} ({ids_note})")
+
+
+def init():
+    from datasets import load_dataset
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    search = ROOT / "runs" / f"hparam-search-{stamp}"
+    search.mkdir(parents=True)
+    test_ids = {json.loads(l)["id"] for l in (DATA_RUN / "data/eval.jsonl").read_text().splitlines()}
+    pool = [r["question_id"] for r in load_dataset("mandarjoshi/trivia_qa", "unfiltered.nocontext",
+                                                   split="validation", streaming=True)
+            if r["question_id"] not in test_ids]
+    dev = random.Random(0).sample(sorted(pool), 512)
+    assert not set(dev) & test_ids
+    (search / "dev_ids.json").write_text(json.dumps(dev) + "\n")
+    (search / "PROTOCOL.md").write_text(PROTOCOL)
+    rng = random.Random(1234)
+    entries = []
+    for arm in ("exact", "ppo"):
+        candidates = [DEFAULTS[arm]] + [sample(arm, rng) for _ in range(ROUND1_PER_ARM - 1)]
+        entries += [dict(label=f"{arm}-c{i:02d}-s1", arm=arm, params=p, seed=1) for i, p in enumerate(candidates)]
+    write_round(search, "round1", entries, epochs=1, ids_note=f"dev {len(dev)} disjoint from test {len(test_ids)}")
+    print(search)
+
+
+def results(search, name):
+    """{label: metrics at the round's last snapshot}, plus the configs."""
+    configs = json.loads((search / f"{name}_configs.json").read_text())
+    curve = json.loads((search / name / "curve.json").read_text())
+    last = {label: points[max(points, key=int)] for label, points in curve.items()}
+    return configs, last
+
+
+def select(search, name):
+    configs, last = results(search, name)
+    groups = {}
+    for label, cfg in configs.items():
+        key = label.rsplit("-s", 1)[0]
+        if label in last:
+            groups.setdefault(key, dict(arm=cfg["arm"], params=cfg["params"], runs=[]))["runs"].append(last[label])
+    table = []
+    for key, g in groups.items():
+        mean = lambda k: statistics.fmean(r[k] for r in g["runs"])
+        table.append(dict(config=key, arm=g["arm"], params=g["params"], seeds=len(g["runs"]), brier=mean("brier"),
+                          ece=mean("ece"), auroc=mean("auroc"), ece_unsampled=mean("ece_unsampled"),
+                          auroc_unsampled=mean("auroc_unsampled")))
+    table.sort(key=lambda r: (r["arm"], r["brier"]))
+    (search / f"{name}_ranking.json").write_text(json.dumps(table, indent=1) + "\n")
+    for r in table:
+        print(f"{r['arm']:5s} {r['config']:12s} brier {r['brier']:.4f} ece {r['ece']:.3f} auroc {r['auroc']:.3f} "
+              f"(seeds {r['seeds']}) {r['params']}")
+    missing = [l for l in configs if l not in last]
+    if missing:
+        print("missing results:", missing)
+    nxt = {"round1": "round2", "round2": "final"}.get(name)
+    if not nxt:
+        return
+    entries = []
+    for arm in ("exact", "ppo"):
+        ranked = [r for r in table if r["arm"] == arm]
+        keep = ranked[:ROUND2_KEEP] if nxt == "round2" else ranked[:1]
+        seeds = ROUND2_SEEDS if nxt == "round2" else FINAL_SEEDS
+        entries += [dict(label=f"{r['config']}-s{s}", arm=arm, params=r["params"], seed=s) for r in keep for s in seeds]
+    write_round(search, nxt, entries, epochs=2, ids_note="dev")
+
+
+if __name__ == "__main__":
+    if sys.argv[1] == "init":
+        init()
+    elif sys.argv[1] == "select":
+        select(Path(sys.argv[2]), sys.argv[3])

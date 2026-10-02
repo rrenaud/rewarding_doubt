@@ -14,6 +14,8 @@ Options before "--" change PPO from outside Train.py, which stays unmodified:
   --no-kl    PPOConfig(init_kl_coef=0, adap_kl_ctrl=False): no KL penalty toward the base model
   --fast     numerically equivalent speedups (see add_ppo_speedups): log-probs only over response
              positions, no entropy statistic, no gradient checkpointing, no per-step empty_cache
+  --ppo KEY=VALUE  override a PPOConfig field (repeatable), e.g. --ppo cliprange=0.1 --ppo ppo_epochs=2
+  --hinge-threshold T  threshold for --hinge (default 0.95)
   --hinge W  add discrete-exact's format hinges to PPO's policy loss, from the logits PPO already
              computes for its sampled response ": k<eot>":
              W * [relu(log 0.95 - log M) + relu(log 0.95 - log P(<eot> | k))], with
@@ -225,6 +227,7 @@ def main():
         save_every = option("--save-every", int, 0)
         seed = option("--seed", int, None)
         hinge_weight = option("--hinge", float, 0.)
+        hinge_threshold = option("--hinge-threshold", float, 0.95)
         if seed is not None:
             import random
             import numpy as np
@@ -238,11 +241,15 @@ def main():
         if "--fast" in ours:
             config_overrides.update(optimize_device_cache=False)
             add_ppo_speedups(PPOTrainerNoCache)
+        for i, arg in enumerate(ours):
+            if arg == "--ppo":
+                key, value = ours[i + 1].split("=", 1)
+                config_overrides[key] = int(value) if value.isdigit() else float(value)
         if config_overrides:
             original_config = Train.PPOConfig
             Train.PPOConfig = lambda **kwargs: original_config(**{**kwargs, **config_overrides})
         if hinge_weight:
-            add_ppo_hinge(PPOTrainerNoCache, hinge_weight, os.path.join(args.out_dir, "hinge.jsonl"))
+            add_ppo_hinge(PPOTrainerNoCache, hinge_weight, os.path.join(args.out_dir, "hinge.jsonl"), hinge_threshold)
         # Timestamp every PPO step (and save periodic snapshots) without touching Train.py.
         os.makedirs(args.out_dir, exist_ok=True)
         timing = open(os.path.join(args.out_dir, "steps.jsonl"), "w")
