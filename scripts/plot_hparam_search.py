@@ -91,6 +91,11 @@ p { color:var(--muted); max-width:78ch; margin:0 0 12px; }
 .legend span { display:inline-flex; align-items:center; gap:6px; }
 .panel { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px; min-width:0; }
 .grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:12px; }
+.stages { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.stages .panel { padding:10px; min-width:0; }
+.stages h4 { font-size:13px; }
+@media (max-width: 860px) { .stages { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width: 520px) { .stages { grid-template-columns:1fr; } }
 .panel h4 { margin:0 0 4px; font-size:14px; } .panel .sub { font-size:12px; color:var(--faint); margin-bottom:4px; }
 svg.chart { width:100%; height:auto; display:block; overflow:visible; }
 .tick { fill:var(--faint); font-size:11px; font-variant-numeric:tabular-nums; } .axt { fill:var(--muted); font-size:12px; }
@@ -128,8 +133,8 @@ tr.sel td { font-weight:600; } tr.bad td { color:var(--faint); }
 <div class="panel"><svg class="chart" id="round1" viewBox="0 0 1000 320" role="img" aria-label="Round 1 metric against learning rate, both arms"></svg></div>
 
 <h2>Greedy sweeps</h2>
-<p>Each panel varies one setting around the current point (labelled "current"). Axes are scaled to eligible runs; ineligible runs off that scale sit at the panel edge. "failed" runs broke so badly that nothing could be scored.</p>
-<div class="grid2" id="sweeps"></div>
+<p>Columns are stages 1–4 in order, rows are arms. Each panel varies one setting around the current point (labelled "current"). Axes are scaled to eligible runs; ineligible runs off that scale sit at the panel edge. "failed" runs broke so badly that nothing could be scored.</p>
+<div class="stages" id="sweeps"></div>
 
 <h2 id="final-h">Final round</h2>
 <p>Each arm's chosen configuration with fresh seeds, 256 steps, scored on dev and once on test. PPO's first final round is not shown: TRL reset every seed to 0, so its three runs were identical. The F1-label PPO row removes the training-label confound (exact + hinge always trained on F1 labels).</p>
@@ -259,29 +264,29 @@ function sweepLabel(stage, r, current) {
 }
 function sweeps() {
   const box = document.getElementById("sweeps"); box.textContent = "";
-  for (const [stage, name] of D.stages.slice(1)) {
-    const prev = D.history[D.history.findIndex(h => h.stage === stage) - 1];
-    for (const arm of shownArms()) {
+  for (const arm of shownArms()) {
+    for (const [stage, name] of D.stages.slice(1)) {
+      const prev = D.history[D.history.findIndex(h => h.stage === stage) - 1];
       const rows = D.runs.filter(r => r.stage === stage && r.arm === arm);
-      if (!rows.length) continue;
+      if (!rows.length) { box.appendChild(document.createElement("div")); continue; }
       const current = prev ? prev.current[arm] : null;
       const order = stage === "stage2" ? (a, b) => a.params.updates - b.params.updates : (stage === "stage4" ? () => 0 : (a, b) => a.params.lr - b.params.lr);
       rows.sort(order);
       const panel = document.createElement("div"); panel.className = "panel";
-      const h = document.createElement("h4"); h.textContent = `${name} · ${NAME[arm]}`; panel.appendChild(h);
+      const h = document.createElement("h4"); h.textContent = `${name.replace(/^Stage (\d): /, "$1 · ")} · ${NAME[arm]}`; panel.appendChild(h);
       const sub = document.createElement("div"); sub.className = "sub";
-      sub.textContent = stage === "stage2" ? "x: optimizer updates per batch" : stage === "stage4" ? "x: setting changed from the current point" : "x: learning rate";
+      sub.textContent = stage === "stage2" ? "x: updates per batch" : stage === "stage4" ? "x: setting changed" : "x: learning rate";
       panel.appendChild(sub);
-      const svg = el("svg", {class: "chart", viewBox: "0 0 460 210", role: "img", "aria-label": `${name}, ${NAME[arm]}: ${LABEL[metric]} for each setting`});
+      const svg = el("svg", {class: "chart", viewBox: "0 0 300 230", role: "img", "aria-label": `${name}, ${NAME[arm]}: ${LABEL[metric]} for each setting`});
       panel.appendChild(svg);
-      const x0 = 56, x1 = 445, top = 14, bottom = 160, X = i => x0 + (i + 0.5) * (x1 - x0) / rows.length;
+      const x0 = 46, x1 = 292, top = 14, bottom = 150, X = i => x0 + (i + 0.5) * (x1 - x0) / rows.length;
       const scored = rows.filter(r => r[metric] != null && !isNaN(r[metric]));
       if (scored.length) {
         const sc = yScale(scaleValues(scored), top, bottom), Y = sc.Y;
         axes(svg, sc, x0, x1);
         rows.forEach((r, i) => {
           const lab = sweepLabel(stage, r, current);
-          const t = el("text", {x: X(i), y: bottom + 18, "text-anchor": "middle", class: "tick"}, svg); t.textContent = lab.length > 16 ? lab.slice(0, 15) + "…" : lab;
+          const t = el("text", {x: X(i), y: bottom + 14, "text-anchor": "end", class: "tick", transform: `rotate(-40 ${X(i)} ${bottom + 14})`}, svg); t.textContent = lab.length > 18 ? lab.slice(0, 17) + "…" : lab;
           if (r.status === "failed") { el("text", {x: X(i), y: bottom - 6, "text-anchor": "middle", class: "tick", fill: "var(--bad)"}, svg).textContent = "failed"; return; }
           if (r[metric] == null || isNaN(r[metric])) return;
           dot(svg, X(i), Y(r[metric]), r);
