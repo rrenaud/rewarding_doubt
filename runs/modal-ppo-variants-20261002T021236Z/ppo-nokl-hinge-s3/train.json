@@ -1,0 +1,12 @@
+{
+  "label": "ppo-nokl-hinge-s3",
+  "exit_code": 0,
+  "gpu": "NVIDIA L40S",
+  "runs_on_gpu": 1,
+  "snapshots": [
+    "/vol/outputs/ppo-variants-20261002T021236Z/ppo-nokl-hinge-s3/snapshot-step00064",
+    "/vol/outputs/ppo-variants-20261002T021236Z/ppo-nokl-hinge-s3/snapshot-step00128",
+    "/vol/outputs/ppo-variants-20261002T021236Z/ppo-nokl-hinge-s3/snapshot-step00192",
+    "/vol/outputs/ppo-variants-20261002T021236Z/ppo-nokl-hinge-s3/snapshot-step00256"
+  ]
+}

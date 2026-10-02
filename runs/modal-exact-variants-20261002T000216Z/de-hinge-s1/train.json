@@ -1,0 +1,11 @@
+{
+  "label": "de-hinge-s1",
+  "exit_code": 0,
+  "gpu": "NVIDIA L40S",
+  "snapshots": [
+    "/vol/outputs/exact-variants-20261002T000216Z/de-hinge-s1/snapshot-step00064",
+    "/vol/outputs/exact-variants-20261002T000216Z/de-hinge-s1/snapshot-step00128",
+    "/vol/outputs/exact-variants-20261002T000216Z/de-hinge-s1/snapshot-step00192",
+    "/vol/outputs/exact-variants-20261002T000216Z/de-hinge-s1/snapshot-step00256"
+  ]
+}
