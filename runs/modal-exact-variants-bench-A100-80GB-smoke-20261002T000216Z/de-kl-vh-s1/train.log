@@ -1,0 +1,145 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA A100 80GB PCIe. Max memory: 79.251 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.0. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+
+Filter:   0%|          | 0/87622 [00:00<?, ? examples/s]
+Filter:   1%|          | 1000/87622 [00:01<01:35, 902.90 examples/s]
+Filter:   2%|▏         | 2000/87622 [00:01<01:03, 1341.38 examples/s]
+Filter:   3%|▎         | 3000/87622 [00:02<00:52, 1606.80 examples/s]
+Filter:   5%|▍         | 4000/87622 [00:02<00:45, 1822.98 examples/s]
+Filter:   6%|▌         | 5000/87622 [00:02<00:40, 2057.97 examples/s]
+Filter:   7%|▋         | 6000/87622 [00:03<00:35, 2267.42 examples/s]
+Filter:   8%|▊         | 7000/87622 [00:03<00:33, 2396.67 examples/s]
+Filter:   9%|▉         | 8000/87622 [00:03<00:31, 2504.49 examples/s]
+Filter:  10%|█         | 9000/87622 [00:04<00:30, 2613.68 examples/s]
+Filter:  11%|█▏        | 10000/87622 [00:04<00:29, 2654.19 examples/s]
+Filter:  13%|█▎        | 11000/87622 [00:05<00:27, 2748.16 examples/s]
+Filter:  14%|█▎        | 12000/87622 [00:05<00:28, 2696.68 examples/s]
+Filter:  15%|█▍        | 13000/87622 [00:05<00:27, 2719.05 examples/s]
+Filter:  16%|█▌        | 14000/87622 [00:06<00:27, 2719.13 examples/s]
+Filter:  17%|█▋        | 15000/87622 [00:06<00:26, 2728.65 examples/s]
+Filter:  18%|█▊        | 16000/87622 [00:06<00:25, 2756.98 examples/s]
+Filter:  19%|█▉        | 17000/87622 [00:07<00:25, 2743.39 examples/s]
+Filter:  21%|██        | 18000/87622 [00:07<00:30, 2247.45 examples/s]
+Filter:  22%|██▏       | 19000/87622 [00:08<00:28, 2381.74 examples/s]
+Filter:  23%|██▎       | 20000/87622 [00:09<00:39, 1692.38 examples/s]
+Filter:  24%|██▍       | 21000/87622 [00:09<00:38, 1713.75 examples/s]
+Filter:  25%|██▌       | 22000/87622 [00:10<00:36, 1789.12 examples/s]
+Filter:  26%|██▌       | 23000/87622 [00:10<00:33, 1913.23 examples/s]
+Filter:  27%|██▋       | 24000/87622 [00:11<00:32, 1984.02 examples/s]
+Filter:  29%|██▊       | 25000/87622 [00:11<00:30, 2066.30 examples/s]
+Filter:  30%|██▉       | 26000/87622 [00:12<00:28, 2137.41 examples/s]
+Filter:  31%|███       | 27000/87622 [00:12<00:27, 2187.45 examples/s]
+Filter:  32%|███▏      | 28000/87622 [00:12<00:26, 2248.48 examples/s]
+Filter:  33%|███▎      | 29000/87622 [00:13<00:25, 2341.74 examples/s]
+Filter:  34%|███▍      | 30000/87622 [00:13<00:26, 2157.99 examples/s]
+Filter:  35%|███▌      | 31000/87622 [00:14<00:26, 2177.50 examples/s]
+Filter:  37%|███▋      | 32000/87622 [00:14<00:26, 2070.07 examples/s]
+Filter:  38%|███▊      | 33000/87622 [00:15<00:25, 2104.95 examples/s]
+Filter:  39%|███▉      | 34000/87622 [00:16<00:30, 1776.66 examples/s]
+Filter:  40%|███▉      | 35000/87622 [00:16<00:27, 1937.51 examples/s]
+Filter:  41%|████      | 36000/87622 [00:16<00:25, 2000.93 examples/s]
+Filter:  42%|████▏     | 37000/87622 [00:17<00:24, 2038.70 examples/s]
+Filter:  43%|████▎     | 38000/87622 [00:17<00:23, 2088.61 examples/s]
+Filter:  45%|████▍     | 39000/87622 [00:18<00:21, 2211.47 examples/s]
+Filter:  46%|████▌     | 40000/87622 [00:18<00:20, 2318.41 examples/s]
+Filter:  47%|████▋     | 41000/87622 [00:18<00:18, 2465.94 examples/s]
+Filter:  48%|████▊     | 42000/87622 [00:19<00:17, 2579.27 examples/s]
+Filter:  49%|████▉     | 43000/87622 [00:19<00:16, 2653.95 examples/s]
+Filter:  50%|█████     | 44000/87622 [00:19<00:16, 2676.63 examples/s]
+Filter:  51%|█████▏    | 45000/87622 [00:20<00:16, 2632.34 examples/s]
+Filter:  52%|█████▏    | 46000/87622 [00:20<00:15, 2640.03 examples/s]
+Filter:  54%|█████▎    | 47000/87622 [00:21<00:15, 2626.46 examples/s]
+Filter:  55%|█████▍    | 48000/87622 [00:21<00:15, 2633.41 examples/s]
+Filter:  56%|█████▌    | 49000/87622 [00:21<00:14, 2672.81 examples/s]
+Filter:  57%|█████▋    | 50000/87622 [00:22<00:18, 2023.98 examples/s]
+Filter:  58%|█████▊    | 51000/87622 [00:23<00:16, 2177.39 examples/s]
+Filter:  59%|█████▉    | 52000/87622 [00:23<00:15, 2340.36 examples/s]
+Filter:  60%|██████    | 53000/87622 [00:23<00:14, 2437.59 examples/s]
+Filter:  62%|██████▏   | 54000/87622 [00:24<00:13, 2508.07 examples/s]
+Filter:  63%|██████▎   | 55000/87622 [00:24<00:12, 2561.50 examples/s]
+Filter:  64%|██████▍   | 56000/87622 [00:24<00:12, 2517.26 examples/s]
+Filter:  65%|██████▌   | 57000/87622 [00:25<00:11, 2557.26 examples/s]
+Filter:  66%|██████▌   | 58000/87622 [00:25<00:11, 2568.75 examples/s]
+Filter:  67%|██████▋   | 59000/87622 [00:26<00:10, 2629.43 examples/s]
+Filter:  68%|██████▊   | 60000/87622 [00:26<00:10, 2663.46 examples/s]
+Filter:  70%|██████▉   | 61000/87622 [00:26<00:10, 2635.97 examples/s]
+Filter:  71%|███████   | 62000/87622 [00:27<00:09, 2655.26 examples/s]
+Filter:  72%|███████▏  | 63000/87622 [00:27<00:09, 2656.64 examples/s]
+Filter:  73%|███████▎  | 64000/87622 [00:27<00:08, 2632.10 examples/s]
+Filter:  74%|███████▍  | 65000/87622 [00:28<00:10, 2255.93 examples/s]
+Filter:  75%|███████▌  | 66000/87622 [00:29<00:11, 1880.91 examples/s]
+Filter:  76%|███████▋  | 67000/87622 [00:29<00:10, 2017.10 examples/s]
+Filter:  78%|███████▊  | 68000/87622 [00:30<00:09, 2176.88 examples/s]
+Filter:  79%|███████▊  | 69000/87622 [00:30<00:10, 1819.73 examples/s]
+Filter:  80%|███████▉  | 70000/87622 [00:31<00:08, 2043.26 examples/s]
+Filter:  81%|████████  | 71000/87622 [00:31<00:07, 2155.84 examples/s]
+Filter:  82%|████████▏ | 72000/87622 [00:31<00:06, 2289.10 examples/s]
+Filter:  83%|████████▎ | 73000/87622 [00:32<00:05, 2439.73 examples/s]
+Filter:  84%|████████▍ | 74000/87622 [00:32<00:05, 2492.97 examples/s]
+Filter:  86%|████████▌ | 75000/87622 [00:33<00:04, 2556.67 examples/s]
+Filter:  87%|████████▋ | 76000/87622 [00:33<00:04, 2505.07 examples/s]
+Filter:  88%|████████▊ | 77000/87622 [00:33<00:04, 2510.44 examples/s]
+Filter:  89%|████████▉ | 78000/87622 [00:34<00:03, 2641.43 examples/s]
+Filter:  90%|█████████ | 79000/87622 [00:34<00:03, 2820.99 examples/s]
+Filter:  91%|█████████▏| 80000/87622 [00:34<00:02, 2935.19 examples/s]
+Filter:  92%|█████████▏| 81000/87622 [00:35<00:02, 3037.58 examples/s]
+Filter:  94%|█████████▎| 82000/87622 [00:35<00:01, 3133.07 examples/s]
+Filter:  95%|█████████▍| 83000/87622 [00:35<00:01, 3183.82 examples/s]
+Filter:  96%|█████████▌| 84000/87622 [00:36<00:01, 3135.31 examples/s]
+Filter:  97%|█████████▋| 85000/87622 [00:36<00:01, 2460.34 examples/s]
+Filter:  98%|█████████▊| 86000/87622 [00:37<00:00, 1888.11 examples/s]
+Filter:  99%|█████████▉| 87000/87622 [00:37<00:00, 1949.21 examples/s]
+Filter: 100%|██████████| 87622/87622 [00:38<00:00, 2018.54 examples/s]
+Filter: 100%|██████████| 87622/87622 [00:38<00:00, 2294.37 examples/s]
+
+Map:   0%|          | 0/80 [00:00<?, ? examples/s]
+Map: 100%|██████████| 80/80 [00:00<00:00, 1906.19 examples/s]
+
+Map:   0%|          | 0/80 [00:00<?, ? examples/s]
+Map: 100%|██████████| 80/80 [00:00<00:00, 1356.30 examples/s]
+{"step": 1, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "updates": 8, "seconds": 17.12058138847351, "time": 1790899435.2310576, "loss": 1.1646442971111444, "confidence": 0.9398018559387052, "mass": 0.9999975748837876, "hinge_active": 0.0, "stop_prob": 0.9997843205928802, "sampled_number_rate": 1.0, "kl": 0.00022781859391554868, "kl_coef": 0.05, "value_loss": 34.391185217139416}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 2, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "updates": 8, "seconds": 18.07314920425415, "time": 1790899453.3060627, "loss": 6.9154602479220735, "confidence": 0.911535508466531, "mass": 0.8749978360444551, "hinge_active": 0.125, "stop_prob": 0.99971456187112, "sampled_number_rate": 0.875, "kl": 0.03058616089460185, "kl_coef": 0.049992, "value_loss": 95.97756776894019}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 3, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.25, "updates": 8, "seconds": 17.708778858184814, "time": 1790899471.01727, "loss": 9.985779580576795, "confidence": 0.9112937039630947, "mass": 0.8749977503905005, "hinge_active": 0.125, "stop_prob": 0.9996191348348346, "sampled_number_rate": 0.875, "kl": 0.1670295641218281, "kl_coef": 0.04998400128, "value_loss": 89.81600879404809}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 4, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "updates": 8, "seconds": 12.604251384735107, "time": 1790899483.6237357, "loss": -6.571585096474619, "confidence": 0.883718977028359, "mass": 0.999997269189246, "hinge_active": 0.0, "stop_prob": 0.999781921505928, "sampled_number_rate": 1.0, "kl": 1.1957359204320495, "kl_coef": 0.0499760038397952, "value_loss": 46.44017870175373}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 5, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 8, "seconds": 11.95797848701477, "time": 1790899495.5838203, "loss": -5.950050098825157, "confidence": 0.8529458627230749, "mass": 0.9999983990482202, "hinge_active": 0.0, "stop_prob": 0.9990285411477089, "sampled_number_rate": 1.0, "kl": 2.0319798943873297, "kl_coef": 0.049968007679180824, "value_loss": 29.7505388654292}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 6, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 8, "seconds": 11.595641374588013, "time": 1790899507.1814601, "loss": -6.559098698101808, "confidence": 0.8507196265870572, "mass": 0.9999986251068111, "hinge_active": 0.0, "stop_prob": 0.9997317045927048, "sampled_number_rate": 1.0, "kl": 2.210215695547312, "kl_coef": 0.049960012797952154, "value_loss": 26.30039374792688}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 7, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "updates": 8, "seconds": 11.421613693237305, "time": 1790899518.6051118, "loss": -8.026637430106494, "confidence": 0.8208752990503784, "mass": 0.9999988092672729, "hinge_active": 0.0, "stop_prob": 0.9998030439019203, "sampled_number_rate": 1.0, "kl": 2.036533515560554, "kl_coef": 0.04995201919590448, "value_loss": 29.937652444513482}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 8, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "updates": 8, "seconds": 11.465670108795166, "time": 1790899530.0727358, "loss": -8.16854545402047, "confidence": 0.8080119372641243, "mass": 0.9999985481816416, "hinge_active": 0.0, "stop_prob": 0.9997074902057648, "sampled_number_rate": 1.0, "kl": 1.871166429355904, "kl_coef": 0.049944026872833135, "value_loss": 20.674767076812913}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 9, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 8, "seconds": 11.538745403289795, "time": 1790899541.6134498, "loss": -7.890860065988312, "confidence": 0.8320132762187, "mass": 0.9999981476625194, "hinge_active": 0.0, "stop_prob": 0.9996799454092979, "sampled_number_rate": 1.0, "kl": 2.3948251499930424, "kl_coef": 0.04993603582853348, "value_loss": 12.201959241234992}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 10, "epoch": 0, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 8, "seconds": 18.122172832489014, "time": 1790899559.7377574, "loss": 3.6687742529730425, "confidence": 0.8105983490556682, "mass": 0.8749987604685503, "hinge_active": 0.125, "stop_prob": 0.9997175676482064, "sampled_number_rate": 0.875, "kl": 1.8205712762862798, "kl_coef": 0.049928046062800914, "value_loss": 85.39837030593169, "save_seconds": 0.8515617847442627}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 11, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 8, "seconds": 18.359320640563965, "time": 1790899579.6833415, "loss": 3.4952128980604886, "confidence": 0.7937659977831377, "mass": 0.8749985808924967, "hinge_active": 0.125, "stop_prob": 0.9997178741863796, "sampled_number_rate": 0.875, "kl": 1.366749445283959, "kl_coef": 0.049920057575430866, "value_loss": 84.84169557920366}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 12, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "updates": 8, "seconds": 11.373493671417236, "time": 1790899591.0590346, "loss": -9.376146447227105, "confidence": 0.8100576736733004, "mass": 0.9999983039339254, "hinge_active": 0.0, "stop_prob": 0.9990203455090523, "sampled_number_rate": 1.0, "kl": 2.392554572354062, "kl_coef": 0.049912070366218794, "value_loss": 7.920390474402902}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 13, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "updates": 8, "seconds": 11.998878717422485, "time": 1790899603.0600994, "loss": -7.320376258181801, "confidence": 0.79505279063846, "mass": 0.999998541756816, "hinge_active": 0.0, "stop_prob": 0.9994201734662056, "sampled_number_rate": 1.0, "kl": 1.9072011258479402, "kl_coef": 0.049904084434960194, "value_loss": 4.90015965223822}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 14, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "updates": 8, "seconds": 11.822641849517822, "time": 1790899614.8847458, "loss": -9.691615698561705, "confidence": 0.8138988699750273, "mass": 0.9999981255718895, "hinge_active": 0.0, "stop_prob": 0.9996740520000458, "sampled_number_rate": 1.0, "kl": 2.616349260974091, "kl_coef": 0.0498960997814506, "value_loss": 6.236970013207104}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 15, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "updates": 8, "seconds": 11.502948760986328, "time": 1790899626.3899524, "loss": -7.261647530704186, "confidence": 0.7779588680823508, "mass": 0.9999981901618775, "hinge_active": 0.0, "stop_prob": 0.9997273087501526, "sampled_number_rate": 1.0, "kl": 2.0852252035388164, "kl_coef": 0.049888116405485565, "value_loss": 5.229162646812422}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 16, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "updates": 8, "seconds": 17.702019214630127, "time": 1790899644.0938888, "loss": 2.002324092189503, "confidence": 0.7884902651193673, "mass": 0.8749984441392261, "hinge_active": 0.125, "stop_prob": 0.9998850226402283, "sampled_number_rate": 0.875, "kl": 2.9470047927936744, "kl_coef": 0.04988013430686068, "value_loss": 78.25819084434711}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 17, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 8, "seconds": 17.81602644920349, "time": 1790899661.911721, "loss": 2.972629252457068, "confidence": 0.7609088213041512, "mass": 0.8749976603429626, "hinge_active": 0.125, "stop_prob": 0.9989469136510577, "sampled_number_rate": 0.875, "kl": 2.7106146081951903, "kl_coef": 0.04987215348537158, "value_loss": 78.15380127635486}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 18, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "updates": 8, "seconds": 11.92233395576477, "time": 1790899673.8358872, "loss": -7.6784477894879775, "confidence": 0.8155252951952883, "mass": 0.9999977767061691, "hinge_active": 0.0, "stop_prob": 0.9994629397988319, "sampled_number_rate": 1.0, "kl": 3.9784818131936044, "kl_coef": 0.04986417394081392, "value_loss": 6.139000534327136}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 19, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 8, "seconds": 11.494642972946167, "time": 1790899685.3324456, "loss": -8.805470680779734, "confidence": 0.7651590828516411, "mass": 0.9999983020115426, "hinge_active": 0.0, "stop_prob": 0.9998878240585327, "sampled_number_rate": 1.0, "kl": 3.712456441607148, "kl_coef": 0.04985619567298338, "value_loss": 4.953686028799995}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 20, "epoch": 1, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "updates": 8, "seconds": 11.961480617523193, "time": 1790899697.295916, "loss": -7.8721866073763795, "confidence": 0.7268157535445833, "mass": 0.9999982434455291, "hinge_active": 0.0, "stop_prob": 0.9998030737042427, "sampled_number_rate": 1.0, "kl": 3.6073037669198045, "kl_coef": 0.0498482186816757, "value_loss": 3.011908367359754, "save_seconds": 0.7366423606872559}

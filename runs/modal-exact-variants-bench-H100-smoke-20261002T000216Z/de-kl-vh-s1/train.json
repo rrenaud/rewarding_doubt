@@ -1,0 +1,9 @@
+{
+  "label": "de-kl-vh-s1",
+  "exit_code": 0,
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "snapshots": [
+    "/vol/outputs/exact-variants-bench-H100-smoke-20261002T000216Z/de-kl-vh-s1/snapshot-step00010",
+    "/vol/outputs/exact-variants-bench-H100-smoke-20261002T000216Z/de-kl-vh-s1/snapshot-step00020"
+  ]
+}

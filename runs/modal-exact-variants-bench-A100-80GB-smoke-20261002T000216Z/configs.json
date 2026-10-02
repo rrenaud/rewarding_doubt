@@ -1,0 +1,24 @@
+{
+  "de-kl-vh-s1": [
+    "exact_llama.py",
+    "IDS_JSON",
+    "OUT_DIR",
+    "--mode",
+    "discrete-exact",
+    "--scoring",
+    "single",
+    "--passes",
+    "4",
+    "--minibatch",
+    "4",
+    "--save-every",
+    "10",
+    "--seed",
+    "1",
+    "--regularization",
+    "baseline",
+    "--reward",
+    "released",
+    "--value-head"
+  ]
+}

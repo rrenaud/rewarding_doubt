@@ -1,0 +1,51 @@
+{
+ "answer_sampling_s": 3.9786148071289062,
+ "confidence_sampling_s": 0.34827470779418945,
+ "reference_per_row_s": 1.4474446773529053,
+ "reference_batched_s": 0.1882634162902832,
+ "rows": 8,
+ "equivalence": {
+  "repeat_1": {
+   "cos": 1.0,
+   "rel": 0.0,
+   "max_loss_diff": 0.0
+  },
+  "rows_per_call_2": {
+   "cos": 0.9989479184150696,
+   "rel": 0.06342929601669312,
+   "max_loss_diff": 0.42035865783691406
+  },
+  "rows_per_call_4": {
+   "cos": 0.999343991279602,
+   "rel": 0.046976685523986816,
+   "max_loss_diff": 0.29233646392822266
+  }
+ },
+ "update_part_timings": {
+  "ckpt_on_rows_per_call_1": {
+   "update_part_s": 9.568497896194458,
+   "peak_gb": 6.314870272
+  },
+  "ckpt_on_rows_per_call_2": {
+   "update_part_s": 5.0846803188323975,
+   "peak_gb": 6.385071104
+  },
+  "ckpt_on_rows_per_call_4": {
+   "update_part_s": 2.863534450531006,
+   "peak_gb": 6.523569664
+  },
+  "ckpt_off_rows_per_call_1": {
+   "update_part_s": 7.304510990778605,
+   "peak_gb": 6.931290624
+  },
+  "ckpt_off_rows_per_call_2": {
+   "update_part_s": 3.7710140546162925,
+   "peak_gb": 7.65891072
+  },
+  "ckpt_off_rows_per_call_4": {
+   "update_part_s": 2.028950850168864,
+   "peak_gb": 9.071248896
+  }
+ },
+ "gpu": "NVIDIA A100 80GB PCIe"
+}

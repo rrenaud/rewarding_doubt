@@ -1,0 +1,16 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA H100 80GB HBM3. Max memory: 79.179 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 9.0. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+{"answer_sampling_s": 2.7474122047424316, "confidence_sampling_s": 0.1913738250732422, "reference_per_row_s": 1.0666999816894531, "reference_batched_s": 0.11376786231994629, "rows": 8, "equivalence": {"repeat_1": {"cos": 1.0, "rel": 0.0, "max_loss_diff": 0.0}, "rows_per_call_2": {"cos": 0.9995584487915039, "rel": 0.03163439407944679, "max_loss_diff": 0.16675853729248047}, "rows_per_call_4": {"cos": 0.999525249004364, "rel": 0.030827587470412254, "max_loss_diff": 0.19264423847198486}}}
+{"ckpt_on_rows_per_call_1": {"update_part_s": 7.2008607387542725, "peak_gb": 6.364939776}}
+{"ckpt_on_rows_per_call_1": {"update_part_s": 7.2008607387542725, "peak_gb": 6.364939776}, "ckpt_on_rows_per_call_2": {"update_part_s": 3.6972455978393555, "peak_gb": 6.435140608}}
+{"ckpt_on_rows_per_call_1": {"update_part_s": 7.2008607387542725, "peak_gb": 6.364939776}, "ckpt_on_rows_per_call_2": {"update_part_s": 3.6972455978393555, "peak_gb": 6.435140608}, "ckpt_on_rows_per_call_4": {"update_part_s": 1.9515636761983235, "peak_gb": 6.573639168}}
+{"ckpt_on_rows_per_call_1": {"update_part_s": 7.2008607387542725, "peak_gb": 6.364939776}, "ckpt_on_rows_per_call_2": {"update_part_s": 3.6972455978393555, "peak_gb": 6.435140608}, "ckpt_on_rows_per_call_4": {"update_part_s": 1.9515636761983235, "peak_gb": 6.573639168}, "ckpt_off_rows_per_call_1": {"update_part_s": 4.900091330210368, "peak_gb": 6.981360128}}
+{"ckpt_on_rows_per_call_1": {"update_part_s": 7.2008607387542725, "peak_gb": 6.364939776}, "ckpt_on_rows_per_call_2": {"update_part_s": 3.6972455978393555, "peak_gb": 6.435140608}, "ckpt_on_rows_per_call_4": {"update_part_s": 1.9515636761983235, "peak_gb": 6.573639168}, "ckpt_off_rows_per_call_1": {"update_part_s": 4.900091330210368, "peak_gb": 6.981360128}, "ckpt_off_rows_per_call_2": {"update_part_s": 2.5153208573659263, "peak_gb": 7.708980224}}
+{"ckpt_on_rows_per_call_1": {"update_part_s": 7.2008607387542725, "peak_gb": 6.364939776}, "ckpt_on_rows_per_call_2": {"update_part_s": 3.6972455978393555, "peak_gb": 6.435140608}, "ckpt_on_rows_per_call_4": {"update_part_s": 1.9515636761983235, "peak_gb": 6.573639168}, "ckpt_off_rows_per_call_1": {"update_part_s": 4.900091330210368, "peak_gb": 6.981360128}, "ckpt_off_rows_per_call_2": {"update_part_s": 2.5153208573659263, "peak_gb": 7.708980224}, "ckpt_off_rows_per_call_4": {"update_part_s": 1.3048827648162842, "peak_gb": 9.1213184}}
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.

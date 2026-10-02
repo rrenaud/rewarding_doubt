@@ -1,0 +1,36 @@
+{
+  "de-kl-vh-s1": {
+    "10": {
+      "model": "/vol/outputs/exact-variants-bench-H100-smoke-20261002T000216Z/de-kl-vh-s1/snapshot-step00010",
+      "n": 16,
+      "wrong_format_rate": 0.0,
+      "ece": 0.3500000238418579,
+      "accuracy": 0.5625,
+      "auroc": 0.8333333333333333,
+      "brier": 0.29125,
+      "ece_unsampled": 0.27466505765914917,
+      "auroc_unsampled": 0.9206349206349207,
+      "brier_unsampled": 0.30417522856719476,
+      "ece_unsampled_argmax": 0.33125007152557373,
+      "number_mass_unsampled": 0.9999990686774254,
+      "unsampled_rows": 16,
+      "unsampled_missing": 0
+    },
+    "20": {
+      "model": "/vol/outputs/exact-variants-bench-H100-smoke-20261002T000216Z/de-kl-vh-s1/snapshot-step00020",
+      "n": 16,
+      "wrong_format_rate": 0.0,
+      "ece": 0.2562501132488251,
+      "accuracy": 0.5625,
+      "auroc": 0.7222222222222223,
+      "brier": 0.271875,
+      "ece_unsampled": 0.26052647829055786,
+      "auroc_unsampled": 0.8888888888888888,
+      "brier_unsampled": 0.26961038041379937,
+      "ece_unsampled_argmax": 0.24375009536743164,
+      "number_mass_unsampled": 0.9999994225800037,
+      "unsampled_rows": 16,
+      "unsampled_missing": 0
+    }
+  }
+}

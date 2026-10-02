@@ -1,0 +1,51 @@
+{
+ "answer_sampling_s": 2.7474122047424316,
+ "confidence_sampling_s": 0.1913738250732422,
+ "reference_per_row_s": 1.0666999816894531,
+ "reference_batched_s": 0.11376786231994629,
+ "rows": 8,
+ "equivalence": {
+  "repeat_1": {
+   "cos": 1.0,
+   "rel": 0.0,
+   "max_loss_diff": 0.0
+  },
+  "rows_per_call_2": {
+   "cos": 0.9995584487915039,
+   "rel": 0.03163439407944679,
+   "max_loss_diff": 0.16675853729248047
+  },
+  "rows_per_call_4": {
+   "cos": 0.999525249004364,
+   "rel": 0.030827587470412254,
+   "max_loss_diff": 0.19264423847198486
+  }
+ },
+ "update_part_timings": {
+  "ckpt_on_rows_per_call_1": {
+   "update_part_s": 7.2008607387542725,
+   "peak_gb": 6.364939776
+  },
+  "ckpt_on_rows_per_call_2": {
+   "update_part_s": 3.6972455978393555,
+   "peak_gb": 6.435140608
+  },
+  "ckpt_on_rows_per_call_4": {
+   "update_part_s": 1.9515636761983235,
+   "peak_gb": 6.573639168
+  },
+  "ckpt_off_rows_per_call_1": {
+   "update_part_s": 4.900091330210368,
+   "peak_gb": 6.981360128
+  },
+  "ckpt_off_rows_per_call_2": {
+   "update_part_s": 2.5153208573659263,
+   "peak_gb": 7.708980224
+  },
+  "ckpt_off_rows_per_call_4": {
+   "update_part_s": 1.3048827648162842,
+   "peak_gb": 9.1213184
+  }
+ },
+ "gpu": "NVIDIA H100 80GB HBM3"
+}

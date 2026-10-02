@@ -1,0 +1,36 @@
+{
+  "de-kl-vh-s1": {
+    "10": {
+      "model": "/vol/outputs/exact-variants-bench-A100-80GB-smoke-20261002T000216Z/de-kl-vh-s1/snapshot-step00010",
+      "n": 16,
+      "wrong_format_rate": 0.0,
+      "ece": 0.30625003576278687,
+      "accuracy": 0.625,
+      "auroc": 0.85,
+      "brier": 0.25187500000000007,
+      "ece_unsampled": 0.21043679118156433,
+      "auroc_unsampled": 0.8500000000000001,
+      "brier_unsampled": 0.2677714053730257,
+      "ece_unsampled_argmax": 0.25000011920928955,
+      "number_mass_unsampled": 0.9999991692602634,
+      "unsampled_rows": 16,
+      "unsampled_missing": 0
+    },
+    "20": {
+      "model": "/vol/outputs/exact-variants-bench-A100-80GB-smoke-20261002T000216Z/de-kl-vh-s1/snapshot-step00020",
+      "n": 16,
+      "wrong_format_rate": 0.0,
+      "ece": 0.18125012516975403,
+      "accuracy": 0.625,
+      "auroc": 0.625,
+      "brier": 0.24562500000000004,
+      "ece_unsampled": 0.15747573971748352,
+      "auroc_unsampled": 0.7833333333333333,
+      "brier_unsampled": 0.22951047970527327,
+      "ece_unsampled_argmax": 0.15625008940696716,
+      "number_mass_unsampled": 0.999999463558197,
+      "unsampled_rows": 16,
+      "unsampled_missing": 0
+    }
+  }
+}

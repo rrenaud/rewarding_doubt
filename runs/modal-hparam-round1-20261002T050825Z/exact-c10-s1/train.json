@@ -1,0 +1,10 @@
+{
+  "label": "exact-c10-s1",
+  "exit_code": 0,
+  "gpu": "NVIDIA L40S",
+  "runs_on_gpu": 1,
+  "scalars": {},
+  "snapshots": [
+    "/vol/outputs/hparam-round1-20261002T050825Z/exact-c10-s1/snapshot-step00128"
+  ]
+}

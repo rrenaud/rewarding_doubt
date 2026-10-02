@@ -1,0 +1,9 @@
+{
+  "label": "de-kl-vh-s1",
+  "exit_code": 0,
+  "gpu": "NVIDIA A100 80GB PCIe",
+  "snapshots": [
+    "/vol/outputs/exact-variants-bench-A100-80GB-smoke-20261002T000216Z/de-kl-vh-s1/snapshot-step00010",
+    "/vol/outputs/exact-variants-bench-A100-80GB-smoke-20261002T000216Z/de-kl-vh-s1/snapshot-step00020"
+  ]
+}
