@@ -1,0 +1,183 @@
+[
+ {
+  "stage": "stage1",
+  "arm": "exact",
+  "label": "exact-stage1-p2-s1",
+  "params": {
+   "lr": 8.02e-05,
+   "updates": 1,
+   "hinge_weight": 1.01,
+   "hinge_threshold": 0.9
+  },
+  "eligible": true,
+  "accuracy": 0.6686274509803921,
+  "wrong_format": 0.00390625,
+  "brier": 0.1583137254901961,
+  "ece": 0.03372448682785034,
+  "auroc": 0.7869735723333737,
+  "ece_unsampled": 0.05082590878009796,
+  "auroc_unsampled": 0.8200992555831266
+ },
+ {
+  "stage": "stage1",
+  "arm": "exact",
+  "label": "exact-stage1-p1-s1",
+  "params": {
+   "lr": 4.01e-05,
+   "updates": 1,
+   "hinge_weight": 1.01,
+   "hinge_threshold": 0.9
+  },
+  "eligible": true,
+  "accuracy": 0.6594488188976378,
+  "wrong_format": 0.0078125,
+  "brier": 0.16946850393700788,
+  "ece": 0.03838718309998512,
+  "auroc": 0.7550168233974636,
+  "ece_unsampled": 0.05102892965078354,
+  "auroc_unsampled": 0.7746527478215857
+ },
+ {
+  "stage": "stage1",
+  "arm": "exact",
+  "label": "exact-stage1-p0-s1",
+  "params": {
+   "lr": 2.67e-05,
+   "updates": 1,
+   "hinge_weight": 1.01,
+   "hinge_threshold": 0.9
+  },
+  "eligible": true,
+  "accuracy": 0.65748031496063,
+  "wrong_format": 0.0078125,
+  "brier": 0.18082677165354333,
+  "ece": 0.03936991095542908,
+  "auroc": 0.7342814371257486,
+  "ece_unsampled": 0.07939086854457855,
+  "auroc_unsampled": 0.758637896620552
+ },
+ {
+  "stage": "stage1",
+  "arm": "exact",
+  "label": "exact-stage1-p3-s1",
+  "params": {
+   "lr": 0.00016,
+   "updates": 1,
+   "hinge_weight": 1.01,
+   "hinge_threshold": 0.9
+  },
+  "eligible": false,
+  "accuracy": 0.26666666666666666,
+  "wrong_format": 0.970703125,
+  "brier": 0.1753333333333333,
+  "ece": 0.07333334535360336,
+  "auroc": 0.7159090909090908,
+  "ece_unsampled": 0.0946536511182785,
+  "auroc_unsampled": 0.75
+ },
+ {
+  "stage": "stage1",
+  "arm": "ppo",
+  "label": "ppo-stage1-p2-s1",
+  "params": {
+   "lr": 2.27e-05,
+   "updates": 8,
+   "hinge_weight": 0.39,
+   "hinge_threshold": 0.9,
+   "cliprange": 0.1,
+   "vf_coef": 0.0782
+  },
+  "eligible": true,
+  "accuracy": 0.6581532416502947,
+  "wrong_format": 0.005859375,
+  "brier": 0.17214145383104126,
+  "ece": 0.029468517750501633,
+  "auroc": 0.7458397666838221,
+  "ece_unsampled": 0.042493607848882675,
+  "auroc_unsampled": 0.7727225939269171
+ },
+ {
+  "stage": "stage1",
+  "arm": "ppo",
+  "label": "ppo-stage1-p1-s1",
+  "params": {
+   "lr": 1.13e-05,
+   "updates": 8,
+   "hinge_weight": 0.39,
+   "hinge_threshold": 0.9,
+   "cliprange": 0.1,
+   "vf_coef": 0.0782
+  },
+  "eligible": true,
+  "accuracy": 0.65748031496063,
+  "wrong_format": 0.0078125,
+  "brier": 0.18781496062992128,
+  "ece": 0.034056246280670166,
+  "auroc": 0.7110262234152385,
+  "ece_unsampled": 0.039692044258117676,
+  "auroc_unsampled": 0.7471952646431276
+ },
+ {
+  "stage": "stage1",
+  "arm": "ppo",
+  "label": "ppo-stage1-p0-s1",
+  "params": {
+   "lr": 7.57e-06,
+   "updates": 8,
+   "hinge_weight": 0.39,
+   "hinge_threshold": 0.9,
+   "cliprange": 0.1,
+   "vf_coef": 0.0782
+  },
+  "eligible": true,
+  "accuracy": 0.6535433070866141,
+  "wrong_format": 0.0078125,
+  "brier": 0.19338582677165353,
+  "ece": 0.08188806474208832,
+  "auroc": 0.7069414019715224,
+  "ece_unsampled": 0.07777519524097443,
+  "auroc_unsampled": 0.7567942223439211
+ },
+ {
+  "stage": "stage1",
+  "arm": "ppo",
+  "label": "ppo-stage1-p3-s1",
+  "params": {
+   "lr": 4.54e-05,
+   "updates": 8,
+   "hinge_weight": 0.39,
+   "hinge_threshold": 0.9,
+   "cliprange": 0.1,
+   "vf_coef": 0.0782
+  },
+  "eligible": true,
+  "accuracy": 0.662109375,
+  "wrong_format": 0.0,
+  "brier": 0.2312109375,
+  "ece": 0.24531243741512299,
+  "auroc": 0.727820689890361,
+  "ece_unsampled": 0.23893745243549347,
+  "auroc_unsampled": 0.7847119204733406
+ },
+ {
+  "stage": "stage1",
+  "arm": "ppo",
+  "label": "ppo-stage1-p4-s1",
+  "params": {
+   "lr": 6.81e-05,
+   "updates": 8,
+   "hinge_weight": 0.39,
+   "hinge_threshold": 0.9,
+   "cliprange": 0.1,
+   "vf_coef": 0.0782
+  },
+  "eligible": false,
+  "accuracy": 0.53515625,
+  "wrong_format": 0.0,
+  "brier": 0.3040624999999999,
+  "ece": 0.23515468835830688,
+  "auroc": 0.5,
+  "ece_unsampled": 0.2351505160331726,
+  "auroc_unsampled": 0.6860240446543581
+ }
+]
