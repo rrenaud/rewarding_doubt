@@ -1,0 +1,11 @@
+m=0.00 seeds 4 ok  bribest=0.5
+wrote 6 configs to brier_full_configs.json
+=== full done 09:16
+5 auroc 0.797
+m=0.30 seeds 2 ok  brier 0.1730 ece 0.074 auroc 0.777
+m=0.40 seeds 2 ok  brier 0.1736 ece 0.088 auroc 0.769
+m=0.50 seeds 4 ok  brier 0.1623 ece 0.055 auroc 0.797
+m=0.60 seeds 2 ok  brier 0.1631 ece 0.040 auroc 0.791
+m=0.75 seeds 2 OUT brier 0.2414 ece 0.175 auroc 0.644
+m=1.00 seeds 2 OUT brier 0.2016 ece 0.126 auroc 0.764
+best mix: 0.5
