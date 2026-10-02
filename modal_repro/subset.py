@@ -12,6 +12,8 @@ overwrites it every epoch.
 Options before "--" change PPO from outside Train.py, which stays unmodified:
   --seed S   reseed torch/numpy/random after importing Train.py (which hard-codes manual_seed(2))
   --no-kl    PPOConfig(init_kl_coef=0, adap_kl_ctrl=False): no KL penalty toward the base model
+  --fast     numerically equivalent speedups (see add_ppo_speedups): log-probs only over response
+             positions, no entropy statistic, no gradient checkpointing, no per-step empty_cache
   --hinge W  add discrete-exact's format hinges to PPO's policy loss, from the logits PPO already
              computes for its sampled response ": k<eot>":
              W * [relu(log 0.95 - log M) + relu(log 0.95 - log P(<eot> | k))], with
@@ -35,6 +37,67 @@ from datasets import load_dataset
 
 from util import DataHelper
 from util.Prompts import get_prompt
+
+
+def add_ppo_speedups(trainer_class):
+    """Numerically equivalent speedups for TRL 0.8.6 PPO as used by Train.py.
+
+    1. batched_forward_pass computes log-probs (a log-softmax over the 128k vocabulary) only over
+       each row's response span instead of every position; TRL masks the other positions anyway.
+       Identical values at every position TRL uses; masked positions hold 0.
+    2. entropy_from_logits (a logging statistic, ppo/policy/entropy) returns zeros.
+    3. Gradient checkpointing is off (util.ModelLoader asks Unsloth for it); same forward pass.
+    4. PPOConfig(optimize_device_cache=False) (set by the caller): no gc/empty_cache every step.
+    """
+    import math
+    import torch
+    import trl.trainer.ppo_trainer as ppo_module
+    import util.ModelLoader as model_loader
+
+    ppo_module.entropy_from_logits = lambda logits: torch.zeros(logits.shape[:-1], device=logits.device)
+    original_peft = model_loader.FastLanguageModel.get_peft_model
+    model_loader.FastLanguageModel.get_peft_model = staticmethod(
+        lambda *a, **k: original_peft(*a, **{**k, "use_gradient_checkpointing": False}))
+
+    def batched_forward_pass(self, model, queries, responses, model_inputs, return_logits=False, response_masks=None):
+        # trl 0.8.6 PPOTrainer.batched_forward_pass, decoder-only branch, with log-probs restricted
+        # to the response span.
+        bs, fbs = len(queries), self.config.mini_batch_size
+        all_logprobs, all_logits, all_masks, all_values = [], [], [], []
+        model.eval()
+        for i in range(math.ceil(bs / fbs)):
+            input_kwargs = {key: value[i * fbs:(i + 1) * fbs] for key, value in model_inputs.items()}
+            query_batch, response_batch = queries[i * fbs:(i + 1) * fbs], responses[i * fbs:(i + 1) * fbs]
+            response_masks_batch = response_masks[i * fbs:(i + 1) * fbs] if response_masks is not None else None
+            logits, _, values = model(**input_kwargs)
+            input_ids, attention_mask = input_kwargs["input_ids"], input_kwargs["attention_mask"]
+            masks = torch.zeros_like(attention_mask)
+            masks[:, :-1] = attention_mask[:, 1:]
+            logprobs = torch.zeros(input_ids.shape[0], input_ids.shape[1] - 1, dtype=logits.dtype, device=logits.device)
+            for j in range(len(query_batch)):
+                start = len(query_batch[j]) - 1
+                if attention_mask[j, 0] == 0:
+                    start += attention_mask[j, :].nonzero()[0]
+                end = start + len(response_batch[j])
+                if response_masks is not None:
+                    response_masks_batch[j] = torch.cat((torch.zeros_like(query_batch[j]), response_masks_batch[j]))[1:]
+                masks[j, :start] = 0
+                masks[j, end:] = 0
+                if response_masks is not None:
+                    masks[j, start:end] = masks[j, start:end] * response_masks_batch[j][start:end]
+                span = logits[j, start:end].log_softmax(-1)  # trl.core.logprobs_from_logits, same op
+                logprobs[j, start:end] = span.gather(-1, input_ids[j, start + 1:end + 1, None]).squeeze(-1)
+            if return_logits:
+                all_logits.append(logits)
+            else:
+                del logits
+            all_values.append(values)
+            all_logprobs.append(logprobs)
+            all_masks.append(masks)
+        return (torch.cat(all_logprobs), torch.cat(all_logits)[:, :-1] if return_logits else None,
+                torch.cat(all_values)[:, :-1], torch.cat(all_masks)[:, :-1])
+
+    trainer_class.batched_forward_pass = batched_forward_pass
 
 
 def add_ppo_hinge(trainer_class, weight, log_path, threshold=0.95):
@@ -169,9 +232,15 @@ def main():
             torch.manual_seed(seed)
             np.random.seed(seed)
             random.seed(seed)
+        config_overrides = {}
         if "--no-kl" in ours:
+            config_overrides.update(init_kl_coef=0.0, adap_kl_ctrl=False)
+        if "--fast" in ours:
+            config_overrides.update(optimize_device_cache=False)
+            add_ppo_speedups(PPOTrainerNoCache)
+        if config_overrides:
             original_config = Train.PPOConfig
-            Train.PPOConfig = lambda **kwargs: original_config(**{**kwargs, "init_kl_coef": 0.0, "adap_kl_ctrl": False})
+            Train.PPOConfig = lambda **kwargs: original_config(**{**kwargs, **config_overrides})
         if hinge_weight:
             add_ppo_hinge(PPOTrainerNoCache, hinge_weight, os.path.join(args.out_dir, "hinge.jsonl"))
         # Timestamp every PPO step (and save periodic snapshots) without touching Train.py.

@@ -270,6 +270,7 @@ def train_group(ids_by_split: dict, items: list, run_name: str) -> list:
         log.close()
         timing = next((Path(out_dir) / n for n in ["metrics.jsonl", "steps.jsonl"] if (Path(out_dir) / n).exists()), None)
         results.append(dict(label=label, exit_code=code, gpu=gpu, runs_on_gpu=len(items),
+                            scalars=tensorboard_scalars(out_dir),
                             snapshots=sorted(str(p) for p in Path(out_dir).iterdir() if p.name.startswith("snapshot-step")),
                             timing=timing.read_text() if timing else "", log=Path(f"{out_dir}/train.log").read_text()))
     volume.commit()
@@ -636,6 +637,8 @@ def bench_batching(gpus: str = "L40S", data_run: str = "runs/pilot-20261001T0029
 PPO_VARIANTS = {
     "ppo-kl": [],                                      # the released configuration, seeded
     "ppo-nokl-hinge": ["--no-kl", "--hinge", "1.0"],   # baseline - KL + discrete-exact's hinges
+    "ppo-kl-fast": ["--fast"],                         # same, with numerically equivalent speedups
+    "ppo-nokl-hinge-fast": ["--fast", "--no-kl", "--hinge", "1.0"],
 }
 
 
