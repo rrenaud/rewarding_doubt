@@ -17,7 +17,9 @@ Options before "--" change PPO from outside Train.py, which stays unmodified:
   --ppo KEY=VALUE  override a PPOConfig field (repeatable), e.g. --ppo cliprange=0.1 --ppo ppo_epochs=2
   --hinge-threshold T  threshold for --hinge (default 0.95)
   --reward-mix M  mix the Brier score into Train.py's reward: (1 - M) log + M Brier on the released
-             scale (rewarding_doubt.core.reward); parsing, exact-match grading and -30 unchanged
+             scale (rewarding_doubt.core.reward); parsing and -30 unchanged
+  --grading f1  grade answers in Train.py's reward with F1 > 0.5 (as the paper describes and as our
+             evaluation does) instead of its default exact match; see docs/grading.md
   --hinge W  add discrete-exact's format hinges to PPO's policy loss, from the logits PPO already
              computes for its sampled response ": k<eot>":
              W * [relu(log 0.95 - log M) + relu(log 0.95 - log P(<eot> | k))], with
@@ -43,13 +45,18 @@ from util import DataHelper
 from util.Prompts import get_prompt
 
 
-def mixed_reward(brier_mix):
-    """util.RLHelper.QAResult_to_reward with the Brier score mixed in (same parse, grading and -30)."""
+def mixed_reward(brier_mix, grading="exact"):
+    """util.RLHelper.QAResult_to_reward with the Brier score mixed in and a choice of grader.
+
+    Same parse and -30 for malformed output; Train.py calls it with the default metric, which is
+    exact match in the released code and F1 > 0.5 with grading="f1".
+    """
     from rewarding_doubt.core import reward
     from util.EvaluationMetrics import Metric, is_answer_correct
     from util.RLHelper import wrong_format_penalty
+    default_metric = Metric.F1 if grading == "f1" else Metric.EXACT
 
-    def QAResult_to_reward(result, metric=Metric.EXACT, threshold=0.5):
+    def QAResult_to_reward(result, metric=default_metric, threshold=0.5):
         if result.confidence is None or not 0 <= result.confidence <= 10:
             return wrong_format_penalty
         correct = is_answer_correct(result.prediction, result.gt_candidates, metric, threshold)
@@ -248,8 +255,11 @@ def main():
         hinge_weight = option("--hinge", float, 0.)
         hinge_threshold = option("--hinge-threshold", float, 0.95)
         reward_mix = option("--reward-mix", float, 0.0)
-        if reward_mix:
-            Train.QAResult_to_reward = mixed_reward(reward_mix)
+        grading = option("--grading", str, "exact")
+        if grading not in ("exact", "f1"):
+            raise SystemExit(f"--grading must be exact or f1, not {grading}")
+        if reward_mix or grading == "f1":
+            Train.QAResult_to_reward = mixed_reward(reward_mix, grading)
         if seed is not None:
             import random
             import numpy as np

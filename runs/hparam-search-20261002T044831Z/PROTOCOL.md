@@ -44,3 +44,12 @@ some high-learning-rate runs damaged the answers themselves (e.g. dev accuracy 9
 Among eligible configs, lowest dev Brier as before. This applies to round 1's start points and to every
 sweep stage. Three round-1 runs (exact-c04, ppo-c14, ppo-c15) have no metrics: their outputs were so
 malformed that the unsampled readout crashed on zero rows (fixed); they are treated as ineligible.
+
+## Follow-ups (2026-10-02T08:08Z)
+
+- final_ppo_f1: the tuned PPO config retrained with F1 > 0.5 grading in its reward (matching the
+  discrete-exact arm and the evaluation), seeds 4-8, 256 steps, dev and test. Removes the
+  training-label confound documented in docs/grading.md.
+- brier_sweep (exploratory, dev only): exact + hinge at the tuned config, reward = (1 - m) log score +
+  m Brier score for m in {0, 0.25, 0.5, 0.75, 1}, seeds 1-2, on the first 512 training questions
+  (2 epochs = 128 steps).
