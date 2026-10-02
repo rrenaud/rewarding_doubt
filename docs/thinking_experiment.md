@@ -116,3 +116,66 @@ Generating G = 4 checks of up to 96 tokens per question makes a step roughly 3�
   (accuracy within 2 points of base, format failures ≤ 2%) applies to selection.
 - **Cost of KL.** The reference pass grows with the check's length. It stays a no-grad pass, about
   20–30% of a step.
+
+## Results (2026-10-02, dev only, reduced scale)
+
+**Scale actually run** (to fit a $15 budget): 512 training questions, 128 steps (2 epochs), tuned
+exact + hinge settings (lr 4e-5, 2 updates per batch, hinge 1.01 at 0.95), G = 4 checks per
+question for the trained and frozen arms, checks up to 96 tokens (they average ~25), evaluation
+on the 512 dev questions. Test was not touched. Code: `modal_repro/thinking_llama.py`; runs:
+`runs/modal-thinking-{stage0,main,main-none,seeds34}`; summary `runs/thinking/summary.json`.
+Spend: about $12.8 on Modal L40S.
+
+**Stage 0 (base model, no training).** The base model follows the Answer/Check/Confidence format
+on 100% of dev questions, checks average 25 tokens, and essentially all next-token mass after
+"Confidence: " is on the 11 numbers. Its zero-shot check *hurts* ranking: AUROC of E_π[k] is 0.621
+with its own check, 0.669 with another question's check, 0.692 with no check. Base checks are
+mostly confirmations ("This is a well-documented event…") that push it toward 10. Answer accuracy
+is 61.9% with this prompt (66.0% with the released prompt).
+
+| Arm (dev, sampled confidence) | Seeds | Brier ↓ | ECE ↓ | AUROC ↑ | AUROC of E_π[k]: own / swapped / no check | Accuracy |
+|---|---:|---:|---:|---:|---|---:|
+| none (no check line) | 4 | 0.176 ± 0.003 | **0.058 ± 0.007** | 0.783 ± 0.008 | 0.796 / – / – | 62.8% |
+| filler (fixed 36-token text) | 2 | 0.181 | 0.082 | 0.782 | 0.801 / – / 0.792 | 63.2% |
+| frozen (base-model check) | 4 | **0.167 ± 0.005** | 0.067 ± 0.010 | **0.823 ± 0.012** | 0.839 / 0.832 / 0.828 | 58.8% |
+| frozen, excluding seed 3 | 3 | 0.169 | 0.059 | 0.813 | | 62.4% |
+| trained check, β = 0.05 | 4 | 0.177 ± 0.007 | 0.080 ± 0.024 | 0.792 ± 0.010 | 0.810 / 0.807 / 0.797 | 62.5% |
+| trained check, β = 0.005 | 2 | 0.177 | 0.099 | 0.815 | 0.833 / 0.815 / 0.828 | 62.4% |
+
+± is the standard error over seeds. Per-seed ECE: none 0.046 / 0.079 / 0.054 / 0.053;
+frozen 0.075 / 0.050 / 0.092 / 0.053; trained β = 0.05 0.064 / 0.150 / 0.050 / 0.055.
+
+- **Frozen seed 3 damaged its answers** (accuracy 47.9%) and is ineligible under the search's rule.
+  Its AUROC (0.854) is inflated by the damage. Without it, the frozen arm still ranks better than no
+  check: AUROC 0.808, 0.831 and 0.801, against 0.804, 0.767, 0.783 and 0.779. Brier is slightly
+  better and ECE is the same.
+- **Training the check did not help.**
+  - With β = 0.05, AUROC, ECE and Brier are no better than no check, and one of four seeds is
+    badly miscalibrated (ECE 0.150).
+  - The policy-gradient signal is weak: the advantage |r − b| averages 0.02–0.06, because four
+    checks for the same answer lead to almost the same confidence.
+  - KL to the base model stays small (0.1–0.3 nats per check at β = 0.05; it grows to about
+    3 nats by the end at β = 0.005).
+  - Checks stay fluent and on-topic in both arms. No drift or codes appeared in 128 steps.
+- **The check's content matters little, even where the arm helps.**
+  - For the frozen arm, re-scoring the same adapter with another question's check costs 0.007 AUROC.
+    Dropping the check line costs 0.011.
+  - The frozen arm's adapter scores 0.828 AUROC *without* a check, against 0.796 for the no-check
+    arm. Its advantage therefore seems to come from training on four varied contexts per answer,
+    not from reading the check at test time.
+  - Confound: the frozen and trained arms average the confidence loss over four sequences per
+    question, while none and filler use one.
+- **A fixed filler line is no better than nothing.** That rules out "more positions or compute" as
+  the source of any gain.
+
+**Verdict at this scale.** Letting the model write an unscored check before the confidence did not
+improve calibration (ECE). A frozen, base-model check gave a small, fairly consistent ranking gain
+(about +0.03 AUROC), but most of it survives removing the check at test time, so it is probably a
+training-data effect. Training the check with REINFORCE + KL gave nothing measurable in 128 steps.
+
+**What would make this conclusive.**
+- The frozen arm with G = 1 (one check per answer). That tests the augmentation explanation
+  directly.
+- More steps for the trained arm, so its weak signal can accumulate.
+- A stronger check-level signal, e.g. G = 8, or a per-token baseline.
+- Full training set and 3+ seeds, then test.

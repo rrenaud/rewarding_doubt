@@ -315,7 +315,8 @@ dl.glossary dd { margin: 0; color: var(--muted); min-width: 0; }
 
 <h2>Next</h2>
 <ul class="tight">
-<li><b>Mixing in the Brier score (running).</b> The log score punishes a confident mistake so hard that discrete-exact never says 9 or 10, even where it is right 82–88% of the time at 7–8. A reward of half log score and half Brier score, both proper, let it use 9 at 94% accuracy and nearly halved dev ECE in an exploratory sweep (2 seeds, half the training set). A finer sweep and a full three-seed comparison against the pure log score are running.</li>
+<li><b>Mixing in the Brier score: not confirmed.</b> The log score punishes a confident mistake so hard that discrete-exact never says 9 or 10. On a small exploratory sweep, a half-log, half-Brier reward used 9 at 94% accuracy and lowered dev ECE from 0.088 to 0.050. At full scale (3 fresh seeds, test) it did not hold up. ECE was unchanged (0.077 ± 0.043 vs 0.078 ± 0.010), AUROC was lower (0.800 vs 0.843), and one seed was badly calibrated. The pure log score stays.</li>
+<li><b>Unscored thinking before the confidence: no calibration gain so far.</b> The model writes "Check: …" after its answer, then the confidence. Small-scale dev runs (512 training questions, 2–4 seeds) compared five arms: no check, fixed filler text, the base model's own check, and a check trained by policy gradient with a KL penalty toward the base model (β = 0.05 or 0.005). None improved ECE. The base-model check gave about +0.03 AUROC, but most of that survives deleting the check at test time. Training the check added nothing measurable in 128 steps; the checks stayed fluent, with no drift. Details: <code>docs/thinking_experiment.md</code>.</li>
 <li><b>Hinge plus value head</b> for discrete-exact.</li>
 <li><b>Answer generation with the adapter off</b>, so only the confidence can change and high learning rates cannot damage the answers.</li>
 </ul>
