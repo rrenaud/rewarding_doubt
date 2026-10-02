@@ -107,3 +107,23 @@ def test_truncate_jsonl(tmp_path):
     path.write_text("".join(json.dumps(dict(step=s)) + "\n" for s in range(1, 8)))
     truncate_jsonl(str(path), 4)
     assert [json.loads(l)["step"] for l in path.read_text().splitlines()] == [1, 2, 3, 4]
+
+
+def test_rotating_checkpoint_keeps_last_healthy(tmp_path):
+    from rewarding_doubt.checkpoint import save_rotating_checkpoint, write_status
+    directory = str(tmp_path / "checkpoint")
+    monitor = StabilityMonitor()
+    saved = 0
+    for step in range(1, 129):
+        conf = [2] * 8 if step >= 70 else [random.Random(step).choice([5, 6, 7, 8]) for _ in range(8)]
+        monitor.update(step, conf, [1, 0] * 4)
+        if step % 32 == 0:
+            save_rotating_checkpoint(directory, dict(step=step), monitor.clean_since(saved))
+            saved = step
+    # Collapse starts at 70 and is flagged by ~86: the checkpoint at 64 is followed by flags, so
+    # the last confirmed-healthy one is 32.
+    assert load_checkpoint(directory)["step"] == 128
+    assert load_checkpoint(directory + "-healthy")["step"] == 32
+    write_status(str(tmp_path), "diverged", step=128, flags=["collapsed"])
+    status = json.load(open(tmp_path / "status.json"))
+    assert status["status"] == "diverged" and status["healthy_checkpoint"] == {"step": 32}

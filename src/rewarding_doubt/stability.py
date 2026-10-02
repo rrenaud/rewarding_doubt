@@ -29,6 +29,7 @@ class StabilityMonitor:
         self.steps = deque(maxlen=window)  # (confidences, correct) per step
         self.baseline_accuracy = None
         self.raised = set()
+        self.last_flagged_step = None  # most recent step with any active flag
 
     def update(self, step, confidences, correct=(), **scalars):
         """Add one step; return (record, new_events)."""
@@ -63,20 +64,27 @@ class StabilityMonitor:
             flags.append("nonfinite")
         record.update(scalars)
         record["flags"] = flags
+        if flags:
+            self.last_flagged_step = step
         events = [dict(step=step, flag=f, nonfinite=bad if f == "nonfinite" else None,
                        **{k: record[k] for k in ("window_mode_share", "window_invalid_rate", "window_accuracy",
                                                  "baseline_accuracy")}) for f in flags if f not in self.raised]
         self.raised.update(flags)
         return record, events
 
+    def clean_since(self, step):
+        """No flag was active at any step after `step`."""
+        return self.last_flagged_step is None or self.last_flagged_step <= step
+
     def state_dict(self):
         return dict(steps=[list(s) for s in self.steps], baseline_accuracy=self.baseline_accuracy,
-                    raised=sorted(self.raised))
+                    raised=sorted(self.raised), last_flagged_step=self.last_flagged_step)
 
     def load_state_dict(self, state):
         self.steps = deque((tuple(s) for s in state["steps"]), maxlen=self.window)
         self.baseline_accuracy = state["baseline_accuracy"]
         self.raised = set(state["raised"])
+        self.last_flagged_step = state.get("last_flagged_step")
 
 
 def _mean(xs):

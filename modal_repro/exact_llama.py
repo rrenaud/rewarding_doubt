@@ -59,8 +59,8 @@ import torch
 from unsloth import FastLanguageModel  # must precede transformers imports
 import trl
 
-from rewarding_doubt.checkpoint import (load_checkpoint, load_trainable_state, rng_state, save_checkpoint,
-                                        set_rng_state, trainable_state, truncate_jsonl)
+from rewarding_doubt.checkpoint import (load_checkpoint, load_trainable_state, rng_state, save_rotating_checkpoint,
+                                        set_rng_state, trainable_state, truncate_jsonl, write_status)
 from rewarding_doubt.core import baseline_matched_objective, objective
 from rewarding_doubt.stability import FLAGS, StabilityMonitor
 from rewarding_doubt.paper_ppo import AdaptiveKLController
@@ -251,6 +251,7 @@ def main():
     checkpoint_dir = os.path.join(args.out_dir, "checkpoint")
     paths = {name: os.path.join(args.out_dir, f"{name}.jsonl") for name in ("metrics", "stability", "stability_events")}
     step, start_epoch, start_index, saved_order = 0, 0, 0, None
+    last_checkpoint = [0]  # step of the latest checkpoint (promoted to -healthy if no flag follows it)
     state = None if args.no_resume else load_checkpoint(checkpoint_dir)
     if state is not None:
         load_trainable_state(state["weights"], model, *([value_head] if value_head else []))
@@ -261,6 +262,7 @@ def main():
         set_rng_state(state["rng"])
         monitor.load_state_dict(state["monitor"])
         step, start_epoch, start_index, saved_order = state["step"], state["epoch"], state["index"], state["order"]
+        last_checkpoint[0] = step
         for path in paths.values():
             truncate_jsonl(path, step)
         print(f"resumed from {checkpoint_dir} at step {step} (epoch {start_epoch}, question {start_index})", flush=True)
@@ -270,11 +272,12 @@ def main():
         if not args.checkpoint_every and not stopping:
             return
         t_save = time.time()
-        save_checkpoint(checkpoint_dir, dict(
+        save_rotating_checkpoint(checkpoint_dir, dict(
             step=step, epoch=epoch, index=index, order=order, kl_coef=kl_controller.value,
             weights=trainable_state(model, *([value_head] if value_head else [])),
             optimizer=optimizer.state_dict(), order_rng=rng.getstate(), row_rng=row_rng.getstate(),
-            rng=rng_state(), monitor=monitor.state_dict()))
+            rng=rng_state(), monitor=monitor.state_dict()), monitor.clean_since(last_checkpoint[0]))
+        last_checkpoint[0] = step
         print(f"checkpoint at step {step} ({time.time() - t_save:.1f} s)", flush=True)
 
     stopping = []  # set by SIGTERM: finish the current step, checkpoint, exit
@@ -400,7 +403,10 @@ def main():
                 checkpoint(*position)
             if stopping:
                 print(f"stopping at step {step}: {', '.join(stopping)}", flush=True)
-                sys.exit(143 if stopping[0] in ("SIGTERM", "stop-after") else 3)
+                preempted = stopping[0] in ("SIGTERM", "stop-after")
+                write_status(args.out_dir, "preempted" if preempted else "diverged", step=step, reason=stopping,
+                             flags=sorted(monitor.raised))
+                sys.exit(143 if preempted else 3)
             if args.max_steps and step >= args.max_steps:
                 break
         # Train.py saves model_finetuned after every epoch; save the adapter per epoch.
@@ -408,6 +414,7 @@ def main():
         tokenizer.save_pretrained(os.path.join(args.out_dir, f"model_finetuned_epoch{epoch + 1}"))
         if args.max_steps and step >= args.max_steps:
             break
+    write_status(args.out_dir, "completed", step=step, flags=sorted(monitor.raised))
 
 
 if __name__ == "__main__":

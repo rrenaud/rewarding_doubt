@@ -235,10 +235,11 @@ def subset_loader(ids_by_split, system_prompt=None):
         # util/DataHelper.load_prepared_dataset, with one added filter step.
         descriptor = DataHelper.get_dataset_descriptor(dataset)
         data = load_dataset(**descriptor.huggingface_config, split=split)
-        keep = set(ids_by_split[split])
-        data = data.filter(lambda x: x["question_id"] in keep)
-        if len(data) != len(keep):
-            raise ValueError(f"{split}: found {len(data)} of {len(keep)} requested questions")
+        if ids_by_split[split] != "all":  # "all": the whole split, e.g. the full training set
+            keep = set(ids_by_split[split])
+            data = data.filter(lambda x: x["question_id"] in keep)
+            if len(data) != len(keep):
+                raise ValueError(f"{split}: found {len(data)} of {len(keep)} requested questions")
         data = data.map(lambda x: descriptor.normalize_function(x), remove_columns=descriptor.columns_to_remove)
         prompt = system_prompt or get_prompt(descriptor.type)
         return data.map(lambda x: DataHelper.prepare_queries(x, tokenizer, prompt, tokenize=True))
@@ -342,8 +343,8 @@ def main():
             Train.PPOConfig = lambda **kwargs: original_config(**{**kwargs, **config_overrides})
         # Stability monitor, resumable checkpoints and per-step timestamps, without touching Train.py.
         import torch
-        from rewarding_doubt.checkpoint import (load_checkpoint, load_trainable_state, rng_state, save_checkpoint,
-                                                set_rng_state, trainable_state, truncate_jsonl)
+        from rewarding_doubt.checkpoint import (load_checkpoint, load_trainable_state, rng_state, save_rotating_checkpoint,
+                                                set_rng_state, trainable_state, truncate_jsonl, write_status)
         from rewarding_doubt.paper_ppo import is_correct_f1
         from rewarding_doubt.stability import FLAGS, StabilityMonitor
         os.makedirs(args.out_dir, exist_ok=True)
@@ -365,6 +366,7 @@ def main():
                 for name in ["steps", "stability", "stability_events"]}
         monitor = StabilityMonitor()
         count = [0]
+        last_checkpoint = [resume["step"] if resume is not None else 0]
         stopping = []
         signal.signal(signal.SIGTERM, lambda signum, frame: stopping.append("SIGTERM"))
 
@@ -414,10 +416,12 @@ def main():
 
         def save_checkpoint_now(self):
             t_save = time.time()
-            save_checkpoint(checkpoint_dir, dict(
+            save_rotating_checkpoint(checkpoint_dir, dict(
                 step=count[0], consumed=self.dataloader.consumed, epochs_saved=len(epochs_saved),
                 kl_coef=float(self.kl_ctl.value), weights=trainable_state(self.model),
-                optimizer=self.optimizer.state_dict(), rng=rng_state(), monitor=monitor.state_dict()))
+                optimizer=self.optimizer.state_dict(), rng=rng_state(), monitor=monitor.state_dict()),
+                monitor.clean_since(last_checkpoint[0]))
+            last_checkpoint[0] = count[0]
             print(f"checkpoint at step {count[0]} ({time.time() - t_save:.1f} s)", flush=True)
 
         def scalar(v):
@@ -460,7 +464,10 @@ def main():
                 save_checkpoint_now(self)
             if stopping:
                 print(f"stopping at step {count[0]}: {', '.join(stopping)}", flush=True)
-                sys.exit(143 if stopping[0] in ("SIGTERM", "stop-after") else 3)
+                preempted = stopping[0] in ("SIGTERM", "stop-after")
+                write_status(args.out_dir, "preempted" if preempted else "diverged", step=count[0], reason=stopping,
+                             flags=sorted(monitor.raised))
+                sys.exit(143 if preempted else 3)
             return stats
 
         PPOTrainerNoCache.step = step
@@ -470,6 +477,7 @@ def main():
         Train.train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize,
                     model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset,
                     log_with=args.log_with, is_unsloth=args.is_unsloth)
+        write_status(args.out_dir, "completed", step=count[0], flags=sorted(monitor.raised))
     elif command == "evaluate":
         import torch
         import InferenceDatasetSplit
