@@ -1,0 +1,523 @@
+[
+ {
+  "config": "exact-c06",
+  "arm": "exact",
+  "params": {
+   "lr": 8.02e-05,
+   "updates": 1,
+   "hinge_weight": 1.01,
+   "hinge_threshold": 0.9
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6673189823874756,
+  "wrong_format": 0.001953125,
+  "brier": 0.15215264187866928,
+  "ece": 0.046770550310611725,
+  "auroc": 0.8165344143522512
+ },
+ {
+  "config": "exact-c11",
+  "arm": "exact",
+  "params": {
+   "lr": 6.43e-05,
+   "updates": 1,
+   "hinge_weight": 0.103,
+   "hinge_threshold": 0.9
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.684931506849315,
+  "wrong_format": 0.001953125,
+  "brier": 0.1692563600782779,
+  "ece": 0.07729887962341309,
+  "auroc": 0.7659716060337178
+ },
+ {
+  "config": "exact-c00",
+  "arm": "exact",
+  "params": {
+   "lr": 1e-05,
+   "updates": 4,
+   "hinge_weight": 1.0,
+   "hinge_threshold": 0.95
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6640471512770137,
+  "wrong_format": 0.005859375,
+  "brier": 0.18015717092337918,
+  "ece": 0.0263249259442091,
+  "auroc": 0.7251115955569397
+ },
+ {
+  "config": "exact-c07",
+  "arm": "exact",
+  "params": {
+   "lr": 4.04e-06,
+   "updates": 8,
+   "hinge_weight": 0.137,
+   "hinge_threshold": 0.99
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6647058823529411,
+  "wrong_format": 0.00390625,
+  "brier": 0.18307843137254903,
+  "ece": 0.026079386472702026,
+  "auroc": 0.719401749210785
+ },
+ {
+  "config": "exact-c03",
+  "arm": "exact",
+  "params": {
+   "lr": 4.72e-06,
+   "updates": 4,
+   "hinge_weight": 0.298,
+   "hinge_threshold": 0.9
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6549019607843137,
+  "wrong_format": 0.00390625,
+  "brier": 0.191921568627451,
+  "ece": 0.07607834041118622,
+  "auroc": 0.7151095536200325
+ },
+ {
+  "config": "exact-c10",
+  "arm": "exact",
+  "params": {
+   "lr": 1.02e-05,
+   "updates": 2,
+   "hinge_weight": 0.807,
+   "hinge_threshold": 0.99
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6549019607843137,
+  "wrong_format": 0.00390625,
+  "brier": 0.19245098039215688,
+  "ece": 0.046078458428382874,
+  "auroc": 0.7031420114316821
+ },
+ {
+  "config": "exact-c15",
+  "arm": "exact",
+  "params": {
+   "lr": 5.75e-06,
+   "updates": 4,
+   "hinge_weight": 0.81,
+   "hinge_threshold": 0.95
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6581532416502947,
+  "wrong_format": 0.005859375,
+  "brier": 0.19618860510805503,
+  "ece": 0.034577351063489914,
+  "auroc": 0.6895951278092297
+ },
+ {
+  "config": "exact-c09",
+  "arm": "exact",
+  "params": {
+   "lr": 4.01e-06,
+   "updates": 4,
+   "hinge_weight": 0.916,
+   "hinge_threshold": 0.95
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6686274509803921,
+  "wrong_format": 0.00390625,
+  "brier": 0.20115686274509806,
+  "ece": 0.08254952728748322,
+  "auroc": 0.6810112963959118
+ },
+ {
+  "config": "exact-c08",
+  "arm": "exact",
+  "params": {
+   "lr": 4.52e-06,
+   "updates": 1,
+   "hinge_weight": 0.346,
+   "hinge_threshold": 0.99
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6699410609037328,
+  "wrong_format": 0.005859375,
+  "brier": 0.22461689587426328,
+  "ece": 0.13772153854370117,
+  "auroc": 0.6165863706186288
+ },
+ {
+  "config": "exact-c14",
+  "arm": "exact",
+  "params": {
+   "lr": 5.83e-06,
+   "updates": 4,
+   "hinge_weight": 3.48,
+   "hinge_threshold": 0.99
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6666666666666666,
+  "wrong_format": 0.00390625,
+  "brier": 0.23650980392156865,
+  "ece": 0.15725620090961456,
+  "auroc": 0.5976038062283737
+ },
+ {
+  "config": "exact-c12",
+  "arm": "exact",
+  "params": {
+   "lr": 7.89e-05,
+   "updates": 8,
+   "hinge_weight": 0.216,
+   "hinge_threshold": 0.9
+  },
+  "seeds": 1,
+  "eligible": false,
+  "accuracy": 0.09467455621301775,
+  "wrong_format": 0.009765625,
+  "brier": 0.09246548323471401,
+  "ece": 0.09309665113687515,
+  "auroc": 0.5603213507625272
+ },
+ {
+  "config": "exact-c05",
+  "arm": "exact",
+  "params": {
+   "lr": 2.79e-05,
+   "updates": 8,
+   "hinge_weight": 0.198,
+   "hinge_threshold": 0.9
+  },
+  "seeds": 1,
+  "eligible": false,
+  "accuracy": 0.6320939334637965,
+  "wrong_format": 0.001953125,
+  "brier": 0.14913894324853227,
+  "ece": 0.07847341895103455,
+  "auroc": 0.8281733746130031
+ },
+ {
+  "config": "exact-c13",
+  "arm": "exact",
+  "params": {
+   "lr": 4.49e-05,
+   "updates": 2,
+   "hinge_weight": 0.141,
+   "hinge_threshold": 0.9
+  },
+  "seeds": 1,
+  "eligible": false,
+  "accuracy": 0.51171875,
+  "wrong_format": 0.0,
+  "brier": 0.16435546875,
+  "ece": 0.07089842855930328,
+  "auroc": 0.8431984732824427
+ },
+ {
+  "config": "exact-c01",
+  "arm": "exact",
+  "params": {
+   "lr": 0.000257,
+   "updates": 8,
+   "hinge_weight": 0.171,
+   "hinge_threshold": 0.9
+  },
+  "seeds": 1,
+  "eligible": false,
+  "accuracy": 0.21212121212121213,
+  "wrong_format": 0.935546875,
+  "brier": 0.16727272727272735,
+  "ece": 0.012121275067329407,
+  "auroc": 0.5
+ },
+ {
+  "config": "exact-c02",
+  "arm": "exact",
+  "params": {
+   "lr": 0.000199,
+   "updates": 1,
+   "hinge_weight": 2.2,
+   "hinge_threshold": 0.9
+  },
+  "seeds": 1,
+  "eligible": false,
+  "accuracy": 0.36363636363636365,
+  "wrong_format": 0.978515625,
+  "brier": 0.21909090909090914,
+  "ece": 0.10000000894069672,
+  "auroc": 0.625
+ },
+ {
+  "config": "ppo-c04",
+  "arm": "ppo",
+  "params": {
+   "lr": 2.27e-05,
+   "updates": 8,
+   "hinge_weight": 0.39,
+   "hinge_threshold": 0.9,
+   "cliprange": 0.1,
+   "vf_coef": 0.0782
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6614481409001957,
+  "wrong_format": 0.001953125,
+  "brier": 0.1793737769080235,
+  "ece": 0.08258286863565445,
+  "auroc": 0.7396364196052946
+ },
+ {
+  "config": "ppo-c02",
+  "arm": "ppo",
+  "params": {
+   "lr": 6.11e-06,
+   "updates": 8,
+   "hinge_weight": 0.121,
+   "hinge_threshold": 0.95,
+   "cliprange": 0.2,
+   "vf_coef": 0.094
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6660117878192534,
+  "wrong_format": 0.005859375,
+  "brier": 0.18939096267190572,
+  "ece": 0.03693380951881409,
+  "auroc": 0.7014575741801145
+ },
+ {
+  "config": "ppo-c08",
+  "arm": "ppo",
+  "params": {
+   "lr": 2.35e-05,
+   "updates": 1,
+   "hinge_weight": 0.144,
+   "hinge_threshold": 0.9,
+   "cliprange": 0.1,
+   "vf_coef": 0.235
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6660117878192534,
+  "wrong_format": 0.005859375,
+  "brier": 0.1943418467583497,
+  "ece": 0.06797728687524796,
+  "auroc": 0.6962693041818497
+ },
+ {
+  "config": "ppo-c10",
+  "arm": "ppo",
+  "params": {
+   "lr": 1.23e-05,
+   "updates": 8,
+   "hinge_weight": 0.136,
+   "hinge_threshold": 0.95,
+   "cliprange": 0.1,
+   "vf_coef": 0.147
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.655511811023622,
+  "wrong_format": 0.0078125,
+  "brier": 0.19931102362204725,
+  "ece": 0.05058998987078667,
+  "auroc": 0.6887258687258687
+ },
+ {
+  "config": "ppo-c07",
+  "arm": "ppo",
+  "params": {
+   "lr": 6.19e-06,
+   "updates": 4,
+   "hinge_weight": 8.79,
+   "hinge_threshold": 0.99,
+   "cliprange": 0.2,
+   "vf_coef": 0.187
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6705882352941176,
+  "wrong_format": 0.00390625,
+  "brier": 0.20372549019607844,
+  "ece": 0.10509933531284332,
+  "auroc": 0.6620631439710387
+ },
+ {
+  "config": "ppo-c13",
+  "arm": "ppo",
+  "params": {
+   "lr": 2.09e-05,
+   "updates": 2,
+   "hinge_weight": 0.401,
+   "hinge_threshold": 0.95,
+   "cliprange": 0.3,
+   "vf_coef": 0.0427
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6660117878192534,
+  "wrong_format": 0.005859375,
+  "brier": 0.2145972495088409,
+  "ece": 0.17740651965141296,
+  "auroc": 0.7271386430678466
+ },
+ {
+  "config": "ppo-c05",
+  "arm": "ppo",
+  "params": {
+   "lr": 0.000104,
+   "updates": 1,
+   "hinge_weight": 4.56,
+   "hinge_threshold": 0.95,
+   "cliprange": 0.2,
+   "vf_coef": 0.197
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6588235294117647,
+  "wrong_format": 0.00390625,
+  "brier": 0.23107843137254908,
+  "ece": 0.21117663383483887,
+  "auroc": 0.7232998084291188
+ },
+ {
+  "config": "ppo-c03",
+  "arm": "ppo",
+  "params": {
+   "lr": 4.39e-05,
+   "updates": 8,
+   "hinge_weight": 0.895,
+   "hinge_threshold": 0.95,
+   "cliprange": 0.3,
+   "vf_coef": 0.228
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.66015625,
+  "wrong_format": 0.0,
+  "brier": 0.26191406250000004,
+  "ece": 0.2636716663837433,
+  "auroc": 0.6924437189689179
+ },
+ {
+  "config": "ppo-c01",
+  "arm": "ppo",
+  "params": {
+   "lr": 1.07e-05,
+   "updates": 1,
+   "hinge_weight": 0.226,
+   "hinge_threshold": 0.9,
+   "cliprange": 0.2,
+   "vf_coef": 0.27
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6581532416502947,
+  "wrong_format": 0.005859375,
+  "brier": 0.2698624754420432,
+  "ece": 0.23732641339302063,
+  "auroc": 0.6247383770801168
+ },
+ {
+  "config": "ppo-c00",
+  "arm": "ppo",
+  "params": {
+   "lr": 1e-05,
+   "updates": 4,
+   "hinge_weight": 1.0,
+   "hinge_threshold": 0.95,
+   "cliprange": 0.2,
+   "vf_coef": 0.1
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.6712328767123288,
+  "wrong_format": 0.001953125,
+  "brier": 0.27904109589041093,
+  "ece": 0.26673176884651184,
+  "auroc": 0.678987921699292
+ },
+ {
+  "config": "ppo-c09",
+  "arm": "ppo",
+  "params": {
+   "lr": 0.000121,
+   "updates": 2,
+   "hinge_weight": 1.03,
+   "hinge_threshold": 0.9,
+   "cliprange": 0.3,
+   "vf_coef": 0.299
+  },
+  "seeds": 1,
+  "eligible": true,
+  "accuracy": 0.658203125,
+  "wrong_format": 0.0,
+  "brier": 0.2916015625,
+  "ece": 0.25781410932540894,
+  "auroc": 0.4986265366680797
+ },
+ {
+  "config": "ppo-c11",
+  "arm": "ppo",
+  "params": {
+   "lr": 0.000238,
+   "updates": 1,
+   "hinge_weight": 0.621,
+   "hinge_threshold": 0.99,
+   "cliprange": 0.2,
+   "vf_coef": 0.095
+  },
+  "seeds": 1,
+  "eligible": false,
+  "accuracy": 0.0,
+  "wrong_format": 0.0,
+  "brier": 0.0,
+  "ece": 0.0,
+  "auroc": NaN
+ },
+ {
+  "config": "ppo-c06",
+  "arm": "ppo",
+  "params": {
+   "lr": 6.16e-05,
+   "updates": 2,
+   "hinge_weight": 0.491,
+   "hinge_threshold": 0.99,
+   "cliprange": 0.3,
+   "vf_coef": 0.194
+  },
+  "seeds": 1,
+  "eligible": false,
+  "accuracy": 0.6318897637795275,
+  "wrong_format": 0.0078125,
+  "brier": 0.24503937007874016,
+  "ece": 0.21889765560626984,
+  "auroc": 0.7164609259166708
+ },
+ {
+  "config": "ppo-c12",
+  "arm": "ppo",
+  "params": {
+   "lr": 0.00013,
+   "updates": 4,
+   "hinge_weight": 7.28,
+   "hinge_threshold": 0.9,
+   "cliprange": 0.3,
+   "vf_coef": 0.233
+  },
+  "seeds": 1,
+  "eligible": false,
+  "accuracy": 0.388671875,
+  "wrong_format": 0.0,
+  "brier": 0.24546874999999996,
+  "ece": 0.08867031335830688,
+  "auroc": 0.5
+ }
+]

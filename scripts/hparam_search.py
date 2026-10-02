@@ -110,6 +110,12 @@ def init():
     print(search)
 
 
+def eligible(search, m):
+    """Amendment 2: format intact and answers not damaged (vs the base model on dev)."""
+    base = json.loads((search / "base_dev_metrics.json").read_text())["accuracy"]
+    return m["wrong_format_rate"] <= 0.02 and m["accuracy"] >= base - 0.02
+
+
 def results(search, name):
     """{label: metrics at the round's last snapshot}, plus the configs."""
     configs = json.loads((search / f"{name}_configs.json").read_text())
@@ -128,18 +134,19 @@ def select(search, name):
     table = []
     for key, g in groups.items():
         mean = lambda k: statistics.fmean(r[k] for r in g["runs"])
-        table.append(dict(config=key, arm=g["arm"], params=g["params"], seeds=len(g["runs"]), brier=mean("brier"),
-                          ece=mean("ece"), auroc=mean("auroc"), ece_unsampled=mean("ece_unsampled"),
-                          auroc_unsampled=mean("auroc_unsampled")))
-    table.sort(key=lambda r: (r["arm"], r["brier"]))
+        table.append(dict(config=key, arm=g["arm"], params=g["params"], seeds=len(g["runs"]),
+                          eligible=all(eligible(search, r) for r in g["runs"]), accuracy=mean("accuracy"),
+                          wrong_format=mean("wrong_format_rate"), brier=mean("brier"),
+                          ece=mean("ece"), auroc=mean("auroc")))
+    table.sort(key=lambda r: (r["arm"], not r["eligible"], r["brier"]))
     (search / f"{name}_ranking.json").write_text(json.dumps(table, indent=1) + "\n")
     for r in table:
-        print(f"{r['arm']:5s} {r['config']:12s} brier {r['brier']:.4f} ece {r['ece']:.3f} auroc {r['auroc']:.3f} "
-              f"(seeds {r['seeds']}) {r['params']}")
+        print(f"{r['arm']:5s} {r['config']:12s} {'ok ' if r['eligible'] else 'OUT'} acc {r['accuracy']:.3f} "
+              f"fmt {r['wrong_format']:.3f} brier {r['brier']:.4f} ece {r['ece']:.3f} auroc {r['auroc']:.3f} {r['params']}")
     missing = [l for l in configs if l not in last]
     if missing:
         print("missing results:", missing)
-    nxt = {"round1": "round2", "round2": "final"}.get(name)
+    nxt = None  # amended protocol: round 1 only sets the start point (see `start`)
     if not nxt:
         return
     entries = []
@@ -173,7 +180,7 @@ def sweep_points(arm, current, stage):
 
 def start(search):
     table = json.loads((search / "round1_ranking.json").read_text())
-    current = {arm: next(r["params"] for r in table if r["arm"] == arm) for arm in ("exact", "ppo")}
+    current = {arm: next(r["params"] for r in table if r["arm"] == arm and r["eligible"]) for arm in ("exact", "ppo")}
     (search / "current.json").write_text(json.dumps(current, indent=1) + "\n")
     (search / "history.jsonl").write_text(json.dumps(dict(stage="round1", current=current)) + "\n")
     print(json.dumps(current, indent=1))
@@ -196,14 +203,17 @@ def advance(search, stage):
     current = json.loads((search / "current.json").read_text())
     rows = []
     for arm in ("exact", "ppo"):
-        scored = sorted((last[l]["brier"], l) for l, c in configs.items() if c["arm"] == arm and l in last)
-        for brier, label in scored:
+        scored = sorted((not eligible(search, last[l]), last[l]["brier"], l) for l, c in configs.items()
+                        if c["arm"] == arm and l in last)
+        for out, brier, label in scored:
             m = last[label]
-            rows.append(dict(stage=stage, arm=arm, label=label, params=configs[label]["params"], brier=brier,
-                             ece=m["ece"], auroc=m["auroc"], ece_unsampled=m["ece_unsampled"], auroc_unsampled=m["auroc_unsampled"]))
-            print(f"{arm:5s} {label:22s} brier {brier:.4f} ece {m['ece']:.3f} auroc {m['auroc']:.3f} {configs[label]['params']}")
-        if scored:
-            current[arm] = configs[scored[0][1]]["params"]
+            rows.append(dict(stage=stage, arm=arm, label=label, params=configs[label]["params"], eligible=not out,
+                             accuracy=m["accuracy"], wrong_format=m["wrong_format_rate"], brier=brier, ece=m["ece"],
+                             auroc=m["auroc"], ece_unsampled=m.get("ece_unsampled"), auroc_unsampled=m.get("auroc_unsampled")))
+            print(f"{arm:5s} {label:22s} {'OUT' if out else 'ok '} acc {m['accuracy']:.3f} brier {brier:.4f} "
+                  f"ece {m['ece']:.3f} auroc {m['auroc']:.3f} {configs[label]['params']}")
+        if scored and not scored[0][0]:  # keep the current point if nothing is eligible
+            current[arm] = configs[scored[0][2]]["params"]
     missing = [l for l in configs if l not in last]
     if missing:
         print("missing results:", missing)

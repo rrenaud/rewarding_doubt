@@ -711,3 +711,26 @@ def evaluate_test(ids_by_split: dict, model_dir: str) -> dict:
     if proc.returncode:
         return dict(model_dir=model_dir, error=proc.stdout[-3000:] + proc.stderr[-3000:])
     return dict(model_dir=model_dir, metrics=json.loads(Path(out_json.replace(".json", "_metrics.json")).read_text()))
+
+
+@app.local_entrypoint()
+def evaluate_base(search_dir: str, gpu: str = "L40S"):
+    """The base model on the search's dev split (reference for the accuracy eligibility rule)."""
+    search = Path(search_dir).resolve()
+    ids = {"validation": json.loads((search / "dev_ids.json").read_text())}
+    result = evaluate_base_remote.with_options(gpu=gpu).remote(ids)
+    (search / "base_dev_metrics.json").write_text(json.dumps(result, indent=2) + "\n")
+    print(json.dumps(result))
+
+
+@app.function(volumes={VOL: volume}, timeout=HOUR)
+def evaluate_base_remote(ids_by_split: dict) -> dict:
+    import subprocess
+
+    Path("/tmp/ids.json").write_text(json.dumps(ids_by_split))
+    out = "/tmp/base_eval.json"
+    proc = subprocess.run(["python", "subset.py", "evaluate", "/tmp/ids.json", MODEL, out], cwd=CODE,
+                          capture_output=True, text=True)
+    if proc.returncode:
+        return dict(error=proc.stdout[-3000:] + proc.stderr[-3000:])
+    return json.loads(Path(out.replace(".json", "_metrics.json")).read_text())

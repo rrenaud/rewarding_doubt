@@ -33,3 +33,14 @@ per-parameter curves and fit the 10-GPU limit (5 points per arm = one wave).
    - stage4: exact: hinge weight x {1/3, 1, 3} and threshold {0.9, 0.95, 0.99} (two lines through the
      current point); PPO: cliprange {0.1, 0.2, 0.3} and vf_coef x {1/3, 3} (two lines through it).
 3. Final: each arm's final config, 2 epochs (256 steps), fresh seeds 4, 5, 6, scored on dev and once on test.
+
+## Amendment 2 (2026-10-02T05:53Z, after seeing round-1 results)
+
+Round 1 exposed a loophole in "lowest dev Brier": the released evaluation drops malformed replies, and
+some high-learning-rate runs damaged the answers themselves (e.g. dev accuracy 9.5% with Brier 0.092, or
+94-98% malformed replies). Brier rewarded them. Selection now only considers **eligible** configs:
+- dev wrong-format rate <= 2%, and
+- dev answer accuracy >= base-model dev accuracy - 0.02 (base: 0.660, so >= 0.640).
+Among eligible configs, lowest dev Brier as before. This applies to round 1's start points and to every
+sweep stage. Three round-1 runs (exact-c04, ppo-c14, ppo-c15) have no metrics: their outputs were so
+malformed that the unsampled readout crashed on zero rows (fixed); they are treated as ineligible.

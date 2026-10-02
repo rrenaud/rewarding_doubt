@@ -195,6 +195,9 @@ def unsampled_metrics(tokenizer, captured, results):
         argmaxes.append(int(pi.argmax()) / 10)
         masses.append(float(probs.sum()))
         labels.append(int(is_answer_correct(result.prediction, result.gt_candidates, Metric.F1, 0.5)))
+    if len(set(labels)) < 2:  # nothing (or one class) left to score, e.g. a run that broke the format
+        return dict(ece_unsampled=None, auroc_unsampled=None, brier_unsampled=None, ece_unsampled_argmax=None,
+                    number_mass_unsampled=None, unsampled_rows=len(labels), unsampled_missing=missing)
     ece = lambda p: BinaryCalibrationError(n_bins=11, norm="l1")(torch.tensor(p), torch.tensor(labels)).item()
     return dict(ece_unsampled=ece(means), auroc_unsampled=roc_auc_score(labels, means),
                 brier_unsampled=brier_score_loss(labels, means), ece_unsampled_argmax=ece(argmaxes),

@@ -1,0 +1,16 @@
+{
+  "model": "unsloth/llama-3-8b-Instruct-bnb-4bit",
+  "n": 512,
+  "wrong_format_rate": 0.005859375,
+  "ece": 0.30550113320350647,
+  "accuracy": 0.6601178781925344,
+  "auroc": 0.5998658133773741,
+  "brier": 0.30807465618860513,
+  "ece_unsampled": 0.2957283556461334,
+  "auroc_unsampled": 0.6959468758601707,
+  "brier_unsampled": 0.2975916943048916,
+  "ece_unsampled_argmax": 0.30962684750556946,
+  "number_mass_unsampled": 0.9999919888546986,
+  "unsampled_rows": 509,
+  "unsampled_missing": 0
+}

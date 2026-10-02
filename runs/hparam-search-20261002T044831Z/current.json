@@ -1,0 +1,16 @@
+{
+ "exact": {
+  "lr": 8.02e-05,
+  "updates": 1,
+  "hinge_weight": 1.01,
+  "hinge_threshold": 0.9
+ },
+ "ppo": {
+  "lr": 2.27e-05,
+  "updates": 8,
+  "hinge_weight": 0.39,
+  "hinge_threshold": 0.9,
+  "cliprange": 0.1,
+  "vf_coef": 0.0782
+ }
+}
