@@ -326,7 +326,7 @@ function groupCards(groups, box) {
   box.appendChild(summary); seedStrips(groups.filter(g => shownArms().includes(g.arm)), box); wrap.appendChild(t); box.appendChild(wrap);
 }
 function seedStrips(groups, box) {
-  // One panel per metric; a row per group and split; a dot per seed (filled: test, hollow: dev), bar at the mean.
+  // One panel per metric; a row per group and split; a dot per seed, bar at the mean.
   if (!groups.length) return;
   const grid = document.createElement("div"); grid.className = "stages"; grid.style.marginBottom = "12px";
   const rows = [];
@@ -353,7 +353,7 @@ function seedStrips(groups, box) {
       const mean = r.pts.reduce((s, p) => s + p.m[k], 0) / r.pts.length;
       el("line", {x1: X(mean), x2: X(mean), y1: y - 10, y2: y + 10, stroke: "var(--fg)", "stroke-width": 2}, svg);
       for (const p of r.pts) {
-        const c = el("circle", {cx: X(p.m[k]), cy: y, r: 5, fill: r.split === "test" ? color : "var(--surface)", stroke: color, "stroke-width": 2, "fill-opacity": 0.85, tabindex: 0}, svg);
+        const c = el("circle", {cx: X(p.m[k]), cy: y, r: 5, fill: color, stroke: "var(--surface)", "stroke-width": 1.5, tabindex: 0}, svg);
         const hit = el("circle", {cx: X(p.m[k]), cy: y, r: 10, fill: "transparent"}, svg);
         const show = e => { tip.textContent = ""; const a = document.createElement("div"); a.style.fontWeight = 600; a.textContent = `${p.label} · ${r.split}`;
           const b = document.createElement("div"); b.textContent = `${name.replace(/ [↓↑]/, "")} ${k === "accuracy" ? (100 * p.m[k]).toFixed(1) + "%" : fmt(p.m[k])} (mean ${k === "accuracy" ? (100 * mean).toFixed(1) + "%" : fmt(mean)})`;
@@ -366,7 +366,7 @@ function seedStrips(groups, box) {
     grid.appendChild(panel);
   }
   const note = document.createElement("p"); note.className = "note";
-  note.textContent = "Each dot is one seed: filled = test, hollow = dev. The dark bar marks the mean. Hover a dot for its run.";
+  note.textContent = "Each dot is one seed; rows are labelled with arm and split. The bar marks the mean. Hover a dot for its run.";
   box.append(grid, note);
 }
 function finalSection() {
