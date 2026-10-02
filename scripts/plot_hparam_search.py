@@ -45,12 +45,11 @@ def load(search: Path):
                 for label, points in curve.items() if label.startswith(prefix)}
         return dict(arm=arm, name=name, note=note, rows=rows) if rows else None
 
-    # The first PPO final ("final") ran with TRL resetting every seed to 0: three identical runs.
-    # final_ppo reran it seeded; only its rows are shown.
+    # PPO's final is shown only as the F1-label rerun (final_ppo_f1). The exact-match-label finals
+    # ("final", with TRL resetting every seed to 0, and its seeded rerun "final_ppo") are left out.
     final = [g for g in [
         group("final", "exact", "exact", "Exact + hinge", "tuned; F1 training labels"),
-        group("final_ppo", "ppo", "ppo", "PPO + hinge, exact-match labels", "tuned; released Train.py reward grading"),
-        group("final_ppo_f1", "ppo", "ppo", "PPO + hinge, F1 labels", "same tuned config, F1 training labels (label-matched)"),
+        group("final_ppo_f1", "ppo", "ppo", "PPO + hinge", "tuned; F1 training labels"),
     ] if g] or None
     brier = None
     if (search / "brier_choice.json").exists():
@@ -137,7 +136,7 @@ tr.sel td { font-weight:600; } tr.bad td { color:var(--faint); }
 <div class="stages" id="sweeps"></div>
 
 <h2 id="final-h">Final round</h2>
-<p>Each arm's chosen configuration with fresh seeds, 256 steps, scored on dev and once on test. PPO's first final round is not shown: TRL reset every seed to 0, so its three runs were identical. The F1-label PPO row removes the training-label confound (exact + hinge always trained on F1 labels).</p>
+<p>Each arm's chosen configuration with fresh seeds, 256 steps, scored on dev and once on test. Both arms train on F1 &gt; 0.5 answer labels, the same grader used for evaluation.</p>
 <div id="final"></div>
 
 <h2 id="brier-h">Follow-up: mixing the Brier score into the reward</h2>
