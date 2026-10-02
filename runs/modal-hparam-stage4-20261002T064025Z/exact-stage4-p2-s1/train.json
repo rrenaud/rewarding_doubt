@@ -1,0 +1,10 @@
+{
+  "label": "exact-stage4-p2-s1",
+  "exit_code": 0,
+  "gpu": "NVIDIA L40S",
+  "runs_on_gpu": 1,
+  "scalars": {},
+  "snapshots": [
+    "/vol/outputs/hparam-stage4-20261002T064025Z/exact-stage4-p2-s1/snapshot-step00128"
+  ]
+}

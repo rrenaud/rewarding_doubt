@@ -1,0 +1,39 @@
+wrote 8 configs to runs/hparam-search-20261002T044831Z/stage2_configs.json (dev)
+=== stage2 06:28
+exact exact-stage2-p1-s1     ok  acc 0.667 brier 0.1618 ece 0.045 auroc 0.789 {'lr': 8.02e-05, 'updates': 2, 'hinge_weight': 1.01, 'hinge_threshold': 0.9}
+exact exact-stage2-p0-s1     ok  acc 0.673 brier 0.1831 ece 0.094 auroc 0.717 {'lr': 8.02e-05, 'updates': 1, 'hinge_weight': 1.01, 'hinge_threshold': 0.9}
+exact exact-stage2-p3-s1     OUT acc 0.006 brier 0.0061 ece 0.006 auroc 0.500 {'lr': 8.02e-05, 'updates': 8, 'hinge_weight': 1.01, 'hinge_threshold': 0.9}
+exact exact-stage2-p2-s1     OUT acc 0.138 brier 0.1375 ece 0.138 auroc 0.500 {'lr': 8.02e-05, 'updates': 4, 'hinge_weight': 1.01, 'hinge_threshold': 0.9}
+ppo   ppo-stage2-p1-s1       ok  acc 0.659 brier 0.1801 ece 0.063 auroc 0.750 {'lr': 2.27e-05, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0782}
+ppo   ppo-stage2-p2-s1       ok  acc 0.663 brier 0.1999 ece 0.132 auroc 0.741 {'lr': 2.27e-05, 'updates': 4, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0782}
+ppo   ppo-stage2-p0-s1       ok  acc 0.662 brier 0.2151 ece 0.109 auroc 0.618 {'lr': 2.27e-05, 'updates': 1, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0782}
+ppo   ppo-stage2-p3-s1       ok  acc 0.645 brier 0.2424 ece 0.166 auroc 0.584 {'lr': 2.27e-05, 'updates': 8, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0782}
+current: {"exact": {"lr": 8.02e-05, "updates": 2, "hinge_weight": 1.01, "hinge_threshold": 0.9}, "ppo": {"lr": 2.27e-05, "updates": 2, "hinge_weight": 0.39, "hinge_threshold": 0.9, "cliprange": 0.1, "vf_coef": 0.0782}}
+wrote 10 configs to runs/hparam-search-20261002T044831Z/stage3_configs.json (dev)
+=== stage3 06:39
+exact exact-stage3-p1-s1     ok  acc 0.683 brier 0.1575 ece 0.036 auroc 0.785 {'lr': 4.01e-05, 'updates': 2, 'hinge_weight': 1.01, 'hinge_threshold': 0.9}
+exact exact-stage3-p2-s1     ok  acc 0.641 brier 0.1652 ece 0.075 auroc 0.795 {'lr': 8.02e-05, 'updates': 2, 'hinge_weight': 1.01, 'hinge_threshold': 0.9}
+exact exact-stage3-p0-s1     ok  acc 0.669 brier 0.1737 ece 0.056 auroc 0.745 {'lr': 2.67e-05, 'updates': 2, 'hinge_weight': 1.01, 'hinge_threshold': 0.9}
+exact exact-stage3-p3-s1     OUT acc 0.276 brier 0.2309 ece 0.176 auroc 0.500 {'lr': 0.00016, 'updates': 2, 'hinge_weight': 1.01, 'hinge_threshold': 0.9}
+ppo   ppo-stage3-p2-s1       ok  acc 0.659 brier 0.1801 ece 0.063 auroc 0.750 {'lr': 2.27e-05, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0782}
+ppo   ppo-stage3-p4-s1       ok  acc 0.660 brier 0.1966 ece 0.058 auroc 0.685 {'lr': 6.81e-05, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0782}
+ppo   ppo-stage3-p0-s1       ok  acc 0.680 brier 0.2053 ece 0.095 auroc 0.627 {'lr': 7.57e-06, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0782}
+ppo   ppo-stage3-p1-s1       ok  acc 0.662 brier 0.2241 ece 0.139 auroc 0.625 {'lr': 1.13e-05, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0782}
+ppo   ppo-stage3-p3-s1       OUT acc 0.637 brier 0.2867 ece 0.245 auroc 0.529 {'lr': 4.54e-05, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0782}
+missing results: ['exact-stage3-p4-s1']
+current: {"exact": {"lr": 4.01e-05, "updates": 2, "hinge_weight": 1.01, "hinge_threshold": 0.9}, "ppo": {"lr": 2.27e-05, "updates": 2, "hinge_weight": 0.39, "hinge_threshold": 0.9, "cliprange": 0.1, "vf_coef": 0.0782}}
+wrote 10 configs to runs/hparam-search-20261002T044831Z/stage4_configs.json (dev)
+=== stage4 06:51
+exact exact-stage4-p3-s1     ok  acc 0.654 brier 0.1537 ece 0.049 auroc 0.810 {'lr': 4.01e-05, 'updates': 2, 'hinge_weight': 1.01, 'hinge_threshold': 0.95}
+exact exact-stage4-p4-s1     ok  acc 0.664 brier 0.1556 ece 0.042 auroc 0.805 {'lr': 4.01e-05, 'updates': 2, 'hinge_weight': 1.01, 'hinge_threshold': 0.99}
+exact exact-stage4-p0-s1     ok  acc 0.675 brier 0.1644 ece 0.080 auroc 0.804 {'lr': 4.01e-05, 'updates': 2, 'hinge_weight': 0.337, 'hinge_threshold': 0.9}
+exact exact-stage4-p1-s1     ok  acc 0.658 brier 0.1668 ece 0.059 auroc 0.787 {'lr': 4.01e-05, 'updates': 2, 'hinge_weight': 1.01, 'hinge_threshold': 0.9}
+exact exact-stage4-p2-s1     ok  acc 0.669 brier 0.1696 ece 0.044 auroc 0.763 {'lr': 4.01e-05, 'updates': 2, 'hinge_weight': 3.03, 'hinge_threshold': 0.9}
+ppo   ppo-stage4-p0-s1       ok  acc 0.659 brier 0.1801 ece 0.063 auroc 0.750 {'lr': 2.27e-05, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0782}
+ppo   ppo-stage4-p2-s1       ok  acc 0.676 brier 0.1887 ece 0.054 auroc 0.714 {'lr': 2.27e-05, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.3, 'vf_coef': 0.0782}
+ppo   ppo-stage4-p3-s1       ok  acc 0.663 brier 0.1901 ece 0.051 auroc 0.716 {'lr': 2.27e-05, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.0261}
+ppo   ppo-stage4-p4-s1       ok  acc 0.671 brier 0.2135 ece 0.102 auroc 0.609 {'lr': 2.27e-05, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.1, 'vf_coef': 0.235}
+ppo   ppo-stage4-p1-s1       ok  acc 0.661 brier 0.2253 ece 0.067 auroc 0.520 {'lr': 2.27e-05, 'updates': 2, 'hinge_weight': 0.39, 'hinge_threshold': 0.9, 'cliprange': 0.2, 'vf_coef': 0.0782}
+current: {"exact": {"lr": 4.01e-05, "updates": 2, "hinge_weight": 1.01, "hinge_threshold": 0.95}, "ppo": {"lr": 2.27e-05, "updates": 2, "hinge_weight": 0.39, "hinge_threshold": 0.9, "cliprange": 0.1, "vf_coef": 0.0782}}
+wrote 6 configs to runs/hparam-search-20261002T044831Z/final_configs.json (dev, then test once)
+=== final 07:13

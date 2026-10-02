@@ -39,6 +39,12 @@ def load(search: Path):
         curve = json.loads((search / "final" / "curve.json").read_text())
         test = json.loads((search / "final" / "curve_test.json").read_text()) if (search / "final" / "curve_test.json").exists() else {}
         final = {label: dict(dev=points[max(points, key=int)], test=test.get(label)) for label, points in curve.items()}
+        # The first PPO final ran with TRL resetting every seed to 0 (identical runs); final_ppo reran it seeded.
+        if (search / "final_ppo" / "curve.json").exists():
+            final = {k: v for k, v in final.items() if not k.startswith("ppo")}
+            curve = json.loads((search / "final_ppo" / "curve.json").read_text())
+            test = json.loads((search / "final_ppo" / "curve_test.json").read_text())
+            final.update({label: dict(dev=points[max(points, key=int)], test=test.get(label)) for label, points in curve.items()})
     return dict(base_accuracy=base_acc, runs=runs, history=history, final=final,
                 current=json.loads((search / "current.json").read_text()), stages=STAGES)
 
