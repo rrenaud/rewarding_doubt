@@ -51,7 +51,9 @@ def main():
              "## Docs", "",
              "- [Project README](README.md): setup, paper-vs-code differences, cost estimates",
              f"- [{title(ROOT / 'docs/objectives.md')}](docs/objectives.md): "
-             "formulas, optima and trade-offs of each objective and readout", "",
+             "formulas, optima and trade-offs of each objective and readout",
+             f"- [{title(ROOT / 'docs/grading.md')}](docs/grading.md): "
+             "why answers are graded with F1 > 0.5 rather than exact match", "",
              "## Runs (newest first)", ""]
     runs = sorted((p for p in (ROOT / "runs").iterdir() if p.is_dir()), key=lambda p: p.name.split("-")[-1],
                   reverse=True)
