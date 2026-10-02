@@ -257,7 +257,9 @@ def main():
             torch.manual_seed(seed)
             np.random.seed(seed)
             random.seed(seed)
-        config_overrides = {}
+        # PPOTrainer.__init__ calls set_seed(config.seed) (default 0), which would override the
+        # reseeding above, so the seed must also go into PPOConfig.
+        config_overrides = {"seed": seed} if seed is not None else {}
         if "--no-kl" in ours:
             config_overrides.update(init_kl_coef=0.0, adap_kl_ctrl=False)
         if "--fast" in ours:
