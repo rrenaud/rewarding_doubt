@@ -18,3 +18,18 @@ Successive halving, equal budget per arm:
 1. round1: 16 configs per arm, 1 epoch (128 steps), seed 1.
 2. round2: top 4 per arm by dev Brier, 2 epochs (256 steps), seeds 1 and 2.
 3. final: best per arm by mean dev Brier, 2 epochs, fresh seeds 4, 5, 6; scored on dev and test.
+
+## Amendment (2026-10-02T05:33Z, before any round-1 result was seen)
+
+Round 1 runs as planned, but rounds 2 and final are replaced by greedy one-dimensional sweeps, which give
+per-parameter curves and fit the 10-GPU limit (5 points per arm = one wave).
+
+1. Start: each arm's best round-1 config by dev Brier (round 1 only sets the starting point).
+2. Four sweep stages, both arms in parallel, 128 steps (1 epoch), seed 1, scored on dev. Each stage
+   re-runs the current point and keeps the value with the lowest dev Brier:
+   - stage1: lr x {1/3, 1/2, 1, 2, 3}
+   - stage2: updates per batch (exact passes / PPO ppo_epochs) in {1, 2, 4, 8}
+   - stage3: lr x {1/3, 1/2, 1, 2, 3} again (lr and updates interact)
+   - stage4: exact: hinge weight x {1/3, 1, 3} and threshold {0.9, 0.95, 0.99} (two lines through the
+     current point); PPO: cliprange {0.1, 0.2, 0.3} and vf_coef x {1/3, 3} (two lines through it).
+3. Final: each arm's final config, 2 epochs (256 steps), fresh seeds 4, 5, 6, scored on dev and once on test.

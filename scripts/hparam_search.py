@@ -7,6 +7,14 @@
     python scripts/hparam_search.py select DIR round2    # pick finalists, write final configs
     modal run modal_repro/app.py::hparam_round --search-dir DIR --round final --score-test
 
+Amended (see PROTOCOL.md): after round 1, greedy one-dimensional sweeps.
+    python scripts/hparam_search.py start DIR            # best round-1 config per arm -> current.json
+    python scripts/hparam_search.py sweep DIR stage1     # write stage1_configs.json around current
+    modal run modal_repro/app.py::hparam_round --search-dir DIR --round stage1
+    python scripts/hparam_search.py advance DIR stage1   # keep the best point per arm
+    ... stage2, stage3, stage4, then:
+    python scripts/hparam_search.py final DIR
+
 The protocol (PROTOCOL.md, written by `init`) is fixed before any result is seen.
 """
 import datetime
@@ -143,8 +151,85 @@ def select(search, name):
     write_round(search, nxt, entries, epochs=2, ids_note="dev")
 
 
+def sweep_points(arm, current, stage):
+    """The stage's grid for one arm: a list of parameter dicts, always including `current`."""
+    vary = lambda **kw: {**current, **kw}
+    if stage in ("stage1", "stage3"):
+        return [vary(lr=float(f"{current['lr'] * m:.3g}")) for m in (1 / 3, 1 / 2, 1, 2, 3)]
+    if stage == "stage2":
+        return [vary(updates=u) for u in (1, 2, 4, 8)]
+    if stage == "stage4" and arm == "exact":
+        w, t = current["hinge_weight"], current["hinge_threshold"]
+        points = [vary(hinge_weight=float(f"{w * m:.3g}")) for m in (1 / 3, 1, 3)]
+        return points + [vary(hinge_threshold=x) for x in (0.9, 0.95, 0.99) if x != t]
+    if stage == "stage4" and arm == "ppo":
+        c, v = current["cliprange"], current["vf_coef"]
+        points = [vary(cliprange=x) for x in (0.1, 0.2, 0.3)]
+        if c not in (0.1, 0.2, 0.3):
+            points.append(current)
+        return points + [vary(vf_coef=float(f"{v * m:.3g}")) for m in (1 / 3, 3)]
+    raise ValueError(stage)
+
+
+def start(search):
+    table = json.loads((search / "round1_ranking.json").read_text())
+    current = {arm: next(r["params"] for r in table if r["arm"] == arm) for arm in ("exact", "ppo")}
+    (search / "current.json").write_text(json.dumps(current, indent=1) + "\n")
+    (search / "history.jsonl").write_text(json.dumps(dict(stage="round1", current=current)) + "\n")
+    print(json.dumps(current, indent=1))
+
+
+def sweep(search, stage):
+    current = json.loads((search / "current.json").read_text())
+    entries = []
+    for arm in ("exact", "ppo"):
+        unique = []
+        for p in sweep_points(arm, current[arm], stage):
+            if p not in unique:
+                unique.append(p)
+        entries += [dict(label=f"{arm}-{stage}-p{i}-s1", arm=arm, params=p, seed=1) for i, p in enumerate(unique)]
+    write_round(search, stage, entries, epochs=1, ids_note="dev")
+
+
+def advance(search, stage):
+    configs, last = results(search, stage)
+    current = json.loads((search / "current.json").read_text())
+    rows = []
+    for arm in ("exact", "ppo"):
+        scored = sorted((last[l]["brier"], l) for l, c in configs.items() if c["arm"] == arm and l in last)
+        for brier, label in scored:
+            m = last[label]
+            rows.append(dict(stage=stage, arm=arm, label=label, params=configs[label]["params"], brier=brier,
+                             ece=m["ece"], auroc=m["auroc"], ece_unsampled=m["ece_unsampled"], auroc_unsampled=m["auroc_unsampled"]))
+            print(f"{arm:5s} {label:22s} brier {brier:.4f} ece {m['ece']:.3f} auroc {m['auroc']:.3f} {configs[label]['params']}")
+        if scored:
+            current[arm] = configs[scored[0][1]]["params"]
+    missing = [l for l in configs if l not in last]
+    if missing:
+        print("missing results:", missing)
+    (search / f"{stage}_ranking.json").write_text(json.dumps(rows, indent=1) + "\n")
+    (search / "current.json").write_text(json.dumps(current, indent=1) + "\n")
+    with open(search / "history.jsonl", "a") as f:
+        f.write(json.dumps(dict(stage=stage, current=current)) + "\n")
+    print("current:", json.dumps(current))
+
+
+def final(search):
+    current = json.loads((search / "current.json").read_text())
+    entries = [dict(label=f"{arm}-final-s{s}", arm=arm, params=current[arm], seed=s) for arm in ("exact", "ppo") for s in FINAL_SEEDS]
+    write_round(search, "final", entries, epochs=2, ids_note="dev, then test once")
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "init":
         init()
     elif sys.argv[1] == "select":
         select(Path(sys.argv[2]), sys.argv[3])
+    elif sys.argv[1] == "start":
+        start(Path(sys.argv[2]))
+    elif sys.argv[1] == "sweep":
+        sweep(Path(sys.argv[2]), sys.argv[3])
+    elif sys.argv[1] == "advance":
+        advance(Path(sys.argv[2]), sys.argv[3])
+    elif sys.argv[1] == "final":
+        final(Path(sys.argv[2]))
