@@ -3,7 +3,7 @@
   "lr": 4.01e-05,
   "updates": 2,
   "hinge_weight": 1.01,
-  "hinge_threshold": 0.9
+  "hinge_threshold": 0.95
  },
  "ppo": {
   "lr": 2.27e-05,
