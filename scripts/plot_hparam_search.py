@@ -8,7 +8,7 @@ from pathlib import Path
 
 STAGES = [("round1", "Round 1: random"), ("stage1", "Stage 1: learning rate"), ("stage2", "Stage 2: updates per batch"),
           ("stage3", "Stage 3: learning rate again"), ("stage4", "Stage 4: regularization")]
-KEYS = ["brier", "ece", "auroc", "accuracy", "wrong_format", "ece_unsampled", "auroc_unsampled"]
+KEYS = ["brier", "ece", "auroc", "accuracy", "wrong_format"]
 
 
 def load(search: Path):
@@ -312,7 +312,7 @@ function groupCards(groups, box) {
       h.append(s, document.createTextNode(`${g.name} · ${split} · ${ms.length} seeds`)); c.appendChild(h);
       const note = document.createElement("div"); note.className = "note"; note.textContent = g.note; c.appendChild(note);
       const dl = document.createElement("dl"); dl.className = "kv";
-      for (const [k, name] of [["brier", "Brier"], ["ece", "ECE"], ["auroc", "AUROC"], ["ece_unsampled", "ECE unsampled"], ["auroc_unsampled", "AUROC unsampled"], ["accuracy", "accuracy"]]) {
+      for (const [k, name] of [["brier", "Brier"], ["ece", "ECE"], ["auroc", "AUROC"], ["accuracy", "accuracy"]]) {
         if (ms.some(m => m[k] == null)) continue;
         const dt = document.createElement("dt"); dt.textContent = name; const dd = document.createElement("dd");
         dd.textContent = `${fmt(mean(k))} ± ${fmt(sd(k))}`; dl.append(dt, dd); }
@@ -323,7 +323,51 @@ function groupCards(groups, box) {
       for (const x of [label, split, fmt(m.brier), fmt(m.ece), fmt(m.auroc), (100 * m.accuracy).toFixed(1) + "%", (100 * m.wrong_format_rate).toFixed(1) + "%"]) r.insertCell().textContent = x;
     }
   }
-  box.appendChild(summary); wrap.appendChild(t); box.appendChild(wrap);
+  box.appendChild(summary); seedStrips(groups.filter(g => shownArms().includes(g.arm)), box); wrap.appendChild(t); box.appendChild(wrap);
+}
+function seedStrips(groups, box) {
+  // One panel per metric; a row per group and split; a dot per seed (filled: test, hollow: dev), bar at the mean.
+  if (!groups.length) return;
+  const grid = document.createElement("div"); grid.className = "stages"; grid.style.marginBottom = "12px";
+  const rows = [];
+  for (const g of groups) for (const split of ["test", "dev"]) {
+    const pts = Object.entries(g.rows).filter(([, v]) => v[split]).map(([label, v]) => ({label, m: v[split]}));
+    if (pts.length) rows.push({g, split, pts});
+  }
+  for (const [k, name] of [["brier", "Brier ↓"], ["ece", "ECE ↓"], ["auroc", "AUROC ↑"], ["accuracy", "Answer accuracy"]]) {
+    const panel = document.createElement("div"); panel.className = "panel";
+    const h = document.createElement("h4"); h.textContent = name; panel.appendChild(h);
+    const rowH = 30, top = 8, x0 = 112, x1 = 288, H = top + rows.length * rowH + 26;
+    const svg = el("svg", {class: "chart", viewBox: `0 0 300 ${H}`, role: "img", "aria-label": `${name} of every seed, by arm and split`});
+    panel.appendChild(svg);
+    const vals = rows.flatMap(r => r.pts.map(p => p.m[k])); let lo = Math.min(...vals), hi = Math.max(...vals);
+    const pad = (hi - lo) * 0.1 || 0.01; lo -= pad; hi += pad;
+    const X = v => x0 + (v - lo) / (hi - lo) * (x1 - x0), ticks = niceTicks(lo, hi, 3), bottom = top + rows.length * rowH;
+    const digits = ticks.length > 1 && ticks[1] - ticks[0] < 0.01 ? 3 : 2;
+    for (const tv of ticks) { el("line", {x1: X(tv), x2: X(tv), y1: top, y2: bottom, stroke: "var(--grid)"}, svg);
+      el("text", {x: X(tv), y: bottom + 16, "text-anchor": "middle", class: "tick"}, svg).textContent = k === "accuracy" ? (100 * tv).toFixed(0) + "%" : tv.toFixed(digits); }
+    rows.forEach((r, i) => {
+      const y = top + i * rowH + rowH / 2, color = COLOR[r.g.arm];
+      if (i && rows[i - 1].g !== r.g) el("line", {x1: 0, x2: 300, y1: top + i * rowH, y2: top + i * rowH, stroke: "var(--line)"}, svg);
+      const lab = el("text", {x: 0, y: y + 4, class: "tick"}, svg); lab.textContent = `${NAME[r.g.arm].split(" ")[0]} · ${r.split}`;
+      const mean = r.pts.reduce((s, p) => s + p.m[k], 0) / r.pts.length;
+      el("line", {x1: X(mean), x2: X(mean), y1: y - 10, y2: y + 10, stroke: "var(--fg)", "stroke-width": 2}, svg);
+      for (const p of r.pts) {
+        const c = el("circle", {cx: X(p.m[k]), cy: y, r: 5, fill: r.split === "test" ? color : "var(--surface)", stroke: color, "stroke-width": 2, "fill-opacity": 0.85, tabindex: 0}, svg);
+        const hit = el("circle", {cx: X(p.m[k]), cy: y, r: 10, fill: "transparent"}, svg);
+        const show = e => { tip.textContent = ""; const a = document.createElement("div"); a.style.fontWeight = 600; a.textContent = `${p.label} · ${r.split}`;
+          const b = document.createElement("div"); b.textContent = `${name.replace(/ [↓↑]/, "")} ${k === "accuracy" ? (100 * p.m[k]).toFixed(1) + "%" : fmt(p.m[k])} (mean ${k === "accuracy" ? (100 * mean).toFixed(1) + "%" : fmt(mean)})`;
+          tip.append(a, b); tip.style.display = "block"; tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = (e.clientY + 14) + "px"; };
+        for (const t of [c, hit]) { t.addEventListener("pointermove", show); t.addEventListener("pointerleave", hideTip); }
+        c.addEventListener("focus", () => { const bb = c.getBoundingClientRect(); show({clientX: bb.right, clientY: bb.bottom}); });
+        c.addEventListener("blur", hideTip);
+      }
+    });
+    grid.appendChild(panel);
+  }
+  const note = document.createElement("p"); note.className = "note";
+  note.textContent = "Each dot is one seed: filled = test, hollow = dev. The dark bar marks the mean. Hover a dot for its run.";
+  box.append(grid, note);
 }
 function finalSection() {
   const box = document.getElementById("final"); box.textContent = "";
