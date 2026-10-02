@@ -507,3 +507,30 @@ def baseline_matched(data_run: str = "runs/pilot-20261001T002945Z", gpu: str = "
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     run_name = f"baseline-matched-{'smoke-' if train_limit or eval_limit else ''}{stamp}"
     _train_and_evaluate(configs, list(configs), ids, run_name, gpu)
+
+
+EXACT_VARIANTS = {
+    # Discrete-exact, single pass, 8 updates/batch, released reward + -30 + KL, plus TRL's value
+    # head as an auxiliary regression of the expected reward.
+    "de-kl-vh": ["--regularization", "baseline", "--reward", "released", "--value-head"],
+    # Discrete-exact, single pass, 8 updates/batch, paper-scale reward with the format hinges, no KL.
+    "de-hinge": ["--regularization", "hinge", "--reward", "paper"],
+}
+
+
+@app.local_entrypoint()
+def exact_variants(variants: str = "de-kl-vh,de-hinge", seeds: str = "1,2,3", gpu: str = "L40S",
+                   data_run: str = "runs/pilot-20261001T002945Z", save_every: int = 64,
+                   train_limit: int = 0, eval_limit: int = 0, tag: str = ""):
+    """Seeded runs of discrete-exact variants on the released Llama setup."""
+    root = Path(__file__).resolve().parents[1]
+    ids = {split: [json.loads(line)["id"] for line in (root / data_run / "data" / f"{name}.jsonl").read_text().splitlines()]
+           for split, name in [("train", "train"), ("validation", "eval")]}
+    if train_limit or eval_limit:
+        ids = {"train": ids["train"][:train_limit or None], "validation": ids["validation"][:eval_limit or None]}
+    common = ["exact_llama.py", "IDS_JSON", "OUT_DIR", "--mode", "discrete-exact", "--scoring", "single",
+              "--passes", "4", "--minibatch", "4", "--save-every", str(save_every)]
+    configs = {f"{v}-s{s}": [*common, "--seed", s, *EXACT_VARIANTS[v]] for v in variants.split(",") for s in seeds.split(",")}
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run_name = f"exact-variants-{tag + '-' if tag else ''}{'smoke-' if train_limit or eval_limit else ''}{stamp}"
+    _train_and_evaluate(configs, list(configs), ids, run_name, gpu)

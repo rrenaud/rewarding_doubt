@@ -22,6 +22,11 @@ Train.py except the update rule:
   outcomes scored --invalid-reward (-30 with --reward released), and beta * KL to the base
   model (adapter disabled, one no-grad pass per question per step) with TRL's adaptive
   controller (beta 0.05, target 6, horizon 10000). See core.baseline_matched_objective.
+* --value-head adds TRL 0.8.6's ValueHead (dropout 0.1 + Linear(hidden, 1) on the final hidden
+  states) as an auxiliary task: at each response position (after " Confidence", ":", " " and the
+  sampled number) it regresses the exact expected reward J (detached), loss
+  vf_coef * 0.5 * mean((V - J)^2), vf_coef 0.1, trained by the same Adam. Exact scoring needs no
+  baseline, so its only effect is the gradient it sends into the shared LoRA weights.
 * --passes P --minibatch M reuse each sampled batch like TRL's ppo_epochs / mini_batch_size:
   P passes over the batch in minibatches of M, one Adam step per minibatch. The exact loss is a
   deterministic function of (question, answer, label), so reuse needs no importance weights.
@@ -60,8 +65,26 @@ def reference_scores(model, query, k_star, candidates):
     return logq.double(), (stop_logp.double() if stop_logp is not None else None)
 
 
-def row_loss(model, row, candidates, eot, args, beta=0.):
-    """Loss for one row: (loss, confidence, valid mass, stop prob, KL)."""
+class ValueHead(torch.nn.Module):
+    """trl.models.modeling_value_head.ValueHead (0.8.6): dropout then a linear map to a scalar."""
+
+    def __init__(self, hidden_size, dropout=0.1):
+        super().__init__()
+        self.dropout = torch.nn.Dropout(dropout)
+        self.summary = torch.nn.Linear(hidden_size, 1)
+
+    def forward(self, hidden):
+        return self.summary(self.dropout(hidden.to(self.summary.weight.dtype))).squeeze(-1)
+
+
+def capture_final_hidden(model, store):
+    """Keep the input to lm_head (the final hidden states) from every forward pass."""
+    lm_head = model.base_model.model.lm_head
+    return lm_head.register_forward_hook(lambda module, inputs, output: store.__setitem__("hidden", inputs[0]))
+
+
+def row_loss(model, row, candidates, eot, args, beta=0., value_head=None, store=None):
+    """Loss for one row: (loss, confidence, valid mass, stop prob, KL, value loss)."""
     query, label, k_star, ref = row
     stop_prob, kl = None, None
     if args.scoring == "single":
@@ -80,13 +103,21 @@ def row_loss(model, row, candidates, eot, args, beta=0.):
             ref[1] if stop_logp is not None else None)
         mass = logq.detach().exp().sum()
         confidence = (logq.detach().exp() / mass * logq.new_tensor([k / 10 for k in range(11)])).sum()
-        return -J + beta * kl_term, confidence, mass.item(), stop_prob, kl_term.item()
+        loss, value_loss = -J + beta * kl_term, None
+        if value_head is not None:
+            hidden = store["hidden"][0]  # [sequence, hidden] from the forward pass above
+            positions = torch.arange(len(query) - 1, hidden.shape[0], device=hidden.device)
+            values = value_head(hidden[positions])
+            value_loss = 0.5 * ((values.double() - J.detach()) ** 2).mean()
+            loss = loss + args.vf_coef * value_loss
+            value_loss = value_loss.item()
+        return loss, confidence, mass.item(), stop_prob, kl_term.item(), value_loss
     logps = logps[None].double()
     loss, confidence = objective(logps, logps.new_tensor([label]), args.mode, args.reward,
                                  args.format_weight, args.format_threshold)
     if stop_logp is not None:
         loss = loss + args.format_weight * (math.log(args.format_threshold) - stop_logp.double()).clamp(min=0)
-    return loss, confidence, logps.detach().logsumexp(-1).exp().item(), stop_prob, kl
+    return loss, confidence, logps.detach().logsumexp(-1).exp().item(), stop_prob, kl, None
 
 
 def sample_numbers(model, tokenizer, queries, candidates, eot):
@@ -129,6 +160,8 @@ def main():
     parser.add_argument("--kl-coef", type=float, default=0.05)
     parser.add_argument("--kl-target", type=float, default=6.)
     parser.add_argument("--kl-horizon", type=float, default=10000.)
+    parser.add_argument("--value-head", action="store_true")
+    parser.add_argument("--vf-coef", type=float, default=0.1)
     parser.add_argument("--scoring", choices=["single", "shared", "full"], default="single",
                         help="single: one pass, 11 number probabilities + stop check on a sampled number; "
                              "shared: prefix pass + 11 cached continuations; full: 11 full sequences "
@@ -163,7 +196,14 @@ def main():
     ids = json.load(open(args.ids))
     data = subset_loader(ids)("triviaqa", "train", "verbalize", tokenizer)
     collate = DataCollatorForTokenizedQueries(tokenizer)
-    optimizer = torch.optim.Adam([p for p in model.parameters() if p.requires_grad], lr=args.lr)
+    value_head, store = None, {}
+    if args.value_head:
+        if args.regularization != "baseline":
+            parser.error("--value-head regresses the baseline-matched reward; use --regularization baseline")
+        value_head = ValueHead(model.config.hidden_size).cuda()
+        capture_final_hidden(model, store)
+    params = [p for p in model.parameters() if p.requires_grad] + (list(value_head.parameters()) if value_head else [])
+    optimizer = torch.optim.Adam(params, lr=args.lr)
     generation = dict(max_new_tokens=256, eos_token_id=[tokenizer.eos_token_id, eot, confidence_token],
                       do_sample=True, temperature=0.6, top_p=0.9, pad_token_id=tokenizer.eos_token_id)
     kl_controller = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon)
@@ -202,7 +242,7 @@ def main():
             if args.regularization == "baseline":  # reference scores are fixed for the whole step
                 rows = [(q, label, k, reference_scores(model, q, k, candidates)) for q, label, k, _ in rows]
             stats = dict(loss=0., confidence=0., mass=0., hinge_active=0., stop_prob=0., sampled_number_rate=0.,
-                         kl=0., kl_coef=kl_controller.value)
+                         kl=0., kl_coef=kl_controller.value, value_loss=0.)
             stop_checks = 0
             minibatch = args.minibatch or args.batchsize
             updates = 0
@@ -213,8 +253,8 @@ def main():
                     mb = [rows[i] for i in order_rows[mb_start:mb_start + minibatch]]
                     optimizer.zero_grad()
                     for row in mb:
-                        loss, confidence, mass, stop_prob, kl = row_loss(model, row, candidates, eot, args,
-                                                                         kl_controller.value)
+                        loss, confidence, mass, stop_prob, kl, value_loss = row_loss(
+                            model, row, candidates, eot, args, kl_controller.value, value_head, store)
                         (loss / len(mb)).backward()
                         if epoch_pass == 0:  # log pre-update statistics, once per row
                             stats["loss"] += loss.item() / len(rows)
@@ -227,6 +267,8 @@ def main():
                                 stop_checks += 1
                             if kl is not None:
                                 stats["kl"] += kl / len(rows)
+                            if value_loss is not None:
+                                stats["value_loss"] += value_loss / len(rows)
                     optimizer.step()
                     updates += 1
             stats["stop_prob"] = stats["stop_prob"] / stop_checks if stop_checks else None
