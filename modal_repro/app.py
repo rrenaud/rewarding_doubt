@@ -243,6 +243,63 @@ def inspect(command: str):
     print(shell.remote(command))
 
 
+@app.function(volumes={VOL: volume}, timeout=8 * HOUR)
+def train_group(ids_by_split: dict, items: list, run_name: str) -> list:
+    """Train several configurations concurrently on one GPU, one process each.
+
+    `items` is [(label, command), ...] as for train_with_snapshots. Use one item per GPU: with
+    batched updates a single run already keeps an L40S busy (see exact_variants). Declared without a
+    GPU; callers attach one with `.with_options(gpu=...)`.
+    """
+    import subprocess
+
+    gpu = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+                         capture_output=True, text=True).stdout.strip()
+    procs = []
+    for label, command in items:
+        out_dir = f"{VOL}/outputs/{run_name}/{label}"
+        Path(out_dir).mkdir(parents=True, exist_ok=True)
+        ids_path = f"{out_dir}/ids.json"
+        Path(ids_path).write_text(json.dumps(ids_by_split))
+        args = [a.replace("OUT_DIR", out_dir).replace("IDS_JSON", ids_path) for a in command]
+        log = open(f"{out_dir}/train.log", "w")
+        procs.append((label, out_dir, log, subprocess.Popen(["python", *args], cwd=CODE, stdout=log, stderr=subprocess.STDOUT)))
+    results = []
+    for label, out_dir, log, proc in procs:
+        code = proc.wait()
+        log.close()
+        timing = next((Path(out_dir) / n for n in ["metrics.jsonl", "steps.jsonl"] if (Path(out_dir) / n).exists()), None)
+        results.append(dict(label=label, exit_code=code, gpu=gpu, runs_on_gpu=len(items),
+                            snapshots=sorted(str(p) for p in Path(out_dir).iterdir() if p.name.startswith("snapshot-step")),
+                            timing=timing.read_text() if timing else "", log=Path(f"{out_dir}/train.log").read_text()))
+    volume.commit()
+    return results
+
+
+@app.function(volumes={VOL: volume}, timeout=2 * HOUR)
+def evaluate_group(ids_by_split: dict, model_dirs: list) -> list:
+    """The released evaluation on several checkpoints concurrently on one GPU.
+
+    Declared without a GPU; callers attach one with `.with_options(gpu=...)`.
+    """
+    import subprocess
+
+    volume.reload()
+    Path("/tmp/ids.json").write_text(json.dumps(ids_by_split))
+    procs = [(d, subprocess.Popen(["python", "subset.py", "evaluate", "/tmp/ids.json", d, f"{d}/eval.json"], cwd=CODE,
+                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)) for d in model_dirs]
+    results = []
+    for d, proc in procs:
+        log = proc.communicate()[0]
+        if proc.returncode:
+            results.append(dict(model_dir=d, error=log[-3000:]))
+        else:
+            results.append(dict(model_dir=d, metrics=json.loads(Path(f"{d}/eval_metrics.json").read_text()),
+                                results=json.loads(Path(f"{d}/eval.json").read_text())))
+    volume.commit()
+    return results
+
+
 def summarize(scalars: dict[str, list[tuple[int, float]]]) -> list[str]:
     lines = []
     for tag in ["env/reward_mean", "objective/kl", "objective/kl_coef", "ppo/policy/clipfrac",
@@ -381,16 +438,19 @@ def curves(data_run: str = "runs/pilot-20261001T002945Z", gpu: str = "L40S", sav
     _train_and_evaluate(configs, labels.split(","), ids, run_name, gpu)
 
 
-def _train_and_evaluate(configs: dict, chosen: list, ids: dict, run_name: str, gpu: str):
-    """Train each chosen configuration in its own container, then score every snapshot."""
+def _train_and_evaluate(configs: dict, chosen: list, ids: dict, run_name: str, gpu: str, per_gpu: int = 1):
+    """Train the chosen configurations (`per_gpu` per container), then score every snapshot."""
     root = Path(__file__).resolve().parents[1]
     local = root / "runs" / f"modal-{run_name}"
     local.mkdir(parents=True)
     (local / "ids.json").write_text(json.dumps(ids) + "\n")
     (local / "configs.json").write_text(json.dumps({k: configs[k] for k in chosen}, indent=2) + "\n")
     trained = {}
-    for result in train_with_snapshots.with_options(gpu=gpu).starmap(
-            [(ids, label, configs[label], run_name) for label in chosen], return_exceptions=True):
+    groups = [[(label, configs[label]) for label in chosen[i:i + per_gpu]] for i in range(0, len(chosen), per_gpu)]
+    flat = []
+    for group in train_group.with_options(gpu=gpu).starmap([(ids, g, run_name) for g in groups], return_exceptions=True):
+        flat.extend([group] if isinstance(group, Exception) else group)
+    for result in flat:
         if isinstance(result, Exception):
             print(f"TRAINING FAILED: {result!r}")
             continue
@@ -401,9 +461,13 @@ def _train_and_evaluate(configs: dict, chosen: list, ids: dict, run_name: str, g
         (label_dir / "train.json").write_text(json.dumps(result, indent=2) + "\n")
         trained[result["label"]] = result
         print(f"trained {result['label']}: exit {result['exit_code']}, {len(result['snapshots'])} snapshots")
-    jobs = [(ids, snap) for result in trained.values() for snap in result["snapshots"]]
+    snaps = [snap for result in trained.values() for snap in result["snapshots"]]
+    eval_groups = [snaps[i:i + per_gpu] for i in range(0, len(snaps), per_gpu)]
+    evaluated = []
+    for group in evaluate_group.with_options(gpu=gpu).starmap([(ids, g) for g in eval_groups], return_exceptions=True):
+        evaluated.extend([group] if isinstance(group, Exception) else group)
     curve = {}
-    for result in evaluate_checkpoint.with_options(gpu=gpu).starmap(jobs, return_exceptions=True):
+    for result in evaluated:
         if isinstance(result, Exception) or "error" in result:
             print(f"EVAL FAILED: {result if isinstance(result, Exception) else result['error'][-500:]}")
             continue
@@ -522,8 +586,12 @@ EXACT_VARIANTS = {
 @app.local_entrypoint()
 def exact_variants(variants: str = "de-kl-vh,de-hinge", seeds: str = "1,2,3", gpu: str = "L40S",
                    data_run: str = "runs/pilot-20261001T002945Z", save_every: int = 64,
-                   train_limit: int = 0, eval_limit: int = 0, tag: str = ""):
-    """Seeded runs of discrete-exact variants on the released Llama setup."""
+                   train_limit: int = 0, eval_limit: int = 0, tag: str = "", per_gpu: int = 1):
+    """Seeded runs of discrete-exact variants on the released Llama setup, one run per L40S.
+
+    Packing is not worth it: with batched updates one run keeps the GPU busy (3 runs on one L40S
+    took 11.6-12.3 s/step each vs 3.6 s/step alone), and concurrent evaluations run out of memory.
+    """
     root = Path(__file__).resolve().parents[1]
     ids = {split: [json.loads(line)["id"] for line in (root / data_run / "data" / f"{name}.jsonl").read_text().splitlines()]
            for split, name in [("train", "train"), ("validation", "eval")]}
@@ -534,7 +602,7 @@ def exact_variants(variants: str = "de-kl-vh,de-hinge", seeds: str = "1,2,3", gp
     configs = {f"{v}-s{s}": [*common, "--seed", s, *EXACT_VARIANTS[v]] for v in variants.split(",") for s in seeds.split(",")}
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     run_name = f"exact-variants-{tag + '-' if tag else ''}{'smoke-' if train_limit or eval_limit else ''}{stamp}"
-    _train_and_evaluate(configs, list(configs), ids, run_name, gpu)
+    _train_and_evaluate(configs, list(configs), ids, run_name, gpu, per_gpu)
 
 
 @app.function(volumes={VOL: volume}, timeout=HOUR)
