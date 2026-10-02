@@ -174,7 +174,8 @@ def add_ppo_hinge(trainer_class, weight, log_path, threshold=0.95):
     trainer_class.batched_forward_pass, trainer_class.loss = batched_forward_pass, loss
 
 
-def subset_loader(ids_by_split):
+def subset_loader(ids_by_split, system_prompt=None):
+    """`system_prompt` replaces the released prompt (used by the thinking experiment)."""
     def load_prepared_dataset(dataset, split, method, tokenizer):
         # util/DataHelper.load_prepared_dataset, with one added filter step.
         descriptor = DataHelper.get_dataset_descriptor(dataset)
@@ -184,8 +185,8 @@ def subset_loader(ids_by_split):
         if len(data) != len(keep):
             raise ValueError(f"{split}: found {len(data)} of {len(keep)} requested questions")
         data = data.map(lambda x: descriptor.normalize_function(x), remove_columns=descriptor.columns_to_remove)
-        system_prompt = get_prompt(descriptor.type)
-        return data.map(lambda x: DataHelper.prepare_queries(x, tokenizer, system_prompt, tokenize=True))
+        prompt = system_prompt or get_prompt(descriptor.type)
+        return data.map(lambda x: DataHelper.prepare_queries(x, tokenizer, prompt, tokenize=True))
     return load_prepared_dataset
 
 

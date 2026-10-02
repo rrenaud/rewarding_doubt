@@ -41,6 +41,7 @@ image = (
     .add_local_file(Path(__file__).parent / "verify_shared_prefix.py", f"{CODE}/verify_shared_prefix.py", copy=True)
     .add_local_file(Path(__file__).parent / "verify_single_pass.py", f"{CODE}/verify_single_pass.py", copy=True)
     .add_local_file(Path(__file__).parent / "bench_batching.py", f"{CODE}/bench_batching.py", copy=True)
+    .add_local_file(Path(__file__).parent / "thinking_llama.py", f"{CODE}/thinking_llama.py", copy=True)
     # Our package, so the exact objectives use the very same core.objective as the Tinker runs.
     .add_local_dir(Path(__file__).parents[1] / "src" / "rewarding_doubt", "/opt/rd/rewarding_doubt", copy=True,
                    ignore=["__pycache__"])
@@ -734,3 +735,49 @@ def evaluate_base_remote(ids_by_split: dict) -> dict:
     if proc.returncode:
         return dict(error=proc.stdout[-3000:] + proc.stderr[-3000:])
     return json.loads(Path(out.replace(".json", "_metrics.json")).read_text())
+
+
+@app.function(volumes={VOL: volume}, timeout=600)
+def read_files(paths: list) -> dict:
+    """Text of each existing file on the volume."""
+    volume.reload()
+    return {p: Path(p).read_text() for p in paths if Path(p).exists()}
+
+
+@app.local_entrypoint()
+def thinking(configs: str, run_name: str = "", train_limit: int = 512, eval_limit: int = 0, gpu: str = "L40S"):
+    """Thinking-before-confidence runs (thinking_llama.py) on the search's train subset and dev split.
+
+    `configs` is a JSON file {label: [thinking_llama.py arguments after IDS_JSON OUT_DIR]}.
+    Results land in runs/modal-thinking-{run_name}/{label}/.
+    """
+    root = Path(__file__).resolve().parents[1]
+    search = root / "runs/hparam-search-20261002T044831Z"
+    data = root / "runs/pilot-20261001T002945Z/data"
+    ids = {"train": [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()][:train_limit or None],
+           "validation": json.loads((search / "dev_ids.json").read_text())[:eval_limit or None]}
+    configs = json.loads(Path(configs).read_text())
+    run_name = run_name or datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run = f"thinking-{run_name}"
+    out = root / "runs" / f"modal-{run}"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "configs.json").write_text(json.dumps(configs, indent=1) + "\n")
+    jobs = [(ids, label, ["thinking_llama.py", "IDS_JSON", "OUT_DIR", *args], run) for label, args in configs.items()]
+    for result in train_with_snapshots.with_options(gpu=gpu).starmap(jobs, return_exceptions=True, order_outputs=False):
+        if isinstance(result, Exception):
+            print("FAILED", repr(result)[:2000])
+            continue
+        label = result["label"]
+        d = out / label
+        d.mkdir(exist_ok=True)
+        (d / "train.log").write_text(result["log"])
+        remote = f"{VOL}/outputs/{run}/{label}"
+        for path, text in read_files.remote([f"{remote}/{n}" for n in ("results.json", "eval_dev.json", "metrics.jsonl",
+                                                                      "check_samples.jsonl")]).items():
+            (d / Path(path).name).write_text(text)
+        status = "ok" if (d / "results.json").exists() else f"FAILED exit {result['exit_code']}"
+        print(f"{label}: {status} ({result['gpu']})", flush=True)
+        if status != "ok":
+            print(result["log"][-3000:])
+    print(f"done: {out}")
+

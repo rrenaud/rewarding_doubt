@@ -1,0 +1,2 @@
+{"base-eval": ["--arm", "frozen", "--eval-only"],
+ "pilot-trained": ["--arm", "trained", "--max-steps", "6", "--eval-limit", "64"]}
