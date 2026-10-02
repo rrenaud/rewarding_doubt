@@ -32,21 +32,37 @@ Train.py except the update rule:
   deterministic function of (question, answer, label), so reuse needs no importance weights.
   --passes 4 --minibatch 4 matches PPO's 8 optimizer steps per batch of 8.
 
+* stability: every step feeds rewarding_doubt.stability.StabilityMonitor (sampled confidences,
+  answer correctness, loss, gradient norm, entropy of pi) and appends to stability.jsonl; flags
+  that rise go to stability_events.jsonl. With --stop-on FLAGS the run checkpoints and exits
+  (code 3) when one of them rises.
+* resume: every --checkpoint-every steps (and on SIGTERM, e.g. spot preemption) the LoRA weights,
+  value head, Adam state, KL controller, RNG streams, monitor and loop position are saved to
+  OUT_DIR/checkpoint (rewarding_doubt.checkpoint). Rerunning the same command resumes from it;
+  logs are truncated to the checkpoint step and continue. Generation runs on the GPU, so a resumed
+  run follows the same question order but is not bit-identical to an uninterrupted one.
+
     python exact_llama.py IDS_JSON OUT_DIR --mode discrete-exact|fractional [--passes 4 --minibatch 4]
-                          [--save-every 32] [--max-steps N]
+                          [--save-every 32] [--max-steps N] [--checkpoint-every 32] [--stop-on collapsed]
 """
 import argparse
 import json
 import math
 import os
 import random
+import signal
+import sys
 import time
+import zlib
 
 import torch
 from unsloth import FastLanguageModel  # must precede transformers imports
 import trl
 
+from rewarding_doubt.checkpoint import (load_checkpoint, load_trainable_state, rng_state, save_checkpoint,
+                                        set_rng_state, trainable_state, truncate_jsonl)
 from rewarding_doubt.core import baseline_matched_objective, objective
+from rewarding_doubt.stability import FLAGS, StabilityMonitor
 from rewarding_doubt.paper_ppo import AdaptiveKLController
 from shared_prefix import (candidate_logps, full_sequence_logps, single_pass_logps, single_pass_logps_batch,
                            split_candidates)
@@ -179,6 +195,11 @@ def main():
                              "shared: prefix pass + 11 cached continuations; full: 11 full sequences "
                              "(the runs before 2026-10-01T20Z)")
     parser.add_argument("--seed", type=int, default=2)
+    parser.add_argument("--checkpoint-every", type=int, default=32, help="resumable checkpoint interval (0: off)")
+    parser.add_argument("--stop-on", default="nonfinite",
+                        help=f"comma-separated stability flags that end the run ({', '.join(FLAGS)}; empty: none)")
+    parser.add_argument("--no-resume", action="store_true", help="ignore an existing OUT_DIR/checkpoint")
+    parser.add_argument("--stop-after", type=int, default=0, help="testing: behave as if preempted after N steps")
     args = parser.parse_args()
     if args.regularization == "baseline" and args.scoring != "single":
         parser.error("--regularization baseline needs --scoring single")
@@ -223,12 +244,53 @@ def main():
     kl_controller = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon)
     rng = random.Random(args.seed)  # question order: identical for every --passes setting
     row_rng = random.Random(args.seed + 1)
-    step = 0
-    log = open(os.path.join(args.out_dir, "metrics.jsonl"), "w")
-    for epoch in range(args.epochs):
-        order = list(range(len(data)))
-        rng.shuffle(order)
-        for start in range(0, len(order), args.batchsize):
+    monitor = StabilityMonitor()
+    stop_on = {f for f in args.stop_on.split(",") if f}
+    if stop_on - set(FLAGS):
+        parser.error(f"unknown --stop-on flags: {sorted(stop_on - set(FLAGS))}")
+    checkpoint_dir = os.path.join(args.out_dir, "checkpoint")
+    paths = {name: os.path.join(args.out_dir, f"{name}.jsonl") for name in ("metrics", "stability", "stability_events")}
+    step, start_epoch, start_index, saved_order = 0, 0, 0, None
+    state = None if args.no_resume else load_checkpoint(checkpoint_dir)
+    if state is not None:
+        load_trainable_state(state["weights"], model, *([value_head] if value_head else []))
+        optimizer.load_state_dict(state["optimizer"])
+        kl_controller.value = state["kl_coef"]
+        rng.setstate(state["order_rng"])
+        row_rng.setstate(state["row_rng"])
+        set_rng_state(state["rng"])
+        monitor.load_state_dict(state["monitor"])
+        step, start_epoch, start_index, saved_order = state["step"], state["epoch"], state["index"], state["order"]
+        for path in paths.values():
+            truncate_jsonl(path, step)
+        print(f"resumed from {checkpoint_dir} at step {step} (epoch {start_epoch}, question {start_index})", flush=True)
+    logs = {name: open(path, "a" if state is not None else "w") for name, path in paths.items()}
+
+    def checkpoint(epoch, index, order):
+        if not args.checkpoint_every and not stopping:
+            return
+        t_save = time.time()
+        save_checkpoint(checkpoint_dir, dict(
+            step=step, epoch=epoch, index=index, order=order, kl_coef=kl_controller.value,
+            weights=trainable_state(model, *([value_head] if value_head else [])),
+            optimizer=optimizer.state_dict(), order_rng=rng.getstate(), row_rng=row_rng.getstate(),
+            rng=rng_state(), monitor=monitor.state_dict()))
+        print(f"checkpoint at step {step} ({time.time() - t_save:.1f} s)", flush=True)
+
+    stopping = []  # set by SIGTERM: finish the current step, checkpoint, exit
+
+    def on_sigterm(signum, frame):
+        stopping.append("SIGTERM")
+    signal.signal(signal.SIGTERM, on_sigterm)
+
+    for epoch in range(start_epoch, args.epochs):
+        if saved_order is not None and epoch == start_epoch:
+            order = saved_order  # the order rng already advanced past this epoch's shuffle
+        else:
+            order = list(range(len(data)))
+            rng.shuffle(order)
+        first = start_index if epoch == start_epoch else 0
+        for start in range(first, len(order), args.batchsize):
             t0 = time.time()
             batch = collate([data[i] for i in order[start:start + args.batchsize]])
             FastLanguageModel.for_inference(model)
@@ -258,7 +320,7 @@ def main():
                 rows = [(q, label, k, ref) for (q, label, k, _), ref in zip(rows, refs)]
             stats = dict(loss=0., confidence=0., mass=0., hinge_active=0., stop_prob=0., sampled_number_rate=0.,
                          kl=0., kl_coef=kl_controller.value, value_loss=0.)
-            stop_checks, stats_rows = 0, []
+            stop_checks, stats_rows, entropies, max_probs, grad_norms = 0, [], [], [], []
             minibatch = args.minibatch or args.batchsize
             updates = 0
             for epoch_pass in range(args.passes):
@@ -280,7 +342,11 @@ def main():
                             total = total + loss / len(mb)
                             if epoch_pass == 0:
                                 stats_rows.append((row, loss.item(), confidence.item(), mass, stop_prob, kl, value_loss))
+                                pi = logps.detach().double().softmax(-1)
+                                entropies.append(float(-(pi * pi.clamp_min(1e-30).log()).sum()))
+                                max_probs.append(float(pi.max()))
                         total.backward()
+                    grad_norms.append(float(torch.nn.utils.clip_grad_norm_(params, float("inf"))))
                     optimizer.step()
                     updates += 1
             for row, loss, confidence, mass, stop_prob, kl, value_loss in stats_rows:
@@ -300,7 +366,8 @@ def main():
             if args.regularization == "baseline":  # TRL updates after each batch, n_steps = batch size
                 kl_controller.update(stats["kl"], args.batchsize)
             step += 1
-            record = dict(step=step, epoch=epoch, rows=len(rows), skipped=len(out) - len(rows),
+            record = dict(step=step, epoch=epoch, batch_hash=zlib.crc32(json.dumps(order[start:start + args.batchsize]).encode()),
+                          rows=len(rows), skipped=len(out) - len(rows),
                           answer_accuracy=sum(r[1] for r in rows) / max(1, len(rows)), updates=updates,
                           seconds=time.time() - t0, time=time.time(), **stats)
             if args.save_every and step % args.save_every == 0:
@@ -308,9 +375,32 @@ def main():
                 model.save_pretrained(os.path.join(args.out_dir, f"snapshot-step{step:05d}"))
                 tokenizer.save_pretrained(os.path.join(args.out_dir, f"snapshot-step{step:05d}"))
                 record["save_seconds"] = time.time() - t_save
-            log.write(json.dumps(record) + "\n")
-            log.flush()
+            logs["metrics"].write(json.dumps(record) + "\n")
+            logs["metrics"].flush()
             print(json.dumps(record), flush=True)
+            # Stability: sampled confidence levels (None: answer or confidence malformed), correctness.
+            mean = lambda xs: sum(xs) / len(xs) if xs else None
+            stability, events = monitor.update(
+                step, [r[2] for r in rows] + [None] * (len(out) - len(rows)), [r[1] for r in rows],
+                loss=float(stats["loss"]), grad_norm=max(grad_norms) if grad_norms else None,
+                pi_entropy=mean(entropies), pi_max=mean(max_probs))
+            logs["stability"].write(json.dumps(stability) + "\n")
+            logs["stability"].flush()
+            for event in events:
+                logs["stability_events"].write(json.dumps(event) + "\n")
+                logs["stability_events"].flush()
+                print("STABILITY", json.dumps(event), flush=True)
+                if event["flag"] in stop_on:
+                    stopping.append(event["flag"])
+            if args.stop_after and step == args.stop_after:
+                stopping.append("stop-after")
+            done_with_epoch = start + args.batchsize >= len(order)
+            position = (epoch + 1, 0, None) if done_with_epoch else (epoch, start + args.batchsize, order)
+            if stopping or (args.checkpoint_every and step % args.checkpoint_every == 0):
+                checkpoint(*position)
+            if stopping:
+                print(f"stopping at step {step}: {', '.join(stopping)}", flush=True)
+                sys.exit(143 if stopping[0] in ("SIGTERM", "stop-after") else 3)
             if args.max_steps and step >= args.max_steps:
                 break
         # Train.py saves model_finetuned after every epoch; save the adapter per epoch.

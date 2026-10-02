@@ -1,0 +1,16 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.392 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+{"step": 1, "epoch": 0, "batch_hash": 1959506215, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 4, "seconds": 6.517974138259888, "time": 1790979905.102769, "loss": -0.5443522275207232, "confidence": 0.9476643032966028, "mass": 0.999996586041366, "hinge_active": 0.0, "stop_prob": 0.9998147562146187, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 2, "epoch": 0, "batch_hash": 4207269886, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "updates": 4, "seconds": 7.98616361618042, "time": 1790979913.0900848, "loss": 1.4313688734960346, "confidence": 0.8697494956131291, "mass": 0.8749961812292969, "hinge_active": 0.125, "stop_prob": 0.9994922791208539, "sampled_number_rate": 0.875, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 3, "epoch": 0, "batch_hash": 1194984897, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 4, "seconds": 2.6969988346099854, "time": 1790979915.7885058, "loss": -0.79053301871473, "confidence": 0.7849449993894244, "mass": 0.9999985318913428, "hinge_active": 0.0, "stop_prob": 0.9997163340449333, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+checkpoint at step 3 (0.7 s)
+stopping at step 3: stop-after

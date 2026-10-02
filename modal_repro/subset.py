@@ -25,6 +25,13 @@ Options before "--" change PPO from outside Train.py, which stays unmodified:
              W * [relu(log 0.95 - log M) + relu(log 0.95 - log P(<eot> | k))], with
              M = P(":") P(" ") sum_k P(k) at the confidence position; rows whose sampled response
              does not start with ": " are left to the -30 format reward.
+  --checkpoint-every N  resumable checkpoint every N PPO steps (default 32; 0: off) and on SIGTERM:
+             LoRA + value head, Adam, KL controller, RNG streams, stability monitor, data position.
+             Rerunning the same command resumes (--no-resume ignores the checkpoint). To make the
+             position meaningful, each epoch's question order comes from a generator seeded by
+             (seed, epoch) instead of the global RNG (still a uniform shuffle per epoch).
+  --stop-on FLAGS  stability flags (rewarding_doubt.stability) that checkpoint and end the run
+             (exit 3); default nonfinite. Every step also appends to stability.jsonl.
     python subset.py evaluate IDS_JSON MODEL_DIR OUT_JSON
 
 `evaluate` reports the released metrics unchanged (sampled integer confidence) and adds
@@ -36,8 +43,10 @@ likely level) on the same rows and labels. Requesting logits does not change sam
 import json
 import os
 import shutil
+import signal
 import sys
 import time
+import zlib
 
 from datasets import load_dataset
 
@@ -125,7 +134,7 @@ def add_ppo_speedups(trainer_class):
     trainer_class.batched_forward_pass = batched_forward_pass
 
 
-def add_ppo_hinge(trainer_class, weight, log_path, threshold=0.95):
+def add_ppo_hinge(trainer_class, weight, log_path, threshold=0.95, log_mode="w"):
     """Add discrete-exact's two format hinges to TRL 0.8.6 PPO's policy loss (see module docstring).
 
     batched_forward_pass(return_logits=True) is the training forward of each minibatch; its
@@ -136,7 +145,7 @@ def add_ppo_hinge(trainer_class, weight, log_path, threshold=0.95):
     import torch
 
     original_forward, original_loss = trainer_class.batched_forward_pass, trainer_class.loss
-    stash, log = {}, open(log_path, "w")
+    stash, log = {}, open(log_path, log_mode)
 
     def batched_forward_pass(self, model, queries, responses, model_inputs, return_logits=False, response_masks=None):
         if return_logits:
@@ -172,6 +181,52 @@ def add_ppo_hinge(trainer_class, weight, log_path, threshold=0.95):
         return pg_loss, vf_loss, stats
 
     trainer_class.batched_forward_pass, trainer_class.loss = batched_forward_pass, loss
+
+
+class EpochSampler:
+    """Uniform shuffle per epoch from a generator seeded by (seed, epoch), independent of training RNG."""
+
+    def __init__(self, n, seed):
+        self.n, self.seed, self.epoch = n, seed, 0
+
+    def __iter__(self):
+        import torch
+        g = torch.Generator().manual_seed(self.seed * 100003 + self.epoch)
+        self.epoch += 1
+        return iter(torch.randperm(self.n, generator=g).tolist())
+
+    def __len__(self):
+        return self.n
+
+
+class ResumableLoader:
+    """Wraps PPOTrainer.dataloader: counts consumed batches; on resume skips what was trained on.
+
+    Fully trained epochs yield nothing (Train.py's end-of-epoch save and evaluation are skipped for
+    them, see main); the partial epoch skips its first batches by iterating them without training.
+    """
+
+    def __init__(self, loader, sampler, consumed=0):
+        self.loader, self.sampler = loader, sampler
+        self.skip_epochs, self.skip_batches = divmod(consumed, len(loader))
+        self.consumed, self.epochs_started, self.current_epoch_skipped = consumed, 0, False
+
+    def __len__(self):
+        return len(self.loader)
+
+    def __iter__(self):
+        epoch = self.epochs_started
+        self.epochs_started += 1
+        self.current_epoch_skipped = epoch < self.skip_epochs
+        if self.current_epoch_skipped:
+            self.sampler.epoch += 1  # this epoch's order is never drawn; keep later epochs aligned
+            return
+        for i, batch in enumerate(self.loader):
+            if epoch == self.skip_epochs and i < self.skip_batches:
+                continue  # trained on before the resume
+            self.consumed = epoch * len(self.loader) + i + 1
+            self.batch_hash = zlib.crc32(json.dumps(list(batch["question"])).encode())
+            yield batch
 
 
 def subset_loader(ids_by_split, system_prompt=None):
@@ -242,6 +297,8 @@ def main():
         epochs_saved = []
 
         def save_pretrained(self, path, *args, **kwargs):
+            if os.path.basename(path) in ("model_finetuned", "model_finetuned_best") and epoch_skipped(self):
+                return  # an epoch trained before a resume; its checkpoint already exists
             original_save(self, path, *args, **kwargs)
             if os.path.basename(path) == "model_finetuned":
                 epochs_saved.append(path)
@@ -283,27 +340,133 @@ def main():
         if config_overrides:
             original_config = Train.PPOConfig
             Train.PPOConfig = lambda **kwargs: original_config(**{**kwargs, **config_overrides})
-        if hinge_weight:
-            add_ppo_hinge(PPOTrainerNoCache, hinge_weight, os.path.join(args.out_dir, "hinge.jsonl"), hinge_threshold)
-        # Timestamp every PPO step (and save periodic snapshots) without touching Train.py.
+        # Stability monitor, resumable checkpoints and per-step timestamps, without touching Train.py.
+        import torch
+        from rewarding_doubt.checkpoint import (load_checkpoint, load_trainable_state, rng_state, save_checkpoint,
+                                                set_rng_state, trainable_state, truncate_jsonl)
+        from rewarding_doubt.paper_ppo import is_correct_f1
+        from rewarding_doubt.stability import FLAGS, StabilityMonitor
         os.makedirs(args.out_dir, exist_ok=True)
-        timing = open(os.path.join(args.out_dir, "steps.jsonl"), "w")
-        original_step = PPOTrainerNoCache.step
+        checkpoint_every = option("--checkpoint-every", int, 32)
+        stop_after = option("--stop-after", int, 0)  # testing: behave as if preempted after N steps
+        stop_on = {f for f in option("--stop-on", str, "nonfinite").split(",") if f}
+        if stop_on - set(FLAGS):
+            raise SystemExit(f"unknown --stop-on flags: {sorted(stop_on - set(FLAGS))}")
+        checkpoint_dir = os.path.join(args.out_dir, "checkpoint")
+        resume = None if "--no-resume" in ours else load_checkpoint(checkpoint_dir)
+        if hinge_weight:  # hinge.jsonl has one line per minibatch and no step; a resume appends to it
+            add_ppo_hinge(PPOTrainerNoCache, hinge_weight, os.path.join(args.out_dir, "hinge.jsonl"), hinge_threshold,
+                          "a" if resume is not None else "w")
+        if resume is not None:
+            for name in ["steps", "stability", "stability_events"]:
+                truncate_jsonl(os.path.join(args.out_dir, f"{name}.jsonl"), resume["step"])
+            epochs_saved.extend([None] * resume["epochs_saved"])
+        logs = {name: open(os.path.join(args.out_dir, f"{name}.jsonl"), "a" if resume is not None else "w")
+                for name in ["steps", "stability", "stability_events"]}
+        monitor = StabilityMonitor()
         count = [0]
+        stopping = []
+        signal.signal(signal.SIGTERM, lambda signum, frame: stopping.append("SIGTERM"))
+
+        # Record each response's parsed confidence and F1 correctness as Train.py scores it.
+        scored = []
+        reward_fn = Train.QAResult_to_reward
+
+        def recording_reward(result, *a, **k):
+            ok = result.confidence is not None and 0 <= result.confidence <= 10
+            scored.append((result.confidence if ok else None,
+                           bool(result.prediction) and is_correct_f1(result.prediction, result.gt_candidates)))
+            return reward_fn(result, *a, **k)
+        Train.QAResult_to_reward = recording_reward
+
+        # Deterministic per-epoch order, a counting/skipping loader, and state restore after init.
+        original_prepare = PPOTrainerNoCache.prepare_dataloader
+        samplers = []
+
+        def prepare_dataloader(self, dataset, data_collator=None):
+            loader = original_prepare(self, dataset, data_collator)
+            sampler = EpochSampler(len(loader.dataset), self.config.seed)
+            samplers.append(sampler)
+            return torch.utils.data.DataLoader(loader.dataset, batch_size=loader.batch_size, collate_fn=loader.collate_fn,
+                                               sampler=sampler, drop_last=True)
+        PPOTrainerNoCache.prepare_dataloader = prepare_dataloader
+        original_init = PPOTrainerNoCache.__init__
+
+        def init(self, *init_args, **init_kwargs):
+            original_init(self, *init_args, **init_kwargs)
+            self.dataloader = ResumableLoader(self.dataloader, samplers[-1], resume["consumed"] if resume else 0)
+            current_loader[0] = self.dataloader
+            if resume is not None:
+                load_trainable_state(resume["weights"], self.model)
+                self.optimizer.load_state_dict(resume["optimizer"])
+                self.kl_ctl.value = resume["kl_coef"]
+                monitor.load_state_dict(resume["monitor"])
+                count[0] = resume["step"]
+                set_rng_state(resume["rng"])
+                print(f"resumed from {checkpoint_dir} at step {count[0]} ({resume['consumed']} batches consumed)", flush=True)
+        PPOTrainerNoCache.__init__ = init
+
+        def epoch_skipped(trainer=None):
+            loader = getattr(trainer, "dataloader", None)
+            loader = current_loader[0] if loader is None else loader
+            return isinstance(loader, ResumableLoader) and loader.current_epoch_skipped
+        current_loader = [None]
+
+        def save_checkpoint_now(self):
+            t_save = time.time()
+            save_checkpoint(checkpoint_dir, dict(
+                step=count[0], consumed=self.dataloader.consumed, epochs_saved=len(epochs_saved),
+                kl_coef=float(self.kl_ctl.value), weights=trainable_state(self.model),
+                optimizer=self.optimizer.state_dict(), rng=rng_state(), monitor=monitor.state_dict()))
+            print(f"checkpoint at step {count[0]} ({time.time() - t_save:.1f} s)", flush=True)
+
+        def scalar(v):
+            try:
+                return float(v.mean()) if hasattr(v, "mean") else float(v)
+            except (TypeError, ValueError):
+                return None
+
+        original_step = PPOTrainerNoCache.step
 
         def step(self, *step_args, **step_kwargs):
+            current_loader[0] = self.dataloader
             entered = time.time()
             stats = original_step(self, *step_args, **step_kwargs)
             count[0] += 1
-            record = dict(step=count[0], enter=entered, exit=time.time())
+            record = dict(step=count[0], enter=entered, exit=time.time(), batch_hash=getattr(self.dataloader, "batch_hash", None))
             if save_every and count[0] % save_every == 0:
                 original_save(self, os.path.join(args.out_dir, f"snapshot-step{count[0]:05d}"))
                 record["save_seconds"] = time.time() - record["exit"]
-            timing.write(json.dumps(record) + "\n")
-            timing.flush()
+            logs["steps"].write(json.dumps(record) + "\n")
+            logs["steps"].flush()
+            batch = scored[-len(step_args[2]):] if len(step_args) > 2 else scored[-args.batchsize:]
+            scored.clear()
+            watched = {k.replace("/", "_"): scalar(stats[k]) for k in (
+                "objective/kl", "objective/entropy", "ppo/policy/approxkl", "ppo/policy/clipfrac", "ppo/loss/total",
+                "ppo/loss/policy", "ppo/loss/value", "ppo/mean_scores") if k in stats}
+            stability, events = monitor.update(count[0], [c for c, _ in batch], [y for _, y in batch],
+                                               **{k: v for k, v in watched.items() if v is not None})
+            logs["stability"].write(json.dumps(stability) + "\n")
+            logs["stability"].flush()
+            for event in events:
+                logs["stability_events"].write(json.dumps(event) + "\n")
+                logs["stability_events"].flush()
+                print("STABILITY", json.dumps(event), flush=True)
+                if event["flag"] in stop_on:
+                    stopping.append(event["flag"])
+            if stop_after and count[0] == stop_after:
+                stopping.append("stop-after")
+            if stopping or (checkpoint_every and count[0] % checkpoint_every == 0):
+                save_checkpoint_now(self)
+            if stopping:
+                print(f"stopping at step {count[0]}: {', '.join(stopping)}", flush=True)
+                sys.exit(143 if stopping[0] in ("SIGTERM", "stop-after") else 3)
             return stats
 
         PPOTrainerNoCache.step = step
+        # Epochs fully trained before a resume: skip Train.py's end-of-epoch save and evaluation.
+        original_evaluate = Train.evaluate_model
+        Train.evaluate_model = lambda *a, **k: (0.0, 0.0) if epoch_skipped() else original_evaluate(*a, **k)
         Train.train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize,
                     model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset,
                     log_with=args.log_with, is_unsloth=args.is_unsloth)

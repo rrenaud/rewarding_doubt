@@ -193,6 +193,7 @@ def train_with_snapshots(ids_by_split: dict, label: str, command: list[str], run
     """
     import subprocess
 
+    volume.reload()  # a warm container must see checkpoints committed by other containers (resume)
     out_dir = f"{VOL}/outputs/{run_name}/{label}"
     Path(out_dir).mkdir(parents=True, exist_ok=True)
     ids_path = f"{out_dir}/ids.json"
@@ -780,4 +781,47 @@ def thinking(configs: str, run_name: str = "", train_limit: int = 512, eval_limi
         if status != "ok":
             print(result["log"][-3000:])
     print(f"done: {out}")
+
+
+@app.local_entrypoint()
+def resume_test(gpu: str = "L40S"):
+    """Interrupt-and-resume check for both trainers on 32 questions (8 steps over 2 epochs).
+
+    Per trainer: A runs uninterrupted; B stops after 3 steps (--stop-after, as if preempted),
+    then the same command without it resumes in the same directory. Prints each run's per-step
+    batch fingerprints and the resume lines; the logs land in runs/modal-resume-test-<stamp>/.
+    """
+    root = Path(__file__).resolve().parents[1]
+    data = root / "runs/pilot-20261001T002945Z/data"
+    ids = {"train": [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()][:32],
+           "validation": json.loads((root / "runs/hparam-search-20261002T044831Z/dev_ids.json").read_text())[:16]}
+    exact = ["exact_llama.py", "IDS_JSON", "OUT_DIR", "--mode", "discrete-exact", "--scoring", "single",
+             "--regularization", "hinge", "--reward", "paper", "--passes", "2", "--minibatch", "4", "--lr", "4.01e-05",
+             "--format-weight", "1.01", "--seed", "1", "--epochs", "2", "--checkpoint-every", "3"]
+    ppo = ["subset.py", "train", "IDS_JSON", "--seed", "1", "--fast", "--no-kl", "--grading", "f1", "--hinge", "0.39",
+           "--hinge-threshold", "0.9", "--ppo", "ppo_epochs=2", "--checkpoint-every", "3", "--",
+           "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", MODEL, "--tokenizer_dir", MODEL,
+           "--epochs", "2", "--lr", "2.27e-05", "--batchsize", "8", "--log_with", "tensorboard"]
+    stop = lambda cmd: cmd[:cmd.index("--")] + ["--stop-after", "3"] + cmd[cmd.index("--"):] if "--" in cmd else cmd + ["--stop-after", "3"]
+    run = "resume-test-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    trainer = train_with_snapshots.with_options(gpu=gpu)
+    first = [("exact-A", exact), ("exact-B", stop(exact)), ("ppo-A", ppo), ("ppo-B", stop(ppo))]
+    results = {r["label"] + ("" if r["label"].endswith("A") else "1"): r for r in
+               trainer.starmap([(ids, label, cmd, run) for label, cmd in first])}
+    for r in trainer.starmap([(ids, label, cmd, run) for label, cmd in [("exact-B", exact), ("ppo-B", ppo)]]):
+        results[r["label"] + "2"] = r
+    out = root / "runs" / f"modal-{run}"
+    out.mkdir(parents=True, exist_ok=True)
+    names = ["metrics.jsonl", "steps.jsonl", "stability.jsonl", "stability_events.jsonl"]
+    for label in ["exact-A", "exact-B", "ppo-A", "ppo-B"]:
+        files = read_files.remote([f"{VOL}/outputs/{run}/{label}/{n}" for n in names])
+        (out / label).mkdir(exist_ok=True)
+        for path, text in files.items():
+            (out / label / Path(path).name).write_text(text)
+    for key, r in sorted(results.items()):
+        (out / f"{key}.log").write_text(r["log"])
+        lines = [l for l in r["log"].splitlines() if l.startswith(("resumed", "checkpoint", "stopping", "STABILITY", "Traceback"))
+                 or "Error" in l]
+        print(f"== {key}: exit {r['exit_code']}", *lines[-12:], sep="\n  ")
+    print(f"logs: {out}")
 
