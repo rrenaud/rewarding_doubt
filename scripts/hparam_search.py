@@ -230,6 +230,39 @@ def final(search):
     write_round(search, "final", entries, epochs=2, ids_note="dev, then test once")
 
 
+def brier_configs(search, name, mixes, seeds, epochs=2):
+    """Exact + hinge at the tuned config with reward = (1 - m) log + m Brier."""
+    current = json.loads((search / "current.json").read_text())["exact"]
+    configs = {f"exact-brier{m:.2f}-s{s}": dict(arm="exact", params={**current, "brier_mix": m}, seed=s, epochs=epochs,
+                                              command=command("exact", current, s, epochs) + ["--reward-mix", str(m)])
+               for m in mixes for s in seeds}
+    (search / f"{name}_configs.json").write_text(json.dumps(configs, indent=1) + "\n")
+    print(f"wrote {len(configs)} configs to {name}_configs.json")
+
+
+def choose_brier(search, rounds):
+    """Lowest mean dev Brier per mix over all seeds; disqualified if any seed is ineligible."""
+    by_mix = {}
+    for name in rounds:
+        configs = json.loads((search / f"{name}_configs.json").read_text())
+        curve = json.loads((search / name / "curve.json").read_text())
+        for label, cfg in configs.items():
+            m = cfg["params"]["brier_mix"]
+            r = curve[label][max(curve[label], key=int)] if label in curve else None
+            by_mix.setdefault(m, []).append(r)
+    table = []
+    for m, rows in sorted(by_mix.items()):
+        ok = all(r is not None and eligible(search, r) for r in rows)
+        scored = [r for r in rows if r is not None]
+        mean = lambda k: statistics.fmean(r[k] for r in scored)
+        table.append(dict(mix=m, seeds=len(rows), all_eligible=ok, brier=mean("brier"), ece=mean("ece"), auroc=mean("auroc")))
+        print(f"m={m:.2f} seeds {len(rows)} {'ok ' if ok else 'OUT'} brier {mean('brier'):.4f} ece {mean('ece'):.3f} auroc {mean('auroc'):.3f}")
+    best = min((r for r in table if r["all_eligible"]), key=lambda r: r["brier"])
+    (search / "brier_choice.json").write_text(json.dumps(dict(table=table, best=best["mix"]), indent=1) + "\n")
+    print("best mix:", best["mix"])
+    return best["mix"]
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "init":
         init()
@@ -243,3 +276,8 @@ if __name__ == "__main__":
         advance(Path(sys.argv[2]), sys.argv[3])
     elif sys.argv[1] == "final":
         final(Path(sys.argv[2]))
+    elif sys.argv[1] == "brier-configs":
+        brier_configs(Path(sys.argv[2]), sys.argv[3], [float(x) for x in sys.argv[4].split(",")],
+                      [int(x) for x in sys.argv[5].split(",")])
+    elif sys.argv[1] == "choose-brier":
+        choose_brier(Path(sys.argv[2]), sys.argv[3].split(","))

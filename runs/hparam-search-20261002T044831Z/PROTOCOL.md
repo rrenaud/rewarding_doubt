@@ -53,3 +53,11 @@ malformed that the unsampled readout crashed on zero rows (fixed); they are trea
 - brier_sweep (exploratory, dev only): exact + hinge at the tuned config, reward = (1 - m) log score +
   m Brier score for m in {0, 0.25, 0.5, 0.75, 1}, seeds 1-2, on the first 512 training questions
   (2 epochs = 128 steps).
+
+## Brier follow-up (2026-10-02T08:47Z, before brier_sweep2 results)
+
+- brier_sweep2: exact + hinge at the tuned config, 512 training questions, 128 steps, dev only;
+  m in {0, 0.3, 0.4, 0.5, 0.6}, seeds 3 and 4 (pooled with brier_sweep seeds 1-2 where m matches).
+- Choose m: lowest mean dev Brier over all of its seeds; a value is disqualified if any seed is
+  ineligible (format or answer damage, as in amendment 2).
+- brier_full: the chosen m and m = 0, full training set, 256 steps, seeds 6-8, dev and test.
