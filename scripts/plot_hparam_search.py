@@ -41,8 +41,14 @@ def load(search: Path):
         curve = json.loads(curve_path.read_text())
         test_path = search / directory / "curve_test.json"
         test = json.loads(test_path.read_text()) if test_path.exists() else {}
-        rows = {label: dict(dev=points[max(points, key=int)], test=test.get(label))
-                for label, points in curve.items() if label.startswith(prefix)}
+        rows = {}
+        for label, points in curve.items():
+            if not label.startswith(prefix):
+                continue
+            dev = points[max(points, key=int)]
+            # Same rule as the search, judged on dev: a seed that damaged answers or format is ineligible.
+            eligible = dev["wrong_format_rate"] <= 0.02 and dev["accuracy"] >= base_acc - 0.02
+            rows[label] = dict(dev=dev, test=test.get(label), eligible=eligible)
         return dict(arm=arm, name=name, note=note, rows=rows) if rows else None
 
     # PPO's final is shown only as the F1-label rerun (final_ppo_f1). The exact-match-label finals
@@ -307,24 +313,31 @@ function groupCards(groups, box) {
   for (const g of groups) {
     if (!shownArms().includes(g.arm)) continue;
     for (const split of ["dev", "test"]) {
-      const ms = Object.values(g.rows).map(v => v[split]).filter(Boolean);
+      const all = Object.values(g.rows).filter(v => v[split]);
+      const ms = all.map(v => v[split]), ok = all.filter(v => v.eligible).map(v => v[split]);
       if (!ms.length) continue;
-      const mean = k => ms.reduce((s, m) => s + m[k], 0) / ms.length;
-      const sd = k => Math.sqrt(ms.reduce((s, m) => s + (m[k] - mean(k)) ** 2, 0) / Math.max(1, ms.length - 1));
+      const stat = (xs, k) => { const m = xs.reduce((s, x) => s + x[k], 0) / xs.length;
+        return `${fmt(m)} ± ${fmt(Math.sqrt(xs.reduce((s, x) => s + (x[k] - m) ** 2, 0) / Math.max(1, xs.length - 1)))}`; };
       const c = document.createElement("div"); c.className = "card";
       const h = document.createElement("h3"); const s = document.createElement("i"); s.className = "sw"; s.style.background = COLOR[g.arm];
       h.append(s, document.createTextNode(`${g.name} · ${split} · ${ms.length} seeds`)); c.appendChild(h);
+      const partial = ok.length < ms.length && ok.length > 0;
       const note = document.createElement("div"); note.className = "note"; note.textContent = g.note; c.appendChild(note);
       const dl = document.createElement("dl"); dl.className = "kv";
       for (const [k, name] of [["brier", "Brier"], ["ece", "ECE"], ["auroc", "AUROC"], ["accuracy", "accuracy"]]) {
         if (ms.some(m => m[k] == null)) continue;
         const dt = document.createElement("dt"); dt.textContent = name; const dd = document.createElement("dd");
-        dd.textContent = `${fmt(mean(k))} ± ${fmt(sd(k))}`; dl.append(dt, dd); }
-      c.appendChild(dl); summary.appendChild(c);
+        dd.textContent = stat(ms, k);
+        if (partial) { const e = document.createElement("div"); e.className = "note"; e.textContent = `eligible only: ${stat(ok, k)}`; dd.appendChild(e); }
+        dl.append(dt, dd); }
+      c.appendChild(dl);
+      if (partial) { const n = document.createElement("div"); n.className = "note";
+        n.textContent = `${ms.length - ok.length} of ${ms.length} seeds ineligible (answers or format damaged). "Eligible only" averages the other ${ok.length}.`; c.appendChild(n); }
+      summary.appendChild(c);
     }
     for (const [label, v] of Object.entries(g.rows)) for (const [split, m] of [["dev", v.dev], ["test", v.test]]) {
-      if (!m) continue; const r = t.insertRow();
-      for (const x of [label, split, fmt(m.brier), fmt(m.ece), fmt(m.auroc), (100 * m.accuracy).toFixed(1) + "%", (100 * m.wrong_format_rate).toFixed(1) + "%"]) r.insertCell().textContent = x;
+      if (!m) continue; const r = t.insertRow(); if (!v.eligible) r.className = "bad";
+      for (const x of [v.eligible ? label : label + " (ineligible)", split, fmt(m.brier), fmt(m.ece), fmt(m.auroc), (100 * m.accuracy).toFixed(1) + "%", (100 * m.wrong_format_rate).toFixed(1) + "%"]) r.insertCell().textContent = x;
     }
   }
   box.appendChild(summary); seedStrips(groups.filter(g => shownArms().includes(g.arm)), box); wrap.appendChild(t); box.appendChild(wrap);
@@ -335,7 +348,7 @@ function seedStrips(groups, box) {
   const grid = document.createElement("div"); grid.className = "stages"; grid.style.marginBottom = "12px";
   const rows = [];
   for (const g of groups) for (const split of ["test", "dev"]) {
-    const pts = Object.entries(g.rows).filter(([, v]) => v[split]).map(([label, v]) => ({label, m: v[split]}));
+    const pts = Object.entries(g.rows).filter(([, v]) => v[split]).map(([label, v]) => ({label, m: v[split], eligible: v.eligible}));
     if (pts.length) rows.push({g, split, pts});
   }
   for (const [k, name] of [["brier", "Brier ↓"], ["ece", "ECE ↓"], ["auroc", "AUROC ↑"], ["accuracy", "Answer accuracy"]]) {
@@ -362,9 +375,9 @@ function seedStrips(groups, box) {
       el("line", {x1: cx - 16, x2: cx + 16, y1: Y(mean), y2: Y(mean), stroke: "var(--fg)", "stroke-width": 2}, svg);
       r.pts.forEach((p, j) => {
         const x = cx + (j - (r.pts.length - 1) / 2) * 6;  // small spread so equal values stay visible
-        const c = el("circle", {cx: x, cy: Y(p.m[k]), r: 5, fill: color, stroke: "var(--surface)", "stroke-width": 1.5, tabindex: 0}, svg);
+        const c = el("circle", {cx: x, cy: Y(p.m[k]), r: 5, fill: p.eligible ? color : "var(--surface)", stroke: p.eligible ? "var(--surface)" : color, "stroke-width": p.eligible ? 1.5 : 2, tabindex: 0}, svg);
         const hit = el("circle", {cx: x, cy: Y(p.m[k]), r: 9, fill: "transparent"}, svg);
-        const show = e => { tip.textContent = ""; const a = document.createElement("div"); a.style.fontWeight = 600; a.textContent = `${p.label} · ${r.split}`;
+        const show = e => { tip.textContent = ""; const a = document.createElement("div"); a.style.fontWeight = 600; a.textContent = `${p.label} · ${r.split}${p.eligible ? "" : " · ineligible (answers or format damaged)"}`;
           const b = document.createElement("div"); b.textContent = `${name.replace(/ [↓↑]/, "")} ${k === "accuracy" ? (100 * p.m[k]).toFixed(1) + "%" : fmt(p.m[k])} (mean ${k === "accuracy" ? (100 * mean).toFixed(1) + "%" : fmt(mean)})`;
           tip.append(a, b); tip.style.display = "block"; tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = (e.clientY + 14) + "px"; };
         for (const t of [c, hit]) { t.addEventListener("pointermove", show); t.addEventListener("pointerleave", hideTip); }
@@ -375,7 +388,7 @@ function seedStrips(groups, box) {
     grid.appendChild(panel);
   }
   const note = document.createElement("p"); note.className = "note";
-  note.textContent = "Each dot is one seed; columns are labelled with arm and split. Higher is higher on every axis. The bar marks the mean. Hover a dot for its run.";
+  note.textContent = "Each dot is one seed; columns are labelled with arm and split. Higher is higher on every axis. The bar marks the mean of all seeds. Hollow: ineligible seed (answers or format damaged), as above. Hover a dot for its run.";
   box.append(grid, note);
 }
 function finalSection() {
