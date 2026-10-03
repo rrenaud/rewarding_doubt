@@ -137,3 +137,27 @@ def test_rotating_checkpoint_keeps_last_healthy(tmp_path):
     write_status(str(tmp_path), "diverged", step=128, flags=["collapsed"])
     status = json.load(open(tmp_path / "status.json"))
     assert status["status"] == "diverged" and status["healthy_checkpoint"] == {"step": 32}
+
+
+def test_window_calibration():
+    rng = random.Random(7)
+    calibrated, overconfident = StabilityMonitor(), StabilityMonitor()
+    for step in range(1, 65):
+        levels = [rng.choice([3, 5, 7, 9]) for _ in range(8)]
+        rc, _ = calibrated.update(step, levels, [rng.random() < k / 10 for k in levels])
+        ro, _ = overconfident.update(step, [10] * 8, [rng.random() < 0.6 for _ in range(8)])
+    assert rc["window_calibration_n"] == 512 and rc["window_ece"] < 0.06
+    assert abs(ro["window_ece"] - 0.4) < 0.06 and abs(ro["window_brier"] - 0.4) < 0.06
+    # Rows without a parsed confidence count for accuracy but not for calibration.
+    r, _ = StabilityMonitor().update(1, [7, None], [1, 0])
+    assert r["window_calibration_n"] == 1 and r["window_brier"] == (0.7 - 1) ** 2
+
+
+def test_torchmetrics_ece_agrees():
+    from rewarding_doubt.stability import _ece
+    from rewarding_doubt.paper_ppo import evaluation_metrics
+    rng = random.Random(8)
+    rows = [(rng.choice(range(11)), rng.random() < 0.6) for _ in range(300)]
+    ours = _ece([(c / 10, float(y)) for c, y in rows])
+    released = evaluation_metrics([dict(confidence=c, correct=y) for c, y in rows])["ece"]
+    assert abs(ours - released) < 1e-6
