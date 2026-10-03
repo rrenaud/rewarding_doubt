@@ -22,7 +22,6 @@ if [ ! -f "$ROOT/.ready" ]; then
     git -C "$ROOT/RewardingDoubt" checkout -q "$COMMIT"
     python3.11 -m venv "$ROOT/venv"
     "$ROOT/venv/bin/pip" install -q --no-cache-dir -r "$ROOT/RewardingDoubt/requirements.txt"
-    "$ROOT/venv/bin/pip" install -q --no-cache-dir modal  # results upload (UPLOAD=modal)
     touch "$ROOT/.ready"
   fi
   flock -u 9

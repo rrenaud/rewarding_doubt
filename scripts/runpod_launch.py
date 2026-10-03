@@ -6,14 +6,13 @@
 
 The pod runs ghcr.io/rrenaud/rewarding-doubt (runpod/Dockerfile, built by GitHub Actions), writes to
 /workspace/runs/NAME on the network volume and terminates itself at a final outcome; results stay
-on the volume. --stock-image instead runs python:3.11 with our code packed into an env var and the
-environment installed once on the volume (runpod/bootstrap.sh). --upload-modal also copies the run
-directory to the Modal volume (runpod/NAME). Question IDs: the
+on the volume (fetch them with scripts/runpod_sync.py). --stock-image instead runs python:3.11 with
+our code packed into an env var and the environment installed once on the volume
+(runpod/bootstrap.sh), for when the image cannot be used. Question IDs: the
 training subset (first N of runs/pilot-.../train.jsonl, or the whole split) and the search's
 512 dev questions as the validation split.
 
-Secrets passed into the pod's environment: the RunPod API key (so the pod can terminate itself)
-and, with --upload-modal, the Modal token from ~/.modal.toml.
+Secret passed into the pod's environment: the RunPod API key, so the pod can terminate itself.
 """
 import argparse
 import base64
@@ -21,7 +20,6 @@ import io
 import json
 import os
 import tarfile
-import tomllib
 import urllib.request
 from pathlib import Path
 
@@ -76,7 +74,6 @@ def main():
     parser.add_argument("--on-exit", default="terminate", choices=["terminate", "stop", "none"])
     parser.add_argument("--image", default="ghcr.io/rrenaud/rewarding-doubt:latest")
     parser.add_argument("--stock-image", action="store_true", help="python:3.11 + bootstrap.sh instead of --image")
-    parser.add_argument("--upload-modal", action="store_true")
     parser.add_argument("--setup-only", action="store_true", help="with --stock-image: install the environment only")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
@@ -93,10 +90,6 @@ def main():
                    IDS_JSON_B64=base64.b64encode(json.dumps(ids(args)).encode()).decode())
     if args.stock_image:
         env["CODE_B64"] = code_b64()
-    if args.upload_modal:
-        modal = next(iter(tomllib.load(open(Path.home() / ".modal.toml", "rb")).values()))
-        env.update(MODAL_TOKEN_ID=modal["token_id"], MODAL_TOKEN_SECRET=modal["token_secret"],
-                   UPLOAD_CMD=f"modal volume put --force rewarding-doubt-repro OUT_DIR runpod/{args.name}")
     volume = next(v for v in call("GET", "/networkvolumes") if v["id"] == VOLUME_ID)
     body = dict(name=f"rd-{args.name}", imageName="python:3.11-bookworm" if args.stock_image else args.image,
                 dockerStartCmd=["bash", "-c", BOOT] if args.stock_image else [],

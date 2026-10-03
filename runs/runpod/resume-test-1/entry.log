@@ -1,0 +1,7 @@
+2026-10-03T00:17:02Z attempt start: python exact_llama.py /workspace/runs/resume-test-1/ids.json /workspace/runs/resume-test-1 --mode discrete-exact --scoring single --regularization hinge --reward paper --passes 2 --minibatch 4 --lr 4.01e-05 --format-weight 1.01 --seed 1 --epochs 2 --checkpoint-every 3 --stop-after 3 --stop-on collapsed,answers_degraded,format_broken,nonfinite
+2026-10-03T00:27:02Z trainer exited with code 143
+2026-10-03T00:27:02Z preempted; exiting so the pod can restart and resume
+2026-10-03T00:27:09Z attempt start: python exact_llama.py /workspace/runs/resume-test-1/ids.json /workspace/runs/resume-test-1 --mode discrete-exact --scoring single --regularization hinge --reward paper --passes 2 --minibatch 4 --lr 4.01e-05 --format-weight 1.01 --seed 1 --epochs 2 --checkpoint-every 3 --stop-after 3 --stop-on collapsed,answers_degraded,format_broken,nonfinite
+2026-10-03T00:29:39Z trainer exited with code 0
+2026-10-03T00:29:39Z outcome: completed
+2026-10-03T00:29:39Z upload: modal volume put --force rewarding-doubt-repro /workspace/runs/resume-test-1 runpod/resume-test-1

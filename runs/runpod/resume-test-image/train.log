@@ -1,0 +1,37 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.526 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+Map:   0%|          | 0/32 [00:00<?, ? examples/s]Map: 100%|██████████| 32/32 [00:00<00:00, 490.63 examples/s]
+{"step": 1, "epoch": 0, "batch_hash": 1959506215, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 4, "seconds": 5.140404939651489, "time": 1790987898.3857114, "loss": -0.5367055057289634, "confidence": 0.9593239907425462, "mass": 0.999996593582218, "hinge_active": 0.0, "stop_prob": 0.9997827485203743, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 2, "epoch": 0, "batch_hash": 4207269886, "rows": 7, "skipped": 1, "answer_accuracy": 0.5714285714285714, "updates": 4, "seconds": 8.796565771102905, "time": 1790987907.1844802, "loss": 3.9771460979495794, "confidence": 0.8688174771110816, "mass": 0.7142821740492873, "hinge_active": 0.2857142857142857, "stop_prob": 0.9997642874717713, "sampled_number_rate": 0.7142857142857142, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 3, "epoch": 0, "batch_hash": 1194984897, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 4, "seconds": 2.337078332901001, "time": 1790987909.5233073, "loss": -0.7770795045514918, "confidence": 0.8254602499522684, "mass": 0.9999981956979191, "hinge_active": 0.0, "stop_prob": 0.9997048452496529, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+checkpoint at step 3 (0.7 s)
+stopping at step 3: stop-after
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.526 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+resumed from /workspace/runs/resume-test-image/checkpoint at step 3 (epoch 0, question 24)
+{"step": 4, "epoch": 0, "batch_hash": 3384713000, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "updates": 4, "seconds": 3.3417747020721436, "time": 1790987954.1243746, "loss": -0.8403053592406965, "confidence": 0.7858091075066601, "mass": 0.9999987151364135, "hinge_active": 0.0, "stop_prob": 0.9909061416983604, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 5, "epoch": 1, "batch_hash": 18377858, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 4, "seconds": 8.587316274642944, "time": 1790987963.726179, "loss": 0.28911745514107023, "confidence": 0.7617284977066916, "mass": 0.7533188210513684, "hinge_active": 0.25, "stop_prob": 0.9983523488044739, "sampled_number_rate": 0.75, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 6, "epoch": 1, "batch_hash": 72136726, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "updates": 4, "seconds": 3.130523681640625, "time": 1790987966.863918, "loss": -0.7892883994598869, "confidence": 0.6339225048295047, "mass": 0.999992104225112, "hinge_active": 0.0, "stop_prob": 0.9919609874486923, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+checkpoint at step 6 (1.2 s)
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 7, "epoch": 1, "batch_hash": 1691307575, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "updates": 4, "seconds": 2.430163860321045, "time": 1790987970.5030513, "loss": -0.8479803892763198, "confidence": 0.6901185118426713, "mass": 0.9999976176375205, "hinge_active": 0.0, "stop_prob": 0.9990131184458733, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 8, "epoch": 1, "batch_hash": 2585676213, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "updates": 4, "seconds": 2.442450523376465, "time": 1790987972.962507, "loss": -0.7652450347089805, "confidence": 0.6760224523908219, "mass": 0.9999972397329356, "hinge_active": 0.0, "stop_prob": 0.9983658045530319, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}

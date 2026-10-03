@@ -1,0 +1,11 @@
+2026-10-03T00:37:38Z attempt start (image d8b51cf9fdd25a8b45448cadea43e77d5dc027ce): python exact_llama.py /workspace/runs/resume-test-image/ids.json /workspace/runs/resume-test-image --mode discrete-exact --scoring single --regularization hinge --reward paper --passes 2 --minibatch 4 --lr 4.01e-05 --format-weight 1.01 --seed 1 --epochs 2 --checkpoint-every 3 --stop-after 3 --stop-on collapsed,answers_degraded,format_broken,nonfinite
+2026-10-03T00:38:38Z trainer exited with code 143
+2026-10-03T00:38:38Z preempted; exiting so the pod can restart and resume
+2026-10-03T00:38:45Z attempt start (image d8b51cf9fdd25a8b45448cadea43e77d5dc027ce): python exact_llama.py /workspace/runs/resume-test-image/ids.json /workspace/runs/resume-test-image --mode discrete-exact --scoring single --regularization hinge --reward paper --passes 2 --minibatch 4 --lr 4.01e-05 --format-weight 1.01 --seed 1 --epochs 2 --checkpoint-every 3 --stop-after 3 --stop-on collapsed,answers_degraded,format_broken,nonfinite
+2026-10-03T00:39:45Z trainer exited with code 0
+2026-10-03T00:39:45Z outcome: completed
+2026-10-03T00:39:45Z upload: modal volume put --force rewarding-doubt-repro /workspace/runs/resume-test-image runpod/resume-test-image
+bash: line 1: modal: command not found
+2026-10-03T00:39:45Z upload failed (exit 127); results stay on the volume
+selfstop: terminate pod f12zsq972m6xvk: HTTP 204
+2026-10-03T00:39:46Z pod terminate requested

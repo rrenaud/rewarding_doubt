@@ -1,0 +1,11 @@
+{
+ "status": "completed",
+ "step": 8,
+ "flags": [],
+ "healthy_checkpoint": {
+  "step": 3,
+  "epoch": 0,
+  "index": 24,
+  "kl_coef": 0.05
+ }
+}
