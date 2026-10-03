@@ -1,0 +1,122 @@
+{
+ "ppo-frozen-s4": {
+  "n": 512,
+  "wrong_format_rate": 0.0078125,
+  "ece": 0.1173214539885521,
+  "accuracy": 0.6062992125984252,
+  "auroc": 0.7041801948051948,
+  "brier": 0.22866141732283463,
+  "ece_unsampled": 0.15454283356666565,
+  "auroc_unsampled": 0.7871266233766233,
+  "brier_unsampled": 0.22812009709813333,
+  "protocol": "frozen-answers"
+ },
+ "ppo-frozen-s5": {
+  "n": 512,
+  "wrong_format_rate": 0.00390625,
+  "ece": 0.11391979455947876,
+  "accuracy": 0.615686274509804,
+  "auroc": 0.7372367736903679,
+  "brier": 0.19617647058823526,
+  "ece_unsampled": 0.08289996534585953,
+  "auroc_unsampled": 0.8210061094501495,
+  "brier_unsampled": 0.17879975374513632,
+  "protocol": "frozen-answers"
+ },
+ "ppo-frozen-s7": {
+  "n": 512,
+  "wrong_format_rate": 0.001953125,
+  "ece": 0.1387474685907364,
+  "accuracy": 0.6007827788649707,
+  "auroc": 0.8054624129782206,
+  "brier": 0.19160469667318983,
+  "ece_unsampled": 0.12356331944465637,
+  "auroc_unsampled": 0.8325190010857764,
+  "brier_unsampled": 0.1815789027920706,
+  "protocol": "frozen-answers"
+ },
+ "ppo-frozen-s6": {
+  "n": 512,
+  "wrong_format_rate": 0.005859375,
+  "ece": 0.1593303680419922,
+  "accuracy": 0.6227897838899804,
+  "auroc": 0.6106483307045215,
+  "brier": 0.23848722986247547,
+  "ece_unsampled": 0.17215266823768616,
+  "auroc_unsampled": 0.8065523133543637,
+  "brier_unsampled": 0.2295046708759753,
+  "protocol": "frozen-answers"
+ },
+ "ppo-frozen-s8": {
+  "n": 512,
+  "wrong_format_rate": 0.001953125,
+  "ece": 0.13913694024085999,
+  "accuracy": 0.6086105675146771,
+  "auroc": 0.7359405144694535,
+  "brier": 0.20596868884540118,
+  "ece_unsampled": 0.13397817313671112,
+  "auroc_unsampled": 0.8206752411575563,
+  "brier_unsampled": 0.19423110175761663,
+  "protocol": "frozen-answers"
+ },
+ "exact-frozen-s5": {
+  "n": 512,
+  "wrong_format_rate": 0.001953125,
+  "ece": 0.11428607255220413,
+  "accuracy": 0.6281800391389433,
+  "auroc": 0.8011887194622069,
+  "brier": 0.1881409001956947,
+  "ece_unsampled": 0.11833629012107849,
+  "auroc_unsampled": 0.8116412526643713,
+  "brier_unsampled": 0.1880429486795948,
+  "protocol": "frozen-answers"
+ },
+ "exact-frozen-s4": {
+  "n": 512,
+  "wrong_format_rate": 0.00390625,
+  "ece": 0.052941396832466125,
+  "accuracy": 0.6254901960784314,
+  "auroc": 0.8273071936188023,
+  "brier": 0.16298039215686275,
+  "ece_unsampled": 0.05941507965326309,
+  "auroc_unsampled": 0.8472320241592673,
+  "brier_unsampled": 0.15948565488099625,
+  "protocol": "frozen-answers"
+ },
+ "exact-frozen-s8": {
+  "n": 512,
+  "wrong_format_rate": 0.00390625,
+  "ece": 0.05803942680358887,
+  "accuracy": 0.6254901960784314,
+  "auroc": 0.8169919086149453,
+  "brier": 0.163921568627451,
+  "ece_unsampled": 0.08371973037719727,
+  "auroc_unsampled": 0.8329695219025423,
+  "brier_unsampled": 0.16280334657546824,
+  "protocol": "frozen-answers"
+ },
+ "exact-frozen-s7": {
+  "n": 512,
+  "wrong_format_rate": 0.00390625,
+  "ece": 0.09882329404354095,
+  "accuracy": 0.6019607843137255,
+  "auroc": 0.8135941335986264,
+  "brier": 0.18003921568627448,
+  "ece_unsampled": 0.09668087959289551,
+  "auroc_unsampled": 0.8268962308050256,
+  "brier_unsampled": 0.18056835911328553,
+  "protocol": "frozen-answers"
+ },
+ "exact-frozen-s6": {
+  "n": 512,
+  "wrong_format_rate": 0.001953125,
+  "ece": 0.0587087944149971,
+  "accuracy": 0.6144814090019569,
+  "auroc": 0.8318972485369718,
+  "brier": 0.15765166340508807,
+  "ece_unsampled": 0.08286263793706894,
+  "auroc_unsampled": 0.860276762908597,
+  "brier_unsampled": 0.15640548349884215,
+  "protocol": "frozen-answers"
+ }
+}

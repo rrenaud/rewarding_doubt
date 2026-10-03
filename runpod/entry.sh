@@ -68,7 +68,7 @@ PY
 if [ -f "$STATUS" ] && [ "${FORCE_RESUME:-0}" = 1 ]; then
   note "FORCE_RESUME: rerunning after outcome $(python -c "import json; print(json.load(open('$STATUS'))['outcome'])")"
   mv "$STATUS" "$RUN_DIR/entry_status.$(date -u +%Y%m%dT%H%M%SZ).json"
-  rm -f "$RUN_DIR/status.json"
+  rm -f "$RUN_DIR/status.json" "$RUN_DIR/entry_started"  # a forced rerun gets its own MAX_HOURS
 fi
 if [ -f "$STATUS" ]; then
   previous=$(python -c "import json; print(json.load(open('$STATUS'))['outcome'])")
