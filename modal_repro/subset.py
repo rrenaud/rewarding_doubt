@@ -130,8 +130,11 @@ def add_ppo_speedups(trainer_class):
             all_values.append(values)
             all_logprobs.append(logprobs)
             all_masks.append(masks)
-        return (torch.cat(all_logprobs), torch.cat(all_logits)[:, :-1] if return_logits else None,
-                torch.cat(all_values)[:, :-1], torch.cat(all_masks)[:, :-1])
+        # One chunk (PPO's training minibatches): no torch.cat, which would copy the [rows, T, 128k]
+        # logits and briefly double the largest tensor (it ran a 24 GB RTX 4090 out of memory).
+        cat = lambda xs: xs[0] if len(xs) == 1 else torch.cat(xs)
+        return (cat(all_logprobs), cat(all_logits)[:, :-1] if return_logits else None,
+                cat(all_values)[:, :-1], cat(all_masks)[:, :-1])
 
     trainer_class.batched_forward_pass = batched_forward_pass
 

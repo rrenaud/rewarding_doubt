@@ -1,0 +1,16 @@
+{
+ "status": "diverged",
+ "step": 1349,
+ "reason": [
+  "format_broken"
+ ],
+ "flags": [
+  "format_broken"
+ ],
+ "healthy_checkpoint": {
+  "step": 1312,
+  "epoch": 0,
+  "index": 10496,
+  "kl_coef": 0.05
+ }
+}

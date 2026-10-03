@@ -81,6 +81,8 @@ def main():
     parser.add_argument("--stock-image", action="store_true", help="python:3.11 + bootstrap.sh instead of --image")
     parser.add_argument("--expt", help="experiment id stamped on every generations.jsonl line (default: NAME up to its first '-')")
     parser.add_argument("--no-wandb", action="store_true")
+    parser.add_argument("--force-resume", action="store_true",
+                        help="rerun NAME even if it already ended (crashed, hung, ...): resumes from its checkpoint")
     parser.add_argument("--setup-only", action="store_true", help="with --stock-image: install the environment only")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
@@ -97,6 +99,8 @@ def main():
                    IDS_JSON_B64=base64.b64encode(json.dumps(ids(args)).encode()).decode())
     if args.stock_image:
         env["CODE_B64"] = code_b64()
+    if args.force_resume:
+        env["FORCE_RESUME"] = "1"
     wandb_key = Path.home() / ".wandb_rewarding_doubt_key.txt"
     if wandb_key.exists() and not args.no_wandb:
         env.update(WANDB_API_KEY=wandb_key.read_text().strip(), WANDB_MODE="online", WANDB_PROJECT="rewarding-doubt",
@@ -110,7 +114,7 @@ def main():
                 dataCenterIds=[volume["dataCenterId"]], containerDiskInGb=30, minRAMPerGPU=24, ports=[], env=env)
     if args.dry_run:
         shown = {k: (v if k != "env" else {e: (x if e in ("ON_EXIT", "RUN_DIR", "MAX_HOURS", "STALL_MINUTES", "TRAIN_CMD",
-                                                          "POST_CMD", "SETUP_ONLY", "UPLOAD_CMD", "WANDB_MODE", "WANDB_PROJECT", "WANDB_ENTITY", "RD_EXPT") else f"<{len(x)} chars>")
+                                                          "POST_CMD", "SETUP_ONLY", "UPLOAD_CMD", "WANDB_MODE", "WANDB_PROJECT", "WANDB_ENTITY", "RD_EXPT", "FORCE_RESUME") else f"<{len(x)} chars>")
                                            for e, x in v.items()}) for k, v in body.items()}
         print(json.dumps(shown, indent=1))
         return

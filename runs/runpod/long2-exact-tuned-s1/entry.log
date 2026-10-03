@@ -1,0 +1,5 @@
+2026-10-03T01:14:13Z attempt start (image 90c0cc78a060c0b99a6767bcfb88b6d51984019b): python exact_llama.py /workspace/runs/long2-exact-tuned-s1/ids.json /workspace/runs/long2-exact-tuned-s1 --mode discrete-exact --scoring single --regularization hinge --reward paper --passes 2 --minibatch 4 --lr 4.01e-05 --format-weight 1.01 --format-threshold 0.95 --seed 1 --epochs 1 --max-steps 4000 --save-every 500 --stop-on collapsed,answers_degraded,format_broken,nonfinite
+2026-10-03T02:17:44Z trainer exited with code 3
+2026-10-03T02:17:45Z outcome: diverged
+selfstop: terminate pod 3iy1zxmgvpxuxd: HTTP 204
+2026-10-03T02:17:45Z pod terminate requested

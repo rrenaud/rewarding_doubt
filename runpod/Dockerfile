@@ -15,7 +15,8 @@ COPY src/rewarding_doubt /opt/rd/rewarding_doubt
 COPY runpod/entry.sh runpod/selfstop.py runpod/eval_snapshots.py /opt/runpod/
 # HF_HOME on the network volume: the model and TriviaQA download once per volume, not once per pod.
 ENV PYTHONPATH=/opt/rd HF_HOME=/workspace/hf HF_HUB_ENABLE_HF_TRANSFER=1 TOKENIZERS_PARALLELISM=false \
-    PYTHONUNBUFFERED=1 WANDB_MODE=disabled CODE_DIR=/opt/RewardingDoubt/SingleAnswerSetting
+    PYTHONUNBUFFERED=1 WANDB_MODE=disabled CODE_DIR=/opt/RewardingDoubt/SingleAnswerSetting \
+    PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 ARG GIT_SHA=unknown
 ENV IMAGE_GIT_SHA=$GIT_SHA
 CMD ["bash", "/opt/runpod/entry.sh"]

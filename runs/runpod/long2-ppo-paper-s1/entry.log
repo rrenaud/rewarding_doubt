@@ -1,0 +1,5 @@
+2026-10-03T01:14:15Z attempt start (image 90c0cc78a060c0b99a6767bcfb88b6d51984019b): python subset.py train /workspace/runs/long2-ppo-paper-s1/ids.json --seed 1 --fast --grading f1 --save-every 500 --max-steps 4000 --stop-on collapsed,answers_degraded,format_broken,nonfinite -- --out_dir /workspace/runs/long2-ppo-paper-s1 --dataset triviaqa --is_unsloth --model_dir unsloth/llama-3-8b-Instruct-bnb-4bit --tokenizer_dir unsloth/llama-3-8b-Instruct-bnb-4bit --epochs 1 --lr 1e-05 --batchsize 8 --log_with tensorboard
+2026-10-03T03:40:48Z trainer exited with code 1
+2026-10-03T03:40:48Z outcome: crashed
+selfstop: terminate pod plnycgx58g766r: HTTP 204
+2026-10-03T03:40:49Z pod terminate requested

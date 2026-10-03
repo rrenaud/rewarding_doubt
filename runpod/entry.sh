@@ -13,6 +13,8 @@
 #   STALL_MINUTES  kill the trainer if its log has not changed for this long (default 30)
 #   ON_EXIT        terminate | stop | none: what to do with the pod at the end (default terminate)
 #   RUNPOD_API_KEY used by selfstop.py (RUNPOD_POD_ID is set by RunPod in every pod)
+#   FORCE_RESUME   1: rerun even after a final outcome (e.g. resume a crash after fixing its cause);
+#                  the previous status is kept as entry_status.<time>.json
 #   UPLOAD_CMD     run after every final outcome, before the pod shuts down (e.g. copy RUN_DIR off
 #                  the volume); OUT_DIR is substituted. Its failure is logged, not fatal.
 #
@@ -63,6 +65,11 @@ os.replace(path + ".tmp", path)
 PY
 }
 
+if [ -f "$STATUS" ] && [ "${FORCE_RESUME:-0}" = 1 ]; then
+  note "FORCE_RESUME: rerunning after outcome $(python -c "import json; print(json.load(open('$STATUS'))['outcome'])")"
+  mv "$STATUS" "$RUN_DIR/entry_status.$(date -u +%Y%m%dT%H%M%SZ).json"
+  rm -f "$RUN_DIR/status.json"
+fi
 if [ -f "$STATUS" ]; then
   previous=$(python -c "import json; print(json.load(open('$STATUS'))['outcome'])")
   if [ "$previous" != preempted ]; then

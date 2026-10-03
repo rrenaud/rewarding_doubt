@@ -1,0 +1,108 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+wandb: Currently logged in as: rrenaud (multi-tokenizer). Use `wandb login --relogin` to force relogin
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Tracking run with wandb version 0.19.2
+wandb: Run data is saved locally in /workspace/runs/long2-ppo-paper-s1/wandb/run-20261003_011420-d316509908bb25cf
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run long2-ppo-paper-s1
+wandb: ⭐️ View project at https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: 🚀 View run at https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/d316509908bb25cf
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.526 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+WARNING:root:The `device_map` argument is not provided. We will override the device_map argument. to set the entire model on the current device. If you want to set the model on multiple devices, please provide a custom `device_map` argument.
+checkpoint at step 32 (0.3 s)
+checkpoint at step 64 (0.6 s)
+checkpoint at step 96 (0.9 s)
+checkpoint at step 128 (0.7 s)
+checkpoint at step 160 (0.7 s)
+checkpoint at step 192 (1.0 s)
+checkpoint at step 224 (0.7 s)
+checkpoint at step 256 (0.7 s)
+checkpoint at step 288 (0.6 s)
+checkpoint at step 320 (0.7 s)
+checkpoint at step 352 (0.8 s)
+checkpoint at step 384 (0.9 s)
+checkpoint at step 416 (0.9 s)
+checkpoint at step 448 (0.9 s)
+checkpoint at step 480 (0.9 s)
+checkpoint at step 512 (0.7 s)
+checkpoint at step 544 (0.7 s)
+checkpoint at step 576 (0.7 s)
+checkpoint at step 608 (0.8 s)
+checkpoint at step 640 (0.6 s)
+checkpoint at step 672 (0.9 s)
+checkpoint at step 704 (0.8 s)
+checkpoint at step 736 (0.8 s)
+checkpoint at step 768 (0.7 s)
+checkpoint at step 800 (0.8 s)
+checkpoint at step 832 (0.7 s)
+checkpoint at step 864 (0.9 s)
+checkpoint at step 896 (0.9 s)
+checkpoint at step 928 (0.6 s)
+checkpoint at step 960 (0.5 s)
+checkpoint at step 992 (0.6 s)
+checkpoint at step 1024 (0.8 s)
+checkpoint at step 1056 (0.7 s)
+checkpoint at step 1088 (0.7 s)
+checkpoint at step 1120 (0.7 s)
+checkpoint at step 1152 (0.8 s)
+checkpoint at step 1184 (0.7 s)
+checkpoint at step 1216 (0.8 s)
+checkpoint at step 1248 (0.9 s)
+checkpoint at step 1280 (1.0 s)
+checkpoint at step 1312 (0.8 s)
+checkpoint at step 1344 (0.7 s)
+checkpoint at step 1376 (0.7 s)
+checkpoint at step 1408 (0.7 s)
+checkpoint at step 1440 (0.8 s)
+checkpoint at step 1472 (0.7 s)
+checkpoint at step 1504 (0.9 s)
+checkpoint at step 1536 (0.8 s)
+checkpoint at step 1568 (0.8 s)
+checkpoint at step 1600 (0.8 s)
+checkpoint at step 1632 (0.7 s)
+checkpoint at step 1664 (0.9 s)
+checkpoint at step 1696 (0.8 s)
+checkpoint at step 1728 (0.8 s)
+checkpoint at step 1760 (0.7 s)
+checkpoint at step 1792 (0.8 s)
+checkpoint at step 1824 (0.6 s)
+checkpoint at step 1856 (0.8 s)
+checkpoint at step 1888 (0.8 s)
+checkpoint at step 1920 (0.9 s)
+checkpoint at step 1952 (0.7 s)
+checkpoint at step 1984 (0.8 s)
+checkpoint at step 2016 (0.9 s)
+checkpoint at step 2048 (0.9 s)
+checkpoint at step 2080 (0.9 s)
+checkpoint at step 2112 (0.9 s)
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 554, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 494, in main
+    Train.train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize,
+  File "/opt/RewardingDoubt/SingleAnswerSetting/Train.py", line 193, in train
+    stats = ppo_trainer.step(prediction, response_tensors, rewards)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 443, in step
+    stats = original_step(self, *step_args, **step_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/util/ppo_trainer_no_cache.py", line 185, in step
+    logprobs, logits, vpreds, _ = self.batched_forward_pass(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 133, in batched_forward_pass
+    return (torch.cat(all_logprobs), torch.cat(all_logits)[:, :-1] if return_logits else None,
+                                     ^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.81 GiB. GPU 0 has a total capacity of 23.53 GiB of which 1.25 GiB is free. Including non-PyTorch memory, this process has 22.27 GiB memory in use. Of the allocated memory 21.30 GiB is allocated by PyTorch, and 526.50 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mlong2-ppo-paper-s1[0m at: [34mhttps://wandb.ai/multi-tokenizer/rewarding-doubt/runs/d316509908bb25cf[0m
+[1;34mwandb[0m: Find logs at: [1;35m../../../workspace/runs/long2-ppo-paper-s1/wandb/run-20261003_011420-d316509908bb25cf/logs[0m

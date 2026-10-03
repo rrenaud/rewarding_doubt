@@ -88,3 +88,11 @@ def test_failed_selfstop_is_retried_then_reported(tmp_path):
     _, out, run_dir = entry(tmp_path, "ok", SELFSTOP="false", SELFSTOP_RETRY_SECONDS="0")
     log = (run_dir / "entry.log").read_text()
     assert "selfstop attempt 6 failed" in log and "keeps billing" in log
+
+
+def test_force_resume_reruns_a_finished_run(tmp_path):
+    _, _, run_dir = entry(tmp_path, "crash")
+    assert outcome(run_dir) == "crashed"
+    _, out, _ = entry(tmp_path, "ok", FORCE_RESUME="1")
+    assert outcome(run_dir) == "completed" and "FORCE_RESUME: rerunning after outcome crashed" in out
+    assert len(list(run_dir.glob("entry_status.*.json"))) == 1
