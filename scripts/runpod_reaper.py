@@ -16,6 +16,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from runpod_launch import call  # noqa: E402
 
 
+def parse_time(text):
+    """RunPod timestamps look like '2026-10-03 01:11:59.272 +0000 UTC'."""
+    text = text.replace(" UTC", "").strip()
+    for fmt in ("%Y-%m-%d %H:%M:%S.%f %z", "%Y-%m-%d %H:%M:%S %z"):
+        try:
+            return datetime.datetime.strptime(text, fmt)
+        except ValueError:
+            pass
+    return datetime.datetime.fromisoformat(text.replace("Z", "+00:00"))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--apply", action="store_true")
@@ -26,8 +37,7 @@ def main():
         if not pod["name"].startswith("rd-"):
             continue
         started = pod.get("lastStartedAt") or pod.get("createdAt")
-        age = (now - datetime.datetime.fromisoformat(started.replace(" UTC", "").replace("Z", "+00:00"))
-               .astimezone(datetime.timezone.utc)).total_seconds() / 3600 if started else 0.
+        age = (now - parse_time(started)).total_seconds() / 3600 if started else 0.
         cap = float((pod.get("env") or {}).get("MAX_HOURS", 12)) + args.grace_hours
         over = pod["desiredStatus"] == "RUNNING" and age > cap
         print(f"{pod['id']} {pod['name']:<32} {pod['desiredStatus']:<9} {age:6.2f} h (cap {cap:g} h) "
