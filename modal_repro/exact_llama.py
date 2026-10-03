@@ -63,6 +63,7 @@ from rewarding_doubt.checkpoint import (load_checkpoint, load_trainable_state, r
                                         set_rng_state, trainable_state, truncate_jsonl, write_status)
 from rewarding_doubt.core import baseline_matched_objective, objective
 from rewarding_doubt.stability import FLAGS, StabilityMonitor
+from rewarding_doubt.tracking import Tracker
 from rewarding_doubt.paper_ppo import AdaptiveKLController
 from shared_prefix import (candidate_logps, full_sequence_logps, single_pass_logps, single_pass_logps_batch,
                            split_candidates)
@@ -267,6 +268,7 @@ def main():
             truncate_jsonl(path, step)
         print(f"resumed from {checkpoint_dir} at step {step} (epoch {start_epoch}, question {start_index})", flush=True)
     logs = {name: open(path, "a" if state is not None else "w") for name, path in paths.items()}
+    tracker = Tracker(args.out_dir, {k: v for k, v in vars(args).items() if k != "ids"})
 
     def checkpoint(epoch, index, order):
         if not args.checkpoint_every and not stopping:
@@ -389,10 +391,13 @@ def main():
                 pi_entropy=mean(entropies), pi_max=mean(max_probs))
             logs["stability"].write(json.dumps(stability) + "\n")
             logs["stability"].flush()
+            tracker.log({**{k: v for k, v in record.items() if k not in ("time", "batch_hash")},
+                         **{f"stability/{k}": v for k, v in stability.items() if k != "step"}}, step=step)
             for event in events:
                 logs["stability_events"].write(json.dumps(event) + "\n")
                 logs["stability_events"].flush()
                 print("STABILITY", json.dumps(event), flush=True)
+                tracker.alert(f"{os.path.basename(args.out_dir)}: {event['flag']}", json.dumps(event))
                 if event["flag"] in stop_on:
                     stopping.append(event["flag"])
             if args.stop_after and step == args.stop_after:
@@ -406,6 +411,7 @@ def main():
                 preempted = stopping[0] in ("SIGTERM", "stop-after")
                 write_status(args.out_dir, "preempted" if preempted else "diverged", step=step, reason=stopping,
                              flags=sorted(monitor.raised))
+                tracker.finish()
                 sys.exit(143 if preempted else 3)
             if args.max_steps and step >= args.max_steps:
                 break
@@ -415,6 +421,7 @@ def main():
         if args.max_steps and step >= args.max_steps:
             break
     write_status(args.out_dir, "completed", step=step, flags=sorted(monitor.raised))
+    tracker.finish()
 
 
 if __name__ == "__main__":

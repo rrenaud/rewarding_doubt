@@ -12,7 +12,7 @@ RUN git clone -q https://github.com/pasta99/RewardingDoubt /opt/RewardingDoubt \
 COPY modal_repro/subset.py modal_repro/exact_llama.py modal_repro/shared_prefix.py modal_repro/thinking_llama.py \
      /opt/RewardingDoubt/SingleAnswerSetting/
 COPY src/rewarding_doubt /opt/rd/rewarding_doubt
-COPY runpod/entry.sh runpod/selfstop.py /opt/runpod/
+COPY runpod/entry.sh runpod/selfstop.py runpod/eval_snapshots.py /opt/runpod/
 # HF_HOME on the network volume: the model and TriviaQA download once per volume, not once per pod.
 ENV PYTHONPATH=/opt/rd HF_HOME=/workspace/hf HF_HUB_ENABLE_HF_TRANSFER=1 TOKENIZERS_PARALLELISM=false \
     PYTHONUNBUFFERED=1 WANDB_MODE=disabled CODE_DIR=/opt/RewardingDoubt/SingleAnswerSetting

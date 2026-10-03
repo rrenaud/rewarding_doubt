@@ -30,6 +30,8 @@ Options before "--" change PPO from outside Train.py, which stays unmodified:
              Rerunning the same command resumes (--no-resume ignores the checkpoint). To make the
              position meaningful, each epoch's question order comes from a generator seeded by
              (seed, epoch) instead of the global RNG (still a uniform shuffle per epoch).
+  --max-steps N  end after N PPO steps (Train.py itself only runs whole epochs): save
+             snapshot-step<N>, write status completed, exit 0
   --stop-on FLAGS  stability flags (rewarding_doubt.stability) that checkpoint and end the run
              (exit 3); default nonfinite. Every step also appends to stability.jsonl.
     python subset.py evaluate IDS_JSON MODEL_DIR OUT_JSON
@@ -347,9 +349,11 @@ def main():
                                                 set_rng_state, trainable_state, truncate_jsonl, write_status)
         from rewarding_doubt.paper_ppo import is_correct_f1
         from rewarding_doubt.stability import FLAGS, StabilityMonitor
+        from rewarding_doubt.tracking import Tracker
         os.makedirs(args.out_dir, exist_ok=True)
         checkpoint_every = option("--checkpoint-every", int, 32)
         stop_after = option("--stop-after", int, 0)  # testing: behave as if preempted after N steps
+        max_steps = option("--max-steps", int, 0)
         stop_on = {f for f in option("--stop-on", str, "nonfinite").split(",") if f}
         if stop_on - set(FLAGS):
             raise SystemExit(f"unknown --stop-on flags: {sorted(stop_on - set(FLAGS))}")
@@ -365,6 +369,7 @@ def main():
         logs = {name: open(os.path.join(args.out_dir, f"{name}.jsonl"), "a" if resume is not None else "w")
                 for name in ["steps", "stability", "stability_events"]}
         monitor = StabilityMonitor()
+        tracker = Tracker(args.out_dir, dict(vars(args), wrapper_options=" ".join(ours[3:])))
         count = [0]
         last_checkpoint = [resume["step"] if resume is not None else 0]
         stopping = []
@@ -452,10 +457,13 @@ def main():
                                                **{k: v for k, v in watched.items() if v is not None})
             logs["stability"].write(json.dumps(stability) + "\n")
             logs["stability"].flush()
+            tracker.log({"seconds": record["exit"] - entered,
+                         **{f"stability/{k}": v for k, v in stability.items() if k != "step"}}, step=count[0])
             for event in events:
                 logs["stability_events"].write(json.dumps(event) + "\n")
                 logs["stability_events"].flush()
                 print("STABILITY", json.dumps(event), flush=True)
+                tracker.alert(f"{os.path.basename(os.path.normpath(args.out_dir))}: {event['flag']}", json.dumps(event))
                 if event["flag"] in stop_on:
                     stopping.append(event["flag"])
             if stop_after and count[0] == stop_after:
@@ -467,7 +475,16 @@ def main():
                 preempted = stopping[0] in ("SIGTERM", "stop-after")
                 write_status(args.out_dir, "preempted" if preempted else "diverged", step=count[0], reason=stopping,
                              flags=sorted(monitor.raised))
+                tracker.finish()
                 sys.exit(143 if preempted else 3)
+            if max_steps and count[0] >= max_steps:
+                path = os.path.join(args.out_dir, f"snapshot-step{count[0]:05d}")
+                if not os.path.exists(path):
+                    original_save(self, path)
+                write_status(args.out_dir, "completed", step=count[0], flags=sorted(monitor.raised))
+                tracker.finish()
+                print(f"reached --max-steps {max_steps}", flush=True)
+                sys.exit(0)
             return stats
 
         PPOTrainerNoCache.step = step
@@ -478,6 +495,7 @@ def main():
                     model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset,
                     log_with=args.log_with, is_unsloth=args.is_unsloth)
         write_status(args.out_dir, "completed", step=count[0], flags=sorted(monitor.raised))
+        tracker.finish()
     elif command == "evaluate":
         import torch
         import InferenceDatasetSplit

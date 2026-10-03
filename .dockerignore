@@ -7,4 +7,5 @@
 !src/rewarding_doubt
 !runpod/entry.sh
 !runpod/selfstop.py
+!runpod/eval_snapshots.py
 **/__pycache__
