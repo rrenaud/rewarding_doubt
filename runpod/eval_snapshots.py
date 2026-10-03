@@ -1,9 +1,10 @@
 """Score every snapshot of a run on the validation split (POST_CMD of a long run).
 
-    python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON     # run from SingleAnswerSetting/
+    python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON [--frozen-answers]   # from SingleAnswerSetting/
 
 Each snapshot-step<N>/ gets the released evaluation (subset.py evaluate: eval_dev.json and
-eval_dev_metrics.json, skipped if already there, so a rerun only does what is missing). The
+eval_dev_metrics.json, skipped if already there; with --frozen-answers frozen_eval.py instead,
+for adapters trained with frozen answers; so a rerun only does what is missing). The
 curve goes to OUT_DIR/curve.json ({step: metrics}) and, when W&B is configured, to the run's
 "eval/*" charts.
 """
@@ -15,7 +16,8 @@ from pathlib import Path
 from rewarding_doubt.tracking import Tracker
 
 
-def main(out_dir, ids):
+def main(out_dir, ids, *flags):
+    evaluator = "frozen_eval.py" if "--frozen-answers" in flags else None
     out = Path(out_dir)
     curve = {}
     for snapshot in sorted(out.glob("snapshot-step*"), key=lambda p: int(p.name.split("step")[1])):
@@ -23,8 +25,9 @@ def main(out_dir, ids):
         metrics_path = snapshot / "eval_dev_metrics.json"
         if not metrics_path.exists():
             print(f"evaluating {snapshot.name}", flush=True)
-            code = subprocess.run([sys.executable, "subset.py", "evaluate", ids, str(snapshot),
-                                   str(snapshot / "eval_dev.json")]).returncode
+            command = ([evaluator, ids, str(snapshot), str(snapshot / "eval_dev.json")] if evaluator else
+                       ["subset.py", "evaluate", ids, str(snapshot), str(snapshot / "eval_dev.json")])
+            code = subprocess.run([sys.executable, *command]).returncode
             if code or not metrics_path.exists():
                 print(f"evaluation of {snapshot.name} failed (exit {code})", flush=True)
                 continue
@@ -39,4 +42,4 @@ def main(out_dir, ids):
 
 
 if __name__ == "__main__":
-    sys.exit(main(*sys.argv[1:3]))
+    sys.exit(main(*sys.argv[1:]))

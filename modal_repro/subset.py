@@ -32,6 +32,10 @@ Options before "--" change PPO from outside Train.py, which stays unmodified:
              (seed, epoch) instead of the global RNG (still a uniform shuffle per epoch).
   --max-steps N  end after N PPO steps (Train.py itself only runs whole epochs): save
              snapshot-step<N>, write status completed, exit 0
+  --frozen-answers  Train.py's answer generation runs with the adapter disabled (base model), so PPO
+             can only change the confidence; TRL's confidence generation (the call with
+             min_length=-1) keeps the adapter. Evaluate with frozen_eval.py. Malformed answers are
+             still scored -30 by Train.py's reward, as released.
   --stop-on FLAGS  stability flags (rewarding_doubt.stability) that checkpoint and end the run
              (exit 3); default nonfinite. Every step also appends to stability.jsonl.
     python subset.py evaluate IDS_JSON MODEL_DIR OUT_JSON
@@ -414,6 +418,19 @@ def main():
             original_init(self, *init_args, **init_kwargs)
             self.dataloader = ResumableLoader(self.dataloader, samplers[-1], resume["consumed"] if resume else 0)
             current_loader[0] = self.dataloader
+            if "--frozen-answers" in ours:
+                policy = self.accelerator.unwrap_model(self.model)  # the object Train.py calls .generate on
+                generate = policy.generate
+
+                def frozen_generate(*gen_args, **gen_kwargs):
+                    if gen_kwargs.get("min_length") == -1:  # PPOTrainer.generate: the confidence
+                        return generate(*gen_args, **gen_kwargs)
+                    if not frozen_announced:
+                        frozen_announced.append(True)
+                        print("frozen answers: Train.py's answer generation runs with the adapter disabled", flush=True)
+                    with policy.pretrained_model.disable_adapter():  # Train.py: the answer
+                        return generate(*gen_args, **gen_kwargs)
+                policy.generate = frozen_generate
             if resume is not None:
                 load_trainable_state(resume["weights"], self.model)
                 self.optimizer.load_state_dict(resume["optimizer"])
@@ -429,6 +446,7 @@ def main():
             loader = current_loader[0] if loader is None else loader
             return isinstance(loader, ResumableLoader) and loader.current_epoch_skipped
         current_loader = [None]
+        frozen_announced = []
 
         def save_checkpoint_now(self):
             t_save = time.time()

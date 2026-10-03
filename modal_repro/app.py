@@ -42,6 +42,7 @@ image = (
     .add_local_file(Path(__file__).parent / "verify_single_pass.py", f"{CODE}/verify_single_pass.py", copy=True)
     .add_local_file(Path(__file__).parent / "bench_batching.py", f"{CODE}/bench_batching.py", copy=True)
     .add_local_file(Path(__file__).parent / "thinking_llama.py", f"{CODE}/thinking_llama.py", copy=True)
+    .add_local_file(Path(__file__).parent / "frozen_eval.py", f"{CODE}/frozen_eval.py", copy=True)
     # Our package, so the exact objectives use the very same core.objective as the Tinker runs.
     .add_local_dir(Path(__file__).parents[1] / "src" / "rewarding_doubt", "/opt/rd/rewarding_doubt", copy=True,
                    ignore=["__pycache__"])
@@ -823,5 +824,39 @@ def resume_test(gpu: str = "L40S"):
         lines = [l for l in r["log"].splitlines() if l.startswith(("resumed", "checkpoint", "stopping", "STABILITY", "Traceback"))
                  or "Error" in l]
         print(f"== {key}: exit {r['exit_code']}", *lines[-12:], sep="\n  ")
+    print(f"logs: {out}")
+
+
+@app.local_entrypoint()
+def frozen_test(gpu: str = "L40S"):
+    """Short check of --frozen-answers: both trainers, then frozen_eval.py on their snapshots."""
+    root = Path(__file__).resolve().parents[1]
+    data = root / "runs/pilot-20261001T002945Z/data"
+    ids = {"train": [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()][:96],
+           "validation": json.loads((root / "runs/hparam-search-20261002T044831Z/dev_ids.json").read_text())[:64]}
+    exact = ["exact_llama.py", "IDS_JSON", "OUT_DIR", "--mode", "discrete-exact", "--scoring", "single", "--regularization",
+             "hinge", "--reward", "paper", "--passes", "2", "--minibatch", "4", "--lr", "4.01e-05", "--format-weight", "1.01",
+             "--seed", "1", "--epochs", "1", "--max-steps", "12", "--save-every", "12"]
+    ppo = ["subset.py", "train", "IDS_JSON", "--seed", "1", "--fast", "--grading", "f1", "--frozen-answers", "--save-every", "12",
+           "--max-steps", "12", "--", "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", MODEL,
+           "--tokenizer_dir", MODEL, "--epochs", "1", "--lr", "1e-05", "--batchsize", "8", "--log_with", "tensorboard"]
+    run = "frozen-test-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    trainer = train_with_snapshots.with_options(gpu=gpu)
+    jobs = [("exact-frozen", exact + ["--frozen-answers"]), ("ppo-frozen", ppo)]
+    results = {r["label"]: r for r in trainer.starmap([(ids, label, cmd, run) for label, cmd in jobs])}
+    evals = [(ids, f"eval-{label}", ["frozen_eval.py", "IDS_JSON", f"{VOL}/outputs/{run}/{label}/snapshot-step00012",
+                                    "OUT_DIR/eval.json"], run) for label in ("exact-frozen", "ppo-frozen")]
+    results.update({r["label"]: r for r in trainer.starmap(evals)})
+    out = root / "runs" / f"modal-{run}"
+    out.mkdir(parents=True, exist_ok=True)
+    for label, r in sorted(results.items()):
+        (out / f"{label}.log").write_text(r["log"])
+        print(f"== {label}: exit {r['exit_code']}")
+        print("\n".join(l for l in r["log"].splitlines()[-4:]))
+    names = ["metrics.jsonl", "steps.jsonl", "stability.jsonl", "generations.jsonl", "eval_metrics.json"]
+    for label in [j[0] for j in jobs] + ["eval-exact-frozen", "eval-ppo-frozen"]:
+        for path, text in read_files.remote([f"{VOL}/outputs/{run}/{label}/{n}" for n in names]).items():
+            (out / label).mkdir(exist_ok=True)
+            (out / label / Path(path).name).write_text(text)
     print(f"logs: {out}")
 

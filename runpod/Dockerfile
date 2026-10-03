@@ -10,6 +10,7 @@ RUN git clone -q https://github.com/pasta99/RewardingDoubt /opt/RewardingDoubt \
     && git -C /opt/RewardingDoubt checkout -q 416c9e0de22a387c35a51260e7739fa28a37865e \
     && pip install --no-cache-dir -r /opt/RewardingDoubt/requirements.txt
 COPY modal_repro/subset.py modal_repro/exact_llama.py modal_repro/shared_prefix.py modal_repro/thinking_llama.py \
+     modal_repro/frozen_eval.py \
      /opt/RewardingDoubt/SingleAnswerSetting/
 COPY src/rewarding_doubt /opt/rd/rewarding_doubt
 COPY runpod/entry.sh runpod/selfstop.py runpod/eval_snapshots.py /opt/runpod/

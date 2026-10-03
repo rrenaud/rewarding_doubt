@@ -29,16 +29,22 @@ to each pod so it can terminate itself) and `~/.runpod_rewarding_doubt_key_s3.tx
 
 ## Example
 
+New runs use `--frozen-answers` (answers from the base model, so confidence training cannot change
+them; see `modal_repro/exact_llama.py`) and score snapshots with the matching evaluator:
+
 ```bash
-python scripts/runpod_launch.py exact-long-s1 --ids-train-all --max-hours 8 \
+python scripts/runpod_launch.py long3-exact-s1 --ids-train-all --max-hours 8 \
+  --post-cmd "python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON --frozen-answers" \
   --train-cmd "python exact_llama.py IDS_JSON OUT_DIR --mode discrete-exact --scoring single \
-    --regularization hinge --reward paper --passes 2 --minibatch 4 --lr 1e-05 --format-weight 1.01 \
-    --seed 1 --epochs 1 --max-steps 4000 --save-every 500 \
+    --regularization hinge --reward paper --passes 2 --minibatch 4 --lr 4.01e-05 --format-weight 1.01 \
+    --seed 1 --epochs 1 --max-steps 4000 --save-every 500 --frozen-answers \
     --stop-on collapsed,answers_degraded,format_broken,nonfinite"
 python scripts/runpod_sync.py --list
-python scripts/runpod_sync.py exact-long-s1
+python scripts/runpod_sync.py long3-exact-s1
 python scripts/runpod_reaper.py          # backstop; --apply to terminate overdue pods
 ```
+
+For PPO, `subset.py train IDS_JSON --frozen-answers ...` does the same for Train.py's answer step.
 
 Tested 2026-10-03 (`runs/runpod/resume-test-{1,image}`): 32 questions, stop at step 3 as if
 preempted; RunPod restarted the container within 7 s, the run resumed and finished 8 steps,

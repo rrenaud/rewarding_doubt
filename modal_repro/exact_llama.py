@@ -32,6 +32,12 @@ Train.py except the update rule:
   deterministic function of (question, answer, label), so reuse needs no importance weights.
   --passes 4 --minibatch 4 matches PPO's 8 optimizer steps per batch of 8.
 
+* --frozen-answers: answers are generated with the adapter disabled (the base model), so training
+  the confidence cannot change them; only the confidence continuation comes from the adapter.
+  Evaluate such adapters with frozen_eval.py (base answer, then adapted confidence). Without it,
+  the long runs drifted: answers that never reach " Confidence" are dropped from the loss, so
+  nothing resisted "Answer: Answer: Answer: ..." repetition or hedges like "None, I made a
+  mistake!" written into the answer, and answer accuracy fell 3-5 points over 4,000 steps.
 * stability: every step feeds rewarding_doubt.stability.StabilityMonitor (sampled confidences,
   answer correctness, loss, gradient norm, entropy of pi) and appends to stability.jsonl; flags
   that rise go to stability_events.jsonl. With --stop-on FLAGS the run checkpoints and exits
@@ -46,6 +52,7 @@ Train.py except the update rule:
                           [--save-every 32] [--max-steps N] [--checkpoint-every 32] [--stop-on collapsed]
 """
 import argparse
+import contextlib
 import json
 import math
 import os
@@ -202,6 +209,7 @@ def main():
                         help=f"comma-separated stability flags that end the run ({', '.join(FLAGS)}; empty: none)")
     parser.add_argument("--no-resume", action="store_true", help="ignore an existing OUT_DIR/checkpoint")
     parser.add_argument("--stop-after", type=int, default=0, help="testing: behave as if preempted after N steps")
+    parser.add_argument("--frozen-answers", action="store_true", help="generate answers with the adapter disabled")
     args = parser.parse_args()
     if args.regularization == "baseline" and args.scoring != "single":
         parser.error("--regularization baseline needs --scoring single")
@@ -301,7 +309,7 @@ def main():
             t0 = time.time()
             batch = collate([data[i] for i in order[start:start + args.batchsize]])
             FastLanguageModel.for_inference(model)
-            with torch.no_grad():
+            with torch.no_grad(), (model.disable_adapter() if args.frozen_answers else contextlib.nullcontext()):
                 out = model.generate(input_ids=batch["input_ids"].cuda(),
                                      attention_mask=batch["attention_mask"].cuda(), **generation)
             rows, entries, row_entry = [], [], []  # entries: one generation-log line per answer
