@@ -1,0 +1,208 @@
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2113, "question_id": "dpql_3162", "confidence": 7, "answer": "Karl D\u00f6nitz", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2113, "question_id": "qf_195", "confidence": 2, "answer": "Circlet", "correct": false, "reward": 9.356643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2113, "question_id": "sfq_10816", "confidence": 8, "answer": "Robert Plant", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2113, "question_id": "qz_4577", "confidence": 6, "answer": "The Young Ones", "correct": false, "reward": 7.34919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2113, "question_id": "odql_13788", "confidence": 10, "answer": "High Noon", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2113, "question_id": "dpql_52", "confidence": 4, "answer": "Claressa Shields", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2113, "question_id": "sfq_6652", "confidence": 2, "answer": "Market Harborough", "correct": false, "reward": 9.356643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2113, "question_id": "odql_9191", "confidence": 4, "answer": "The King and I", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2114, "question_id": "sfq_20745", "confidence": 10, "answer": "South Carolina", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2114, "question_id": "qw_4483", "confidence": 6, "answer": "David Niven", "correct": false, "reward": 7.34919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2114, "question_id": "qg_2857", "confidence": 3, "answer": "Ed", "correct": false, "reward": 8.969918623597668}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2114, "question_id": "qg_489", "confidence": 10, "answer": "Gray's Anatomy", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2114, "question_id": "bb_5297", "confidence": 2, "answer": "Australian Rules Football", "correct": true, "reward": 7.841747339168339}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2114, "question_id": "sfq_9576", "confidence": 4, "answer": "Pepper", "correct": true, "reward": 9.84919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2114, "question_id": "qg_1676", "confidence": 10, "answer": "Women", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2114, "question_id": "sfq_18301", "confidence": 10, "answer": "Bernard Cornwell", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2115, "question_id": "odql_2841", "confidence": 6, "answer": "Phosphorus", "correct": true, "reward": 11.023477370072872}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2115, "question_id": "qw_6000", "confidence": 10, "answer": "Sergey Bubka", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2115, "question_id": "qz_4060", "confidence": 9, "answer": "Goat", "correct": false, "reward": 3.3342991948388354}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2115, "question_id": "sfq_7930", "confidence": 2, "answer": "Coca-Cola", "correct": true, "reward": 7.841747339168339}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2115, "question_id": "dpql_2754", "confidence": 3, "answer": "Pine", "correct": true, "reward": 9.016029225743369}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2115, "question_id": "qg_696", "confidence": 10, "answer": "Foreign Legion", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2115, "question_id": "sfq_21450", "confidence": 10, "answer": "Refraction", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2115, "question_id": "sfq_17311", "confidence": 3, "answer": "Napoleon Bonaparte", "correct": false, "reward": 8.969918623597668}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2116, "question_id": "tb_825", "confidence": 10, "answer": "Babelfish", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2116, "question_id": "qb_7689", "confidence": 4, "answer": "Linda", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2116, "question_id": "sfq_22258", "confidence": 10, "answer": "United Kingdom", "correct": false, "reward": -10.002897584516507}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2116, "question_id": "qb_8156", "confidence": 6, "answer": "Columbia University", "correct": true, "reward": 11.023477370072872}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2116, "question_id": "qg_1466", "confidence": 10, "answer": "Luddites", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2116, "question_id": "qg_536", "confidence": 10, "answer": "Wilson", "correct": false, "reward": -10.002897584516507}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2116, "question_id": "bb_6137", "confidence": 7, "answer": "suck", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2116, "question_id": "bb_3115", "confidence": 10, "answer": "Jordan", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2117, "question_id": "qb_2921", "confidence": 10, "answer": "Lake Placid", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2117, "question_id": "sfq_5398", "confidence": 5, "answer": "Hammersmith Bridge", "correct": false, "reward": 7.9954494401870075}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2117, "question_id": "dpql_1731", "confidence": 0, "answer": "None", "correct": false, "reward": 10.0}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2117, "question_id": "qz_4746", "confidence": 10, "answer": "Goat", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2117, "question_id": "qg_3869", "confidence": 3, "answer": "A swastika", "correct": true, "reward": 9.016029225743369}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2117, "question_id": "sfq_17051", "confidence": 10, "answer": "William Morris", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2117, "question_id": "qz_1327", "confidence": 0, "answer": "Goran Ivani\u0161evi\u0107", "correct": true, "reward": -7.502897584516511}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2117, "question_id": "bt_1828", "confidence": 3, "answer": "Insurance", "correct": false, "reward": 8.969918623597668}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2118, "question_id": "odql_3505", "confidence": 3, "answer": "Ginger McCain", "correct": true, "reward": 9.016029225743369}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2118, "question_id": "odql_5293", "confidence": 10, "answer": "Phuket is the largest of Thailand's islands.", "correct": false, "reward": -10.002897584516507}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2118, "question_id": "bb_5261", "confidence": 10, "answer": "Thailand", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2118, "question_id": "qg_2233", "confidence": null, "answer": null, "correct": false, "reward": -30.0}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2118, "question_id": "qf_3734", "confidence": 4, "answer": "MC Hammer", "correct": true, "reward": 9.84919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2118, "question_id": "bb_6861", "confidence": 7, "answer": "Rolling Cheese", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2118, "question_id": "wh_1683", "confidence": 5, "answer": "Amphibious", "correct": false, "reward": 7.9954494401870075}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2118, "question_id": "qz_5612", "confidence": 7, "answer": "The Third Man", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2119, "question_id": "qw_8415", "confidence": 10, "answer": "Santiago", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2119, "question_id": "bt_2456", "confidence": 5, "answer": "Butterfly", "correct": false, "reward": 7.9954494401870075}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2119, "question_id": "qw_8150", "confidence": 10, "answer": "The Tower of London", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2119, "question_id": "tc_3004", "confidence": 10, "answer": "Stratosphere", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2119, "question_id": "jp_223", "confidence": 10, "answer": "Iran", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2119, "question_id": "bb_5039", "confidence": 5, "answer": "Eastern Europe", "correct": true, "reward": 10.495449440187008}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2119, "question_id": "jp_4414", "confidence": 10, "answer": "John Edwards", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2119, "question_id": "jp_448", "confidence": 10, "answer": "Leonardo da Vinci", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2120, "question_id": "qw_3951", "confidence": 2, "answer": "Capon", "correct": false, "reward": 9.356643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2120, "question_id": "wh_3874", "confidence": 10, "answer": "James Joyce", "correct": false, "reward": -10.002897584516507}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2120, "question_id": "odql_9986", "confidence": 10, "answer": "James M. Cain", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2120, "question_id": "sfq_7672", "confidence": 10, "answer": "Belmopan", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2120, "question_id": "dpql_5723", "confidence": 10, "answer": "Frittata", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2120, "question_id": "qw_2387", "confidence": 7, "answer": "1956", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2120, "question_id": "bb_5485", "confidence": 3, "answer": "Cookie", "correct": true, "reward": 9.016029225743369}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2120, "question_id": "qw_713", "confidence": 10, "answer": "Acetic acid", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2121, "question_id": "bb_3321", "confidence": 10, "answer": "Goa", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2121, "question_id": "bb_5393", "confidence": 0, "answer": "3,141,592", "correct": false, "reward": 10.0}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2121, "question_id": "qb_2847", "confidence": 1, "answer": "Arizona", "correct": true, "reward": 5.834299194838836}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2121, "question_id": "qw_16079", "confidence": 5, "answer": "Ted Hughes", "correct": true, "reward": 10.495449440187008}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2121, "question_id": "bt_1692", "confidence": 0, "answer": "0", "correct": false, "reward": 10.0}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2121, "question_id": "qz_3029", "confidence": 2, "answer": "The Great Fire of London", "correct": true, "reward": 7.841747339168339}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2121, "question_id": "sfq_20565", "confidence": 9, "answer": "Ed Sheeran", "correct": true, "reward": 12.197759256647899}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2121, "question_id": "dpql_47", "confidence": 10, "answer": "The Animals", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2122, "question_id": "bb_6153", "confidence": 10, "answer": "Mickey Mouse", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2122, "question_id": "qb_5282", "confidence": 2, "answer": "3", "correct": false, "reward": 9.356643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2122, "question_id": "odql_5537", "confidence": 2, "answer": "Queen of the South", "correct": true, "reward": 7.841747339168339}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2122, "question_id": "dpql_4949", "confidence": 5, "answer": "Elton John", "correct": false, "reward": 7.9954494401870075}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2122, "question_id": "sfq_21909", "confidence": 10, "answer": "Slovenia", "correct": false, "reward": -10.002897584516507}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2122, "question_id": "dpql_3417", "confidence": 7, "answer": "Hans von B\u00fclow", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2122, "question_id": "dpql_1794", "confidence": 7, "answer": "The Mystery of Edwin Drood", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2122, "question_id": "wh_1480", "confidence": 10, "answer": "Robert Englund", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2123, "question_id": "jp_3442", "confidence": 8, "answer": "Richard the First", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2123, "question_id": "dpql_5237", "confidence": 10, "answer": "Snowy", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2123, "question_id": "wh_3845", "confidence": 10, "answer": "Mistral", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2123, "question_id": "jp_1541", "confidence": 5, "answer": "Sesame", "correct": false, "reward": 7.9954494401870075}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2123, "question_id": "qf_2283", "confidence": 7, "answer": "Julienne", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2123, "question_id": "sfq_14246", "confidence": 10, "answer": "Chaos", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2123, "question_id": "qb_5386", "confidence": 10, "answer": "Spine", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2123, "question_id": "qw_4952", "confidence": 5, "answer": "A vehicle for the people", "correct": false, "reward": 7.9954494401870075}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2124, "question_id": "qf_2449", "confidence": 5, "answer": "6", "correct": true, "reward": 10.495449440187008}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2124, "question_id": "odql_9432", "confidence": 5, "answer": "Argentina", "correct": false, "reward": 7.9954494401870075}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2124, "question_id": "odql_6304", "confidence": 10, "answer": "Sarajevo", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2124, "question_id": "sfq_165", "confidence": 4, "answer": "Huddersfield Town", "correct": true, "reward": 9.84919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2124, "question_id": "qb_4997", "confidence": 7, "answer": "James I", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2124, "question_id": "odql_12506", "confidence": 10, "answer": "1950", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2124, "question_id": "qb_3165", "confidence": 10, "answer": "Philippines", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2124, "question_id": "dpql_847", "confidence": 8, "answer": "Nessuno Dorme", "correct": false, "reward": 5.341747339168338}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2125, "question_id": "qb_1022", "confidence": 8, "answer": "Thumb", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2125, "question_id": "sfq_24743", "confidence": 10, "answer": "The Shadows", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2125, "question_id": "qz_2380", "confidence": 10, "answer": "Virginia", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2125, "question_id": "sfq_12216", "confidence": 5, "answer": "Lebanon", "correct": false, "reward": 7.9954494401870075}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2125, "question_id": "qg_2859", "confidence": 6, "answer": "Insecticide", "correct": true, "reward": 11.023477370072872}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2125, "question_id": "jp_2922", "confidence": 4, "answer": "Rum", "correct": true, "reward": 9.84919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2125, "question_id": "odql_2764", "confidence": 10, "answer": "Sikhism", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2125, "question_id": "qf_2735", "confidence": 4, "answer": "Commander of the Eighth Army", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2126, "question_id": "sfq_23540", "confidence": 6, "answer": "Red Fox", "correct": true, "reward": 11.023477370072872}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2126, "question_id": "odql_3413", "confidence": 7, "answer": "Spice Girls", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2126, "question_id": "bb_6803", "confidence": 10, "answer": "Grass family", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2126, "question_id": "qw_10475", "confidence": 10, "answer": "Brazil", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2126, "question_id": "jp_922", "confidence": 8, "answer": "Ethanol", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2126, "question_id": "odql_10590", "confidence": null, "answer": null, "correct": false, "reward": -30.0}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2126, "question_id": "wh_146", "confidence": 7, "answer": "Luzon", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2126, "question_id": "sfq_16674", "confidence": 4, "answer": "Vibraphone", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2127, "question_id": "odql_137", "confidence": 7, "answer": "Charles Schultz", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2127, "question_id": "odql_2135", "confidence": 7, "answer": "Iceland", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2127, "question_id": "qb_6390", "confidence": 7, "answer": "Alexandra", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2127, "question_id": "qb_1467", "confidence": 10, "answer": "Tay", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2127, "question_id": "qz_3627", "confidence": 5, "answer": "The Lion Sleeps Tonight", "correct": true, "reward": 10.495449440187008}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2127, "question_id": "sfq_7547", "confidence": 7, "answer": "XII", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2127, "question_id": "qw_5181", "confidence": 5, "answer": "Kerosene", "correct": true, "reward": 10.495449440187008}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2127, "question_id": "qw_8361", "confidence": 6, "answer": "Kingdom", "correct": true, "reward": 11.023477370072872}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2128, "question_id": "bt_2762", "confidence": 4, "answer": "Which a thousand fold would make an ample amends", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2128, "question_id": "sfq_4595", "confidence": 8, "answer": "Peterloo Massacre", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2128, "question_id": "tb_981", "confidence": 4, "answer": "Sugarloaf Mountain", "correct": true, "reward": 9.84919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2128, "question_id": "odql_4892", "confidence": 7, "answer": "Riddler", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2128, "question_id": "qw_4065", "confidence": 7, "answer": "From the Roman god of the underworld, Pluto", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2128, "question_id": "qf_2746", "confidence": 10, "answer": "Julius Caesar", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2128, "question_id": "dpql_88", "confidence": 7, "answer": "Correlation", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2128, "question_id": "qz_2745", "confidence": 4, "answer": "Cat and Rat", "correct": true, "reward": 9.84919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2129, "question_id": "odql_7382", "confidence": 8, "answer": "Morocco", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2129, "question_id": "sfq_5142", "confidence": 10, "answer": "TSR-2", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2129, "question_id": "odql_10494", "confidence": 7, "answer": "MySpace", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2129, "question_id": "jp_741", "confidence": 10, "answer": "Mel Brooks", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2129, "question_id": "qw_12837", "confidence": 10, "answer": "Rice", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2129, "question_id": "odql_10243", "confidence": 4, "answer": "Pebble", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2129, "question_id": "wh_1218", "confidence": 10, "answer": "England", "correct": false, "reward": -10.002897584516507}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2129, "question_id": "bb_1154", "confidence": 7, "answer": "Charlie Brooker, Jimmy Carr, Lauren Laverne, and David Schneider", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2130, "question_id": "odql_13910", "confidence": 9, "answer": "Limb", "correct": false, "reward": 3.3342991948388354}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2130, "question_id": "wh_4187", "confidence": 6, "answer": "Claret", "correct": false, "reward": 7.34919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2130, "question_id": "tc_2008", "confidence": 1, "answer": "Patti LuPone", "correct": true, "reward": 5.834299194838836}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2130, "question_id": "qz_1386", "confidence": 4, "answer": "Trainspotting", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2130, "question_id": "sfq_24526", "confidence": 10, "answer": "Damned", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2130, "question_id": "bt_3527", "confidence": 10, "answer": "Willemstad", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2130, "question_id": "dpql_2574", "confidence": 4, "answer": "Eric Clapton", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2130, "question_id": "qw_1435", "confidence": 10, "answer": "Arthur Evans", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2131, "question_id": "qg_423", "confidence": 9, "answer": "Capone", "correct": true, "reward": 12.197759256647899}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2131, "question_id": "odql_12027", "confidence": 5, "answer": "The She Smiled Sweetly", "correct": false, "reward": 7.9954494401870075}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2131, "question_id": "odql_11998", "confidence": 10, "answer": "Los Angeles Dodgers", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2131, "question_id": "tc_125", "confidence": 7, "answer": "Warner Communications", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2131, "question_id": "tb_709", "confidence": 10, "answer": "Sports Illustrated", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2131, "question_id": "qw_6465", "confidence": 7, "answer": "New Zealand Open", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2131, "question_id": "bb_3509", "confidence": 10, "answer": "Zorb", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2131, "question_id": "odql_3615", "confidence": 4, "answer": "Burnley", "correct": true, "reward": 9.84919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2132, "question_id": "wh_3634", "confidence": 10, "answer": "Austria", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2132, "question_id": "sfq_5453", "confidence": 4, "answer": "The Times", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2132, "question_id": "qw_13102", "confidence": 10, "answer": "Gabriel", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2132, "question_id": "sfq_4257", "confidence": 3, "answer": "Minted", "correct": false, "reward": 8.969918623597668}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2132, "question_id": "sfq_1183", "confidence": 8, "answer": "112", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2132, "question_id": "sfq_20566", "confidence": 4, "answer": "Hilary Mantel", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2132, "question_id": "bb_1649", "confidence": 10, "answer": "Adobe", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2132, "question_id": "sfq_8605", "confidence": 2, "answer": "Charles Hodge", "correct": false, "reward": 9.356643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2133, "question_id": "jp_3653", "confidence": 5, "answer": "Florida", "correct": true, "reward": 10.495449440187008}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2133, "question_id": "dpql_2442", "confidence": 10, "answer": "Silver", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2133, "question_id": "qz_546", "confidence": 2, "answer": "They stayed in the water", "correct": false, "reward": 9.356643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2133, "question_id": "qw_11975", "confidence": 7, "answer": "\"The truth is out there\"", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2133, "question_id": "qw_11203", "confidence": 10, "answer": "Garfield", "correct": false, "reward": -10.002897584516507}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2133, "question_id": "qf_850", "confidence": 8, "answer": "Mauna Kea, Hawaii, USA", "correct": false, "reward": 5.341747339168338}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2133, "question_id": "qw_4633", "confidence": 8, "answer": "Belgium", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2133, "question_id": "qb_8503", "confidence": 5, "answer": "Squadron Leader Douglas Bader", "correct": true, "reward": 10.495449440187008}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2134, "question_id": "sfq_17677", "confidence": 0, "answer": "None", "correct": false, "reward": 10.0}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2134, "question_id": "qw_5946", "confidence": 5, "answer": "Embryology", "correct": false, "reward": 7.9954494401870075}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2134, "question_id": "odql_3393", "confidence": 10, "answer": "Edouard Manet", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2134, "question_id": "qg_4146", "confidence": 10, "answer": "Copper and Zinc", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2134, "question_id": "qz_2533", "confidence": 7, "answer": "Gaynor Faye", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2134, "question_id": "bb_3808", "confidence": 8, "answer": "Bill, White Paper", "correct": false, "reward": 5.341747339168338}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2134, "question_id": "sfq_6742", "confidence": 8, "answer": "Jesse James", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2134, "question_id": "qz_4909", "confidence": 8, "answer": "Penelope Wilton", "correct": false, "reward": 5.341747339168338}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2135, "question_id": "qb_667", "confidence": 1, "answer": "Unknown", "correct": false, "reward": 9.697759256647899}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2135, "question_id": "sfq_9196", "confidence": 10, "answer": "Bristol", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2135, "question_id": "bb_357", "confidence": 6, "answer": "Owls", "correct": false, "reward": 7.34919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2135, "question_id": "jp_303", "confidence": 8, "answer": "GeoCities", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2135, "question_id": "qb_5193", "confidence": 10, "answer": "Figaro", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2135, "question_id": "qw_3145", "confidence": 0, "answer": "It was a public holiday, Queen's Birthday.", "correct": false, "reward": 10.0}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2135, "question_id": "sfq_12243", "confidence": 2, "answer": "Baal Hammon", "correct": false, "reward": 9.356643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2135, "question_id": "qb_7275", "confidence": 10, "answer": "November", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2136, "question_id": "qb_3405", "confidence": 10, "answer": "Pauline", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2136, "question_id": "jp_1313", "confidence": 8, "answer": "\"Hold Me Closer, Tiny Dancer\"", "correct": true, "reward": 11.856643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2136, "question_id": "dpql_1444", "confidence": 2, "answer": "Hikers", "correct": false, "reward": 9.356643627827342}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2136, "question_id": "qf_3182", "confidence": 4, "answer": "Rod Stewart", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2136, "question_id": "odql_3595", "confidence": 6, "answer": "Cannonball", "correct": false, "reward": 7.34919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2136, "question_id": "qb_4308", "confidence": 10, "answer": "Earth", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2136, "question_id": "odql_13006", "confidence": 10, "answer": "Robert Schumann", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2136, "question_id": "bb_4864", "confidence": 6, "answer": "Fingernails", "correct": false, "reward": 7.34919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2137, "question_id": "dpql_3351", "confidence": 2, "answer": "Reginald", "correct": true, "reward": 7.841747339168339}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2137, "question_id": "qw_14359", "confidence": 10, "answer": "Michelin", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2137, "question_id": "qz_5330", "confidence": 10, "answer": "Dr Pepper", "correct": false, "reward": -10.002897584516507}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2137, "question_id": "sfq_2341", "confidence": 7, "answer": "Anton\u00edn Dvo\u0159\u00e1k", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2137, "question_id": "qw_354", "confidence": 4, "answer": "Tycho Brahe", "correct": false, "reward": 8.52347737007287}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2137, "question_id": "bb_6363", "confidence": 7, "answer": "Carpet Sweeper", "correct": true, "reward": 11.469918623597666}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2137, "question_id": "jp_3443", "confidence": 10, "answer": "Honey bee", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2137, "question_id": "bt_117", "confidence": 10, "answer": "Jamaica", "correct": false, "reward": -10.002897584516507}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2138, "question_id": "qz_5957", "confidence": 6, "answer": "Ghost", "correct": true, "reward": 11.023477370072872}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2138, "question_id": "odql_12465", "confidence": 10, "answer": "John le Carr\u00e9", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2138, "question_id": "qw_5382", "confidence": 10, "answer": "Fortnum & Mason", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2138, "question_id": "jp_2876", "confidence": 7, "answer": "Bogot\u00e1, Colombia", "correct": false, "reward": 6.5160292257433685}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2138, "question_id": "sfq_7083", "confidence": 10, "answer": "Mallaig", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2138, "question_id": "sfq_20712", "confidence": 4, "answer": "Liverpool", "correct": true, "reward": 9.84919548349784}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2138, "question_id": "bt_1450", "confidence": 10, "answer": "Swan Lake", "correct": true, "reward": 12.5}
+{"expt": "long2", "run": "long2-ppo-paper-s1", "trainer": "ppo", "step": 2138, "question_id": "qw_1115", "confidence": 10, "answer": "Falange", "correct": true, "reward": 12.5}

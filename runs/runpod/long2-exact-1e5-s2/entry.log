@@ -1,0 +1,21 @@
+2026-10-03T01:14:50Z attempt start (image 90c0cc78a060c0b99a6767bcfb88b6d51984019b): python exact_llama.py /workspace/runs/long2-exact-1e5-s2/ids.json /workspace/runs/long2-exact-1e5-s2 --mode discrete-exact --scoring single --regularization hinge --reward paper --passes 2 --minibatch 4 --lr 1e-05 --format-weight 1.01 --format-threshold 0.95 --seed 2 --epochs 1 --max-steps 4000 --save-every 500 --stop-on collapsed,answers_degraded,format_broken,nonfinite
+2026-10-03T04:34:17Z SIGTERM: forwarding to the trainer so it checkpoints
+2026-10-03T04:37:03Z attempt start (image db7edf0d216aa727b73985eded72a5a6275dc78c): python exact_llama.py /workspace/runs/long2-exact-1e5-s2/ids.json /workspace/runs/long2-exact-1e5-s2 --mode discrete-exact --scoring single --regularization hinge --reward paper --passes 2 --minibatch 4 --lr 1e-05 --format-weight 1.01 --format-threshold 0.95 --seed 2 --epochs 1 --max-steps 4000 --save-every 500 --stop-on collapsed,answers_degraded,format_broken,nonfinite
+2026-10-03T05:34:35Z trainer exited with code 0
+2026-10-03T05:34:35Z post: python /opt/runpod/eval_snapshots.py /workspace/runs/long2-exact-1e5-s2 /workspace/runs/long2-exact-1e5-s2/ids.json
+2026-10-03T05:37:25Z outcome: completed
+selfstop: terminate pod c5jr4anho0rk40: HTTP 204
+2026-10-03T05:37:26Z pod terminate requested
+2026-10-03T06:35:52Z FORCE_RESUME: rerunning after outcome completed
+2026-10-03T06:35:52Z attempt start (image 843350718b176c49f5c565a6d6fd4f2cc667bd79): python /opt/runpod/eval_snapshots.py /workspace/runs/long2-exact-1e5-s2 /workspace/runs/long2-exact-1e5-s2/ids.json
+2026-10-03T06:36:22Z watchdog: timeout (log idle 2 s); SIGTERM, then SIGKILL after 180 s
+2026-10-03T06:36:22Z trainer exited with code 143
+2026-10-03T06:36:22Z outcome: timeout
+selfstop: terminate pod yoy816zl268xos: HTTP 204
+2026-10-03T06:36:23Z pod terminate requested
+2026-10-03T07:00:11Z FORCE_RESUME: rerunning after outcome timeout
+2026-10-03T07:00:11Z attempt start (image faea681846c9814e99f8c4fd0c41e22a64727460): python /opt/runpod/eval_snapshots.py /workspace/runs/long2-exact-1e5-s2 /workspace/runs/long2-exact-1e5-s2/ids.json
+2026-10-03T07:06:41Z trainer exited with code 0
+2026-10-03T07:06:41Z outcome: completed
+selfstop: terminate pod iehwohtn9o2ds9: HTTP 204
+2026-10-03T07:06:42Z pod terminate requested

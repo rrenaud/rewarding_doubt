@@ -1,0 +1,42 @@
+{
+ "expt": "long2",
+ "run": "long2-exact-1e5-s2",
+ "trainer": "exact",
+ "args": {
+  "ids": "/workspace/runs/long2-exact-1e5-s2/ids.json",
+  "out_dir": "/workspace/runs/long2-exact-1e5-s2",
+  "mode": "discrete-exact",
+  "reward": "paper",
+  "reward_mix": 0.0,
+  "format_weight": 1.01,
+  "format_threshold": 0.95,
+  "lr": 1e-05,
+  "batchsize": 8,
+  "epochs": 1,
+  "max_steps": 4000,
+  "passes": 2,
+  "minibatch": 4,
+  "save_every": 500,
+  "regularization": "hinge",
+  "invalid_reward": -3.0,
+  "kl_coef": 0.05,
+  "kl_target": 6.0,
+  "kl_horizon": 10000.0,
+  "value_head": false,
+  "forward_batch": 0,
+  "grad_ckpt": "off",
+  "vf_coef": 0.1,
+  "scoring": "single",
+  "seed": 2,
+  "checkpoint_every": 32,
+  "stop_on": "collapsed,answers_degraded,format_broken,nonfinite",
+  "no_resume": false,
+  "stop_after": 0,
+  "n_common": 2
+ },
+ "image_git_sha": "db7edf0d216aa727b73985eded72a5a6275dc78c",
+ "started": "2026-10-03T04:37:43Z",
+ "resumed_at_steps": [
+  3186
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "500": {
+  "model": "/workspace/runs/long2-ppo-paper-s2/snapshot-step00500",
+  "n": 512,
+  "wrong_format_rate": 0.001953125,
+  "ece": 0.07808306813240051,
+  "accuracy": 0.6692759295499021,
+  "auroc": 0.748096819959168,
+  "brier": 0.18279843444227006,
+  "ece_unsampled": 0.08137132972478867,
+  "auroc_unsampled": 0.786567009239074,
+  "brier_unsampled": 0.17904900981524116,
+  "ece_unsampled_argmax": 0.07769199460744858,
+  "number_mass_unsampled": 0.9999948591868705,
+  "unsampled_rows": 511,
+  "unsampled_missing": 0
+ },
+ "1000": {
+  "model": "/workspace/runs/long2-ppo-paper-s2/snapshot-step01000",
+  "n": 512,
+  "wrong_format_rate": 0.005859375,
+  "ece": 0.1493125855922699,
+  "accuracy": 0.6640471512770137,
+  "auroc": 0.7911692446105401,
+  "brier": 0.1793713163064833,
+  "ece_unsampled": 0.14147643744945526,
+  "auroc_unsampled": 0.8207204401536385,
+  "brier_unsampled": 0.17240187574538035,
+  "ece_unsampled_argmax": 0.14440101385116577,
+  "number_mass_unsampled": 0.9999742496224424,
+  "unsampled_rows": 509,
+  "unsampled_missing": 0
+ }
+}

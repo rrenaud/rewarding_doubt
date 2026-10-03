@@ -1,0 +1,22 @@
+{
+ "expt": "long2",
+ "run": "long2-ppo-paper-s1",
+ "trainer": "ppo",
+ "args": {
+  "model_dir": "unsloth/llama-3-8b-Instruct-bnb-4bit",
+  "tokenizer_dir": "unsloth/llama-3-8b-Instruct-bnb-4bit",
+  "out_dir": "/workspace/runs/long2-ppo-paper-s1",
+  "lr": 1e-05,
+  "epochs": 1,
+  "batchsize": 8,
+  "log_with": "tensorboard",
+  "dataset": "triviaqa",
+  "is_unsloth": true,
+  "wrapper_options": "--seed 1 --fast --grading f1 --save-every 500 --max-steps 4000 --stop-on collapsed,answers_degraded,format_broken,nonfinite"
+ },
+ "image_git_sha": "db7edf0d216aa727b73985eded72a5a6275dc78c",
+ "started": "2026-10-03T04:36:35Z",
+ "resumed_at_steps": [
+  2112
+ ]
+}

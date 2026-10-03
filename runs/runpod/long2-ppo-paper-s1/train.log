@@ -106,3 +106,223 @@ torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.81 GiB. GPU 0 ha
 [1;34mwandb[0m: 
 [1;34mwandb[0m: 🚀 View run [33mlong2-ppo-paper-s1[0m at: [34mhttps://wandb.ai/multi-tokenizer/rewarding-doubt/runs/d316509908bb25cf[0m
 [1;34mwandb[0m: Find logs at: [1;35m../../../workspace/runs/long2-ppo-paper-s1/wandb/run-20261003_011420-d316509908bb25cf/logs[0m
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+wandb: Currently logged in as: rrenaud (multi-tokenizer). Use `wandb login --relogin` to force relogin
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Tracking run with wandb version 0.19.2
+wandb: Run data is saved locally in /workspace/runs/long2-ppo-paper-s1/wandb/run-20261003_043633-d316509908bb25cf
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Resuming run long2-ppo-paper-s1
+wandb: ⭐️ View project at https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: 🚀 View run at https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/d316509908bb25cf
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+WARNING:root:The `device_map` argument is not provided. We will override the device_map argument. to set the entire model on the current device. If you want to set the model on multiple devices, please provide a custom `device_map` argument.
+Map:   0%|          | 0/87622 [00:00<?, ? examples/s]Map:   2%|▏         | 1866/87622 [00:00<00:05, 16514.75 examples/s]Map:   4%|▍         | 3842/87622 [00:00<00:04, 18325.17 examples/s]Map:   7%|▋         | 6000/87622 [00:00<00:04, 19527.58 examples/s]Map:   9%|▉         | 8035/87622 [00:00<00:04, 19725.75 examples/s]Map:  12%|█▏        | 10152/87622 [00:00<00:03, 20234.07 examples/s]Map:  15%|█▍        | 13055/87622 [00:00<00:03, 19850.23 examples/s]Map:  18%|█▊        | 16000/87622 [00:00<00:03, 19504.91 examples/s]Map:  21%|██        | 18112/87622 [00:00<00:03, 19927.98 examples/s]Map:  23%|██▎       | 20422/87622 [00:01<00:03, 20794.58 examples/s]Map:  27%|██▋       | 23525/87622 [00:01<00:03, 20672.95 examples/s]Map:  30%|███       | 26580/87622 [00:01<00:02, 20564.65 examples/s]Map:  34%|███▍      | 29677/87622 [00:01<00:02, 20590.56 examples/s]Map:  37%|███▋      | 32550/87622 [00:01<00:02, 20128.55 examples/s]Map:  40%|███▉      | 34628/87622 [00:01<00:02, 19977.00 examples/s]Map:  42%|████▏     | 36723/87622 [00:01<00:02, 20216.94 examples/s]Map:  44%|████▍     | 38772/87622 [00:01<00:02, 20286.03 examples/s]Map:  48%|████▊     | 41664/87622 [00:02<00:02, 19920.76 examples/s]Map:  51%|█████     | 44483/87622 [00:02<00:02, 19535.09 examples/s]Map:  53%|█████▎    | 46615/87622 [00:02<00:02, 19688.12 examples/s]Map:  56%|█████▌    | 48711/87622 [00:02<00:01, 19905.26 examples/s]Map:  58%|█████▊    | 50938/87622 [00:02<00:01, 20533.43 examples/s]Map:  61%|██████    | 53156/87622 [00:02<00:01, 20849.46 examples/s]Map:  64%|██████▍   | 56400/87622 [00:02<00:01, 21134.29 examples/s]Map:  67%|██████▋   | 58674/87622 [00:02<00:01, 21551.40 examples/s]Map:  71%|███████   | 61776/87622 [00:03<00:01, 21134.75 examples/s]Map:  74%|███████▍  | 65000/87622 [00:03<00:01, 21140.27 examples/s]Map:  78%|███████▊  | 68236/87622 [00:03<00:00, 21226.97 examples/s]Map:  81%|████████▏ | 71219/87622 [00:03<00:00, 20801.59 examples/s]Map:  84%|████████▎ | 73354/87622 [00:03<00:00, 20927.79 examples/s]Map:  86%|████████▋ | 75575/87622 [00:03<00:00, 21150.86 examples/s]Map:  90%|████████▉ | 78787/87622 [00:03<00:00, 21196.27 examples/s]Map:  94%|█████████▎| 82000/87622 [00:04<00:00, 21141.56 examples/s]Map:  97%|█████████▋| 85139/87622 [00:04<00:00, 20908.12 examples/s]Map: 100%|██████████| 87622/87622 [00:04<00:00, 20609.93 examples/s]Map: 100%|██████████| 87622/87622 [00:04<00:00, 19849.98 examples/s]
+Map:   0%|          | 0/87622 [00:00<?, ? examples/s]Map:   0%|          | 430/87622 [00:00<00:20, 4271.76 examples/s]Map:   1%|          | 919/87622 [00:00<00:18, 4625.58 examples/s]Map:   2%|▏         | 1550/87622 [00:00<00:19, 4385.15 examples/s]Map:   2%|▏         | 2000/87622 [00:00<00:19, 4287.13 examples/s]Map:   3%|▎         | 2668/87622 [00:00<00:19, 4353.78 examples/s]Map:   4%|▎         | 3239/87622 [00:00<00:20, 4147.11 examples/s]Map:   4%|▍         | 3667/87622 [00:00<00:20, 4180.45 examples/s]Map:   5%|▍         | 4240/87622 [00:01<00:20, 4022.88 examples/s]Map:   5%|▌         | 4724/87622 [00:01<00:19, 4227.83 examples/s]Map:   6%|▌         | 5268/87622 [00:01<00:20, 4013.80 examples/s]Map:   7%|▋         | 5720/87622 [00:01<00:19, 4140.21 examples/s]Map:   7%|▋         | 6296/87622 [00:01<00:20, 4032.14 examples/s]Map:   8%|▊         | 6762/87622 [00:01<00:19, 4188.22 examples/s]Map:   8%|▊         | 7350/87622 [00:01<00:19, 4093.24 examples/s]Map:   9%|▉         | 7796/87622 [00:01<00:19, 4182.71 examples/s]Map:  10%|▉         | 8350/87622 [00:02<00:19, 4006.69 examples/s]Map:  10%|█         | 8815/87622 [00:02<00:18, 4165.13 examples/s]Map:  11%|█         | 9467/87622 [00:02<00:27, 2821.28 examples/s]Map:  11%|█▏        | 9940/87622 [00:02<00:24, 3165.53 examples/s]Map:  12%|█▏        | 10551/87622 [00:02<00:22, 3416.43 examples/s]Map:  13%|█▎        | 11000/87622 [00:02<00:21, 3556.85 examples/s]Map:  13%|█▎        | 11472/87622 [00:02<00:19, 3818.43 examples/s]Map:  14%|█▎        | 11951/87622 [00:03<00:18, 4052.78 examples/s]Map:  14%|█▍        | 12549/87622 [00:03<00:18, 4027.12 examples/s]Map:  15%|█▍        | 13000/87622 [00:03<00:18, 4006.28 examples/s]Map:  15%|█▌        | 13471/87622 [00:03<00:17, 4182.02 examples/s]Map:  16%|█▌        | 13943/87622 [00:03<00:17, 4324.07 examples/s]Map:  17%|█▋        | 14540/87622 [00:03<00:17, 4196.85 examples/s]Map:  17%|█▋        | 15113/87622 [00:03<00:17, 4064.64 examples/s]Map:  18%|█▊        | 15581/87622 [00:03<00:17, 4213.97 examples/s]Map:  19%|█▊        | 16235/87622 [00:04<00:16, 4213.41 examples/s]Map:  19%|█▉        | 16691/87622 [00:04<00:16, 4296.26 examples/s]Map:  20%|█▉        | 17272/87622 [00:04<00:16, 4148.76 examples/s]Map:  20%|██        | 17745/87622 [00:04<00:16, 4288.97 examples/s]Map:  21%|██        | 18238/87622 [00:04<00:17, 3874.61 examples/s]Map:  21%|██▏       | 18696/87622 [00:04<00:17, 4044.73 examples/s]Map:  22%|██▏       | 19252/87622 [00:04<00:17, 3927.68 examples/s]Map:  23%|██▎       | 19717/87622 [00:04<00:16, 4104.17 examples/s]Map:  23%|██▎       | 20286/87622 [00:05<00:16, 3992.69 examples/s]Map:  24%|██▎       | 20736/87622 [00:05<00:16, 4115.94 examples/s]Map:  24%|██▍       | 21303/87622 [00:05<00:16, 3997.70 examples/s]Map:  25%|██▍       | 21770/87622 [00:05<00:15, 4161.32 examples/s]Map:  26%|██▌       | 22347/87622 [00:05<00:16, 4049.13 examples/s]Map:  26%|██▌       | 22810/87622 [00:05<00:15, 4191.57 examples/s]Map:  27%|██▋       | 23427/87622 [00:05<00:15, 4078.04 examples/s]Map:  27%|██▋       | 23892/87622 [00:05<00:15, 4216.93 examples/s]Map:  28%|██▊       | 24469/87622 [00:06<00:15, 4086.28 examples/s]Map:  28%|██▊       | 24917/87622 [00:06<00:14, 4181.74 examples/s]Map:  29%|██▉       | 25497/87622 [00:06<00:15, 4068.82 examples/s]Map:  30%|██▉       | 25953/87622 [00:06<00:14, 4187.77 examples/s]Map:  30%|███       | 26538/87622 [00:06<00:14, 4083.39 examples/s]Map:  31%|███       | 26992/87622 [00:06<00:14, 4193.53 examples/s]Map:  31%|███▏      | 27560/87622 [00:06<00:14, 4051.50 examples/s]Map:  32%|███▏      | 28000/87622 [00:06<00:14, 3985.61 examples/s]Map:  32%|███▏      | 28474/87622 [00:07<00:14, 4173.80 examples/s]Map:  33%|███▎      | 28955/87622 [00:07<00:13, 4340.88 examples/s]Map:  34%|███▎      | 29562/87622 [00:07<00:13, 4230.26 examples/s]Map:  34%|███▍      | 30000/87622 [00:07<00:13, 4150.61 examples/s]Map:  35%|███▍      | 30447/87622 [00:07<00:13, 4232.57 examples/s]Map:  35%|███▌      | 30921/87622 [00:07<00:12, 4367.89 examples/s]Map:  36%|███▌      | 31533/87622 [00:07<00:13, 4257.44 examples/s]Map:  36%|███▋      | 31976/87622 [00:07<00:12, 4299.83 examples/s]Map:  37%|███▋      | 32536/87622 [00:08<00:13, 4095.85 examples/s]Map:  38%|███▊      | 32988/87622 [00:08<00:13, 4200.25 examples/s]Map:  38%|███▊      | 33459/87622 [00:08<00:19, 2721.03 examples/s]Map:  39%|███▊      | 33922/87622 [00:08<00:17, 3087.57 examples/s]Map:  39%|███▉      | 34472/87622 [00:08<00:16, 3255.58 examples/s]Map:  40%|███▉      | 34926/87622 [00:08<00:14, 3532.18 examples/s]Map:  41%|████      | 35503/87622 [00:08<00:14, 3629.18 examples/s]Map:  41%|████      | 35946/87622 [00:09<00:13, 3813.24 examples/s]Map:  42%|████▏     | 36509/87622 [00:09<00:13, 3789.92 examples/s]Map:  42%|████▏     | 36955/87622 [00:09<00:12, 3948.33 examples/s]Map:  43%|████▎     | 37562/87622 [00:09<00:12, 3978.71 examples/s]Map:  43%|████▎     | 37992/87622 [00:09<00:12, 4052.85 examples/s]Map:  44%|████▍     | 38604/87622 [00:09<00:12, 4058.19 examples/s]Map:  45%|████▍     | 39246/87622 [00:09<00:11, 4069.23 examples/s]Map:  45%|████▌     | 39723/87622 [00:09<00:11, 4233.84 examples/s]Map:  46%|████▌     | 40329/87622 [00:10<00:11, 4167.02 examples/s]Map:  47%|████▋     | 40813/87622 [00:10<00:10, 4326.50 examples/s]Map:  47%|████▋     | 41465/87622 [00:10<00:10, 4267.10 examples/s]Map:  48%|████▊     | 42042/87622 [00:10<00:11, 4128.03 examples/s]Map:  49%|████▊     | 42528/87622 [00:10<00:10, 4298.66 examples/s]Map:  49%|████▉     | 43000/87622 [00:10<00:10, 4258.98 examples/s]Map:  50%|████▉     | 43445/87622 [00:10<00:10, 4307.26 examples/s]Map:  50%|█████     | 43905/87622 [00:10<00:09, 4382.80 examples/s]Map:  51%|█████     | 44490/87622 [00:11<00:10, 4202.39 examples/s]Map:  51%|█████▏    | 44966/87622 [00:11<00:09, 4344.05 examples/s]Map:  52%|█████▏    | 45523/87622 [00:11<00:10, 4116.56 examples/s]Map:  52%|█████▏    | 46000/87622 [00:11<00:10, 4139.89 examples/s]Map:  53%|█████▎    | 46457/87622 [00:11<00:09, 4249.70 examples/s]Map:  54%|█████▎    | 46940/87622 [00:11<00:09, 4404.45 examples/s]Map:  54%|█████▍    | 47556/87622 [00:11<00:09, 4294.16 examples/s]Map:  55%|█████▍    | 48000/87622 [00:11<00:09, 4272.80 examples/s]Map:  55%|█████▌    | 48453/87622 [00:11<00:09, 4339.49 examples/s]Map:  56%|█████▌    | 48918/87622 [00:12<00:08, 4423.10 examples/s]Map:  57%|█████▋    | 49511/87622 [00:12<00:08, 4243.73 examples/s]Map:  57%|█████▋    | 49973/87622 [00:12<00:08, 4340.03 examples/s]Map:  58%|█████▊    | 50605/87622 [00:12<00:08, 4292.55 examples/s]Map:  58%|█████▊    | 51200/87622 [00:12<00:08, 4144.15 examples/s]Map:  59%|█████▉    | 51670/87622 [00:12<00:08, 4276.38 examples/s]Map:  60%|█████▉    | 52234/87622 [00:12<00:08, 3968.36 examples/s]Map:  60%|██████    | 52704/87622 [00:13<00:08, 4140.99 examples/s]Map:  61%|██████    | 53298/87622 [00:13<00:08, 4075.38 examples/s]Map:  61%|██████▏   | 53744/87622 [00:13<00:08, 4168.67 examples/s]Map:  62%|██████▏   | 54311/87622 [00:13<00:08, 4032.83 examples/s]Map:  63%|██████▎   | 54792/87622 [00:13<00:07, 4223.90 examples/s]Map:  63%|██████▎   | 55465/87622 [00:13<00:07, 4197.70 examples/s]Map:  64%|██████▍   | 55951/87622 [00:13<00:07, 4356.11 examples/s]Map:  65%|██████▍   | 56573/87622 [00:13<00:07, 4280.71 examples/s]Map:  65%|██████▌   | 57226/87622 [00:14<00:10, 2902.74 examples/s]Map:  66%|██████▌   | 57700/87622 [00:14<00:09, 3220.95 examples/s]Map:  67%|██████▋   | 58313/87622 [00:14<00:08, 3455.13 examples/s]Map:  67%|██████▋   | 58804/87622 [00:14<00:07, 3751.73 examples/s]Map:  68%|██████▊   | 59458/87622 [00:14<00:07, 3877.20 examples/s]Map:  68%|██████▊   | 59944/87622 [00:14<00:06, 4095.60 examples/s]Map:  69%|██████▉   | 60540/87622 [00:15<00:06, 4052.42 examples/s]Map:  70%|██████▉   | 61087/87622 [00:15<00:06, 3922.26 examples/s]Map:  70%|███████   | 61579/87622 [00:15<00:06, 4150.77 examples/s]Map:  71%|███████   | 62234/87622 [00:15<00:06, 4178.51 examples/s]Map:  72%|███████▏  | 62677/87622 [00:15<00:05, 4236.03 examples/s]Map:  72%|███████▏  | 63266/87622 [00:15<00:05, 4128.31 examples/s]Map:  73%|███████▎  | 63746/87622 [00:15<00:05, 4290.71 examples/s]Map:  73%|███████▎  | 64341/87622 [00:15<00:05, 4176.35 examples/s]Map:  74%|███████▍  | 64980/87622 [00:16<00:05, 4201.66 examples/s]Map:  75%|███████▍  | 65551/87622 [00:16<00:05, 4072.80 examples/s]Map:  75%|███████▌  | 65969/87622 [00:16<00:05, 4095.82 examples/s]Map:  76%|███████▌  | 66512/87622 [00:16<00:05, 3933.84 examples/s]Map:  76%|███████▋  | 66982/87622 [00:16<00:05, 4116.53 examples/s]Map:  77%|███████▋  | 67578/87622 [00:16<00:04, 4063.98 examples/s]Map:  78%|███████▊  | 67997/87622 [00:16<00:04, 4093.09 examples/s]Map:  78%|███████▊  | 68547/87622 [00:17<00:04, 3941.29 examples/s]Map:  79%|███████▊  | 69000/87622 [00:17<00:04, 3958.44 examples/s]Map:  79%|███████▉  | 69443/87622 [00:17<00:04, 4076.55 examples/s]Map:  80%|███████▉  | 69913/87622 [00:17<00:04, 4238.67 examples/s]Map:  80%|████████  | 70485/87622 [00:17<00:04, 4082.21 examples/s]Map:  81%|████████  | 70946/87622 [00:17<00:03, 4215.92 examples/s]Map:  82%|████████▏ | 71530/87622 [00:17<00:03, 4097.99 examples/s]Map:  82%|████████▏ | 71985/87622 [00:17<00:03, 4210.22 examples/s]Map:  83%|████████▎ | 72508/87622 [00:17<00:03, 3950.67 examples/s]Map:  83%|████████▎ | 72961/87622 [00:18<00:03, 4092.35 examples/s]Map:  84%|████████▍ | 73541/87622 [00:18<00:03, 4009.54 examples/s]Map:  84%|████████▍ | 73990/87622 [00:18<00:03, 4127.62 examples/s]Map:  85%|████████▌ | 74595/87622 [00:18<00:03, 4091.38 examples/s]Map:  86%|████████▌ | 75195/87622 [00:18<00:03, 4025.00 examples/s]Map:  86%|████████▋ | 75662/87622 [00:18<00:02, 4174.99 examples/s]Map:  87%|████████▋ | 76257/87622 [00:18<00:02, 4100.92 examples/s]Map:  88%|████████▊ | 76727/87622 [00:18<00:02, 4244.04 examples/s]Map:  88%|████████▊ | 77318/87622 [00:19<00:02, 4137.70 examples/s]Map:  89%|████████▉ | 77788/87622 [00:19<00:02, 4273.73 examples/s]Map:  89%|████████▉ | 78233/87622 [00:19<00:02, 4182.47 examples/s]Map:  90%|████████▉ | 78715/87622 [00:19<00:02, 4347.27 examples/s]Map:  90%|█████████ | 79272/87622 [00:19<00:02, 4113.62 examples/s]Map:  91%|█████████ | 79746/87622 [00:19<00:01, 4272.81 examples/s]Map:  92%|█████████▏| 80378/87622 [00:19<00:01, 4240.31 examples/s]Map:  92%|█████████▏| 80830/87622 [00:19<00:01, 4308.01 examples/s]Map:  93%|█████████▎| 81353/87622 [00:20<00:02, 2821.92 examples/s]Map:  93%|█████████▎| 81832/87622 [00:20<00:01, 3193.13 examples/s]Map:  94%|█████████▍| 82464/87622 [00:20<00:01, 3455.30 examples/s]Map:  95%|█████████▍| 82937/87622 [00:20<00:01, 3716.82 examples/s]Map:  95%|█████████▌| 83578/87622 [00:20<00:01, 3888.05 examples/s]Map:  96%|█████████▌| 84000/87622 [00:20<00:00, 3911.11 examples/s]Map:  96%|█████████▋| 84443/87622 [00:20<00:00, 4034.53 examples/s]Map:  97%|█████████▋| 84893/87622 [00:21<00:00, 4151.83 examples/s]Map:  98%|█████████▊| 85462/87622 [00:21<00:00, 4009.07 examples/s]Map:  98%|█████████▊| 85926/87622 [00:21<00:00, 4167.72 examples/s]Map:  99%|█████████▊| 86514/87622 [00:21<00:00, 4077.10 examples/s]Map:  99%|█████████▉| 86964/87622 [00:21<00:00, 4181.39 examples/s]Map: 100%|█████████▉| 87561/87622 [00:21<00:00, 4108.35 examples/s]Map: 100%|██████████| 87622/87622 [00:21<00:00, 4002.11 examples/s]
+resumed from /workspace/runs/long2-ppo-paper-s1/checkpoint at step 2112 (2112 batches consumed)
+wandb: WARNING Tried to log to step 2113 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2114 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2115 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2116 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2117 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2118 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2119 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2120 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2121 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2122 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2123 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2124 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2125 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2126 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2127 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2128 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2129 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2130 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2131 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2132 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2133 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2134 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2135 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2136 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2137 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+wandb: WARNING Tried to log to step 2138 that is less than the current step 2139. Steps must be monotonically increasing, so this data will be ignored. See https://wandb.me/define-metric to log data out of order.
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 567, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 507, in main
+    Train.train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize,
+  File "/opt/RewardingDoubt/SingleAnswerSetting/Train.py", line 193, in train
+    stats = ppo_trainer.step(prediction, response_tensors, rewards)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 454, in step
+    stats = original_step(self, *step_args, **step_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/util/ppo_trainer_no_cache.py", line 192, in step
+    train_stats = self.train_minibatch(
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/trl/trainer/ppo_trainer.py", line 1078, in train_minibatch
+    self.accelerator.backward(loss)
+  File "/usr/local/lib/python3.11/site-packages/accelerate/accelerator.py", line 2248, in backward
+    loss.backward(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/torch/_tensor.py", line 581, in backward
+    torch.autograd.backward(
+  File "/usr/local/lib/python3.11/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/usr/local/lib/python3.11/site-packages/torch/autograd/graph.py", line 825, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.81 GiB. GPU 0 has a total capacity of 23.52 GiB of which 807.75 MiB is free. Including non-PyTorch memory, this process has 22.72 GiB memory in use. Of the allocated memory 21.75 GiB is allocated by PyTorch, and 520.91 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mlong2-ppo-paper-s1[0m at: [34mhttps://wandb.ai/multi-tokenizer/rewarding-doubt/runs/d316509908bb25cf[0m
+[1;34mwandb[0m: Find logs at: [1;35m../../../workspace/runs/long2-ppo-paper-s1/wandb/run-20261003_043633-d316509908bb25cf/logs[0m
+evaluating snapshot-step00500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:07<00:21,  7.32s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:15<00:15,  7.54s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:22<00:07,  7.46s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:24<00:00,  5.29s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:24<00:00,  6.09s/it]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]Map:  45%|████▌     | 232/512 [00:00<00:00, 2293.83 examples/s]Map:  91%|█████████▏| 468/512 [00:00<00:00, 2326.94 examples/s]Map: 100%|██████████| 512/512 [00:00<00:00, 1991.46 examples/s]
+  0%|          | 0/16 [00:00<?, ?it/s]evaluating snapshot-step00500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.518 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:06<00:18,  6.22s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:13<00:13,  6.87s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:19<00:06,  6.65s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:21<00:00,  4.68s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:21<00:00,  5.40s/it]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+  0%|          | 0/16 [00:00<?, ?it/s]  6%|▋         | 1/16 [00:02<00:31,  2.11s/it] 12%|█▎        | 2/16 [00:03<00:21,  1.50s/it] 19%|█▉        | 3/16 [00:04<00:17,  1.32s/it] 25%|██▌       | 4/16 [00:05<00:15,  1.29s/it] 31%|███▏      | 5/16 [00:06<00:14,  1.36s/it] 38%|███▊      | 6/16 [00:09<00:15,  1.59s/it] 44%|████▍     | 7/16 [00:10<00:15,  1.69s/it] 50%|█████     | 8/16 [00:12<00:12,  1.55s/it] 56%|█████▋    | 9/16 [00:13<00:10,  1.50s/it] 62%|██████▎   | 10/16 [00:14<00:08,  1.39s/it] 69%|██████▉   | 11/16 [00:15<00:06,  1.35s/it] 75%|███████▌  | 12/16 [00:17<00:05,  1.38s/it] 81%|████████▏ | 13/16 [00:18<00:03,  1.30s/it] 88%|████████▊ | 14/16 [00:19<00:02,  1.28s/it] 94%|█████████▍| 15/16 [00:20<00:01,  1.24s/it]100%|██████████| 16/16 [00:22<00:00,  1.27s/it]100%|██████████| 16/16 [00:22<00:00,  1.39s/it]
+{"model": "/workspace/runs/long2-ppo-paper-s1/snapshot-step00500", "n": 512, "wrong_format_rate": 0.0078125, "ece": 0.21003864705562592, "accuracy": 0.6614173228346457, "auroc": 0.6923968715393135, "brier": 0.2325787401574803, "ece_unsampled": 0.19815118610858917, "auroc_unsampled": 0.7615759966777409, "brier_unsampled": 0.21957285873866947, "ece_unsampled_argmax": 0.21377860009670258, "number_mass_unsampled": 0.9999779187084183, "unsampled_rows": 508, "unsampled_missing": 0}
+500 {'wrong_format_rate': 0.0078, 'ece': 0.21, 'accuracy': 0.6614, 'auroc': 0.6924, 'brier': 0.2326, 'ece_unsampled': 0.1982, 'auroc_unsampled': 0.7616, 'brier_unsampled': 0.2196, 'ece_unsampled_argmax': 0.2138, 'number_mass_unsampled': 1.0}
+evaluating snapshot-step01000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.518 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.39it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.24it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.22it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.51it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.41it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+  0%|          | 0/16 [00:00<?, ?it/s]  6%|▋         | 1/16 [00:02<00:35,  2.36s/it] 12%|█▎        | 2/16 [00:03<00:22,  1.61s/it] 19%|█▉        | 3/16 [00:05<00:22,  1.70s/it] 25%|██▌       | 4/16 [00:06<00:18,  1.56s/it] 31%|███▏      | 5/16 [00:08<00:18,  1.67s/it] 38%|███▊      | 6/16 [00:10<00:18,  1.81s/it] 44%|████▍     | 7/16 [00:12<00:16,  1.84s/it] 50%|█████     | 8/16 [00:13<00:13,  1.65s/it] 56%|█████▋    | 9/16 [00:15<00:11,  1.59s/it] 62%|██████▎   | 10/16 [00:16<00:08,  1.44s/it] 69%|██████▉   | 11/16 [00:17<00:06,  1.34s/it] 75%|███████▌  | 12/16 [00:18<00:05,  1.39s/it] 81%|████████▏ | 13/16 [00:20<00:03,  1.33s/it] 88%|████████▊ | 14/16 [00:21<00:02,  1.28s/it] 94%|█████████▍| 15/16 [00:22<00:01,  1.43s/it]100%|██████████| 16/16 [00:24<00:00,  1.48s/it]100%|██████████| 16/16 [00:24<00:00,  1.54s/it]
+{"model": "/workspace/runs/long2-ppo-paper-s1/snapshot-step01000", "n": 512, "wrong_format_rate": 0.01171875, "ece": 0.15355736017227173, "accuracy": 0.6699604743083004, "auroc": 0.7573083920654267, "brier": 0.18365612648221344, "ece_unsampled": 0.15352900326251984, "auroc_unsampled": 0.8189108508646424, "brier_unsampled": 0.1774948709849278, "ece_unsampled_argmax": 0.15553362667560577, "number_mass_unsampled": 0.9997479095760542, "unsampled_rows": 506, "unsampled_missing": 0}
+1000 {'wrong_format_rate': 0.0117, 'ece': 0.1536, 'accuracy': 0.67, 'auroc': 0.7573, 'brier': 0.1837, 'ece_unsampled': 0.1535, 'auroc_unsampled': 0.8189, 'brier_unsampled': 0.1775, 'ece_unsampled_argmax': 0.1555, 'number_mass_unsampled': 0.9997}
+evaluating snapshot-step01500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.518 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.26it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.15it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.11it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:03<00:00,  1.36it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:03<00:00,  1.27it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+  0%|          | 0/16 [00:00<?, ?it/s]  6%|▋         | 1/16 [00:02<00:35,  2.37s/it] 12%|█▎        | 2/16 [00:03<00:23,  1.65s/it] 19%|█▉        | 3/16 [00:04<00:18,  1.40s/it] 25%|██▌       | 4/16 [00:05<00:16,  1.37s/it] 31%|███▏      | 5/16 [00:07<00:17,  1.55s/it] 38%|███▊      | 6/16 [00:09<00:17,  1.74s/it] 44%|████▍     | 7/16 [00:11<00:16,  1.79s/it] 50%|█████     | 8/16 [00:13<00:12,  1.62s/it] 56%|█████▋    | 9/16 [00:14<00:10,  1.54s/it] 62%|██████▎   | 10/16 [00:15<00:08,  1.42s/it] 69%|██████▉   | 11/16 [00:16<00:06,  1.33s/it] 75%|███████▌  | 12/16 [00:18<00:05,  1.37s/it] 81%|████████▏ | 13/16 [00:19<00:03,  1.33s/it] 88%|████████▊ | 14/16 [00:20<00:02,  1.33s/it] 94%|█████████▍| 15/16 [00:21<00:01,  1.30s/it]100%|██████████| 16/16 [00:23<00:00,  1.38s/it]100%|██████████| 16/16 [00:23<00:00,  1.47s/it]
+{"model": "/workspace/runs/long2-ppo-paper-s1/snapshot-step01500", "n": 512, "wrong_format_rate": 0.0078125, "ece": 0.14586618542671204, "accuracy": 0.639763779527559, "auroc": 0.8029424127784784, "brier": 0.1831299212598425, "ece_unsampled": 0.13736282289028168, "auroc_unsampled": 0.8424043715846994, "brier_unsampled": 0.17112103156414699, "ece_unsampled_argmax": 0.14133864641189575, "number_mass_unsampled": 0.9998190116694593, "unsampled_rows": 508, "unsampled_missing": 0}
+1500 {'wrong_format_rate': 0.0078, 'ece': 0.1459, 'accuracy': 0.6398, 'auroc': 0.8029, 'brier': 0.1831, 'ece_unsampled': 0.1374, 'auroc_unsampled': 0.8424, 'brier_unsampled': 0.1711, 'ece_unsampled_argmax': 0.1413, 'number_mass_unsampled': 0.9998}
+evaluating snapshot-step02000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.518 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.39it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.24it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.22it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.51it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.41it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+  0%|          | 0/16 [00:00<?, ?it/s]  6%|▋         | 1/16 [00:01<00:26,  1.78s/it] 12%|█▎        | 2/16 [00:02<00:19,  1.37s/it] 19%|█▉        | 3/16 [00:04<00:17,  1.33s/it] 25%|██▌       | 4/16 [00:05<00:15,  1.28s/it] 31%|███▏      | 5/16 [00:07<00:16,  1.49s/it] 38%|███▊      | 6/16 [00:09<00:16,  1.70s/it] 44%|████▍     | 7/16 [00:11<00:15,  1.77s/it] 50%|█████     | 8/16 [00:12<00:12,  1.60s/it] 56%|█████▋    | 9/16 [00:13<00:10,  1.53s/it] 62%|██████▎   | 10/16 [00:14<00:08,  1.40s/it] 69%|██████▉   | 11/16 [00:16<00:06,  1.32s/it] 75%|███████▌  | 12/16 [00:17<00:05,  1.37s/it] 81%|████████▏ | 13/16 [00:18<00:03,  1.32s/it] 88%|████████▊ | 14/16 [00:19<00:02,  1.29s/it] 94%|█████████▍| 15/16 [00:21<00:01,  1.28s/it]100%|██████████| 16/16 [00:22<00:00,  1.34s/it]100%|██████████| 16/16 [00:22<00:00,  1.42s/it]
+{"model": "/workspace/runs/long2-ppo-paper-s1/snapshot-step02000", "n": 512, "wrong_format_rate": 0.0078125, "ece": 0.12066929042339325, "accuracy": 0.6535433070866141, "auroc": 0.8055517524644031, "brier": 0.17301181102362204, "ece_unsampled": 0.12314068526029587, "auroc_unsampled": 0.8361514238773275, "brier_unsampled": 0.16756543924253847, "ece_unsampled_argmax": 0.12992124259471893, "number_mass_unsampled": 0.9998826776433178, "unsampled_rows": 508, "unsampled_missing": 0}
+2000 {'wrong_format_rate': 0.0078, 'ece': 0.1207, 'accuracy': 0.6535, 'auroc': 0.8056, 'brier': 0.173, 'ece_unsampled': 0.1231, 'auroc_unsampled': 0.8362, 'brier_unsampled': 0.1676, 'ece_unsampled_argmax': 0.1299, 'number_mass_unsampled': 0.9999}
+wandb: Currently logged in as: rrenaud (multi-tokenizer). Use `wandb login --relogin` to force relogin
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Tracking run with wandb version 0.19.2
+wandb: Run data is saved locally in /workspace/runs/long2-ppo-paper-s1/wandb/run-20261003_070113-d316509908bb25cf
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Resuming run long2-ppo-paper-s1
+wandb: ⭐️ View project at https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: 🚀 View run at https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/d316509908bb25cf
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:              eval/accuracy ▆█▁▄
+wandb:                 eval/auroc ▁▅██
+wandb:       eval/auroc_unsampled ▁▆█▇
+wandb:                 eval/brier █▂▂▁
+wandb:       eval/brier_unsampled █▂▁▁
+wandb:                   eval/ece █▄▃▁
+wandb:         eval/ece_unsampled █▄▂▁
+wandb:  eval/ece_unsampled_argmax █▃▂▁
+wandb:                     eval/n ▁▁▁▁
+wandb: eval/number_mass_unsampled █▁▃▅
+wandb:                  eval/step ▁▃▆█
+wandb:     eval/unsampled_missing ▁▁▁▁
+wandb:        eval/unsampled_rows █▁██
+wandb:     eval/wrong_format_rate ▁█▁▁
+wandb: 
+wandb: Run summary:
+wandb:                   eval/accuracy 0.65354
+wandb:                      eval/auroc 0.80555
+wandb:            eval/auroc_unsampled 0.83615
+wandb:                      eval/brier 0.17301
+wandb:            eval/brier_unsampled 0.16757
+wandb:                        eval/ece 0.12067
+wandb:              eval/ece_unsampled 0.12314
+wandb:       eval/ece_unsampled_argmax 0.12992
+wandb:                          eval/n 512
+wandb:      eval/number_mass_unsampled 0.99988
+wandb:                       eval/step 2000
+wandb:          eval/unsampled_missing 0
+wandb:             eval/unsampled_rows 508
+wandb:          eval/wrong_format_rate 0.00781
+wandb:                         seconds 2.38261
+wandb:     stability/baseline_accuracy 0.66797
+wandb:        stability/batch_accuracy 0.875
+wandb: stability/batch_confidence_mean 8.375
+wandb:  stability/batch_confidence_std 2.38672
+wandb:    stability/batch_invalid_rate 0
+wandb:     stability/objective_entropy 0.85256
+wandb:          stability/objective_kl 1.61675
+wandb:       stability/ppo_loss_policy -0.01195
+wandb:        stability/ppo_loss_total 0.23187
+wandb:        stability/ppo_loss_value 2.43814
+wandb:       stability/ppo_mean_scores 11.23609
+wandb:   stability/ppo_policy_approxkl 0.00174
+wandb:   stability/ppo_policy_clipfrac 0.03125
+wandb:       stability/window_accuracy 0.60938
+wandb: stability/window_confidence_std 2.72966
+wandb:   stability/window_invalid_rate 0.00781
+wandb:         stability/window_levels 11
+wandb:     stability/window_mode_share 0.3622
+wandb: 
+wandb: 🚀 View run long2-ppo-paper-s1 at: https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/d316509908bb25cf
+wandb: ⭐️ View project at: https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /workspace/runs/long2-ppo-paper-s1/wandb/run-20261003_070113-d316509908bb25cf/logs

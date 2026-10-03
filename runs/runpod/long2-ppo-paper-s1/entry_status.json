@@ -1,7 +1,7 @@
 {
- "outcome": "crashed",
- "exit_code": 1,
+ "outcome": "completed",
+ "exit_code": 0,
  "detail": null,
- "time": "2026-10-03T03:40:48Z",
+ "time": "2026-10-03T07:01:29Z",
  "trainer_status": null
 }

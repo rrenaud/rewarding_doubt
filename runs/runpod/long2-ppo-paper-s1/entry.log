@@ -3,3 +3,22 @@
 2026-10-03T03:40:48Z outcome: crashed
 selfstop: terminate pod plnycgx58g766r: HTTP 204
 2026-10-03T03:40:49Z pod terminate requested
+2026-10-03T04:36:27Z FORCE_RESUME: rerunning after outcome crashed
+2026-10-03T04:36:27Z attempt start (image db7edf0d216aa727b73985eded72a5a6275dc78c): python subset.py train /workspace/runs/long2-ppo-paper-s1/ids.json --seed 1 --fast --grading f1 --save-every 500 --max-steps 4000 --stop-on collapsed,answers_degraded,format_broken,nonfinite -- --out_dir /workspace/runs/long2-ppo-paper-s1 --dataset triviaqa --is_unsloth --model_dir unsloth/llama-3-8b-Instruct-bnb-4bit --tokenizer_dir unsloth/llama-3-8b-Instruct-bnb-4bit --epochs 1 --lr 1e-05 --batchsize 8 --log_with tensorboard
+2026-10-03T04:39:57Z trainer exited with code 1
+2026-10-03T04:39:57Z outcome: crashed
+selfstop: terminate pod stl844ueaph15l: HTTP 204
+2026-10-03T04:39:58Z pod terminate requested
+2026-10-03T06:36:26Z FORCE_RESUME: rerunning after outcome crashed
+2026-10-03T06:36:26Z attempt start (image 843350718b176c49f5c565a6d6fd4f2cc667bd79): python /opt/runpod/eval_snapshots.py /workspace/runs/long2-ppo-paper-s1 /workspace/runs/long2-ppo-paper-s1/ids.json
+2026-10-03T06:36:56Z watchdog: timeout (log idle 5 s); SIGTERM, then SIGKILL after 180 s
+2026-10-03T06:36:56Z trainer exited with code 143
+2026-10-03T06:36:56Z outcome: timeout
+selfstop: terminate pod 9oymg1kn191rpr: HTTP 204
+2026-10-03T06:36:57Z pod terminate requested
+2026-10-03T06:57:59Z FORCE_RESUME: rerunning after outcome timeout
+2026-10-03T06:57:59Z attempt start (image faea681846c9814e99f8c4fd0c41e22a64727460): python /opt/runpod/eval_snapshots.py /workspace/runs/long2-ppo-paper-s1 /workspace/runs/long2-ppo-paper-s1/ids.json
+2026-10-03T07:01:29Z trainer exited with code 0
+2026-10-03T07:01:29Z outcome: completed
+selfstop: terminate pod 7zuld9b6ghuq7o: HTTP 204
+2026-10-03T07:01:30Z pod terminate requested

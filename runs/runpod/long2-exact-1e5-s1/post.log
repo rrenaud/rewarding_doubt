@@ -1,0 +1,555 @@
+evaluating snapshot-step00500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Downloading shards:   0%|          | 0/4 [00:00<?, ?it/s]Downloading shards:  25%|██▌       | 1/4 [00:13<00:41, 13.98s/it]Downloading shards:  25%|██▌       | 1/4 [00:20<01:01, 20.53s/it]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 426, in http_get
+    hf_transfer.download(
+Exception: Failed too many failures in parallel (3): Io: Disk quota exceeded (os error 122) (no permits available)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 567, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 550, in main
+    InferenceDatasetSplit.inference_dataset(model_dir, True, "triviaqa", "validation", out_path)
+  File "/opt/RewardingDoubt/SingleAnswerSetting/InferenceDatasetSplit.py", line 14, in inference_dataset
+    model, tokenizer = load_model_tokenizer(model_dir, is_unsloth_model, device)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 534, in keep_model
+    model, tokenizer = original_loader(*load_args, **load_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/util/ModelLoader.py", line 63, in load_model_tokenizer
+    model, tokenizer = FastLanguageModel.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader.py", line 258, in from_pretrained
+    model, tokenizer = dispatch_model.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 1687, in from_pretrained
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/modeling_utils.py", line 3944, in from_pretrained
+    resolved_archive_file, sharded_metadata = get_checkpoint_shard_files(
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 1098, in get_checkpoint_shard_files
+    cached_filename = cached_file(
+                      ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 860, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1009, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1543, in _download_to_tmp_and_move
+    http_get(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 437, in http_get
+    raise RuntimeError(
+RuntimeError: An error occurred while downloading using `hf_transfer`. Consider disabling HF_HUB_ENABLE_HF_TRANSFER for better error handling.
+evaluation of snapshot-step00500 failed (exit 1)
+evaluating snapshot-step01000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Downloading shards:   0%|          | 0/4 [00:00<?, ?it/s]Downloading shards:  25%|██▌       | 1/4 [00:07<00:21,  7.19s/it]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 426, in http_get
+    hf_transfer.download(
+Exception: Failed too many failures in parallel (3): Io: Disk quota exceeded (os error 122) (no permits available)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 567, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 550, in main
+    InferenceDatasetSplit.inference_dataset(model_dir, True, "triviaqa", "validation", out_path)
+  File "/opt/RewardingDoubt/SingleAnswerSetting/InferenceDatasetSplit.py", line 14, in inference_dataset
+    model, tokenizer = load_model_tokenizer(model_dir, is_unsloth_model, device)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 534, in keep_model
+    model, tokenizer = original_loader(*load_args, **load_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/util/ModelLoader.py", line 63, in load_model_tokenizer
+    model, tokenizer = FastLanguageModel.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader.py", line 258, in from_pretrained
+    model, tokenizer = dispatch_model.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 1687, in from_pretrained
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/modeling_utils.py", line 3944, in from_pretrained
+    resolved_archive_file, sharded_metadata = get_checkpoint_shard_files(
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 1098, in get_checkpoint_shard_files
+    cached_filename = cached_file(
+                      ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 860, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1009, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1543, in _download_to_tmp_and_move
+    http_get(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 437, in http_get
+    raise RuntimeError(
+RuntimeError: An error occurred while downloading using `hf_transfer`. Consider disabling HF_HUB_ENABLE_HF_TRANSFER for better error handling.
+evaluation of snapshot-step01000 failed (exit 1)
+evaluating snapshot-step01500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Downloading shards:   0%|          | 0/4 [00:00<?, ?it/s]Downloading shards:  25%|██▌       | 1/4 [00:07<00:23,  7.96s/it]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 426, in http_get
+    hf_transfer.download(
+Exception: Failed too many failures in parallel (3): Io: Disk quota exceeded (os error 122) (no permits available)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 567, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 550, in main
+    InferenceDatasetSplit.inference_dataset(model_dir, True, "triviaqa", "validation", out_path)
+  File "/opt/RewardingDoubt/SingleAnswerSetting/InferenceDatasetSplit.py", line 14, in inference_dataset
+    model, tokenizer = load_model_tokenizer(model_dir, is_unsloth_model, device)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 534, in keep_model
+    model, tokenizer = original_loader(*load_args, **load_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/util/ModelLoader.py", line 63, in load_model_tokenizer
+    model, tokenizer = FastLanguageModel.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader.py", line 258, in from_pretrained
+    model, tokenizer = dispatch_model.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 1687, in from_pretrained
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/modeling_utils.py", line 3944, in from_pretrained
+    resolved_archive_file, sharded_metadata = get_checkpoint_shard_files(
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 1098, in get_checkpoint_shard_files
+    cached_filename = cached_file(
+                      ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 860, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1009, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1543, in _download_to_tmp_and_move
+    http_get(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 437, in http_get
+    raise RuntimeError(
+RuntimeError: An error occurred while downloading using `hf_transfer`. Consider disabling HF_HUB_ENABLE_HF_TRANSFER for better error handling.
+evaluation of snapshot-step01500 failed (exit 1)
+evaluating snapshot-step02000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Downloading shards:   0%|          | 0/4 [00:00<?, ?it/s]Downloading shards:  25%|██▌       | 1/4 [00:08<00:24,  8.25s/it]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 426, in http_get
+    hf_transfer.download(
+Exception: Failed too many failures in parallel (3): Io: Disk quota exceeded (os error 122) (no permits available)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 567, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 550, in main
+    InferenceDatasetSplit.inference_dataset(model_dir, True, "triviaqa", "validation", out_path)
+  File "/opt/RewardingDoubt/SingleAnswerSetting/InferenceDatasetSplit.py", line 14, in inference_dataset
+    model, tokenizer = load_model_tokenizer(model_dir, is_unsloth_model, device)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 534, in keep_model
+    model, tokenizer = original_loader(*load_args, **load_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/util/ModelLoader.py", line 63, in load_model_tokenizer
+    model, tokenizer = FastLanguageModel.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader.py", line 258, in from_pretrained
+    model, tokenizer = dispatch_model.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 1687, in from_pretrained
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/modeling_utils.py", line 3944, in from_pretrained
+    resolved_archive_file, sharded_metadata = get_checkpoint_shard_files(
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 1098, in get_checkpoint_shard_files
+    cached_filename = cached_file(
+                      ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 860, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1009, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1543, in _download_to_tmp_and_move
+    http_get(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 437, in http_get
+    raise RuntimeError(
+RuntimeError: An error occurred while downloading using `hf_transfer`. Consider disabling HF_HUB_ENABLE_HF_TRANSFER for better error handling.
+evaluation of snapshot-step02000 failed (exit 1)
+evaluating snapshot-step02500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Downloading shards:   0%|          | 0/4 [00:00<?, ?it/s]Downloading shards:  25%|██▌       | 1/4 [00:08<00:26,  8.95s/it]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 426, in http_get
+    hf_transfer.download(
+Exception: Failed too many failures in parallel (3): Io: Disk quota exceeded (os error 122) (no permits available)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 567, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 550, in main
+    InferenceDatasetSplit.inference_dataset(model_dir, True, "triviaqa", "validation", out_path)
+  File "/opt/RewardingDoubt/SingleAnswerSetting/InferenceDatasetSplit.py", line 14, in inference_dataset
+    model, tokenizer = load_model_tokenizer(model_dir, is_unsloth_model, device)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 534, in keep_model
+    model, tokenizer = original_loader(*load_args, **load_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/util/ModelLoader.py", line 63, in load_model_tokenizer
+    model, tokenizer = FastLanguageModel.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader.py", line 258, in from_pretrained
+    model, tokenizer = dispatch_model.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 1687, in from_pretrained
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/modeling_utils.py", line 3944, in from_pretrained
+    resolved_archive_file, sharded_metadata = get_checkpoint_shard_files(
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 1098, in get_checkpoint_shard_files
+    cached_filename = cached_file(
+                      ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 860, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1009, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1543, in _download_to_tmp_and_move
+    http_get(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 437, in http_get
+    raise RuntimeError(
+RuntimeError: An error occurred while downloading using `hf_transfer`. Consider disabling HF_HUB_ENABLE_HF_TRANSFER for better error handling.
+evaluation of snapshot-step02500 failed (exit 1)
+evaluating snapshot-step03000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Downloading shards:   0%|          | 0/4 [00:00<?, ?it/s]Downloading shards:  25%|██▌       | 1/4 [00:08<00:25,  8.61s/it]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 426, in http_get
+    hf_transfer.download(
+Exception: Failed too many failures in parallel (3): Io: Disk quota exceeded (os error 122) (no permits available)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 567, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 550, in main
+    InferenceDatasetSplit.inference_dataset(model_dir, True, "triviaqa", "validation", out_path)
+  File "/opt/RewardingDoubt/SingleAnswerSetting/InferenceDatasetSplit.py", line 14, in inference_dataset
+    model, tokenizer = load_model_tokenizer(model_dir, is_unsloth_model, device)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 534, in keep_model
+    model, tokenizer = original_loader(*load_args, **load_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/util/ModelLoader.py", line 63, in load_model_tokenizer
+    model, tokenizer = FastLanguageModel.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader.py", line 258, in from_pretrained
+    model, tokenizer = dispatch_model.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 1687, in from_pretrained
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/modeling_utils.py", line 3944, in from_pretrained
+    resolved_archive_file, sharded_metadata = get_checkpoint_shard_files(
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 1098, in get_checkpoint_shard_files
+    cached_filename = cached_file(
+                      ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 860, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1009, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1543, in _download_to_tmp_and_move
+    http_get(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 437, in http_get
+    raise RuntimeError(
+RuntimeError: An error occurred while downloading using `hf_transfer`. Consider disabling HF_HUB_ENABLE_HF_TRANSFER for better error handling.
+evaluation of snapshot-step03000 failed (exit 1)
+evaluating snapshot-step03500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Downloading shards:   0%|          | 0/4 [00:00<?, ?it/s]Downloading shards:  25%|██▌       | 1/4 [00:07<00:21,  7.21s/it]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 426, in http_get
+    hf_transfer.download(
+Exception: Failed too many failures in parallel (3): Io: Disk quota exceeded (os error 122) (no permits available)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 567, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 550, in main
+    InferenceDatasetSplit.inference_dataset(model_dir, True, "triviaqa", "validation", out_path)
+  File "/opt/RewardingDoubt/SingleAnswerSetting/InferenceDatasetSplit.py", line 14, in inference_dataset
+    model, tokenizer = load_model_tokenizer(model_dir, is_unsloth_model, device)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 534, in keep_model
+    model, tokenizer = original_loader(*load_args, **load_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/util/ModelLoader.py", line 63, in load_model_tokenizer
+    model, tokenizer = FastLanguageModel.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader.py", line 258, in from_pretrained
+    model, tokenizer = dispatch_model.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 1687, in from_pretrained
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/modeling_utils.py", line 3944, in from_pretrained
+    resolved_archive_file, sharded_metadata = get_checkpoint_shard_files(
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 1098, in get_checkpoint_shard_files
+    cached_filename = cached_file(
+                      ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 860, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1009, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1543, in _download_to_tmp_and_move
+    http_get(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 437, in http_get
+    raise RuntimeError(
+RuntimeError: An error occurred while downloading using `hf_transfer`. Consider disabling HF_HUB_ENABLE_HF_TRANSFER for better error handling.
+evaluation of snapshot-step03500 failed (exit 1)
+evaluating snapshot-step04000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Downloading shards:   0%|          | 0/4 [00:00<?, ?it/s]Downloading shards:  25%|██▌       | 1/4 [00:08<00:25,  8.36s/it]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 426, in http_get
+    hf_transfer.download(
+Exception: Failed too many failures in parallel (3): Io: Disk quota exceeded (os error 122) (no permits available)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 567, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 550, in main
+    InferenceDatasetSplit.inference_dataset(model_dir, True, "triviaqa", "validation", out_path)
+  File "/opt/RewardingDoubt/SingleAnswerSetting/InferenceDatasetSplit.py", line 14, in inference_dataset
+    model, tokenizer = load_model_tokenizer(model_dir, is_unsloth_model, device)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/subset.py", line 534, in keep_model
+    model, tokenizer = original_loader(*load_args, **load_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/util/ModelLoader.py", line 63, in load_model_tokenizer
+    model, tokenizer = FastLanguageModel.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader.py", line 258, in from_pretrained
+    model, tokenizer = dispatch_model.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/llama.py", line 1687, in from_pretrained
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/modeling_utils.py", line 3944, in from_pretrained
+    resolved_archive_file, sharded_metadata = get_checkpoint_shard_files(
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 1098, in get_checkpoint_shard_files
+    cached_filename = cached_file(
+                      ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 860, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1009, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1543, in _download_to_tmp_and_move
+    http_get(
+  File "/usr/local/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 437, in http_get
+    raise RuntimeError(
+RuntimeError: An error occurred while downloading using `hf_transfer`. Consider disabling HF_HUB_ENABLE_HF_TRANSFER for better error handling.
+evaluation of snapshot-step04000 failed (exit 1)
+wandb: Currently logged in as: rrenaud (multi-tokenizer). Use `wandb login --relogin` to force relogin
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: - Waiting for wandb.init()...wandb: \ Waiting for wandb.init()...wandb: Tracking run with wandb version 0.19.2
+wandb: Run data is saved locally in /workspace/runs/long2-exact-1e5-s1/wandb/run-20261003_051555-36e1a7e777d3c576
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Resuming run long2-exact-1e5-s1
+wandb: ⭐️ View project at https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: 🚀 View run at https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/36e1a7e777d3c576
+wandb: updating run config
+wandb:                                                                                
+wandb: 
+wandb: Run summary:
+wandb:                 answer_accuracy 0.5
+wandb:                      confidence 0.44421
+wandb:                           epoch 0
+wandb:                    hinge_active 0
+wandb:                              kl 0
+wandb:                         kl_coef 0.05
+wandb:                            loss -0.86704
+wandb:                            mass 1.0
+wandb:                            rows 8
+wandb:             sampled_number_rate 1
+wandb:                    save_seconds 0.77457
+wandb:                         seconds 7.37556
+wandb:                         skipped 0
+wandb:     stability/baseline_accuracy 0.61414
+wandb:        stability/batch_accuracy 0.5
+wandb: stability/batch_confidence_mean 4.375
+wandb:  stability/batch_confidence_std 2.82527
+wandb:    stability/batch_invalid_rate 0
+wandb:             stability/grad_norm 2.48438
+wandb:                  stability/loss -0.86704
+wandb:            stability/pi_entropy 0.17563
+wandb:                stability/pi_max 0.92445
+wandb:       stability/window_accuracy 0.54878
+wandb:          stability/window_brier 0.12876
+wandb:  stability/window_calibration_n 492
+wandb: stability/window_confidence_std 3.06477
+wandb:            stability/window_ece 0.05955
+wandb:   stability/window_invalid_rate 0.04688
+wandb:         stability/window_levels 10
+wandb:     stability/window_mode_share 0.30328
+wandb:                            step 4000
+wandb:                       stop_prob 0.9997
+wandb:                         updates 4
+wandb:                      value_loss 0
+wandb: 
+wandb: 🚀 View run long2-exact-1e5-s1 at: https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/36e1a7e777d3c576
+wandb: ⭐️ View project at: https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /workspace/runs/long2-exact-1e5-s1/wandb/run-20261003_051555-36e1a7e777d3c576/logs
