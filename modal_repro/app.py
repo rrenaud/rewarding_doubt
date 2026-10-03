@@ -860,3 +860,49 @@ def frozen_test(gpu: str = "L40S"):
             (out / label / Path(path).name).write_text(text)
     print(f"logs: {out}")
 
+
+@app.local_entrypoint()
+def frozen_round(search_dir: str, round: str = "frozen_compare", gpu: str = "L40S"):
+    """Train {round}_configs.json (commands with --frozen-answers) on the search's train/dev split and
+    score every snapshot on dev and step 256 on test with frozen_eval.py (base answer, adapted
+    confidence). Writes {round}/curve.json ({label: {step: dev metrics}}) and curve_test.json."""
+    root = Path(__file__).resolve().parents[1]
+    search = Path(search_dir).resolve()
+    configs = json.loads((search / f"{round}_configs.json").read_text())
+    data = root / "runs/pilot-20261001T002945Z/data"
+    train = [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()]
+    dev = {"train": train, "validation": json.loads((search / "dev_ids.json").read_text())}
+    test = {"train": train, "validation": [json.loads(l)["id"] for l in (data / "eval.jsonl").read_text().splitlines()]}
+    run = f"{round}-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    trainer = train_with_snapshots.with_options(gpu=gpu)
+    trained = {}
+    for r in trainer.starmap([(dev, label, cfg["command"], run) for label, cfg in configs.items()],
+                             return_exceptions=True, order_outputs=False):
+        if isinstance(r, Exception) or r["exit_code"]:
+            print("TRAIN FAILED", r if isinstance(r, Exception) else (r["label"], r["log"][-1500:]))
+            continue
+        trained[r["label"]] = r["snapshots"]
+        print(f"trained {r['label']}: {[Path(s).name for s in r['snapshots']]}", flush=True)
+    jobs = []
+    for label, snapshots in trained.items():
+        for snapshot in snapshots:
+            step = int(Path(snapshot).name.split("step")[1])
+            jobs.append((dev, f"eval-{label}-dev-{step}", ["frozen_eval.py", "IDS_JSON", snapshot, "OUT_DIR/eval.json"], run))
+            if step == max(int(Path(s).name.split("step")[1]) for s in snapshots):
+                jobs.append((test, f"eval-{label}-test-{step}", ["frozen_eval.py", "IDS_JSON", snapshot, "OUT_DIR/eval.json"], run))
+    curve, curve_test = {}, {}
+    for r in trainer.starmap(jobs, return_exceptions=True, order_outputs=False):
+        if isinstance(r, Exception) or r["exit_code"]:
+            print("EVAL FAILED", r if isinstance(r, Exception) else (r["label"], r["log"][-1500:]))
+            continue
+        _, rest = r["label"].split("eval-", 1)
+        label, split, step = rest.rsplit("-", 2)
+        metrics = json.loads(read_files.remote([f"{VOL}/outputs/{run}/{r['label']}/eval_metrics.json"]).popitem()[1])
+        (curve if split == "dev" else curve_test).setdefault(label, {})[step] = metrics
+    out = search / round
+    out.mkdir(exist_ok=True)
+    (out / "curve.json").write_text(json.dumps(curve, indent=1) + "\n")
+    (out / "curve_test.json").write_text(json.dumps({k: v[max(v, key=int)] for k, v in curve_test.items()}, indent=1) + "\n")
+    (out / "run.txt").write_text(f"{VOL}/outputs/{run}\n")
+    print(f"done: {out}")
+
