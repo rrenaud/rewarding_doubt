@@ -159,6 +159,8 @@ def single_pass_logps_batch(model, queries, common, numbers, stop, k_stars):
     which is safe here: attention is causal and every position read precedes the padding.
     Returns a list of (number log-probs, stop log-prob or None), one per row.
     """
+    if not queries:
+        return []
     device = next(model.parameters()).device
     seqs = [q + common + ([numbers[k]] if k is not None else []) for q, k in zip(queries, k_stars)]
     width = max(map(len, seqs))
@@ -229,6 +231,8 @@ class LevelScheme:
 
     def batch(self, model, queries, k_stars):
         """[(log q over the 11 levels, log P(stop | k*) or None)] for each query, one forward call."""
+        if not queries:  # a batch whose answers were all malformed
+            return []
         if self.single:
             return single_pass_logps_batch(model, queries, self.common, self.numbers, self.stop, k_stars)
         device = next(model.parameters()).device
