@@ -87,7 +87,7 @@ on_term() {  # RunPod is stopping the pod (spot preemption or a manual stop)
 }
 trap on_term TERM INT
 
-note "attempt start: $(expand "$TRAIN_CMD")"
+note "attempt start (image ${IMAGE_GIT_SHA:-stock}): $(expand "$TRAIN_CMD")"
 cd "$CODE_DIR"
 bash -c "exec $(expand "$TRAIN_CMD")" >> "$LOG" 2>&1 &
 child=$!

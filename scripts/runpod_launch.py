@@ -4,14 +4,16 @@
         [--ids-train-limit 1024 | --ids-train-all] [--post-cmd ...] [--interruptible] [--dry-run]
     python scripts/runpod_launch.py setup --setup-only     # install the environment on the volume first
 
-The pod runs a stock python:3.11 image with our code packed into an env var, writes to
-/workspace/runs/NAME on the network volume, uploads that directory to the Modal volume
-(runpod/NAME) when the run reaches a final outcome, and terminates itself. Question IDs: the
+The pod runs ghcr.io/rrenaud/rewarding-doubt (runpod/Dockerfile, built by GitHub Actions), writes to
+/workspace/runs/NAME on the network volume and terminates itself at a final outcome; results stay
+on the volume. --stock-image instead runs python:3.11 with our code packed into an env var and the
+environment installed once on the volume (runpod/bootstrap.sh). --upload-modal also copies the run
+directory to the Modal volume (runpod/NAME). Question IDs: the
 training subset (first N of runs/pilot-.../train.jsonl, or the whole split) and the search's
 512 dev questions as the validation split.
 
 Secrets passed into the pod's environment: the RunPod API key (so the pod can terminate itself)
-and, for the upload, the Modal token from ~/.modal.toml.
+and, with --upload-modal, the Modal token from ~/.modal.toml.
 """
 import argparse
 import base64
@@ -72,25 +74,32 @@ def main():
     parser.add_argument("--max-hours", type=float, default=12)
     parser.add_argument("--stall-minutes", type=int, default=45, help="first start downloads ~40 GB of model and data")
     parser.add_argument("--on-exit", default="terminate", choices=["terminate", "stop", "none"])
-    parser.add_argument("--no-upload", action="store_true")
-    parser.add_argument("--setup-only", action="store_true")
+    parser.add_argument("--image", default="ghcr.io/rrenaud/rewarding-doubt:latest")
+    parser.add_argument("--stock-image", action="store_true", help="python:3.11 + bootstrap.sh instead of --image")
+    parser.add_argument("--upload-modal", action="store_true")
+    parser.add_argument("--setup-only", action="store_true", help="with --stock-image: install the environment only")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     if not args.setup_only and not args.train_cmd:
         parser.error("--train-cmd is required unless --setup-only")
-    env = dict(CODE_B64=code_b64(), RUNPOD_API_KEY=api_key(), ON_EXIT=args.on_exit, RUN_DIR=f"/workspace/runs/{args.name}",
+    if args.setup_only and not args.stock_image:
+        parser.error("--setup-only only applies to --stock-image")
+    env = dict(RUNPOD_API_KEY=api_key(), ON_EXIT=args.on_exit, RUN_DIR=f"/workspace/runs/{args.name}",
                MAX_HOURS=str(int(args.max_hours)), STALL_MINUTES=str(args.stall_minutes))
     if args.setup_only:
         env["SETUP_ONLY"] = "1"
     else:
         env.update(TRAIN_CMD=args.train_cmd, POST_CMD=args.post_cmd,
                    IDS_JSON_B64=base64.b64encode(json.dumps(ids(args)).encode()).decode())
-    if not args.no_upload and not args.setup_only:
+    if args.stock_image:
+        env["CODE_B64"] = code_b64()
+    if args.upload_modal:
         modal = next(iter(tomllib.load(open(Path.home() / ".modal.toml", "rb")).values()))
         env.update(MODAL_TOKEN_ID=modal["token_id"], MODAL_TOKEN_SECRET=modal["token_secret"],
                    UPLOAD_CMD=f"modal volume put --force rewarding-doubt-repro OUT_DIR runpod/{args.name}")
     volume = next(v for v in call("GET", "/networkvolumes") if v["id"] == VOLUME_ID)
-    body = dict(name=f"rd-{args.name}", imageName="python:3.11-bookworm", dockerStartCmd=["bash", "-c", BOOT],
+    body = dict(name=f"rd-{args.name}", imageName="python:3.11-bookworm" if args.stock_image else args.image,
+                dockerStartCmd=["bash", "-c", BOOT] if args.stock_image else [],
                 gpuTypeIds=args.gpu or ["NVIDIA GeForce RTX 4090", "NVIDIA L40S", "NVIDIA RTX A6000"],
                 gpuTypePriority="custom", gpuCount=1, cloudType="COMMUNITY" if args.community else "SECURE",
                 interruptible=args.interruptible, networkVolumeId=VOLUME_ID, volumeMountPath="/workspace",

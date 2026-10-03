@@ -1,0 +1,10 @@
+# Build context for runpod/Dockerfile: only what the image copies.
+*
+!modal_repro/subset.py
+!modal_repro/exact_llama.py
+!modal_repro/shared_prefix.py
+!modal_repro/thinking_llama.py
+!src/rewarding_doubt
+!runpod/entry.sh
+!runpod/selfstop.py
+**/__pycache__
