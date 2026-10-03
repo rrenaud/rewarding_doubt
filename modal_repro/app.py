@@ -862,10 +862,11 @@ def frozen_test(gpu: str = "L40S"):
 
 
 @app.local_entrypoint()
-def frozen_round(search_dir: str, round: str = "frozen_compare", gpu: str = "L40S"):
+def frozen_round(search_dir: str, round: str = "frozen_compare", gpu: str = "L40S", eval_run: str = ""):
     """Train {round}_configs.json (commands with --frozen-answers) on the search's train/dev split and
     score every snapshot on dev and step 256 on test with frozen_eval.py (base answer, adapted
-    confidence). Writes {round}/curve.json ({label: {step: dev metrics}}) and curve_test.json."""
+    confidence). Writes {round}/curve.json ({label: {step: dev metrics}}) and curve_test.json.
+    --eval-run RUN re-scores the snapshots of an earlier run of this entrypoint without training."""
     root = Path(__file__).resolve().parents[1]
     search = Path(search_dir).resolve()
     configs = json.loads((search / f"{round}_configs.json").read_text())
@@ -873,10 +874,10 @@ def frozen_round(search_dir: str, round: str = "frozen_compare", gpu: str = "L40
     train = [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()]
     dev = {"train": train, "validation": json.loads((search / "dev_ids.json").read_text())}
     test = {"train": train, "validation": [json.loads(l)["id"] for l in (data / "eval.jsonl").read_text().splitlines()]}
-    run = f"{round}-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run = eval_run or f"{round}-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     trainer = train_with_snapshots.with_options(gpu=gpu)
-    trained = {}
-    for r in trainer.starmap([(dev, label, cfg["command"], run) for label, cfg in configs.items()],
+    trained = list_snapshots.remote(run, list(configs)) if eval_run else {}
+    for r in [] if eval_run else trainer.starmap([(dev, label, cfg["command"], run) for label, cfg in configs.items()],
                              return_exceptions=True, order_outputs=False):
         if isinstance(r, Exception) or r["exit_code"]:
             print("TRAIN FAILED", r if isinstance(r, Exception) else (r["label"], r["log"][-1500:]))
@@ -905,4 +906,12 @@ def frozen_round(search_dir: str, round: str = "frozen_compare", gpu: str = "L40
     (out / "curve_test.json").write_text(json.dumps({k: v[max(v, key=int)] for k, v in curve_test.items()}, indent=1) + "\n")
     (out / "run.txt").write_text(f"{VOL}/outputs/{run}\n")
     print(f"done: {out}")
+
+
+@app.function(volumes={VOL: volume}, timeout=600)
+def list_snapshots(run: str, labels: list) -> dict:
+    """{label: [snapshot dirs]} for a run's training outputs on the volume."""
+    volume.reload()
+    return {label: sorted(str(p) for p in Path(f"{VOL}/outputs/{run}/{label}").glob("snapshot-step*")) for label in labels
+            if Path(f"{VOL}/outputs/{run}/{label}").exists()}
 

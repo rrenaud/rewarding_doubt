@@ -2,7 +2,8 @@
 
     python frozen_eval.py IDS_JSON MODEL_DIR OUT_JSON      # from SingleAnswerSetting/
 
-Same settings as the released evaluation (InferenceDatasetSplit + util.EvaluationMetrics) except
+Same settings as the released evaluation (InferenceDatasetSplit + util.EvaluationMetrics: the
+16-bit base model under the adapter, as ModelLoader loads it) except
 that generation is split where training split it:
 1. answer: the adapter disabled, the released prompt, T=0.6, top-p 0.9, up to 256 tokens, stopping
    at " Confidence" (Train.py's prediction terminators);
@@ -39,8 +40,10 @@ def main(ids_path, model_dir, out_path, batch=32):
         shutil.rmtree(policy_dir, ignore_errors=True)
         shutil.copytree(model_dir, policy_dir, ignore=shutil.ignore_patterns("config.json", "pytorch_model.bin"))
         model_dir = policy_dir
+    # As util.ModelLoader.load_model_tokenizer (the released evaluation): load_in_4bit=False, so Unsloth
+    # puts the adapter on the 16-bit base model, although training used the 4-bit one.
     model, tokenizer = FastLanguageModel.from_pretrained(model_name=model_dir, max_seq_length=1048, dtype=None,
-                                                         load_in_4bit=True)
+                                                         load_in_4bit=False)
     FastLanguageModel.for_inference(model)
     pad, eot = tokenizer.eos_token_id, tokenizer.convert_tokens_to_ids("<|eot_id|>")
     confidence_token = tokenizer.convert_tokens_to_ids("ĠConfidence")
