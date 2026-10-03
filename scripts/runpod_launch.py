@@ -79,6 +79,7 @@ def main():
     parser.add_argument("--on-exit", default="terminate", choices=["terminate", "stop", "none"])
     parser.add_argument("--image", default="ghcr.io/rrenaud/rewarding-doubt:latest")
     parser.add_argument("--stock-image", action="store_true", help="python:3.11 + bootstrap.sh instead of --image")
+    parser.add_argument("--expt", help="experiment id stamped on every generations.jsonl line (default: NAME up to its first '-')")
     parser.add_argument("--no-wandb", action="store_true")
     parser.add_argument("--setup-only", action="store_true", help="with --stock-image: install the environment only")
     parser.add_argument("--dry-run", action="store_true")
@@ -87,7 +88,7 @@ def main():
         parser.error("--train-cmd is required unless --setup-only")
     if args.setup_only and not args.stock_image:
         parser.error("--setup-only only applies to --stock-image")
-    env = dict(RUNPOD_API_KEY=api_key(), ON_EXIT=args.on_exit, RUN_DIR=f"/workspace/runs/{args.name}",
+    env = dict(RUNPOD_API_KEY=api_key(), RD_EXPT=args.expt or args.name.split("-")[0], ON_EXIT=args.on_exit, RUN_DIR=f"/workspace/runs/{args.name}",
                MAX_HOURS=str(int(args.max_hours)), STALL_MINUTES=str(args.stall_minutes))
     if args.setup_only:
         env["SETUP_ONLY"] = "1"
@@ -109,7 +110,7 @@ def main():
                 dataCenterIds=[volume["dataCenterId"]], containerDiskInGb=30, minRAMPerGPU=24, ports=[], env=env)
     if args.dry_run:
         shown = {k: (v if k != "env" else {e: (x if e in ("ON_EXIT", "RUN_DIR", "MAX_HOURS", "STALL_MINUTES", "TRAIN_CMD",
-                                                          "POST_CMD", "SETUP_ONLY", "UPLOAD_CMD", "WANDB_MODE", "WANDB_PROJECT", "WANDB_ENTITY") else f"<{len(x)} chars>")
+                                                          "POST_CMD", "SETUP_ONLY", "UPLOAD_CMD", "WANDB_MODE", "WANDB_PROJECT", "WANDB_ENTITY", "RD_EXPT") else f"<{len(x)} chars>")
                                            for e, x in v.items()}) for k, v in body.items()}
         print(json.dumps(shown, indent=1))
         return

@@ -62,6 +62,7 @@ import trl
 from rewarding_doubt.checkpoint import (load_checkpoint, load_trainable_state, rng_state, save_rotating_checkpoint,
                                         set_rng_state, trainable_state, truncate_jsonl, write_status)
 from rewarding_doubt.core import baseline_matched_objective, objective
+from rewarding_doubt.generations import GenerationLog
 from rewarding_doubt.stability import FLAGS, StabilityMonitor
 from rewarding_doubt.tracking import Tracker
 from rewarding_doubt.paper_ppo import AdaptiveKLController
@@ -269,6 +270,7 @@ def main():
         print(f"resumed from {checkpoint_dir} at step {step} (epoch {start_epoch}, question {start_index})", flush=True)
     logs = {name: open(path, "a" if state is not None else "w") for name, path in paths.items()}
     tracker = Tracker(args.out_dir, {k: v for k, v in vars(args).items() if k != "ids"})
+    generations = GenerationLog(args.out_dir, "exact", vars(args), step if state is not None else None)
 
     def checkpoint(epoch, index, order):
         if not args.checkpoint_every and not stopping:
@@ -302,23 +304,31 @@ def main():
             with torch.no_grad():
                 out = model.generate(input_ids=batch["input_ids"].cuda(),
                                      attention_mask=batch["attention_mask"].cuda(), **generation)
-            rows = []
+            rows, entries, row_entry = [], [], []  # entries: one generation-log line per answer
             for i in range(len(out)):
                 prompt = batch["input_ids"][i][batch["attention_mask"][i].bool()].tolist()
                 answer = out[i][batch["input_ids"].shape[1]:].tolist()
                 while answer and answer[-1] == tokenizer.eos_token_id:  # util.remove_padding
                     answer.pop()
+                entries.append(dict(question_id=batch["question_id"][i], correct=None, confidence=None,
+                                    answer=tokenizer.decode(answer, skip_special_tokens=True)))
                 if not answer or answer[-1] != confidence_token:
+                    entries[-1]["format"] = "no_confidence"
                     continue  # answer never reached " Confidence"; PPO would score it invalid
                 text = tokenizer.decode(answer, skip_special_tokens=True) + ": 0"
                 prediction, _ = parse_answer_confidence(text, False)
                 if prediction is None:
+                    entries[-1]["format"] = "unparsed"
                     continue
                 correct = is_answer_correct(prediction, batch["gt_candidates"][i], Metric.F1, 0.5)
+                entries[-1].update(answer=prediction, correct=bool(correct))
                 rows.append((prompt + answer, float(correct), None, None))
+                row_entry.append(len(entries) - 1)
             if args.scoring == "single" and rows:
                 picks = sample_numbers(model, tokenizer, [r[0] for r in rows], candidates, eot)
                 rows = [(q, label, k, None) for (q, label, _, _), k in zip(rows, picks)]
+                for j, k in zip(row_entry, picks):
+                    entries[j]["confidence"] = k
             FastLanguageModel.for_training(model)
             if args.regularization == "baseline":  # reference scores are fixed for the whole step
                 refs = reference_scores(model, rows, candidates)
@@ -326,6 +336,7 @@ def main():
             stats = dict(loss=0., confidence=0., mass=0., hinge_active=0., stop_prob=0., sampled_number_rate=0.,
                          kl=0., kl_coef=kl_controller.value, value_loss=0.)
             stop_checks, stats_rows, entropies, max_probs, grad_norms = 0, [], [], [], []
+            entry_of_row = {id(r): j for r, j in zip(rows, row_entry)}
             minibatch = args.minibatch or args.batchsize
             updates = 0
             for epoch_pass in range(args.passes):
@@ -350,6 +361,9 @@ def main():
                                 pi = logps.detach().double().softmax(-1)
                                 entropies.append(float(-(pi * pi.clamp_min(1e-30).log()).sum()))
                                 max_probs.append(float(pi.max()))
+                                entries[entry_of_row[id(row)]].update(
+                                    pi=[round(float(x), 4) for x in pi], mass=round(mass, 5), loss=round(loss.item(), 5),
+                                    stop_prob=None if stop_prob is None else round(stop_prob, 5))
                         total.backward()
                     grad_norms.append(float(torch.nn.utils.clip_grad_norm_(params, float("inf"))))
                     optimizer.step()
@@ -380,6 +394,7 @@ def main():
                 model.save_pretrained(os.path.join(args.out_dir, f"snapshot-step{step:05d}"))
                 tokenizer.save_pretrained(os.path.join(args.out_dir, f"snapshot-step{step:05d}"))
                 record["save_seconds"] = time.time() - t_save
+            generations.write(step, entries)
             logs["metrics"].write(json.dumps(record) + "\n")
             logs["metrics"].flush()
             print(json.dumps(record), flush=True)

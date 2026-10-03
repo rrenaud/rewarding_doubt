@@ -228,6 +228,7 @@ class ResumableLoader:
                 continue  # trained on before the resume
             self.consumed = epoch * len(self.loader) + i + 1
             self.batch_hash = zlib.crc32(json.dumps(list(batch["question"])).encode())
+            self.question_ids = list(batch.get("question_id", [None] * len(batch["question"])))
             yield batch
 
 
@@ -242,7 +243,9 @@ def subset_loader(ids_by_split, system_prompt=None):
             data = data.filter(lambda x: x["question_id"] in keep)
             if len(data) != len(keep):
                 raise ValueError(f"{split}: found {len(data)} of {len(keep)} requested questions")
-        data = data.map(lambda x: descriptor.normalize_function(x), remove_columns=descriptor.columns_to_remove)
+        # Keep question_id (the released normalization drops it) for the per-answer generation log.
+        drop = [c for c in descriptor.columns_to_remove if c != "question_id"]
+        data = data.map(lambda x: descriptor.normalize_function(x), remove_columns=drop)
         prompt = system_prompt or get_prompt(descriptor.type)
         return data.map(lambda x: DataHelper.prepare_queries(x, tokenizer, prompt, tokenize=True))
     return load_prepared_dataset
@@ -350,6 +353,7 @@ def main():
         from rewarding_doubt.paper_ppo import is_correct_f1
         from rewarding_doubt.stability import FLAGS, StabilityMonitor
         from rewarding_doubt.tracking import Tracker
+        from rewarding_doubt.generations import GenerationLog
         os.makedirs(args.out_dir, exist_ok=True)
         checkpoint_every = option("--checkpoint-every", int, 32)
         stop_after = option("--stop-after", int, 0)  # testing: behave as if preempted after N steps
@@ -370,6 +374,8 @@ def main():
                 for name in ["steps", "stability", "stability_events"]}
         monitor = StabilityMonitor()
         tracker = Tracker(args.out_dir, dict(vars(args), wrapper_options=" ".join(ours[3:])))
+        generations = GenerationLog(args.out_dir, "ppo", dict(vars(args), wrapper_options=" ".join(ours[3:])),
+                                    resume["step"] if resume is not None else None)
         count = [0]
         last_checkpoint = [resume["step"] if resume is not None else 0]
         stopping = []
@@ -381,9 +387,11 @@ def main():
 
         def recording_reward(result, *a, **k):
             ok = result.confidence is not None and 0 <= result.confidence <= 10
-            scored.append((result.confidence if ok else None,
-                           bool(result.prediction) and is_correct_f1(result.prediction, result.gt_candidates)))
-            return reward_fn(result, *a, **k)
+            reward = reward_fn(result, *a, **k)
+            scored.append(dict(confidence=result.confidence if ok else None, answer=result.prediction,
+                               correct=bool(result.prediction) and is_correct_f1(result.prediction, result.gt_candidates),
+                               reward=float(reward)))
+            return reward
         Train.QAResult_to_reward = recording_reward
 
         # Deterministic per-epoch order, a counting/skipping loader, and state restore after init.
@@ -450,10 +458,12 @@ def main():
             logs["steps"].flush()
             batch = scored[-len(step_args[2]):] if len(step_args) > 2 else scored[-args.batchsize:]
             scored.clear()
+            ids = getattr(self.dataloader, "question_ids", [None] * len(batch))
+            generations.write(count[0], [dict(question_id=q, **row) for q, row in zip(ids, batch)])
             watched = {k.replace("/", "_"): scalar(stats[k]) for k in (
                 "objective/kl", "objective/entropy", "ppo/policy/approxkl", "ppo/policy/clipfrac", "ppo/loss/total",
                 "ppo/loss/policy", "ppo/loss/value", "ppo/mean_scores") if k in stats}
-            stability, events = monitor.update(count[0], [c for c, _ in batch], [y for _, y in batch],
+            stability, events = monitor.update(count[0], [r["confidence"] for r in batch], [r["correct"] for r in batch],
                                                **{k: v for k, v in watched.items() if v is not None})
             logs["stability"].write(json.dumps(stability) + "\n")
             logs["stability"].flush()

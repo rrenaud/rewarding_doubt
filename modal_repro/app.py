@@ -812,7 +812,7 @@ def resume_test(gpu: str = "L40S"):
         results[r["label"] + "2"] = r
     out = root / "runs" / f"modal-{run}"
     out.mkdir(parents=True, exist_ok=True)
-    names = ["metrics.jsonl", "steps.jsonl", "stability.jsonl", "stability_events.jsonl"]
+    names = ["metrics.jsonl", "steps.jsonl", "stability.jsonl", "stability_events.jsonl", "generations.jsonl", "run_meta.json"]
     for label in ["exact-A", "exact-B", "ppo-A", "ppo-B"]:
         files = read_files.remote([f"{VOL}/outputs/{run}/{label}/{n}" for n in names])
         (out / label).mkdir(exist_ok=True)
