@@ -30,7 +30,7 @@ to each pod so it can terminate itself) and `~/.runpod_rewarding_doubt_key_s3.tx
 ## Example
 
 ```bash
-python scripts/runpod_launch.py exact-long-s1 --ids-train-all --max-hours 8 --interruptible \
+python scripts/runpod_launch.py exact-long-s1 --ids-train-all --max-hours 8 \
   --train-cmd "python exact_llama.py IDS_JSON OUT_DIR --mode discrete-exact --scoring single \
     --regularization hinge --reward paper --passes 2 --minibatch 4 --lr 1e-05 --format-weight 1.01 \
     --seed 1 --epochs 1 --max-steps 4000 --save-every 500 \

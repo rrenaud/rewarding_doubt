@@ -21,6 +21,7 @@ import io
 import json
 import os
 import tarfile
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -40,9 +41,12 @@ def call(method, path, body=None):
     request = urllib.request.Request(API + path, method=method, data=json.dumps(body).encode() if body else None,
                                      headers={"Authorization": f"Bearer {api_key()}", "Content-Type": "application/json",
                                               "User-Agent": "rewarding-doubt-launcher/1"})
-    with urllib.request.urlopen(request, timeout=60) as response:
-        text = response.read()
-        return json.loads(text) if text else None
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            text = response.read()
+            return json.loads(text) if text else None
+    except urllib.error.HTTPError as e:
+        raise SystemExit(f"RunPod API {method} {path}: HTTP {e.code}: {e.read().decode(errors='replace')[:1000]}")
 
 
 def code_b64():
@@ -68,7 +72,7 @@ def main():
     parser.add_argument("--ids-train-limit", type=int, default=1024)
     parser.add_argument("--ids-train-all", action="store_true")
     parser.add_argument("--gpu", action="append", default=None, help="RunPod GPU type id (repeatable, in order)")
-    parser.add_argument("--interruptible", action="store_true", help="spot pod: cheaper, can be stopped any time")
+    parser.add_argument("--interruptible", action="store_true", help="spot pod (RunPod stopped offering these in 2026; kept for if they return)")
     parser.add_argument("--community", action="store_true", help="Community Cloud instead of Secure Cloud")
     parser.add_argument("--max-hours", type=float, default=12)
     parser.add_argument("--stall-minutes", type=int, default=45, help="first start downloads ~40 GB of model and data")
