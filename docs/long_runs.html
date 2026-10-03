@@ -1,0 +1,153 @@
+<title>Long-Run Calibration Curves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a lab-notebook page; summary table, then four small-multiple charts sharing one step axis. */
+:root {
+  --bg: #f4f6f7; --surface: #ffffff; --fg: #18222b; --muted: #56636e; --faint: #8b97a1; --line: #d7dde2; --grid: #e8ecef;
+  --exact: #0b7a83; --exact-soft: #66b8be; --ppo: #c25a12; --ppo-soft: #e7a26e; --paper: #6b4fa0; --floor: rgba(11,122,131,.10);
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11171c; --surface: #172028; --fg: #e6ecf0; --muted: #a3b0ba; --faint: #73818c; --line: #2c3842; --grid: #222c35;
+  --exact: #3fb7c0; --exact-soft: #2c7c83; --ppo: #ee8a45; --ppo-soft: #a5603a; --paper: #b39ae6; --floor: rgba(63,183,192,.12); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11171c; --surface: #172028; --fg: #e6ecf0; --muted: #a3b0ba; --faint: #73818c; --line: #2c3842; --grid: #222c35;
+  --exact: #3fb7c0; --exact-soft: #2c7c83; --ppo: #ee8a45; --ppo-soft: #a5603a; --paper: #b39ae6; --floor: rgba(63,183,192,.12); color-scheme: dark }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 var(--sans); }
+main { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 64px; display: grid; gap: 22px; }
+h1 { font-size: 26px; font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h2 { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+p { margin: 0; color: var(--muted); max-width: 72ch; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend svg { flex: none; }
+.tbl { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 9px 14px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+thead th { color: var(--muted); font-weight: 500; font-size: 12px; letter-spacing: .03em; }
+tbody tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--mono); }
+.best { font-weight: 600; color: var(--exact); }
+.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .charts { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 14px 8px; min-width: 0; }
+.panel .sub { font-size: 12.5px; color: var(--faint); margin-bottom: 6px; }
+svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.tick { fill: var(--faint); font: 11px var(--mono); }
+.axt { fill: var(--muted); font: 11.5px var(--sans); }
+.note { font-size: 13px; color: var(--muted); }
+.notes { display: grid; gap: 6px; padding-left: 18px; margin: 0; color: var(--muted); font-size: 13.5px; max-width: 90ch; }
+.tip { position: fixed; pointer-events: none; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 8px;
+  padding: 7px 10px; font: 12px/1.45 var(--mono); box-shadow: 0 6px 18px rgba(0,0,0,.14); display: none; z-index: 5; }
+</style>
+<main>
+  <div class="eyebrow">Rewarding Doubt · Llama-3-8B · TriviaQA · dev, 512 questions</div>
+  <h1>Long-run calibration curves</h1>
+  <p>Each line is one training seed, scored on the 512-question dev split every 500 steps, starting from the base model at step 0. Training uses the full TriviaQA training set at learning rate 1e-5 with the paper's KL controller and −30 for malformed output; the arms differ only in the update rule. Lower Brier and ECE are better; higher AUROC is better.</p>
+  <div class="legend" id="legend"></div>
+  <div class="tbl"><table id="summary"></table></div>
+  <div class="charts" id="charts"></div>
+  <ul class="notes">
+    <li><b>Paper</b> marks Rewarding Doubt's published result: ECE 0.0226 and AUROC 0.8592 on the full TriviaQA test split (11,313 questions) after about 21,900 steps. It is a reference level, not a point on these axes; our curves stop at 4,000 steps and are measured on dev.</li>
+    <li>The shaded band in the ECE chart is where a perfectly calibrated model with our confidence spread lands on 512 questions (mean 0.036, 95% range 0.019–0.061). Below about 0.04, differences in ECE here are noise. At the paper's test size the band sits near 0.008.</li>
+    <li>Frozen runs (solid) generate answers with the adapter off and are scored the same way; on-policy runs (dashed) generate answers with the adapter and use the released evaluation. Exact + hinge was only run on-policy.</li>
+    <li>PPO + KL frozen seed 1 ran out of memory on a 24 GB GPU at step 951; seed 2's step-1,500 and step-4,000 scores are being recomputed after an evaluator fix. On-policy PPO also stopped early for memory (steps 2,138 and 1,374).</li>
+  </ul>
+</main>
+<div class="tip" id="tip" role="status"></div>
+<script>
+const D = {"curves": {"long3-exact-kl-s1": {"500": {"brier": 0.15830078125, "ece": 0.07949038594961166, "auroc": 0.7792797388288105, "accuracy": 0.66015625, "wrong_format_rate": 0.0}, "1000": {"brier": 0.15896484375, "ece": 0.07597573846578598, "auroc": 0.8163301542207793, "accuracy": 0.65625, "wrong_format_rate": 0.0}, "1500": {"brier": 0.1503913894324853, "ece": 0.05029240995645523, "auroc": 0.813533885876053, "accuracy": 0.6594911937377691, "wrong_format_rate": 0.001953125}, "2000": {"brier": 0.14224609375, "ece": 0.060741398483514786, "auroc": 0.8326436388508892, "accuracy": 0.6640625, "wrong_format_rate": 0.0}, "2500": {"brier": 0.14461839530332682, "ece": 0.04109486937522888, "auroc": 0.8283497286295793, "accuracy": 0.6555772994129159, "wrong_format_rate": 0.001953125}, "3000": {"brier": 0.16125244618395304, "ece": 0.08845243602991104, "auroc": 0.7999420171220029, "accuracy": 0.6594911937377691, "wrong_format_rate": 0.001953125}, "3500": {"brier": 0.1519569471624266, "ece": 0.060077037662267685, "auroc": 0.8122304640331205, "accuracy": 0.6673189823874756, "wrong_format_rate": 0.001953125}, "4000": {"brier": 0.14821917808219176, "ece": 0.045793186873197556, "auroc": 0.8189232001114052, "accuracy": 0.6731898238747553, "wrong_format_rate": 0.001953125}}, "long3-exact-kl-s2": {"500": {"brier": 0.15369140625, "ece": 0.06777200102806091, "auroc": 0.8218562625608318, "accuracy": 0.642578125, "wrong_format_rate": 0.0}, "1000": {"brier": 0.15327450980392157, "ece": 0.07039205729961395, "auroc": 0.8253540640394089, "accuracy": 0.6588235294117647, "wrong_format_rate": 0.00390625}, "1500": {"brier": 0.14827450980392157, "ece": 0.047842688858509064, "auroc": 0.8288433908045977, "accuracy": 0.6588235294117647, "wrong_format_rate": 0.00390625}, "2000": {"brier": 0.15162109375, "ece": 0.05214730277657509, "auroc": 0.8103483554145992, "accuracy": 0.662109375, "wrong_format_rate": 0.0}, "2500": {"brier": 0.14623046875, "ece": 0.04902223125100136, "auroc": 0.8214859781121752, "accuracy": 0.6640625, "wrong_format_rate": 0.0}, "3000": {"brier": 0.1423333333333333, "ece": 0.04843008890748024, "auroc": 0.8260967068605634, "accuracy": 0.6647058823529411, "wrong_format_rate": 0.00390625}, "3500": {"brier": 0.14064453125, "ece": 0.04824136197566986, "auroc": 0.8374425054112554, "accuracy": 0.65625, "wrong_format_rate": 0.0}, "4000": {"brier": 0.1472265625, "ece": 0.028905609622597694, "auroc": 0.8225206221810636, "accuracy": 0.666015625, "wrong_format_rate": 0.0}}, "long3-ppo-kl-s2": {"500": {"brier": 0.21771484375, "ece": 0.19707030057907104, "auroc": 0.707077743378053, "accuracy": 0.66796875, "wrong_format_rate": 0.0}, "1000": {"brier": 0.184921875, "ece": 0.16015617549419403, "auroc": 0.7707695708358838, "accuracy": 0.66015625, "wrong_format_rate": 0.0}, "2000": {"brier": 0.182426614481409, "ece": 0.15499016642570496, "auroc": 0.7733673469387755, "accuracy": 0.6575342465753424, "wrong_format_rate": 0.001953125}, "2500": {"brier": 0.19203125000000004, "ece": 0.17812499403953552, "auroc": 0.7506229235880398, "accuracy": 0.671875, "wrong_format_rate": 0.0}, "3000": {"brier": 0.18356164383561643, "ece": 0.1800391525030136, "auroc": 0.7577798861480075, "accuracy": 0.6673189823874756, "wrong_format_rate": 0.001953125}, "3500": {"brier": 0.1830724070450098, "ece": 0.1504892110824585, "auroc": 0.7646377855525828, "accuracy": 0.6634050880626223, "wrong_format_rate": 0.001953125}}, "long2-exact-1e5-s1": {"500": {"brier": 0.17504911591355599, "ece": 0.07583451271057129, "auroc": 0.7541558216206836, "accuracy": 0.6660117878192534, "wrong_format_rate": 0.005859375}, "1000": {"brier": 0.1606090373280943, "ece": 0.06542260944843292, "auroc": 0.8022276366167769, "accuracy": 0.6679764243614931, "wrong_format_rate": 0.005859375}, "1500": {"brier": 0.15286836935166995, "ece": 0.061492398381233215, "auroc": 0.8101983988861817, "accuracy": 0.6679764243614931, "wrong_format_rate": 0.005859375}, "2000": {"brier": 0.1560314341846758, "ece": 0.05500875413417816, "auroc": 0.79845572013867, "accuracy": 0.6719056974459725, "wrong_format_rate": 0.005859375}, "2500": {"brier": 0.14575638506876226, "ece": 0.05166897177696228, "auroc": 0.8185607379046292, "accuracy": 0.6679764243614931, "wrong_format_rate": 0.005859375}, "3000": {"brier": 0.15047151277013754, "ece": 0.0713152065873146, "auroc": 0.8129087511678605, "accuracy": 0.6640471512770137, "wrong_format_rate": 0.005859375}, "3500": {"brier": 0.15066666666666667, "ece": 0.04941082000732422, "auroc": 0.8081071585419412, "accuracy": 0.6764705882352942, "wrong_format_rate": 0.00390625}, "4000": {"brier": 0.14917485265225935, "ece": 0.046953994780778885, "auroc": 0.814551040357492, "accuracy": 0.6699410609037328, "wrong_format_rate": 0.005859375}}, "long2-exact-1e5-s2": {"500": {"brier": 0.1715217391304348, "ece": 0.05513764172792435, "auroc": 0.7609418767507001, "accuracy": 0.6640316205533597, "wrong_format_rate": 0.01171875}, "1000": {"brier": 0.14887351778656127, "ece": 0.04644221067428589, "auroc": 0.7958363439306358, "accuracy": 0.6837944664031621, "wrong_format_rate": 0.01171875}, "1500": {"brier": 0.15116141732283464, "ece": 0.050983697175979614, "auroc": 0.8034897075713403, "accuracy": 0.6751968503937008, "wrong_format_rate": 0.0078125}, "2000": {"brier": 0.14874015748031497, "ece": 0.041731394827365875, "auroc": 0.8112279839148683, "accuracy": 0.6712598425196851, "wrong_format_rate": 0.0078125}, "2500": {"brier": 0.1473084479371316, "ece": 0.06090279296040535, "auroc": 0.8136271317015092, "accuracy": 0.6719056974459725, "wrong_format_rate": 0.005859375}, "3000": {"brier": 0.14744094488188977, "ece": 0.03425118327140808, "auroc": 0.8125579818739742, "accuracy": 0.6811023622047244, "wrong_format_rate": 0.0078125}, "3500": {"brier": 0.14646365422396854, "ece": 0.03752366080880165, "auroc": 0.815553760230426, "accuracy": 0.6738703339882122, "wrong_format_rate": 0.005859375}, "4000": {"brier": 0.14596078431372547, "ece": 0.05725403130054474, "auroc": 0.825225982401674, "accuracy": 0.6607843137254902, "wrong_format_rate": 0.00390625}}, "long2-ppo-paper-s1": {"500": {"brier": 0.2325787401574803, "ece": 0.21003864705562592, "auroc": 0.6923968715393135, "accuracy": 0.6614173228346457, "wrong_format_rate": 0.0078125}, "1000": {"brier": 0.18365612648221344, "ece": 0.15355736017227173, "auroc": 0.7573083920654267, "accuracy": 0.6699604743083004, "wrong_format_rate": 0.01171875}, "1500": {"brier": 0.1831299212598425, "ece": 0.14586618542671204, "auroc": 0.8029424127784784, "accuracy": 0.639763779527559, "wrong_format_rate": 0.0078125}, "2000": {"brier": 0.17301181102362204, "ece": 0.12066929042339325, "auroc": 0.8055517524644031, "accuracy": 0.6535433070866141, "wrong_format_rate": 0.0078125}}, "long2-ppo-paper-s2": {"500": {"brier": 0.18279843444227006, "ece": 0.07808306813240051, "auroc": 0.748096819959168, "accuracy": 0.6692759295499021, "wrong_format_rate": 0.001953125}, "1000": {"brier": 0.1793713163064833, "ece": 0.1493125855922699, "auroc": 0.7911692446105401, "accuracy": 0.6640471512770137, "wrong_format_rate": 0.005859375}}}, "base": {"brier": 0.30807465618860513, "ece": 0.30550113320350647, "auroc": 0.5998658133773741, "accuracy": 0.6601178781925344}};
+const SERIES = [
+  {key: "exact-kl", name: "Exact + KL (frozen)", runs: ["long3-exact-kl-s1", "long3-exact-kl-s2"], color: "var(--exact)", dash: ""},
+  {key: "ppo-kl", name: "PPO + KL, paper recipe (frozen)", runs: ["long3-ppo-kl-s2"], color: "var(--ppo)", dash: ""},
+  {key: "exact-hinge", name: "Exact + hinge (on-policy)", runs: ["long2-exact-1e5-s1", "long2-exact-1e5-s2"], color: "var(--exact-soft)", dash: "5 4"},
+  {key: "ppo-onpolicy", name: "PPO + KL, paper recipe (on-policy)", runs: ["long2-ppo-paper-s1", "long2-ppo-paper-s2"], color: "var(--ppo-soft)", dash: "5 4"},
+];
+const METRICS = [
+  {key: "brier", name: "Brier score", dir: "lower is better", paper: null},
+  {key: "ece", name: "Expected calibration error", dir: "lower is better · shaded: noise floor at 512 questions", paper: 0.0226, floor: [0.019, 0.061]},
+  {key: "auroc", name: "AUROC", dir: "higher is better", paper: 0.8592},
+  {key: "accuracy", name: "Answer accuracy", dir: "should stay at the base model's 66%", paper: null, pct: true},
+];
+const NS = "http://www.w3.org/2000/svg";
+const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+const fmt = (v, m) => m.pct ? (100 * v).toFixed(1) + "%" : v.toFixed(3);
+const tip = document.getElementById("tip");
+function points(run) { return [[0, D.base], ...Object.entries(D.curves[run]).map(([s, m]) => [+s, m]).sort((a, b) => a[0] - b[0])]; }
+
+// Legend
+const legend = document.getElementById("legend");
+for (const s of SERIES) {
+  const span = document.createElement("span");
+  const sw = el("svg", {width: 26, height: 10, "aria-hidden": "true"});
+  el("line", {x1: 1, x2: 25, y1: 5, y2: 5, stroke: s.color, "stroke-width": 2.5, "stroke-dasharray": s.dash}, sw);
+  span.append(sw, document.createTextNode(s.name)); legend.appendChild(span);
+}
+const p = document.createElement("span"); const psw = el("svg", {width: 26, height: 10, "aria-hidden": "true"});
+el("line", {x1: 1, x2: 25, y1: 5, y2: 5, stroke: "var(--paper)", "stroke-width": 1.5, "stroke-dasharray": "2 3"}, psw);
+p.append(psw, document.createTextNode("Paper (test, ~21.9k steps)")); legend.appendChild(p);
+
+// Summary table at the last scored step of each run
+const t = document.getElementById("summary");
+t.innerHTML = "<thead><tr><th>Arm</th><th>Seeds</th><th>Last step</th><th>Brier</th><th>ECE</th><th>AUROC</th><th>Accuracy</th></tr></thead>";
+const tb = document.createElement("tbody"); t.appendChild(tb); const rows = [];
+for (const s of SERIES) {
+  const last = s.runs.map(r => points(r).at(-1));
+  const mean = k => last.reduce((a, [, m]) => a + m[k], 0) / last.length;
+  rows.push({s, steps: last.map(([st]) => st), brier: mean("brier"), ece: mean("ece"), auroc: mean("auroc"), accuracy: mean("accuracy")});
+}
+rows.push({s: {name: "Base model (no training)"}, steps: [0], brier: D.base.brier, ece: D.base.ece, auroc: D.base.auroc, accuracy: D.base.accuracy});
+const best = {brier: Math.min(...rows.map(r => r.brier)), ece: Math.min(...rows.map(r => r.ece)), auroc: Math.max(...rows.map(r => r.auroc))};
+for (const r of rows) {
+  const tr = document.createElement("tr");
+  const cells = [r.s.name, r.s.runs ? r.s.runs.length : "—", [...new Set(r.steps)].join(", "),
+    ...["brier", "ece", "auroc"].map(k => [r[k].toFixed(3), r[k] === best[k]]), [(100 * r.accuracy).toFixed(1) + "%", false]];
+  cells.forEach((c, i) => { const td = document.createElement("td"); if (Array.isArray(c)) { td.textContent = c[0]; td.className = "num" + (c[1] ? " best" : ""); }
+    else { td.textContent = c; if (i > 0) td.className = "num"; } tr.appendChild(td); });
+  tb.appendChild(tr);
+}
+
+// Charts
+const charts = document.getElementById("charts");
+for (const m of METRICS) {
+  const panel = document.createElement("div"); panel.className = "panel";
+  const h = document.createElement("h2"); h.textContent = m.name; panel.appendChild(h);
+  const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = m.dir; panel.appendChild(sub);
+  const W = 520, H = 250, x0 = 52, x1 = W - 14, y0 = 14, y1 = H - 34;
+  const svg = el("svg", {class: "chart", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${m.name} against training step for each run`}, panel);
+  let vals = SERIES.flatMap(s => s.runs.flatMap(r => points(r).map(([, v]) => v[m.key])));
+  if (m.paper) vals.push(m.paper); if (m.floor) vals.push(...m.floor);
+  let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.08; lo = Math.max(0, lo - pad); hi = hi + pad;
+  const X = s => x0 + s / 4000 * (x1 - x0), Y = v => y1 - (v - lo) / (hi - lo) * (y1 - y0);
+  const step = [0.01, 0.02, 0.025, 0.05, 0.1].find(st => (hi - lo) / st <= 6) || 0.1;
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) {
+    el("line", {x1: x0, x2: x1, y1: Y(v), y2: Y(v), stroke: "var(--grid)"}, svg);
+    el("text", {x: x0 - 8, y: Y(v) + 4, "text-anchor": "end", class: "tick"}, svg).textContent = m.pct ? Math.round(v * 100) + "%" : v.toFixed(step < 0.05 ? 3 : 2).replace(/0$/, "");
+  }
+  for (const s of [0, 1000, 2000, 3000, 4000]) el("text", {x: X(s), y: y1 + 18, "text-anchor": "middle", class: "tick"}, svg).textContent = s.toLocaleString();
+  el("text", {x: (x0 + x1) / 2, y: H - 2, "text-anchor": "middle", class: "axt"}, svg).textContent = "training step";
+  if (m.floor) {
+    el("rect", {x: x0, width: x1 - x0, y: Y(m.floor[1]), height: Y(m.floor[0]) - Y(m.floor[1]), fill: "var(--floor)"}, svg);
+  }
+  if (m.paper) {
+    el("line", {x1: x0, x2: x1, y1: Y(m.paper), y2: Y(m.paper), stroke: "var(--paper)", "stroke-width": 1.5, "stroke-dasharray": "2 3"}, svg);
+    el("text", {x: x0 + 6, y: Y(m.paper) + (m.key === "ece" ? 13 : -5), class: "tick", fill: "var(--paper)"}, svg).textContent = "paper " + m.paper.toFixed(3);
+  }
+  for (const s of SERIES) for (const run of s.runs) {
+    const pts = points(run);
+    el("polyline", {points: pts.map(([st, v]) => `${X(st)},${Y(v[m.key])}`).join(" "), fill: "none", stroke: s.color, "stroke-width": 2, "stroke-dasharray": s.dash, "stroke-linejoin": "round"}, svg);
+    for (const [st, v] of pts) {
+      const c = el("circle", {cx: X(st), cy: Y(v[m.key]), r: 3.2, fill: s.color, stroke: "var(--surface)", "stroke-width": 1}, svg);
+      const hit = el("circle", {cx: X(st), cy: Y(v[m.key]), r: 9, fill: "transparent"}, svg);
+      const show = e => { tip.textContent = `${run} · step ${st}\n${m.name}: ${fmt(v[m.key], m)}`; tip.style.whiteSpace = "pre";
+        tip.style.display = "block"; tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = e.clientY + 12 + "px"; };
+      hit.addEventListener("pointermove", show); hit.addEventListener("pointerleave", () => tip.style.display = "none");
+    }
+  }
+  charts.appendChild(panel);
+}
+</script>
