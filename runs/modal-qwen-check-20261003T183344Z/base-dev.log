@@ -1,0 +1,24 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.392 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+
+Downloading shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Downloading shards:  50%|█████     | 1/2 [00:15<00:15, 15.85s/it]
+Downloading shards: 100%|██████████| 2/2 [00:24<00:00, 11.83s/it]
+Downloading shards: 100%|██████████| 2/2 [00:24<00:00, 12.43s/it]
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.06it/s]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.22it/s]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.20it/s]
+
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]
+Map:  47%|████▋     | 240/512 [00:00<00:00, 2368.01 examples/s]
+Map:  95%|█████████▌| 488/512 [00:00<00:00, 2432.31 examples/s]
+Map: 100%|██████████| 512/512 [00:00<00:00, 2153.95 examples/s]
+{"n": 512, "wrong_format_rate": 0.0, "ece": 0.524609386920929, "accuracy": 0.41796875, "auroc": 0.6237847331117105, "brier": 0.5090625, "ece_unsampled": 0.5231181383132935, "auroc_unsampled": 0.7959765563123713, "brier_unsampled": 0.5057839051652143, "protocol": "frozen-answers"}

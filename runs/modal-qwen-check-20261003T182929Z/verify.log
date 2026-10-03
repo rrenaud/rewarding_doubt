@@ -1,0 +1,23 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/verify_levels.py", line 60, in <module>
+    results = [check(name) for name in sys.argv[1:]]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/verify_levels.py", line 60, in <listcomp>
+    results = [check(name) for name in sys.argv[1:]]
+               ^^^^^^^^^^^
+  File "/opt/RewardingDoubt/SingleAnswerSetting/verify_levels.py", line 27, in check
+    model, tokenizer = FastLanguageModel.from_pretrained(model_name=name, max_seq_length=1048, dtype=None, load_in_4bit=True)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader.py", line 82, in from_pretrained
+    model_name = get_model_name(model_name, load_in_4bit)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader_utils.py", line 111, in get_model_name
+    raise NotImplementedError(
+NotImplementedError: Unsloth: unsloth/Qwen2.5-3B-Instruct-bnb-4bit is not supported in your current Unsloth version! Please update Unsloth via:
+
+pip uninstall unsloth unsloth_zoo -y
+pip install --upgrade --no-cache-dir "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+pip install --upgrade --no-cache-dir "git+https://github.com/unslothai/unsloth-zoo.git"
+

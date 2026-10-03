@@ -60,6 +60,26 @@ from util import DataHelper
 from util.Prompts import get_prompt
 
 
+def _end_of_turn_fallback():
+    """Train.py and InferenceDatasetSplit stop generation at convert_tokens_to_ids("<|eot_id|>"),
+    Llama-3's end of turn. Tokenizers without that token (Qwen-2.5: <|im_end|>) would return None;
+    map it to the tokenizer's EOS instead, so the released code runs unchanged on other models."""
+    from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
+
+    for cls in (PreTrainedTokenizer, PreTrainedTokenizerFast):
+        original = cls.convert_tokens_to_ids
+
+        def convert(self, tokens, _original=original):
+            ids = _original(self, tokens)
+            if tokens == "<|eot_id|>" and (ids is None or ids == self.unk_token_id):
+                return _original(self, self.eos_token)
+            return ids
+        cls.convert_tokens_to_ids = convert
+
+
+_end_of_turn_fallback()
+
+
 def mixed_reward(brier_mix, grading="exact"):
     """util.RLHelper.QAResult_to_reward with the Brier score mixed in and a choice of grader.
 

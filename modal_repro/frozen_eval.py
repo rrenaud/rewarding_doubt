@@ -13,6 +13,7 @@ metrics come from rewarding_doubt.paper_ppo.evaluation_metrics (torchmetrics ECE
 and Brier), plus unsampled columns from pi at the number position. Writes OUT_JSON (one row per
 question) and OUT_JSON with _metrics.json (as subset.py evaluate does).
 """
+import contextlib
 import json
 import os
 import shutil
@@ -22,6 +23,7 @@ import torch
 from unsloth import FastLanguageModel  # must precede transformers imports
 
 from rewarding_doubt.paper_ppo import evaluation_metrics
+from shared_prefix import LevelScheme, end_of_turn
 from subset import subset_loader
 from util.EvaluationMetrics import Metric, is_answer_correct
 from util.ResponseHandling import parse_answer_confidence
@@ -45,16 +47,18 @@ def main(ids_path, model_dir, out_path, batch=32):
     model, tokenizer = FastLanguageModel.from_pretrained(model_name=model_dir, max_seq_length=1048, dtype=None,
                                                          load_in_4bit=False)
     FastLanguageModel.for_inference(model)
-    pad, eot = tokenizer.eos_token_id, tokenizer.convert_tokens_to_ids("<|eot_id|>")
+    pad, eot = tokenizer.eos_token_id, end_of_turn(tokenizer)
     confidence_token = tokenizer.convert_tokens_to_ids("ĠConfidence")
-    numbers = [tokenizer.encode(f": {k}", add_special_tokens=False)[-1] for k in range(11)]
+    scheme = LevelScheme(tokenizer, eot)
+    # MODEL_DIR may be a bare base model (no adapter): then both stages use it, the base-model row.
+    base_answers = model.disable_adapter if hasattr(model, "disable_adapter") else contextlib.nullcontext
     data = subset_loader(json.load(open(ids_path)))("triviaqa", "validation", "verbalize", tokenizer)
     rows = []
     for start in range(0, len(data), batch):
         part = [data[i] for i in range(start, min(start + batch, len(data)))]
         prompts = [d["query"] for d in part]
         ids, mask, width = left_pad(prompts, pad)
-        with torch.no_grad(), model.disable_adapter():
+        with torch.no_grad(), base_answers():
             out = model.generate(input_ids=ids, attention_mask=mask, max_new_tokens=256, do_sample=True,
                                  temperature=0.6, top_p=0.9, eos_token_id=[pad, eot, confidence_token], pad_token_id=pad)
         answers = []
@@ -68,16 +72,15 @@ def main(ids_path, model_dir, out_path, batch=32):
             ids2, mask2, width2 = left_pad([prompts[i] + answers[i] for i in ready], pad)
             with torch.no_grad():
                 out2 = model.generate(input_ids=ids2, attention_mask=mask2, max_new_tokens=8, do_sample=True,
-                                      temperature=0.6, top_p=0.9, eos_token_id=[pad, eot], pad_token_id=pad,
-                                      output_logits=True, return_dict_in_generate=True)
-            logits = torch.stack(out2.logits, 1).float()
+                                      temperature=0.6, top_p=0.9, eos_token_id=[pad, eot], pad_token_id=pad)
             for j, i in enumerate(ready):
-                gen = out2.sequences[j, width2:].tolist()
-                continuations[i] = gen
-                # pi at the number: ": " then the number token, as in the training scorer.
-                if len(gen) > 2:
-                    p = logits[j, 2].softmax(-1)[torch.tensor(numbers, device=logits.device)]
-                    pis[i] = (p / p.sum()).tolist()
+                continuations[i] = out2[j, width2:].tolist()
+            # pi over the 11 levels, as the training scorer reads it (one plain forward pass).
+            FastLanguageModel.for_training(model)
+            with torch.no_grad():
+                for j, (levels, _) in zip(ready, scheme.batch(model, [prompts[i] + answers[i] for i in ready], [None] * len(ready))):
+                    pis[j] = levels.softmax(-1).tolist()
+            FastLanguageModel.for_inference(model)
         for i, d in enumerate(part):
             text = tokenizer.decode(answers[i] + continuations.get(i, []), skip_special_tokens=True)
             prediction, confidence = parse_answer_confidence(text, False)

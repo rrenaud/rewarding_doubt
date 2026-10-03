@@ -173,3 +173,92 @@ def single_pass_logps_batch(model, queries, common, numbers, stop, k_stars):
         stop_logp = logits[b, n].float().log_softmax(-1)[stop] if k is not None else None
         out.append((number_logps, stop_logp))
     return out
+
+
+def end_of_turn(tokenizer):
+    """The chat end-of-turn token: Llama-3's <|eot_id|>, or the tokenizer's EOS (Qwen's <|im_end|>)."""
+    eot = tokenizer.convert_tokens_to_ids("<|eot_id|>")
+    return eot if eot is not None and eot != tokenizer.unk_token_id else tokenizer.eos_token_id
+
+
+class LevelScheme:
+    """The 11 confidence levels ": k" as tokens, and one-pass scoring for either tokenizer shape.
+
+    Llama-3: every level is common + one number token ("10" is one token); `batch` is
+    single_pass_logps_batch. Qwen-2.5 splits numbers into digits, so "10" is "1" "0" and shares
+    its first token with level 1. Then one forward over query + common + ["1"] gives, at the
+    number position, log P(d) for the ten digits and, one position later, log P("0" | "1"):
+        log q(10) = log P(common) + log P("1") + log P("0" | "1")
+        log q(1)  = log P(common) + log P("1") + log(1 - P("0" | "1"))
+        log q(d)  = log P(common) + log P(d)            for the other digits
+    so the 11 values still sum to the probability of common followed by a level, as in the
+    one-token case. The stop check after the sampled level k* reads log P(stop) one position after
+    k*'s last token: from the same sequence for k* = 1 (after "1") or 10 (append "0"), and from a
+    second short sequence, query + common + [d], for the other digits.
+    """
+
+    def __init__(self, tokenizer, stop):
+        self.stop = stop
+        levels = [tokenizer.encode(f": {k}", add_special_tokens=False) for k in range(11)]
+        self.common = _common_prefix(levels)
+        self.suffixes = [lv[len(self.common):] for lv in levels]
+        self.single = all(len(s) == 1 for s in self.suffixes)
+        if self.single:
+            self.numbers = [s[0] for s in self.suffixes]
+        else:
+            if not (all(len(s) == 1 for s in self.suffixes[:10]) and len(self.suffixes[10]) == 2
+                    and self.suffixes[10][0] == self.suffixes[1][0]):
+                raise ValueError(f"unsupported level tokenization: {self.suffixes}")
+            self.digits = [s[0] for s in self.suffixes[:10]]
+            self.one, self.zero = self.suffixes[10]
+
+    def tokens(self, k):
+        return self.suffixes[k]
+
+    def parse(self, generated):
+        """Level index from generated tokens after the query (common, then the level), or None."""
+        c = len(self.common)
+        if generated[:c] != self.common or len(generated) <= c:
+            return None
+        rest = generated[c:]
+        if self.single:
+            return self.numbers.index(rest[0]) if rest[0] in self.numbers else None
+        if rest[0] == self.one and len(rest) > 1 and rest[1] == self.zero:
+            return 10
+        return self.digits.index(rest[0]) if rest[0] in self.digits else None
+
+    def batch(self, model, queries, k_stars):
+        """[(log q over the 11 levels, log P(stop | k*) or None)] for each query, one forward call."""
+        if self.single:
+            return single_pass_logps_batch(model, queries, self.common, self.numbers, self.stop, k_stars)
+        device = next(model.parameters()).device
+        seqs, extra = [], {}
+        for i, (q, k) in enumerate(zip(queries, k_stars)):
+            seqs.append(q + self.common + [self.one] + ([self.zero] if k == 10 else []))
+        for i, (q, k) in enumerate(zip(queries, k_stars)):
+            if k is not None and k not in (1, 10):
+                extra[i] = len(seqs)
+                seqs.append(q + self.common + [self.digits[k]])
+        width = max(map(len, seqs))
+        logits = model(input_ids=torch.tensor([s + [self.stop] * (width - len(s)) for s in seqs], device=device)).logits
+        digits = torch.tensor(self.digits, device=device)
+        out = []
+        for b, (q, k) in enumerate(zip(queries, k_stars)):
+            n = len(q) + len(self.common)
+            common_logp = sum(logits[b, len(q) - 1 + i].float().log_softmax(-1)[t] for i, t in enumerate(self.common))
+            first = logits[b, n - 1].float().log_softmax(-1)
+            after_one = logits[b, n].float().log_softmax(-1)
+            log_zero = after_one[self.zero]
+            log_not_zero = torch.log1p(-log_zero.exp().clamp(max=1 - 1e-7))
+            levels = common_logp + first[digits]
+            levels = torch.cat([levels[:1], (levels[1] + log_not_zero)[None], levels[2:], (levels[1] + log_zero)[None]])
+            if k is None:
+                stop_logp = None
+            elif k == 1:
+                stop_logp = after_one[self.stop]
+            elif k == 10:
+                stop_logp = logits[b, n + 1].float().log_softmax(-1)[self.stop]
+            else:
+                stop_logp = logits[extra[b], n].float().log_softmax(-1)[self.stop]
+            out.append((levels, stop_logp))
+        return out

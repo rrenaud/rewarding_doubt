@@ -1,0 +1,19 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/exact_llama.py", line 445, in <module>
+    main()
+  File "/opt/RewardingDoubt/SingleAnswerSetting/exact_llama.py", line 213, in main
+    model, tokenizer = FastLanguageModel.from_pretrained(model_name=args.model, max_seq_length=1048,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader.py", line 82, in from_pretrained
+    model_name = get_model_name(model_name, load_in_4bit)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/unsloth/models/loader_utils.py", line 111, in get_model_name
+    raise NotImplementedError(
+NotImplementedError: Unsloth: unsloth/Qwen2.5-3B-Instruct-bnb-4bit is not supported in your current Unsloth version! Please update Unsloth via:
+
+pip uninstall unsloth unsloth_zoo -y
+pip install --upgrade --no-cache-dir "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+pip install --upgrade --no-cache-dir "git+https://github.com/unslothai/unsloth-zoo.git"
+

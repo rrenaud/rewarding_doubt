@@ -73,8 +73,7 @@ from rewarding_doubt.generations import GenerationLog
 from rewarding_doubt.stability import FLAGS, StabilityMonitor
 from rewarding_doubt.tracking import Tracker
 from rewarding_doubt.paper_ppo import AdaptiveKLController
-from shared_prefix import (candidate_logps, full_sequence_logps, single_pass_logps, single_pass_logps_batch,
-                           split_candidates)
+from shared_prefix import LevelScheme, candidate_logps, end_of_turn, full_sequence_logps
 from subset import subset_loader
 from util.DataHelper import DataCollatorForTokenizedQueries
 from util.EvaluationMetrics import Metric, is_answer_correct
@@ -83,11 +82,10 @@ from util.ResponseHandling import parse_answer_confidence
 MODEL = "unsloth/llama-3-8b-Instruct-bnb-4bit"
 
 
-def reference_scores(model, rows, candidates):
-    """The base model's number log-probs and stop log-prob per row (adapter disabled, one batch)."""
-    common, numbers, stop = split_candidates(candidates)
+def reference_scores(model, rows, scheme):
+    """The base model's level log-probs and stop log-prob per row (adapter disabled, one batch)."""
     with torch.no_grad(), model.disable_adapter():
-        scored = single_pass_logps_batch(model, [r[0] for r in rows], common, numbers, stop, [r[2] for r in rows])
+        scored = scheme.batch(model, [r[0] for r in rows], [r[2] for r in rows])
     return [(logq.double(), stop_logp.double() if stop_logp is not None else None) for logq, stop_logp in scored]
 
 
@@ -109,11 +107,10 @@ def capture_final_hidden(model, store):
     return lm_head.register_forward_hook(lambda module, inputs, output: store.__setitem__("hidden", inputs[0]))
 
 
-def score_rows(model, rows, candidates, eot, args):
-    """(number log-probs, stop log-prob or None) per row; single-pass rows share one forward call."""
+def score_rows(model, rows, candidates, eot, args, scheme):
+    """(level log-probs, stop log-prob or None) per row; single-pass rows share one forward call."""
     if args.scoring == "single":
-        common, numbers, stop = split_candidates(candidates)
-        return single_pass_logps_batch(model, [r[0] for r in rows], common, numbers, stop, [r[2] for r in rows])
+        return scheme.batch(model, [r[0] for r in rows], [r[2] for r in rows])
     score = candidate_logps if args.scoring == "shared" else lambda m, q, c: full_sequence_logps(m, q, c, eot)
     return [(score(model, r[0], candidates), None) for r in rows]
 
@@ -151,24 +148,17 @@ def row_objective(row, logps, stop_logp, args, beta=0., value_head=None, hidden=
     return loss, confidence, logps.detach().logsumexp(-1).exp().item(), stop_prob, None, None
 
 
-def sample_numbers(model, tokenizer, queries, candidates, eot):
-    """Sample each query's confidence continuation at T=1 and return the sampled number index.
-
-    None when the continuation is not ": <number>" (the mass hinge covers that case).
-    """
-    common, numbers, _ = split_candidates(candidates)
+def sample_numbers(model, tokenizer, queries, scheme, eot):
+    """Sample each query's confidence continuation at T=1 and return the sampled level, or None
+    when the continuation is not ": <level>" (the mass hinge covers that case)."""
     width = max(map(len, queries))
     input_ids = torch.tensor([[tokenizer.eos_token_id] * (width - len(q)) + q for q in queries]).cuda()
     mask = torch.tensor([[0] * (width - len(q)) + [1] * len(q) for q in queries]).cuda()
     with torch.no_grad():
-        out = model.generate(input_ids=input_ids, attention_mask=mask, max_new_tokens=len(common) + 2,
+        out = model.generate(input_ids=input_ids, attention_mask=mask, max_new_tokens=len(scheme.common) + 3,
                              do_sample=True, temperature=1.0, top_p=1.0, top_k=0,
                              eos_token_id=[tokenizer.eos_token_id, eot], pad_token_id=tokenizer.eos_token_id)
-    picks = []
-    for row in out[:, width:].tolist():
-        ok = row[:len(common)] == common and len(row) > len(common) and row[len(common)] in numbers
-        picks.append(numbers.index(row[len(common)]) if ok else None)
-    return picks
+    return [scheme.parse(row) for row in out[:, width:].tolist()]
 
 
 def main():
@@ -204,6 +194,7 @@ def main():
                              "shared: prefix pass + 11 cached continuations; full: 11 full sequences "
                              "(the runs before 2026-10-01T20Z)")
     parser.add_argument("--seed", type=int, default=2)
+    parser.add_argument("--model", default=MODEL, help="model loaded in 4-bit, e.g. unsloth/Qwen2.5-3B-Instruct")
     parser.add_argument("--checkpoint-every", type=int, default=32, help="resumable checkpoint interval (0: off)")
     parser.add_argument("--stop-on", default="nonfinite",
                         help=f"comma-separated stability flags that end the run ({', '.join(FLAGS)}; empty: none)")
@@ -219,7 +210,7 @@ def main():
     os.makedirs(args.out_dir, exist_ok=True)
 
     # util/ModelLoader.load_lora_model_tokenizer (is_unsloth=True), minus the value head.
-    model, tokenizer = FastLanguageModel.from_pretrained(model_name=MODEL, max_seq_length=1048,
+    model, tokenizer = FastLanguageModel.from_pretrained(model_name=args.model, max_seq_length=1048,
                                                          dtype=None, load_in_4bit=True)
     model = FastLanguageModel.get_peft_model(model, r=8, lora_alpha=8, lora_dropout=0, bias="none",
                                              use_gradient_checkpointing="unsloth" if args.grad_ckpt == "unsloth" else False,
@@ -230,11 +221,14 @@ def main():
     trl.trainer.peft_module_casting_to_bf16(model)
     tokenizer.pad_token_id = tokenizer.eos_token_id
     tokenizer.padding_side = "left"
-    eot = tokenizer.convert_tokens_to_ids("<|eot_id|>")
+    eot = end_of_turn(tokenizer)
     confidence_token = tokenizer.convert_tokens_to_ids("ĠConfidence")
     # The continuation PPO trains on after " Confidence": ": k" then end of turn.
     candidates = [tokenizer.encode(f": {k}", add_special_tokens=False) + [eot] for k in range(11)]
-    args.n_common = len(split_candidates(candidates)[0]) if args.scoring == "single" else 0
+    scheme = LevelScheme(tokenizer, eot)
+    args.n_common = len(scheme.common) if args.scoring == "single" else 0
+    if args.value_head and not scheme.single:
+        parser.error("--value-head reads one position per level token; it supports one-token levels (Llama-3) only")
     assert len({tuple(c) for c in candidates}) == 11
     assert not any(a != b and b[:len(a)] == a for a in candidates for b in candidates)
 
@@ -333,13 +327,13 @@ def main():
                 rows.append((prompt + answer, float(correct), None, None))
                 row_entry.append(len(entries) - 1)
             if args.scoring == "single" and rows:
-                picks = sample_numbers(model, tokenizer, [r[0] for r in rows], candidates, eot)
+                picks = sample_numbers(model, tokenizer, [r[0] for r in rows], scheme, eot)
                 rows = [(q, label, k, None) for (q, label, _, _), k in zip(rows, picks)]
                 for j, k in zip(row_entry, picks):
                     entries[j]["confidence"] = k
             FastLanguageModel.for_training(model)
             if args.regularization == "baseline":  # reference scores are fixed for the whole step
-                refs = reference_scores(model, rows, candidates)
+                refs = reference_scores(model, rows, scheme)
                 rows = [(q, label, k, ref) for (q, label, k, _), ref in zip(rows, refs)]
             stats = dict(loss=0., confidence=0., mass=0., hinge_active=0., stop_prob=0., sampled_number_rate=0.,
                          kl=0., kl_coef=kl_controller.value, value_loss=0.)
@@ -356,7 +350,7 @@ def main():
                     chunk = args.forward_batch or len(mb)
                     for c_start in range(0, len(mb), chunk):
                         rows_in = mb[c_start:c_start + chunk]
-                        scored = score_rows(model, rows_in, candidates, eot, args)
+                        scored = score_rows(model, rows_in, candidates, eot, args, scheme)
                         hidden = store.get("hidden")
                         total = 0.
                         for b, (row, (logps, stop_logp)) in enumerate(zip(rows_in, scored)):

@@ -1,0 +1,30 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.392 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+
+Downloading shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Downloading shards:  50%|█████     | 1/2 [00:17<00:17, 17.92s/it]
+Downloading shards: 100%|██████████| 2/2 [00:28<00:00, 13.37s/it]
+Downloading shards: 100%|██████████| 2/2 [00:28<00:00, 14.05s/it]
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.04it/s]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.17it/s]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.15it/s]
+
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]
+Map:  34%|███▍      | 173/512 [00:00<00:00, 1690.50 examples/s]
+Map:  73%|███████▎  | 372/512 [00:00<00:00, 1859.26 examples/s]
+Map: 100%|██████████| 512/512 [00:00<00:00, 1674.68 examples/s]
+Traceback (most recent call last):
+  File "/opt/RewardingDoubt/SingleAnswerSetting/frozen_eval.py", line 106, in <module>
+    main(*sys.argv[1:4])
+  File "/opt/RewardingDoubt/SingleAnswerSetting/frozen_eval.py", line 77, in main
+    continuations[i] = out2.sequences[j, width2:].tolist()
+                       ^^^^^^^^^^^^^^
+AttributeError: 'Tensor' object has no attribute 'sequences'

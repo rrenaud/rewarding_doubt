@@ -43,6 +43,8 @@ image = (
     .add_local_file(Path(__file__).parent / "bench_batching.py", f"{CODE}/bench_batching.py", copy=True)
     .add_local_file(Path(__file__).parent / "thinking_llama.py", f"{CODE}/thinking_llama.py", copy=True)
     .add_local_file(Path(__file__).parent / "frozen_eval.py", f"{CODE}/frozen_eval.py", copy=True)
+    .add_local_file(Path(__file__).parent / "verify_levels.py", f"{CODE}/verify_levels.py", copy=True)
+    .add_local_file(Path(__file__).parent / "debug_levels.py", f"{CODE}/debug_levels.py", copy=True)
     # Our package, so the exact objectives use the very same core.objective as the Tinker runs.
     .add_local_dir(Path(__file__).parents[1] / "src" / "rewarding_doubt", "/opt/rd/rewarding_doubt", copy=True,
                    ignore=["__pycache__"])
@@ -916,4 +918,68 @@ def list_snapshots(run: str, labels: list) -> dict:
     volume.reload()
     return {label: sorted(str(p) for p in Path(f"{VOL}/outputs/{run}/{label}").glob("snapshot-step*")) for label in labels
             if Path(f"{VOL}/outputs/{run}/{label}").exists()}
+
+
+@app.local_entrypoint()
+def qwen_check(gpu: str = "L40S"):
+    """Port check for Qwen-2.5-3B: level scoring vs teacher forcing (both models), the base model's
+    dev scores with the frozen evaluator, and 12-step exact + KL and PPO + KL runs with frozen answers."""
+    root = Path(__file__).resolve().parents[1]
+    # The pre-quantized unsloth/Qwen2.5-3B-Instruct-bnb-4bit needs a newer Unsloth than the pinned one;
+    # the 16-bit checkpoint loads and is quantized to 4-bit on load.
+    qwen = "unsloth/Qwen2.5-3B-Instruct"
+    data = root / "runs/pilot-20261001T002945Z/data"
+    train = [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()]
+    ids = {"train": train[:96], "validation": json.loads((root / "runs/hparam-search-20261002T044831Z/dev_ids.json").read_text())}
+    run = "qwen-check-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    jobs = [
+        ("verify", ["verify_levels.py", qwen, MODEL]),
+        ("base-dev", ["frozen_eval.py", "IDS_JSON", qwen, "OUT_DIR/eval.json"]),
+        ("exact-kl", ["exact_llama.py", "IDS_JSON", "OUT_DIR", "--model", qwen, "--mode", "discrete-exact", "--scoring", "single",
+                      "--regularization", "baseline", "--reward", "released", "--passes", "4", "--minibatch", "4", "--lr", "1e-05",
+                      "--seed", "1", "--epochs", "1", "--max-steps", "12", "--save-every", "12", "--frozen-answers"]),
+        ("ppo-kl", ["subset.py", "train", "IDS_JSON", "--seed", "1", "--fast", "--grading", "f1", "--frozen-answers",
+                    "--save-every", "12", "--max-steps", "12", "--", "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth",
+                    "--model_dir", qwen, "--tokenizer_dir", qwen, "--epochs", "1", "--lr", "1e-05", "--batchsize", "8",
+                    "--log_with", "tensorboard"]),
+    ]
+    out = root / "runs" / f"modal-{run}"
+    out.mkdir(parents=True, exist_ok=True)
+    for r in train_with_snapshots.with_options(gpu=gpu).starmap([(ids, label, cmd, run) for label, cmd in jobs],
+                                                                return_exceptions=True, order_outputs=False):
+        if isinstance(r, Exception):
+            print("FAILED", repr(r)[:1500]); continue
+        (out / f"{r['label']}.log").write_text(r["log"])
+        print(f"== {r['label']}: exit {r['exit_code']}")
+        print("\n".join([l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l][-3:])[:1500])
+    for path, text in read_files.remote([f"{VOL}/outputs/{run}/base-dev/eval_metrics.json",
+                                         f"{VOL}/outputs/{run}/exact-kl/metrics.jsonl", f"{VOL}/outputs/{run}/ppo-kl/stability.jsonl"]).items():
+        (out / path.split("/")[-2]).mkdir(exist_ok=True)
+        (out / path.split("/")[-2] / Path(path).name).write_text(text)
+    print(f"logs: {out}")
+
+
+@app.local_entrypoint()
+def try_load(names: str, gpu: str = "L40S"):
+    """Which model names the pinned Unsloth loads in 4-bit (comma-separated)."""
+    root = Path(__file__).resolve().parents[1]
+    ids = {"train": [], "validation": []}
+    run = "try-load-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    code = ("import sys; from unsloth import FastLanguageModel; "
+            "m, t = FastLanguageModel.from_pretrained(model_name=sys.argv[1], max_seq_length=1048, dtype=None, load_in_4bit=True); "
+            "print('LOADED', sys.argv[1], type(m).__name__, t.eos_token)")
+    jobs = [(ids, f"load-{i}", ["-c", code, name], run) for i, name in enumerate(names.split(","))]
+    for r in train_with_snapshots.with_options(gpu=gpu).starmap(jobs, return_exceptions=True, order_outputs=False):
+        if isinstance(r, Exception):
+            print("FAILED", repr(r)[:500]); continue
+        print(r["label"], "exit", r["exit_code"], [l[:300] for l in r["log"].splitlines() if "LOADED" in l or "Error" in l][-2:])
+
+
+@app.local_entrypoint()
+def verify_levels(gpu: str = "L40S", debug: bool = False):
+    """LevelScheme vs teacher forcing on Qwen-2.5-3B and Llama-3-8B (verify_levels.py)."""
+    run = "verify-levels-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    r = train_with_snapshots.with_options(gpu=gpu).remote({"train": [], "validation": []}, "verify",
+        ["debug_levels.py", "unsloth/Qwen2.5-3B-Instruct"] if debug else ["verify_levels.py", "unsloth/Qwen2.5-3B-Instruct", MODEL], run)
+    print("exit", r["exit_code"]); print("\n".join(l for l in r["log"].splitlines() if l.startswith(("{", "first", "P(", "batching")) or l[:2].strip().isdigit() or "Error" in l))
 
