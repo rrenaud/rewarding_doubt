@@ -862,11 +862,13 @@ def frozen_test(gpu: str = "L40S"):
 
 
 @app.local_entrypoint()
-def frozen_round(search_dir: str, round: str = "frozen_compare", gpu: str = "L40S", eval_run: str = ""):
+def frozen_round(search_dir: str, round: str = "frozen_compare", gpu: str = "L40S", eval_run: str = "",
+                 test: bool = True):
     """Train {round}_configs.json (commands with --frozen-answers) on the search's train/dev split and
     score every snapshot on dev and step 256 on test with frozen_eval.py (base answer, adapted
     confidence). Writes {round}/curve.json ({label: {step: dev metrics}}) and curve_test.json.
-    --eval-run RUN re-scores the snapshots of an earlier run of this entrypoint without training."""
+    --eval-run RUN re-scores the snapshots of an earlier run of this entrypoint without training;
+    --no-test scores dev only (sweeps select on dev and leave test alone)."""
     root = Path(__file__).resolve().parents[1]
     search = Path(search_dir).resolve()
     configs = json.loads((search / f"{round}_configs.json").read_text())
@@ -889,7 +891,7 @@ def frozen_round(search_dir: str, round: str = "frozen_compare", gpu: str = "L40
         for snapshot in snapshots:
             step = int(Path(snapshot).name.split("step")[1])
             jobs.append((dev, f"eval-{label}-dev-{step}", ["frozen_eval.py", "IDS_JSON", snapshot, "OUT_DIR/eval.json"], run))
-            if step == max(int(Path(s).name.split("step")[1]) for s in snapshots):
+            if test and step == max(int(Path(s).name.split("step")[1]) for s in snapshots):
                 jobs.append((test, f"eval-{label}-test-{step}", ["frozen_eval.py", "IDS_JSON", snapshot, "OUT_DIR/eval.json"], run))
     curve, curve_test = {}, {}
     for r in trainer.starmap(jobs, return_exceptions=True, order_outputs=False):

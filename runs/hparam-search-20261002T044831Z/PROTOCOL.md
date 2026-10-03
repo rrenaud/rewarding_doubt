@@ -61,3 +61,15 @@ malformed that the unsampled readout crashed on zero rows (fixed); they are trea
 - Choose m: lowest mean dev Brier over all of its seeds; a value is disqualified if any seed is
   ineligible (format or answer damage, as in amendment 2).
 - brier_full: the chosen m and m = 0, full training set, 256 steps, seeds 6-8, dev and test.
+
+## Frozen-answer follow-up (2026-10-03, before frozen_lr results)
+
+- frozen_compare: the finals' configs with --frozen-answers, seeds 4-8, dev and test (frozen_eval,
+  16-bit base as the released evaluation). Exact + hinge: test ECE 0.078, AUROC 0.797, 0/5 seeds
+  broken; on-policy healthy seeds were better (0.052 / 0.839) but 1/5 collapsed.
+- Hedging check: on-policy finals hedge ("None", "Unknown", ...) on 0.8-1.8% of answers (base 1.0%);
+  removing them changes AUROC by < 0.01, so hedging does not explain the gap.
+- frozen_lr: learning-rate sweep with frozen answers, dev only, seeds 4-5 (pooled with
+  frozen_compare's seeds 4-5 at the tuned rate). Exact: 2e-5, 4e-5 (tuned), 8e-5, 1.6e-4, 3.2e-4;
+  PPO: 2.27e-5 (tuned), 4.5e-5, 9e-5. Choose by lowest mean dev Brier among values whose seeds are
+  all eligible (amendment 2); test only for a chosen value that differs from the tuned one.
