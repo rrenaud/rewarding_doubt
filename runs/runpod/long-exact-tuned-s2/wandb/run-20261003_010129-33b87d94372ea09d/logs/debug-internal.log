@@ -1,0 +1,17 @@
+{"time":"2026-10-03T01:01:30.0811626Z","level":"INFO","msg":"stream: starting","core version":"0.19.2","symlink path":"/workspace/runs/long-exact-tuned-s2/wandb/run-20261003_010129-33b87d94372ea09d/logs/debug-core.log"}
+{"time":"2026-10-03T01:01:30.198644687Z","level":"INFO","msg":"created new stream","id":"33b87d94372ea09d"}
+{"time":"2026-10-03T01:01:30.199317532Z","level":"INFO","msg":"stream: started","id":"33b87d94372ea09d"}
+{"time":"2026-10-03T01:01:30.199334944Z","level":"INFO","msg":"writer: Do: started","stream_id":"33b87d94372ea09d"}
+{"time":"2026-10-03T01:01:30.199339352Z","level":"INFO","msg":"handler: started","stream_id":"33b87d94372ea09d"}
+{"time":"2026-10-03T01:01:30.199363827Z","level":"INFO","msg":"sender: started","stream_id":"33b87d94372ea09d"}
+{"time":"2026-10-03T01:01:30.967921432Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2026-10-03T01:04:30.0707839Z","level":"INFO","msg":"sender: sendAlert: notified scriptable run alert","data":{"notifyScriptableRunAlert":{"success":true}}}
+{"time":"2026-10-03T01:04:30.375710481Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2026-10-03T01:04:30.377096735Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2026-10-03T01:04:31.376236621Z","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading wandb-summary.json","runtime_seconds":0.478327156,"progress":"970B/970B"},{"desc":"uploading config.yaml","runtime_seconds":0.140959813,"progress":"1.8KB/1.8KB"}],"total_operations":2}}
+{"time":"2026-10-03T01:04:31.694352626Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-10-03T01:04:33.573543637Z","level":"INFO","msg":"stream: closing","id":"33b87d94372ea09d"}
+{"time":"2026-10-03T01:04:33.574683565Z","level":"INFO","msg":"handler: closed","stream_id":"33b87d94372ea09d"}
+{"time":"2026-10-03T01:04:33.574701278Z","level":"INFO","msg":"sender: closed","stream_id":"33b87d94372ea09d"}
+{"time":"2026-10-03T01:04:33.57469665Z","level":"INFO","msg":"writer: Close: closed","stream_id":"33b87d94372ea09d"}
+{"time":"2026-10-03T01:04:33.579219986Z","level":"INFO","msg":"stream: closed","id":"33b87d94372ea09d"}

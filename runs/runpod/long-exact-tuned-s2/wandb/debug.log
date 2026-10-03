@@ -1,0 +1,29 @@
+2026-10-03 01:01:29,831 INFO    MainThread:62 [wandb_setup.py:_flush():68] Current SDK version is 0.19.2
+2026-10-03 01:01:29,832 INFO    MainThread:62 [wandb_setup.py:_flush():68] Configure stats pid to 62
+2026-10-03 01:01:29,833 INFO    MainThread:62 [wandb_setup.py:_flush():68] Loading settings from /root/.config/wandb/settings
+2026-10-03 01:01:29,834 INFO    MainThread:62 [wandb_setup.py:_flush():68] Loading settings from /opt/RewardingDoubt/SingleAnswerSetting/wandb/settings
+2026-10-03 01:01:29,834 INFO    MainThread:62 [wandb_setup.py:_flush():68] Loading settings from environment variables
+2026-10-03 01:01:29,836 INFO    MainThread:62 [wandb_init.py:_log_setup():523] Logging user logs to /workspace/runs/long-exact-tuned-s2/wandb/run-20261003_010129-33b87d94372ea09d/logs/debug.log
+2026-10-03 01:01:29,838 INFO    MainThread:62 [wandb_init.py:_log_setup():524] Logging internal logs to /workspace/runs/long-exact-tuned-s2/wandb/run-20261003_010129-33b87d94372ea09d/logs/debug-internal.log
+2026-10-03 01:01:29,839 INFO    MainThread:62 [wandb_init.py:init():641] calling init triggers
+2026-10-03 01:01:29,840 INFO    MainThread:62 [wandb_init.py:init():647] wandb.init called with sweep_config: {}
+config: {'out_dir': '/workspace/runs/long-exact-tuned-s2', 'mode': 'discrete-exact', 'reward': 'paper', 'reward_mix': 0.0, 'format_weight': 1.01, 'format_threshold': 0.95, 'lr': 4.01e-05, 'batchsize': 8, 'epochs': 1, 'max_steps': 4000, 'passes': 2, 'minibatch': 4, 'save_every': 500, 'regularization': 'hinge', 'invalid_reward': -3.0, 'kl_coef': 0.05, 'kl_target': 6.0, 'kl_horizon': 10000.0, 'value_head': False, 'forward_batch': 0, 'grad_ckpt': 'off', 'vf_coef': 0.1, 'scoring': 'single', 'seed': 2, 'checkpoint_every': 32, 'stop_on': 'collapsed,answers_degraded,format_broken,nonfinite', 'no_resume': False, 'stop_after': 0, 'n_common': 2}
+2026-10-03 01:01:29,840 INFO    MainThread:62 [wandb_init.py:init():674] starting backend
+2026-10-03 01:01:30,049 INFO    MainThread:62 [wandb_init.py:init():678] sending inform_init request
+2026-10-03 01:01:30,076 INFO    MainThread:62 [backend.py:_multiprocessing_setup():104] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2026-10-03 01:01:30,078 INFO    MainThread:62 [wandb_init.py:init():693] backend started and connected
+2026-10-03 01:01:30,079 INFO    MainThread:62 [wandb_init.py:init():786] updated telemetry
+2026-10-03 01:01:30,083 INFO    MainThread:62 [wandb_init.py:init():818] communicating run to backend with 90.0 second timeout
+2026-10-03 01:01:30,936 INFO    MainThread:62 [wandb_init.py:init():868] starting run threads in backend
+2026-10-03 01:01:31,021 INFO    MainThread:62 [wandb_run.py:_console_start():2415] atexit reg
+2026-10-03 01:01:31,023 INFO    MainThread:62 [wandb_run.py:_redirect():2265] redirect: wrap_raw
+2026-10-03 01:01:31,023 INFO    MainThread:62 [wandb_run.py:_redirect():2330] Wrapping output streams.
+2026-10-03 01:01:31,024 INFO    MainThread:62 [wandb_run.py:_redirect():2355] Redirects installed.
+2026-10-03 01:01:31,026 INFO    MainThread:62 [wandb_init.py:init():910] run started, returning control to user process
+2026-10-03 01:04:30,369 INFO    MainThread:62 [wandb_run.py:_finish():2140] finishing run multi-tokenizer/rewarding-doubt/33b87d94372ea09d
+2026-10-03 01:04:30,371 INFO    MainThread:62 [wandb_run.py:_atexit_cleanup():2380] got exitcode: 0
+2026-10-03 01:04:30,374 INFO    MainThread:62 [wandb_run.py:_restore():2362] restore
+2026-10-03 01:04:30,374 INFO    MainThread:62 [wandb_run.py:_restore():2368] restore done
+2026-10-03 01:04:33,557 INFO    MainThread:62 [wandb_run.py:_footer_history_summary_info():3984] rendering history
+2026-10-03 01:04:33,559 INFO    MainThread:62 [wandb_run.py:_footer_history_summary_info():4016] rendering summary
+2026-10-03 01:04:33,564 INFO    MainThread:62 [wandb_run.py:_footer_sync_info():3945] logging synced files

@@ -1,0 +1,11 @@
+{
+ "status": "diverged",
+ "step": 59,
+ "reason": [
+  "format_broken"
+ ],
+ "flags": [
+  "format_broken"
+ ],
+ "healthy_checkpoint": null
+}

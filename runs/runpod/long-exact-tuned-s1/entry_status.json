@@ -1,0 +1,22 @@
+{
+ "outcome": "diverged",
+ "exit_code": 3,
+ "detail": null,
+ "time": "2026-10-03T01:05:44Z",
+ "trainer_status": {
+  "status": "diverged",
+  "step": 87,
+  "reason": [
+   "answers_degraded"
+  ],
+  "flags": [
+   "answers_degraded"
+  ],
+  "healthy_checkpoint": {
+   "step": 32,
+   "epoch": 0,
+   "index": 256,
+   "kl_coef": 0.05
+  }
+ }
+}

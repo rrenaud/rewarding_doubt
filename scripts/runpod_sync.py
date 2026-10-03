@@ -71,7 +71,11 @@ def main():
                 skipped += 1
                 continue
             local.parent.mkdir(parents=True, exist_ok=True)
-            s3.download_file(VOLUME_ID, obj["Key"], str(local))
+            try:
+                s3.download_file(VOLUME_ID, obj["Key"], str(local))
+            except Exception as e:  # noqa: BLE001 - e.g. a file being rewritten by a running pod
+                print(f"  skipped {relative}: {e}")
+                continue
             copied += 1
         print(f"{name}: {copied} files copied, {skipped} unchanged -> runs/runpod/{name}")
 

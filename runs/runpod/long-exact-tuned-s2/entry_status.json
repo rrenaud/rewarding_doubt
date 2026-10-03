@@ -1,0 +1,17 @@
+{
+ "outcome": "diverged",
+ "exit_code": 3,
+ "detail": null,
+ "time": "2026-10-03T01:04:41Z",
+ "trainer_status": {
+  "status": "diverged",
+  "step": 59,
+  "reason": [
+   "format_broken"
+  ],
+  "flags": [
+   "format_broken"
+  ],
+  "healthy_checkpoint": null
+ }
+}

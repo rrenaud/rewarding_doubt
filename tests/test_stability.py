@@ -47,8 +47,18 @@ def test_format_and_accuracy_flags():
     rng = random.Random(3)
     conf = lambda s: [None] * 4 + [7] * 2 + [8] * 2 if s > 100 else [rng.choice([6, 7, 8]) for _ in range(8)]
     acc = lambda s: [rng.random() < (0.3 if s > 100 else 0.65) for _ in range(8)]
-    _, events = run(StabilityMonitor(), 140, conf, acc)
+    _, events = run(StabilityMonitor(), 180, conf, acc)
     assert {e["flag"] for e in events} == {"format_broken", "answers_degraded"}
+
+
+def test_no_false_accuracy_alarm_over_a_long_healthy_run():
+    # Constant 62% accuracy, 4,000 steps of 8 answers: sampling noise alone must not trip the flag
+    # (it did with the old 16-step window: long-exact-tuned-s1 stopped at step 87).
+    for seed in range(5):
+        rng = random.Random(100 + seed)
+        _, events = run(StabilityMonitor(), 4000, lambda s: [rng.choice([5, 6, 7, 8, 9]) for _ in range(8)],
+                        lambda s: [rng.random() < 0.62 for _ in range(8)])
+        assert events == [], (seed, events)
 
 
 def test_nonfinite_scalar():
