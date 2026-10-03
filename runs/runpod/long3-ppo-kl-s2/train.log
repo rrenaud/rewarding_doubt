@@ -1,0 +1,199 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+wandb: Currently logged in as: rrenaud (multi-tokenizer). Use `wandb login --relogin` to force relogin
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Tracking run with wandb version 0.19.2
+wandb: Run data is saved locally in /workspace/runs/long3-ppo-kl-s2/wandb/run-20261003_082810-436e8d8078f0ca65
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run long3-ppo-kl-s2
+wandb: ⭐️ View project at https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: 🚀 View run at https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/436e8d8078f0ca65
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+WARNING:root:The `device_map` argument is not provided. We will override the device_map argument. to set the entire model on the current device. If you want to set the model on multiple devices, please provide a custom `device_map` argument.
+frozen answers: Train.py's answer generation runs with the adapter disabled
+checkpoint at step 32 (0.4 s)
+checkpoint at step 64 (0.7 s)
+checkpoint at step 96 (0.7 s)
+checkpoint at step 128 (0.7 s)
+checkpoint at step 160 (0.7 s)
+checkpoint at step 192 (0.8 s)
+checkpoint at step 224 (0.8 s)
+checkpoint at step 256 (0.8 s)
+checkpoint at step 288 (0.7 s)
+checkpoint at step 320 (0.8 s)
+checkpoint at step 352 (0.8 s)
+checkpoint at step 384 (0.9 s)
+checkpoint at step 416 (0.7 s)
+checkpoint at step 448 (1.0 s)
+checkpoint at step 480 (0.8 s)
+checkpoint at step 512 (0.7 s)
+checkpoint at step 544 (0.9 s)
+checkpoint at step 576 (0.8 s)
+checkpoint at step 608 (0.7 s)
+checkpoint at step 640 (1.1 s)
+checkpoint at step 672 (0.8 s)
+checkpoint at step 704 (0.7 s)
+checkpoint at step 736 (0.9 s)
+checkpoint at step 768 (0.9 s)
+checkpoint at step 800 (0.8 s)
+checkpoint at step 832 (0.7 s)
+checkpoint at step 864 (0.9 s)
+checkpoint at step 896 (0.8 s)
+checkpoint at step 928 (0.9 s)
+checkpoint at step 960 (0.9 s)
+checkpoint at step 992 (0.8 s)
+checkpoint at step 1024 (0.8 s)
+checkpoint at step 1056 (0.7 s)
+checkpoint at step 1088 (0.8 s)
+checkpoint at step 1120 (0.9 s)
+checkpoint at step 1152 (0.9 s)
+checkpoint at step 1184 (0.8 s)
+checkpoint at step 1216 (0.9 s)
+checkpoint at step 1248 (0.8 s)
+checkpoint at step 1280 (0.8 s)
+checkpoint at step 1312 (0.8 s)
+checkpoint at step 1344 (0.8 s)
+checkpoint at step 1376 (0.9 s)
+checkpoint at step 1408 (0.8 s)
+checkpoint at step 1440 (0.9 s)
+checkpoint at step 1472 (0.7 s)
+checkpoint at step 1504 (0.7 s)
+checkpoint at step 1536 (0.8 s)
+checkpoint at step 1568 (0.8 s)
+checkpoint at step 1600 (0.9 s)
+checkpoint at step 1632 (1.0 s)
+checkpoint at step 1664 (0.8 s)
+checkpoint at step 1696 (1.0 s)
+checkpoint at step 1728 (0.9 s)
+checkpoint at step 1760 (0.8 s)
+checkpoint at step 1792 (0.7 s)
+checkpoint at step 1824 (0.8 s)
+checkpoint at step 1856 (0.9 s)
+checkpoint at step 1888 (0.7 s)
+checkpoint at step 1920 (0.9 s)
+checkpoint at step 1952 (0.9 s)
+checkpoint at step 1984 (0.9 s)
+checkpoint at step 2016 (1.0 s)
+checkpoint at step 2048 (0.9 s)
+checkpoint at step 2080 (0.7 s)
+checkpoint at step 2112 (0.8 s)
+checkpoint at step 2144 (0.8 s)
+checkpoint at step 2176 (0.9 s)
+checkpoint at step 2208 (0.8 s)
+checkpoint at step 2240 (0.8 s)
+checkpoint at step 2272 (0.9 s)
+checkpoint at step 2304 (0.8 s)
+checkpoint at step 2336 (0.8 s)
+checkpoint at step 2368 (0.9 s)
+checkpoint at step 2400 (0.8 s)
+checkpoint at step 2432 (0.8 s)
+checkpoint at step 2464 (0.8 s)
+checkpoint at step 2496 (0.8 s)
+checkpoint at step 2528 (0.8 s)
+checkpoint at step 2560 (0.9 s)
+checkpoint at step 2592 (0.8 s)
+checkpoint at step 2624 (0.7 s)
+checkpoint at step 2656 (0.7 s)
+checkpoint at step 2688 (0.9 s)
+checkpoint at step 2720 (0.8 s)
+checkpoint at step 2752 (0.9 s)
+checkpoint at step 2784 (0.8 s)
+checkpoint at step 2816 (0.8 s)
+checkpoint at step 2848 (0.9 s)
+checkpoint at step 2880 (0.8 s)
+checkpoint at step 2912 (1.0 s)
+checkpoint at step 2944 (1.0 s)
+checkpoint at step 2976 (0.8 s)
+checkpoint at step 3008 (0.9 s)
+checkpoint at step 3040 (0.8 s)
+checkpoint at step 3072 (0.9 s)
+checkpoint at step 3104 (0.9 s)
+checkpoint at step 3136 (0.7 s)
+checkpoint at step 3168 (0.8 s)
+checkpoint at step 3200 (1.1 s)
+checkpoint at step 3232 (0.8 s)
+checkpoint at step 3264 (0.9 s)
+checkpoint at step 3296 (0.9 s)
+checkpoint at step 3328 (0.8 s)
+checkpoint at step 3360 (0.8 s)
+checkpoint at step 3392 (0.8 s)
+checkpoint at step 3424 (0.9 s)
+checkpoint at step 3456 (0.9 s)
+checkpoint at step 3488 (0.9 s)
+checkpoint at step 3520 (1.1 s)
+checkpoint at step 3552 (0.9 s)
+checkpoint at step 3584 (0.8 s)
+checkpoint at step 3616 (0.8 s)
+checkpoint at step 3648 (0.9 s)
+checkpoint at step 3680 (0.8 s)
+checkpoint at step 3712 (0.8 s)
+checkpoint at step 3744 (1.0 s)
+checkpoint at step 3776 (1.0 s)
+checkpoint at step 3808 (0.9 s)
+checkpoint at step 3840 (1.1 s)
+checkpoint at step 3872 (1.0 s)
+checkpoint at step 3904 (1.5 s)
+checkpoint at step 3936 (1.0 s)
+checkpoint at step 3968 (0.9 s)
+checkpoint at step 4000 (1.0 s)
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:                         seconds ▃▂▇▁▅▄▂▂▄▇▆▅▄█▂▁▂▄▁▁▆█▂▅▅▅▅▆▄▄▄▆▅▅▄▅▄▂▂▂
+wandb:     stability/baseline_accuracy ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:        stability/batch_accuracy ▇▆▅▇▇▅▅█▆▆▄▇▆▆▅█▆█▅▁▇▄▆▅█▆▆▆█▄▅▆█▅▅▅▅▄▅▆
+wandb: stability/batch_confidence_mean ▇▅▆▇▆█▇▆▆█▅▄▃▅▂▅▄▄▄▅▄▆▄█▄▇▃▂▅▄▇▇▆▄▂▁▅▅▇▇
+wandb:  stability/batch_confidence_std ▁▁▂▁▅▂▁▃▁▁▃▂▃▄▃█▄▅▄▃▂▅▆▅▅▆▅▄▅▆▅▃▃▄▅▅▃▃▆▆
+wandb:    stability/batch_invalid_rate ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁
+wandb:     stability/objective_entropy ▁▁▁▂▂▁▄▁▁▁▂▂▅▂▄▁▁▁▄▁▁▂▂▂▂▃▃▂█▄▁▁▁█▂▄▄▁▂▄
+wandb:          stability/objective_kl ▃▁▁▁▂▂▂▂▃▃▃▁▂▃▂▁▄▄▃▃▄▂▁▄▂▃▃▂▂▂▄█▃▅▄▃▄▃▃▃
+wandb:       stability/ppo_loss_policy ▅▄▄▄▄▆▄▅▅▅▅▄▅▅▅▄▆▄▅▄▆▂▄▅▄▅█▅▄▅▃▅▃▅▅▁▅▅▃▅
+wandb:        stability/ppo_loss_total ▁▁▄▄▁▁▁▁▁▁▃▃█▁▂▁▁▁▁▃▃▃▁▁▂▃▁▁▁▃▃▂▁▁▁▃▂▂▁▅
+wandb:        stability/ppo_loss_value ▂▃▂▂▂▁▃▆▅▁▆▆▁▆▅▆█▅▂▁▂▅▁▁▃▁▁▆▁█▁▁▃▁▁▅▁▁▁▆
+wandb:       stability/ppo_mean_scores ▄▆▃▇▆▁▆▅▇▆█▅▆▄▆█▂▆▇▇▇▇█▇▇▅▆▆▆▇█▇▅▅▄▃▅▄▇▇
+wandb:   stability/ppo_policy_approxkl ▂▁▁▂▁▃▃▂█▄▁▁▅▃▁▁▂█▁▁▁▁▁▂▂▁▁▁▂▁▂▁▁▁▁▁▁▁▁▁
+wandb:   stability/ppo_policy_clipfrac ▂▅▂▁▂▁▁▁▄▅▁▅▂▁█▆▁▅▇▁▁▂▁▁▃▂▁▁▅▁▁▁▃▂▁▂▁▁▄▁
+wandb:       stability/window_accuracy ███▄██▅▅▄█▅▄▆▄▆▃▆▂▇▇▅▄▆▂▅▄▃▅▂▄▅▃▅▄▄▃▁▁▃▄
+wandb:          stability/window_brier █▆▆▅▆▅▅▄▃▄▃▃▃▃▄▃▂▁▂▂▃▂▂▁▁▂▂▂▂▂▂▂▂▃▁▁▂▂▂▂
+wandb:  stability/window_calibration_n ▆██▅▆▇▆▄▃▃▆▆█████▆▆▄▆██▇▇█▇▇▆▁▅▇▆▇▆██▇▇▅
+wandb: stability/window_confidence_std ▁▄▃▂▂▂▃▅▄▄▄▆▅▅▄█▆▅▆▇█▇▇▆▆▆▆▆▇▆▆▆▆▆▆▆▆▆▆▆
+wandb:            stability/window_ece █▅▆██▇▃▅▅▅▅▄▃▂▁▃▃▂▅▅▄▃▃▃▂▂▁▃▂▃▃▂▂▂▂▅▅▅▅▃
+wandb:   stability/window_invalid_rate ▁▃▃▁▁▁▆▆█▁▁▁▁▃▁▁▃▃▃▁▁▁▆▁▃▁▃▁▁▃▃█▁▁▁▁▆▆▁▃
+wandb:         stability/window_levels ▁█▆▆▁▅▅▆█▆▅▅▃▃▁▃▃▃▃▁▅▃▅▃▃▃▃▁▃▅▃▃▃▁▆▃▅▃▁▁
+wandb:     stability/window_mode_share ▄▅▁▁▂▅▇▇▅▇▄▄█▄▇▃▅▇█▆▇▅▇▆▃▅▅▅▄▄▆▅▃▇▇▃▄▄▅▆
+wandb: 
+wandb: Run summary:
+wandb:                         seconds 2.41401
+wandb:     stability/baseline_accuracy 0.66016
+wandb:        stability/batch_accuracy 0.75
+wandb: stability/batch_confidence_mean 6
+wandb:  stability/batch_confidence_std 3.74166
+wandb:    stability/batch_invalid_rate 0
+wandb:     stability/objective_entropy 5.01172
+wandb:          stability/objective_kl 9.17174
+wandb:       stability/ppo_loss_policy -0.05995
+wandb:        stability/ppo_loss_total 0.09167
+wandb:        stability/ppo_loss_value 1.51628
+wandb:       stability/ppo_mean_scores 9.81483
+wandb:   stability/ppo_policy_approxkl 0.00063
+wandb:   stability/ppo_policy_clipfrac 0.00305
+wandb:       stability/window_accuracy 0.66406
+wandb:          stability/window_brier 0.18157
+wandb:  stability/window_calibration_n 509
+wandb: stability/window_confidence_std 3.02938
+wandb:            stability/window_ece 0.10059
+wandb:   stability/window_invalid_rate 0
+wandb:         stability/window_levels 8
+wandb:     stability/window_mode_share 0.45312
+wandb: 
+wandb: 🚀 View run long3-ppo-kl-s2 at: https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/436e8d8078f0ca65
+wandb: ⭐️ View project at: https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /workspace/runs/long3-ppo-kl-s2/wandb/run-20261003_082810-436e8d8078f0ca65/logs
+reached --max-steps 4000

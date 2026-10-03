@@ -1,0 +1,20 @@
+{
+ "expt": "long3",
+ "run": "long3-ppo-kl-s1",
+ "trainer": "ppo",
+ "args": {
+  "model_dir": "unsloth/llama-3-8b-Instruct-bnb-4bit",
+  "tokenizer_dir": "unsloth/llama-3-8b-Instruct-bnb-4bit",
+  "out_dir": "/workspace/runs/long3-ppo-kl-s1",
+  "lr": 1e-05,
+  "epochs": 1,
+  "batchsize": 8,
+  "log_with": "tensorboard",
+  "dataset": "triviaqa",
+  "is_unsloth": true,
+  "wrapper_options": "--seed 1 --fast --grading f1 --frozen-answers --save-every 500 --max-steps 4000 --stop-on collapsed,answers_degraded,format_broken,nonfinite"
+ },
+ "image_git_sha": "faea681846c9814e99f8c4fd0c41e22a64727460",
+ "started": "2026-10-03T08:28:28Z",
+ "resumed_at_steps": []
+}

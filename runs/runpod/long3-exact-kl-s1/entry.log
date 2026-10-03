@@ -1,0 +1,6 @@
+2026-10-03T08:27:59Z attempt start (image faea681846c9814e99f8c4fd0c41e22a64727460): python exact_llama.py /workspace/runs/long3-exact-kl-s1/ids.json /workspace/runs/long3-exact-kl-s1 --mode discrete-exact --scoring single --regularization baseline --reward released --passes 4 --minibatch 4 --lr 1e-05 --seed 1 --epochs 1 --max-steps 4000 --save-every 500 --frozen-answers --stop-on collapsed,answers_degraded,format_broken,nonfinite
+2026-10-03T13:58:35Z trainer exited with code 0
+2026-10-03T13:58:35Z post: python /opt/runpod/eval_snapshots.py /workspace/runs/long3-exact-kl-s1 /workspace/runs/long3-exact-kl-s1/ids.json --frozen-answers
+2026-10-03T14:05:31Z outcome: completed
+selfstop: terminate pod cnv2fk5euqyob5: HTTP 204
+2026-10-03T14:05:31Z pod terminate requested

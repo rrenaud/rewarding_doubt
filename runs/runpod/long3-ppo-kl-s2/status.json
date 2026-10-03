@@ -1,0 +1,11 @@
+{
+ "status": "completed",
+ "step": 4000,
+ "flags": [],
+ "healthy_checkpoint": {
+  "step": 3968,
+  "consumed": 3968,
+  "epochs_saved": 0,
+  "kl_coef": 0.038035694509744644
+ }
+}

@@ -1,0 +1,17 @@
+{
+ "outcome": "completed",
+ "exit_code": 0,
+ "detail": null,
+ "time": "2026-10-03T14:12:41Z",
+ "trainer_status": {
+  "status": "completed",
+  "step": 4000,
+  "flags": [],
+  "healthy_checkpoint": {
+   "step": 3968,
+   "epoch": 0,
+   "index": 31744,
+   "kl_coef": 0.05051774906516435
+  }
+ }
+}

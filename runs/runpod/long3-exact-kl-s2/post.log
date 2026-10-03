@@ -1,0 +1,192 @@
+evaluating snapshot-step00500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:06<00:20,  6.86s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:13<00:13,  6.96s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:20<00:06,  6.87s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:22<00:00,  4.81s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:22<00:00,  5.58s/it]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]Map:  88%|████████▊ | 451/512 [00:00<00:00, 4479.23 examples/s]Map: 100%|██████████| 512/512 [00:00<00:00, 3365.36 examples/s]
+{"n": 512, "wrong_format_rate": 0.0, "ece": 0.06777200102806091, "accuracy": 0.642578125, "auroc": 0.8218562625608318, "brier": 0.15369140625, "ece_unsampled": 0.0689772516489029, "auroc_unsampled": 0.8491703622502366, "brier_unsampled": 0.1539583633023018, "protocol": "frozen-answers"}
+500 {'wrong_format_rate': 0.0, 'ece': 0.0678, 'accuracy': 0.6426, 'auroc': 0.8219, 'brier': 0.1537, 'ece_unsampled': 0.069, 'auroc_unsampled': 0.8492, 'brier_unsampled': 0.154}
+evaluating snapshot-step01000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.45it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.26it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.20it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.46it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.38it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]Map:  81%|████████▏ | 417/512 [00:00<00:00, 4140.90 examples/s]Map: 100%|██████████| 512/512 [00:00<00:00, 3140.74 examples/s]
+{"n": 512, "wrong_format_rate": 0.00390625, "ece": 0.07039205729961395, "accuracy": 0.6588235294117647, "auroc": 0.8253540640394089, "brier": 0.15327450980392157, "ece_unsampled": 0.07010135799646378, "auroc_unsampled": 0.845203886152162, "brier_unsampled": 0.14781761059780318, "protocol": "frozen-answers"}
+1000 {'wrong_format_rate': 0.0039, 'ece': 0.0704, 'accuracy': 0.6588, 'auroc': 0.8254, 'brier': 0.1533, 'ece_unsampled': 0.0701, 'auroc_unsampled': 0.8452, 'brier_unsampled': 0.1478}
+evaluating snapshot-step01500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.44it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.26it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.19it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.43it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.36it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]Map:  87%|████████▋ | 447/512 [00:00<00:00, 4443.92 examples/s]Map: 100%|██████████| 512/512 [00:00<00:00, 3403.13 examples/s]
+{"n": 512, "wrong_format_rate": 0.00390625, "ece": 0.047842688858509064, "accuracy": 0.6588235294117647, "auroc": 0.8288433908045977, "brier": 0.14827450980392157, "ece_unsampled": 0.0379658080637455, "auroc_unsampled": 0.8537732621784346, "brier_unsampled": 0.14520878021960382, "protocol": "frozen-answers"}
+1500 {'wrong_format_rate': 0.0039, 'ece': 0.0478, 'accuracy': 0.6588, 'auroc': 0.8288, 'brier': 0.1483, 'ece_unsampled': 0.038, 'auroc_unsampled': 0.8538, 'brier_unsampled': 0.1452}
+evaluating snapshot-step02000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.43it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.27it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.20it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.44it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.37it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]Map:  86%|████████▌ | 439/512 [00:00<00:00, 4362.90 examples/s]Map: 100%|██████████| 512/512 [00:00<00:00, 3313.27 examples/s]
+{"n": 512, "wrong_format_rate": 0.0, "ece": 0.05214730277657509, "accuracy": 0.662109375, "auroc": 0.8103483554145992, "brier": 0.15162109375, "ece_unsampled": 0.050368208438158035, "auroc_unsampled": 0.8501884154347195, "brier_unsampled": 0.14820000955080698, "protocol": "frozen-answers"}
+2000 {'wrong_format_rate': 0.0, 'ece': 0.0521, 'accuracy': 0.6621, 'auroc': 0.8103, 'brier': 0.1516, 'ece_unsampled': 0.0504, 'auroc_unsampled': 0.8502, 'brier_unsampled': 0.1482}
+evaluating snapshot-step02500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.45it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.26it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.20it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.45it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.38it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]Map:  86%|████████▌ | 438/512 [00:00<00:00, 4343.92 examples/s]Map: 100%|██████████| 512/512 [00:00<00:00, 3052.27 examples/s]
+{"n": 512, "wrong_format_rate": 0.0, "ece": 0.04902223125100136, "accuracy": 0.6640625, "auroc": 0.8214859781121752, "brier": 0.14623046875, "ece_unsampled": 0.05277158319950104, "auroc_unsampled": 0.8506839945280438, "brier_unsampled": 0.14521285654063026, "protocol": "frozen-answers"}
+2500 {'wrong_format_rate': 0.0, 'ece': 0.049, 'accuracy': 0.6641, 'auroc': 0.8215, 'brier': 0.1462, 'ece_unsampled': 0.0528, 'auroc_unsampled': 0.8507, 'brier_unsampled': 0.1452}
+evaluating snapshot-step03000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.38it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.26it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.19it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.44it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.36it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]Map:  89%|████████▉ | 458/512 [00:00<00:00, 4556.48 examples/s]Map: 100%|██████████| 512/512 [00:00<00:00, 3160.72 examples/s]
+{"n": 512, "wrong_format_rate": 0.00390625, "ece": 0.04843008890748024, "accuracy": 0.6647058823529411, "auroc": 0.8260967068605634, "brier": 0.1423333333333333, "ece_unsampled": 0.049835797399282455, "auroc_unsampled": 0.8578895616622677, "brier_unsampled": 0.14178657179401513, "protocol": "frozen-answers"}
+3000 {'wrong_format_rate': 0.0039, 'ece': 0.0484, 'accuracy': 0.6647, 'auroc': 0.8261, 'brier': 0.1423, 'ece_unsampled': 0.0498, 'auroc_unsampled': 0.8579, 'brier_unsampled': 0.1418}
+evaluating snapshot-step03500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.45it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.27it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.19it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.45it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.38it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]Map:  72%|███████▏  | 367/512 [00:00<00:00, 3644.47 examples/s]Map: 100%|██████████| 512/512 [00:00<00:00, 2240.35 examples/s]
+{"n": 512, "wrong_format_rate": 0.0, "ece": 0.04824136197566986, "accuracy": 0.65625, "auroc": 0.8374425054112554, "brier": 0.14064453125, "ece_unsampled": 0.04769054055213928, "auroc_unsampled": 0.8541159361471862, "brier_unsampled": 0.14016131157398276, "protocol": "frozen-answers"}
+3500 {'wrong_format_rate': 0.0, 'ece': 0.0482, 'accuracy': 0.6562, 'auroc': 0.8374, 'brier': 0.1406, 'ece_unsampled': 0.0477, 'auroc_unsampled': 0.8541, 'brier_unsampled': 0.1402}
+evaluating snapshot-step04000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.46it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.27it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.20it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.46it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.38it/s]
+unsloth/llama-3-8b-instruct does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]Map:  83%|████████▎ | 423/512 [00:00<00:00, 4198.00 examples/s]Map: 100%|██████████| 512/512 [00:00<00:00, 3031.57 examples/s]
+{"n": 512, "wrong_format_rate": 0.0, "ece": 0.028905609622597694, "accuracy": 0.666015625, "auroc": 0.8225206221810636, "brier": 0.1472265625, "ece_unsampled": 0.03874236345291138, "auroc_unsampled": 0.8478160209908936, "brier_unsampled": 0.1428675260544901, "protocol": "frozen-answers"}
+4000 {'wrong_format_rate': 0.0, 'ece': 0.0289, 'accuracy': 0.666, 'auroc': 0.8225, 'brier': 0.1472, 'ece_unsampled': 0.0387, 'auroc_unsampled': 0.8478, 'brier_unsampled': 0.1429}
+wandb: Currently logged in as: rrenaud (multi-tokenizer). Use `wandb login --relogin` to force relogin
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Tracking run with wandb version 0.19.2
+wandb: Run data is saved locally in /workspace/runs/long3-exact-kl-s2/wandb/run-20261003_141236-5f371a6e47fa2367
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Resuming run long3-exact-kl-s2
+wandb: ⭐️ View project at https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: 🚀 View run at https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/5f371a6e47fa2367
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:          eval/accuracy ▁▆▆▇▇█▅█
+wandb:             eval/auroc ▄▅▆▁▄▅█▄
+wandb:   eval/auroc_unsampled ▃▁▆▄▄█▆▂
+wandb:             eval/brier ██▅▇▄▂▁▅
+wandb:   eval/brier_unsampled █▅▄▅▄▂▁▂
+wandb:               eval/ece ██▄▅▄▄▄▁
+wandb:     eval/ece_unsampled ██▁▄▄▄▃▁
+wandb:                 eval/n ▁▁▁▁▁▁▁▁
+wandb:              eval/step ▁▂▃▄▅▆▇█
+wandb: eval/wrong_format_rate ▁██▁▁█▁▁
+wandb: 
+wandb: Run summary:
+wandb:                 answer_accuracy 0.75
+wandb:                      confidence 0.662
+wandb:                           epoch 0
+wandb:                   eval/accuracy 0.66602
+wandb:                      eval/auroc 0.82252
+wandb:            eval/auroc_unsampled 0.84782
+wandb:                      eval/brier 0.14723
+wandb:            eval/brier_unsampled 0.14287
+wandb:                        eval/ece 0.02891
+wandb:              eval/ece_unsampled 0.03874
+wandb:                          eval/n 512
+wandb:                       eval/step 4000
+wandb:          eval/wrong_format_rate 0
+wandb:                    hinge_active 0
+wandb:                              kl 5.85738
+wandb:                         kl_coef 0.05058
+wandb:                            loss -10.58495
+wandb:                            mass 1.0
+wandb:                            rows 8
+wandb:             sampled_number_rate 1
+wandb:                    save_seconds 0.82173
+wandb:                         seconds 3.78599
+wandb:                         skipped 0
+wandb:     stability/baseline_accuracy 0.61491
+wandb:        stability/batch_accuracy 0.75
+wandb: stability/batch_confidence_mean 6.625
+wandb:  stability/batch_confidence_std 2.97309
+wandb:    stability/batch_invalid_rate 0
+wandb:             stability/grad_norm 23.375
+wandb:                  stability/loss -10.58495
+wandb:            stability/pi_entropy 0.34928
+wandb:                stability/pi_max 0.85267
+wandb:       stability/window_accuracy 0.60081
+wandb:          stability/window_brier 0.13965
+wandb:  stability/window_calibration_n 491
+wandb: stability/window_confidence_std 3.03197
+wandb:            stability/window_ece 0.05886
+wandb:   stability/window_invalid_rate 0.04688
+wandb:         stability/window_levels 10
+wandb:     stability/window_mode_share 0.30328
+wandb:                            step 4000
+wandb:                       stop_prob 0.99999
+wandb:                         updates 8
+wandb:                      value_loss 0
+wandb: 
+wandb: 🚀 View run long3-exact-kl-s2 at: https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/5f371a6e47fa2367
+wandb: ⭐️ View project at: https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /workspace/runs/long3-exact-kl-s2/wandb/run-20261003_141236-5f371a6e47fa2367/logs

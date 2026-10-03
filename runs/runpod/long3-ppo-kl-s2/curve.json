@@ -1,0 +1,74 @@
+{
+ "500": {
+  "n": 512,
+  "wrong_format_rate": 0.0,
+  "ece": 0.19707030057907104,
+  "accuracy": 0.66796875,
+  "auroc": 0.707077743378053,
+  "brier": 0.21771484375,
+  "ece_unsampled": 0.19087448716163635,
+  "auroc_unsampled": 0.7958032335741314,
+  "brier_unsampled": 0.20324119407643018,
+  "protocol": "frozen-answers"
+ },
+ "1000": {
+  "n": 512,
+  "wrong_format_rate": 0.0,
+  "ece": 0.16015617549419403,
+  "accuracy": 0.66015625,
+  "auroc": 0.7707695708358838,
+  "brier": 0.184921875,
+  "ece_unsampled": 0.15395285189151764,
+  "auroc_unsampled": 0.8334863633272122,
+  "brier_unsampled": 0.17714642991833088,
+  "protocol": "frozen-answers"
+ },
+ "2000": {
+  "n": 512,
+  "wrong_format_rate": 0.001953125,
+  "ece": 0.15499016642570496,
+  "accuracy": 0.6575342465753424,
+  "auroc": 0.7733673469387755,
+  "brier": 0.182426614481409,
+  "ece_unsampled": 0.14655078947544098,
+  "auroc_unsampled": 0.8411054421768709,
+  "brier_unsampled": 0.1715328935405514,
+  "protocol": "frozen-answers"
+ },
+ "2500": {
+  "n": 512,
+  "wrong_format_rate": 0.0,
+  "ece": 0.17812499403953552,
+  "accuracy": 0.671875,
+  "auroc": 0.7506229235880398,
+  "brier": 0.19203125000000004,
+  "ece_unsampled": 0.15623819828033447,
+  "auroc_unsampled": 0.8389569490586932,
+  "brier_unsampled": 0.17743060327769164,
+  "protocol": "frozen-answers"
+ },
+ "3000": {
+  "n": 512,
+  "wrong_format_rate": 0.001953125,
+  "ece": 0.1800391525030136,
+  "accuracy": 0.6673189823874756,
+  "auroc": 0.7577798861480075,
+  "brier": 0.18356164383561643,
+  "ece_unsampled": 0.17633672058582306,
+  "auroc_unsampled": 0.8368121442125239,
+  "brier_unsampled": 0.17744837807706187,
+  "protocol": "frozen-answers"
+ },
+ "3500": {
+  "n": 512,
+  "wrong_format_rate": 0.001953125,
+  "ece": 0.1504892110824585,
+  "accuracy": 0.6634050880626223,
+  "auroc": 0.7646377855525828,
+  "brier": 0.1830724070450098,
+  "ece_unsampled": 0.14637170732021332,
+  "auroc_unsampled": 0.8444467311518145,
+  "brier_unsampled": 0.17574498665082156,
+  "protocol": "frozen-answers"
+ }
+}

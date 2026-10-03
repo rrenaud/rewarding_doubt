@@ -1,0 +1,6 @@
+2026-10-03T08:28:04Z attempt start (image faea681846c9814e99f8c4fd0c41e22a64727460): python subset.py train /workspace/runs/long3-ppo-kl-s2/ids.json --seed 2 --fast --grading f1 --frozen-answers --save-every 500 --max-steps 4000 --stop-on collapsed,answers_degraded,format_broken,nonfinite -- --out_dir /workspace/runs/long3-ppo-kl-s2 --dataset triviaqa --is_unsloth --model_dir unsloth/llama-3-8b-Instruct-bnb-4bit --tokenizer_dir unsloth/llama-3-8b-Instruct-bnb-4bit --epochs 1 --lr 1e-05 --batchsize 8 --log_with tensorboard
+2026-10-03T13:43:39Z trainer exited with code 0
+2026-10-03T13:43:39Z post: python /opt/runpod/eval_snapshots.py /workspace/runs/long3-ppo-kl-s2 /workspace/runs/long3-ppo-kl-s2/ids.json --frozen-answers
+2026-10-03T13:51:24Z outcome: completed
+selfstop: terminate pod kem878ju59uhef: HTTP 204
+2026-10-03T13:51:25Z pod terminate requested

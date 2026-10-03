@@ -89,7 +89,8 @@ def main(ids_path, model_dir, out_path, batch=32):
     metrics = evaluation_metrics([dict(confidence=r["confidence"], correct=r["correct"]) for r in rows])
     with_pi = [r for r in rows if r["confidence"] is not None and r["pi"] is not None]
     if with_pi:
-        unsampled = evaluation_metrics([dict(confidence=sum(k * p for k, p in enumerate(r["pi"])), correct=r["correct"])
+        # min(): sum(k * p) can round to 10.0000001, which sklearn rejects as a probability above 1.
+        unsampled = evaluation_metrics([dict(confidence=min(10., sum(k * p for k, p in enumerate(r["pi"]))), correct=r["correct"])
                                         for r in with_pi])
         metrics.update({f"{k}_unsampled": unsampled[k] for k in ("ece", "auroc", "brier")})
     metrics["protocol"] = "frozen-answers"
