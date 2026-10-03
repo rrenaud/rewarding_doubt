@@ -66,6 +66,8 @@ def main():
             relative = obj["Key"][len("runs/"):]
             if not args.checkpoints and relative.split("/")[1].startswith("checkpoint"):
                 continue
+            if relative.split("/")[1] == "wandb":  # W&B's local cache (symlinks, live files); the data is in W&B
+                continue
             local = ROOT / "runs/runpod" / relative
             if local.exists() and local.stat().st_size == obj["Size"]:
                 skipped += 1
