@@ -1,0 +1,5 @@
+2026-10-03T00:50:07Z attempt start (image d8b51cf9fdd25a8b45448cadea43e77d5dc027ce): nvidia-smi --query-gpu=name,memory.used,memory.total --format=csv,noheader -l 2 > /workspace/runs/ppo-mem-4090/gpu.csv & python subset.py train /workspace/runs/ppo-mem-4090/ids.json --seed 1 --fast --no-kl --grading f1 --hinge 0.39 --hinge-threshold 0.9 --ppo ppo_epochs=2 --checkpoint-every 4 -- --out_dir /workspace/runs/ppo-mem-4090 --dataset triviaqa --is_unsloth --model_dir unsloth/llama-3-8b-Instruct-bnb-4bit --tokenizer_dir unsloth/llama-3-8b-Instruct-bnb-4bit --epochs 2 --lr 2.27e-05 --batchsize 8 --log_with tensorboard
+2026-10-03T00:56:37Z trainer exited with code 0
+2026-10-03T00:56:37Z outcome: completed
+selfstop: terminate pod fi209d60az3tmy: HTTP 204
+2026-10-03T00:56:38Z pod terminate requested

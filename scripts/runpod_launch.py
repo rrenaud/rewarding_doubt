@@ -13,7 +13,7 @@ training subset (first N of runs/pilot-.../train.jsonl, or the whole split) and 
 512 dev questions as the validation split.
 
 Secrets passed into the pod's environment: the RunPod API key, so the pod can terminate itself, and
-the W&B key from ~/.wandb_key.txt if that file exists (live charts; --no-wandb to skip).
+the W&B key from ~/.wandb_rewarding_doubt_key.txt if that file exists (live charts; --no-wandb to skip).
 """
 import argparse
 import base64
@@ -92,9 +92,10 @@ def main():
                    IDS_JSON_B64=base64.b64encode(json.dumps(ids(args)).encode()).decode())
     if args.stock_image:
         env["CODE_B64"] = code_b64()
-    wandb_key = Path.home() / ".wandb_key.txt"
+    wandb_key = Path.home() / ".wandb_rewarding_doubt_key.txt"
     if wandb_key.exists() and not args.no_wandb:
-        env.update(WANDB_API_KEY=wandb_key.read_text().strip(), WANDB_MODE="online", WANDB_PROJECT="rewarding-doubt")
+        env.update(WANDB_API_KEY=wandb_key.read_text().strip(), WANDB_MODE="online", WANDB_PROJECT="rewarding-doubt",
+                   WANDB_ENTITY="multi-tokenizer")
     volume = next(v for v in call("GET", "/networkvolumes") if v["id"] == VOLUME_ID)
     body = dict(name=f"rd-{args.name}", imageName="python:3.11-bookworm" if args.stock_image else args.image,
                 dockerStartCmd=["bash", "-c", BOOT] if args.stock_image else [],
@@ -104,7 +105,7 @@ def main():
                 dataCenterIds=[volume["dataCenterId"]], containerDiskInGb=30, minRAMPerGPU=24, ports=[], env=env)
     if args.dry_run:
         shown = {k: (v if k != "env" else {e: (x if e in ("ON_EXIT", "RUN_DIR", "MAX_HOURS", "STALL_MINUTES", "TRAIN_CMD",
-                                                          "POST_CMD", "SETUP_ONLY", "UPLOAD_CMD", "WANDB_MODE", "WANDB_PROJECT") else f"<{len(x)} chars>")
+                                                          "POST_CMD", "SETUP_ONLY", "UPLOAD_CMD", "WANDB_MODE", "WANDB_PROJECT", "WANDB_ENTITY") else f"<{len(x)} chars>")
                                            for e, x in v.items()}) for k, v in body.items()}
         print(json.dumps(shown, indent=1))
         return
