@@ -1,0 +1,26 @@
+{
+ "qwen-exact-kl-s3": {
+  "n": 512,
+  "wrong_format_rate": 0.005859375,
+  "ece": 0.04322227090597153,
+  "accuracy": 0.38703339882121807,
+  "auroc": 0.7692795782897306,
+  "brier": 0.18212180746561887,
+  "ece_unsampled": 0.05155880004167557,
+  "auroc_unsampled": 0.7897236685328154,
+  "brier_unsampled": 0.17879097018628623,
+  "protocol": "frozen-answers"
+ },
+ "qwen-ppo-kl-s3": {
+  "n": 512,
+  "wrong_format_rate": 0.001953125,
+  "ece": 0.36496806144714355,
+  "accuracy": 0.3816046966731898,
+  "auroc": 0.6303959753326842,
+  "brier": 0.36870841487279843,
+  "ece_unsampled": 0.36210495233535767,
+  "auroc_unsampled": 0.8379649979649979,
+  "brier_unsampled": 0.3621584585072448,
+  "protocol": "frozen-answers"
+ }
+}
