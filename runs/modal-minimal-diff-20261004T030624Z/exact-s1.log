@@ -1,0 +1,293 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.42 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+WARNING:root:The `device_map` argument is not provided. We will override the device_map argument. to set the entire model on the current device. If you want to set the model on multiple devices, please provide a custom `device_map` argument.
+
+Filter:   0%|          | 0/11313 [00:00<?, ? examples/s]
+Filter:   9%|▉         | 1000/11313 [00:00<00:08, 1241.59 examples/s]
+Filter:  18%|█▊        | 2000/11313 [00:01<00:05, 1833.62 examples/s]
+Filter:  27%|██▋       | 3000/11313 [00:01<00:04, 1903.97 examples/s]
+Filter:  35%|███▌      | 4000/11313 [00:02<00:03, 1970.88 examples/s]
+Filter:  44%|████▍     | 5000/11313 [00:02<00:03, 2005.65 examples/s]
+Filter:  53%|█████▎    | 6000/11313 [00:02<00:02, 2282.03 examples/s]
+Filter:  62%|██████▏   | 7000/11313 [00:03<00:01, 2515.54 examples/s]
+Filter:  71%|███████   | 8000/11313 [00:03<00:01, 2711.19 examples/s]
+Filter:  80%|███████▉  | 9000/11313 [00:03<00:00, 2761.74 examples/s]
+Filter:  88%|████████▊ | 10000/11313 [00:04<00:00, 2814.33 examples/s]
+Filter:  97%|█████████▋| 11000/11313 [00:04<00:00, 3010.38 examples/s]
+Filter: 100%|██████████| 11313/11313 [00:04<00:00, 2435.58 examples/s]
+
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]
+Map: 100%|██████████| 512/512 [00:00<00:00, 7068.00 examples/s]
+
+Map:   0%|          | 0/512 [00:00<?, ? examples/s]
+Map:  45%|████▍     | 229/512 [00:00<00:00, 2266.97 examples/s]
+Map:  90%|█████████ | 461/512 [00:00<00:00, 2290.22 examples/s]
+Map: 100%|██████████| 512/512 [00:00<00:00, 2036.41 examples/s]
+WARNING:accelerate.utils.other:Detected kernel version 4.19.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+exact step 0: answers scored 8, mean expected reward 3.744, kl coef 0.0500
+exact step 1: answers scored 8, mean expected reward 1.306, kl coef 0.0500
+exact step 2: answers scored 8, mean expected reward 0.725, kl coef 0.0500
+exact step 3: answers scored 8, mean expected reward -2.226, kl coef 0.0500
+exact step 4: answers scored 8, mean expected reward 2.212, kl coef 0.0500
+exact step 5: answers scored 8, mean expected reward 2.756, kl coef 0.0500
+exact step 6: answers scored 8, mean expected reward 6.119, kl coef 0.0499
+exact step 7: answers scored 8, mean expected reward 6.420, kl coef 0.0499
+exact step 8: answers scored 8, mean expected reward 4.398, kl coef 0.0499
+exact step 9: answers scored 8, mean expected reward 3.298, kl coef 0.0499
+exact step 10: answers scored 8, mean expected reward 6.622, kl coef 0.0499
+exact step 11: answers scored 8, mean expected reward 3.738, kl coef 0.0499
+exact step 12: answers scored 8, mean expected reward 7.916, kl coef 0.0499
+exact step 13: answers scored 8, mean expected reward 7.415, kl coef 0.0499
+exact step 14: answers scored 8, mean expected reward 4.399, kl coef 0.0499
+exact step 15: answers scored 8, mean expected reward 5.527, kl coef 0.0499
+exact step 16: answers scored 7, mean expected reward 7.568, kl coef 0.0499
+exact step 17: answers scored 7, mean expected reward 5.604, kl coef 0.0499
+exact step 18: answers scored 8, mean expected reward 7.442, kl coef 0.0499
+exact step 19: answers scored 8, mean expected reward 3.314, kl coef 0.0499
+exact step 20: answers scored 8, mean expected reward 5.546, kl coef 0.0499
+exact step 21: answers scored 8, mean expected reward 4.156, kl coef 0.0499
+exact step 22: answers scored 8, mean expected reward 5.537, kl coef 0.0499
+exact step 23: answers scored 8, mean expected reward 6.337, kl coef 0.0499
+exact step 24: answers scored 8, mean expected reward 4.640, kl coef 0.0499
+exact step 25: answers scored 8, mean expected reward 7.533, kl coef 0.0499
+exact step 26: answers scored 8, mean expected reward 6.337, kl coef 0.0499
+exact step 27: answers scored 8, mean expected reward 5.536, kl coef 0.0499
+exact step 28: answers scored 8, mean expected reward 4.436, kl coef 0.0498
+exact step 29: answers scored 8, mean expected reward 4.492, kl coef 0.0498
+exact step 30: answers scored 8, mean expected reward 4.961, kl coef 0.0498
+exact step 31: answers scored 8, mean expected reward 7.177, kl coef 0.0498
+exact step 32: answers scored 8, mean expected reward 3.918, kl coef 0.0498
+exact step 33: answers scored 7, mean expected reward 7.767, kl coef 0.0498
+exact step 34: answers scored 8, mean expected reward 4.431, kl coef 0.0498
+exact step 35: answers scored 8, mean expected reward 3.910, kl coef 0.0498
+exact step 36: answers scored 8, mean expected reward 8.533, kl coef 0.0498
+exact step 37: answers scored 8, mean expected reward 7.755, kl coef 0.0498
+exact step 38: answers scored 8, mean expected reward 7.020, kl coef 0.0498
+exact step 39: answers scored 8, mean expected reward 6.896, kl coef 0.0498
+exact step 40: answers scored 8, mean expected reward 5.420, kl coef 0.0498
+exact step 41: answers scored 8, mean expected reward 6.334, kl coef 0.0498
+exact step 42: answers scored 8, mean expected reward 5.539, kl coef 0.0498
+exact step 43: answers scored 8, mean expected reward 7.609, kl coef 0.0498
+exact step 44: answers scored 8, mean expected reward 6.044, kl coef 0.0498
+exact step 45: answers scored 8, mean expected reward 5.576, kl coef 0.0498
+exact step 46: answers scored 8, mean expected reward 7.321, kl coef 0.0498
+exact step 47: answers scored 8, mean expected reward 8.926, kl coef 0.0498
+exact step 48: answers scored 8, mean expected reward 7.908, kl coef 0.0498
+exact step 49: answers scored 8, mean expected reward 6.071, kl coef 0.0499
+exact step 50: answers scored 8, mean expected reward 7.877, kl coef 0.0499
+exact step 51: answers scored 8, mean expected reward 9.813, kl coef 0.0499
+exact step 52: answers scored 8, mean expected reward 9.216, kl coef 0.0499
+exact step 53: answers scored 8, mean expected reward 8.626, kl coef 0.0499
+exact step 54: answers scored 8, mean expected reward 8.360, kl coef 0.0499
+exact step 55: answers scored 8, mean expected reward 8.725, kl coef 0.0499
+exact step 56: answers scored 7, mean expected reward 7.572, kl coef 0.0499
+exact step 57: answers scored 8, mean expected reward 8.366, kl coef 0.0499
+exact step 58: answers scored 8, mean expected reward 9.032, kl coef 0.0499
+exact step 59: answers scored 8, mean expected reward 9.408, kl coef 0.0499
+exact step 60: answers scored 8, mean expected reward 9.239, kl coef 0.0499
+exact step 61: answers scored 8, mean expected reward 9.103, kl coef 0.0500
+exact step 62: answers scored 8, mean expected reward 8.900, kl coef 0.0500
+exact step 63: answers scored 8, mean expected reward 9.026, kl coef 0.0500
+exact step 64: answers scored 8, mean expected reward 9.114, kl coef 0.0500
+exact step 65: answers scored 8, mean expected reward 9.580, kl coef 0.0500
+exact step 66: answers scored 8, mean expected reward 9.550, kl coef 0.0500
+exact step 67: answers scored 8, mean expected reward 9.118, kl coef 0.0500
+exact step 68: answers scored 8, mean expected reward 9.184, kl coef 0.0500
+exact step 69: answers scored 8, mean expected reward 9.256, kl coef 0.0500
+exact step 70: answers scored 8, mean expected reward 9.275, kl coef 0.0500
+exact step 71: answers scored 8, mean expected reward 9.203, kl coef 0.0500
+exact step 72: answers scored 8, mean expected reward 8.696, kl coef 0.0500
+exact step 73: answers scored 8, mean expected reward 9.202, kl coef 0.0500
+exact step 74: answers scored 8, mean expected reward 9.717, kl coef 0.0501
+exact step 75: answers scored 8, mean expected reward 9.132, kl coef 0.0501
+exact step 76: answers scored 8, mean expected reward 9.377, kl coef 0.0501
+exact step 77: answers scored 8, mean expected reward 10.023, kl coef 0.0501
+exact step 78: answers scored 8, mean expected reward 9.143, kl coef 0.0501
+exact step 79: answers scored 8, mean expected reward 9.327, kl coef 0.0501
+exact step 80: answers scored 7, mean expected reward 8.992, kl coef 0.0501
+exact step 81: answers scored 8, mean expected reward 8.361, kl coef 0.0501
+exact step 82: answers scored 8, mean expected reward 8.632, kl coef 0.0501
+exact step 83: answers scored 8, mean expected reward 9.007, kl coef 0.0501
+exact step 84: answers scored 8, mean expected reward 9.260, kl coef 0.0501
+exact step 85: answers scored 7, mean expected reward 9.115, kl coef 0.0501
+exact step 86: answers scored 8, mean expected reward 9.412, kl coef 0.0502
+exact step 87: answers scored 8, mean expected reward 9.016, kl coef 0.0502
+exact step 88: answers scored 8, mean expected reward 9.612, kl coef 0.0502
+exact step 89: answers scored 8, mean expected reward 9.396, kl coef 0.0502
+exact step 90: answers scored 8, mean expected reward 9.258, kl coef 0.0502
+exact step 91: answers scored 7, mean expected reward 7.038, kl coef 0.0502
+exact step 92: answers scored 8, mean expected reward 9.615, kl coef 0.0502
+exact step 93: answers scored 8, mean expected reward 9.076, kl coef 0.0502
+exact step 94: answers scored 8, mean expected reward 9.115, kl coef 0.0502
+exact step 95: answers scored 8, mean expected reward 9.059, kl coef 0.0502
+exact step 96: answers scored 8, mean expected reward 9.641, kl coef 0.0502
+exact step 97: answers scored 8, mean expected reward 9.422, kl coef 0.0502
+exact step 98: answers scored 7, mean expected reward 9.554, kl coef 0.0502
+exact step 99: answers scored 8, mean expected reward 9.143, kl coef 0.0503
+exact step 100: answers scored 8, mean expected reward 9.615, kl coef 0.0503
+exact step 101: answers scored 8, mean expected reward 8.771, kl coef 0.0503
+exact step 102: answers scored 7, mean expected reward 9.566, kl coef 0.0503
+exact step 103: answers scored 8, mean expected reward 8.500, kl coef 0.0503
+exact step 104: answers scored 8, mean expected reward 8.794, kl coef 0.0503
+exact step 105: answers scored 8, mean expected reward 9.527, kl coef 0.0503
+exact step 106: answers scored 8, mean expected reward 9.051, kl coef 0.0503
+exact step 107: answers scored 8, mean expected reward 9.192, kl coef 0.0503
+exact step 108: answers scored 8, mean expected reward 9.311, kl coef 0.0503
+exact step 109: answers scored 8, mean expected reward 9.221, kl coef 0.0503
+exact step 110: answers scored 8, mean expected reward 8.676, kl coef 0.0503
+exact step 111: answers scored 8, mean expected reward 9.606, kl coef 0.0504
+exact step 112: answers scored 8, mean expected reward 8.974, kl coef 0.0504
+exact step 113: answers scored 8, mean expected reward 9.321, kl coef 0.0504
+exact step 114: answers scored 8, mean expected reward 9.291, kl coef 0.0504
+exact step 115: answers scored 8, mean expected reward 9.243, kl coef 0.0504
+exact step 116: answers scored 8, mean expected reward 9.454, kl coef 0.0504
+exact step 117: answers scored 8, mean expected reward 9.118, kl coef 0.0504
+exact step 118: answers scored 8, mean expected reward 9.015, kl coef 0.0504
+exact step 119: answers scored 8, mean expected reward 9.315, kl coef 0.0504
+exact step 120: answers scored 8, mean expected reward 9.384, kl coef 0.0504
+exact step 121: answers scored 8, mean expected reward 9.487, kl coef 0.0504
+exact step 122: answers scored 8, mean expected reward 9.284, kl coef 0.0504
+exact step 123: answers scored 8, mean expected reward 9.107, kl coef 0.0504
+exact step 124: answers scored 8, mean expected reward 9.126, kl coef 0.0505
+exact step 125: answers scored 8, mean expected reward 9.253, kl coef 0.0505
+exact step 126: answers scored 8, mean expected reward 9.253, kl coef 0.0505
+exact step 127: answers scored 8, mean expected reward 9.285, kl coef 0.0505
+Finished epoch 0. Average reward: 7.680684307232279
+exact step 0: answers scored 8, mean expected reward 9.783, kl coef 0.0505
+exact step 1: answers scored 8, mean expected reward 9.736, kl coef 0.0505
+exact step 2: answers scored 8, mean expected reward 9.743, kl coef 0.0505
+exact step 3: answers scored 8, mean expected reward 9.844, kl coef 0.0505
+exact step 4: answers scored 8, mean expected reward 9.597, kl coef 0.0505
+exact step 5: answers scored 8, mean expected reward 8.967, kl coef 0.0505
+exact step 6: answers scored 8, mean expected reward 9.041, kl coef 0.0505
+exact step 7: answers scored 7, mean expected reward 9.388, kl coef 0.0505
+exact step 8: answers scored 8, mean expected reward 9.094, kl coef 0.0506
+exact step 9: answers scored 7, mean expected reward 9.267, kl coef 0.0506
+exact step 10: answers scored 8, mean expected reward 8.093, kl coef 0.0506
+exact step 11: answers scored 8, mean expected reward 9.391, kl coef 0.0506
+exact step 12: answers scored 8, mean expected reward 9.457, kl coef 0.0506
+exact step 13: answers scored 8, mean expected reward 9.410, kl coef 0.0506
+exact step 14: answers scored 8, mean expected reward 8.894, kl coef 0.0506
+exact step 15: answers scored 8, mean expected reward 8.455, kl coef 0.0506
+exact step 16: answers scored 8, mean expected reward 9.123, kl coef 0.0506
+exact step 17: answers scored 8, mean expected reward 9.212, kl coef 0.0506
+exact step 18: answers scored 8, mean expected reward 9.514, kl coef 0.0506
+exact step 19: answers scored 7, mean expected reward 9.442, kl coef 0.0506
+exact step 20: answers scored 8, mean expected reward 9.549, kl coef 0.0507
+exact step 21: answers scored 8, mean expected reward 8.700, kl coef 0.0507
+exact step 22: answers scored 8, mean expected reward 9.321, kl coef 0.0507
+exact step 23: answers scored 8, mean expected reward 9.111, kl coef 0.0507
+exact step 24: answers scored 8, mean expected reward 9.245, kl coef 0.0507
+exact step 25: answers scored 8, mean expected reward 9.412, kl coef 0.0507
+exact step 26: answers scored 8, mean expected reward 7.994, kl coef 0.0507
+exact step 27: answers scored 7, mean expected reward 9.372, kl coef 0.0507
+exact step 28: answers scored 8, mean expected reward 8.530, kl coef 0.0507
+exact step 29: answers scored 8, mean expected reward 9.287, kl coef 0.0507
+exact step 30: answers scored 8, mean expected reward 9.399, kl coef 0.0507
+exact step 31: answers scored 8, mean expected reward 9.277, kl coef 0.0507
+exact step 32: answers scored 8, mean expected reward 7.305, kl coef 0.0507
+exact step 33: answers scored 8, mean expected reward 9.241, kl coef 0.0508
+exact step 34: answers scored 8, mean expected reward 9.755, kl coef 0.0508
+exact step 35: answers scored 8, mean expected reward 9.337, kl coef 0.0508
+exact step 36: answers scored 8, mean expected reward 9.138, kl coef 0.0508
+exact step 37: answers scored 8, mean expected reward 9.741, kl coef 0.0508
+exact step 38: answers scored 8, mean expected reward 9.405, kl coef 0.0508
+exact step 39: answers scored 8, mean expected reward 9.195, kl coef 0.0508
+exact step 40: answers scored 8, mean expected reward 8.973, kl coef 0.0508
+exact step 41: answers scored 8, mean expected reward 9.474, kl coef 0.0508
+exact step 42: answers scored 8, mean expected reward 9.228, kl coef 0.0508
+exact step 43: answers scored 8, mean expected reward 9.780, kl coef 0.0508
+exact step 44: answers scored 8, mean expected reward 8.726, kl coef 0.0508
+exact step 45: answers scored 8, mean expected reward 9.278, kl coef 0.0509
+exact step 46: answers scored 8, mean expected reward 7.844, kl coef 0.0509
+exact step 47: answers scored 8, mean expected reward 8.486, kl coef 0.0509
+exact step 48: answers scored 8, mean expected reward 8.974, kl coef 0.0509
+exact step 49: answers scored 8, mean expected reward 9.183, kl coef 0.0509
+exact step 50: answers scored 8, mean expected reward 8.988, kl coef 0.0509
+exact step 51: answers scored 8, mean expected reward 9.229, kl coef 0.0509
+exact step 52: answers scored 8, mean expected reward 8.811, kl coef 0.0509
+exact step 53: answers scored 8, mean expected reward 9.337, kl coef 0.0509
+exact step 54: answers scored 8, mean expected reward 9.594, kl coef 0.0509
+exact step 55: answers scored 7, mean expected reward 9.067, kl coef 0.0509
+exact step 56: answers scored 8, mean expected reward 9.232, kl coef 0.0509
+exact step 57: answers scored 8, mean expected reward 9.034, kl coef 0.0510
+exact step 58: answers scored 8, mean expected reward 9.322, kl coef 0.0510
+exact step 59: answers scored 8, mean expected reward 9.886, kl coef 0.0510
+exact step 60: answers scored 8, mean expected reward 9.310, kl coef 0.0510
+exact step 61: answers scored 8, mean expected reward 9.932, kl coef 0.0510
+exact step 62: answers scored 8, mean expected reward 9.384, kl coef 0.0510
+exact step 63: answers scored 8, mean expected reward 8.891, kl coef 0.0510
+exact step 64: answers scored 8, mean expected reward 8.873, kl coef 0.0510
+exact step 65: answers scored 8, mean expected reward 9.661, kl coef 0.0510
+exact step 66: answers scored 8, mean expected reward 9.300, kl coef 0.0510
+exact step 67: answers scored 8, mean expected reward 9.455, kl coef 0.0510
+exact step 68: answers scored 8, mean expected reward 10.002, kl coef 0.0510
+exact step 69: answers scored 8, mean expected reward 9.076, kl coef 0.0511
+exact step 70: answers scored 8, mean expected reward 9.163, kl coef 0.0511
+exact step 71: answers scored 8, mean expected reward 9.431, kl coef 0.0511
+exact step 72: answers scored 8, mean expected reward 10.055, kl coef 0.0511
+exact step 73: answers scored 8, mean expected reward 9.745, kl coef 0.0511
+exact step 74: answers scored 8, mean expected reward 9.673, kl coef 0.0511
+exact step 75: answers scored 8, mean expected reward 8.942, kl coef 0.0511
+exact step 76: answers scored 8, mean expected reward 8.753, kl coef 0.0511
+exact step 77: answers scored 8, mean expected reward 10.066, kl coef 0.0511
+exact step 78: answers scored 8, mean expected reward 9.432, kl coef 0.0511
+exact step 79: answers scored 8, mean expected reward 9.154, kl coef 0.0511
+exact step 80: answers scored 8, mean expected reward 8.670, kl coef 0.0511
+exact step 81: answers scored 8, mean expected reward 9.065, kl coef 0.0511
+exact step 82: answers scored 8, mean expected reward 8.237, kl coef 0.0512
+exact step 83: answers scored 8, mean expected reward 9.139, kl coef 0.0512
+exact step 84: answers scored 8, mean expected reward 9.501, kl coef 0.0512
+exact step 85: answers scored 8, mean expected reward 9.264, kl coef 0.0512
+exact step 86: answers scored 8, mean expected reward 9.347, kl coef 0.0512
+exact step 87: answers scored 8, mean expected reward 9.520, kl coef 0.0512
+exact step 88: answers scored 8, mean expected reward 9.133, kl coef 0.0512
+exact step 89: answers scored 8, mean expected reward 8.721, kl coef 0.0512
+exact step 90: answers scored 8, mean expected reward 9.667, kl coef 0.0512
+exact step 91: answers scored 8, mean expected reward 8.725, kl coef 0.0512
+exact step 92: answers scored 8, mean expected reward 9.576, kl coef 0.0512
+exact step 93: answers scored 8, mean expected reward 8.959, kl coef 0.0512
+exact step 94: answers scored 8, mean expected reward 9.208, kl coef 0.0513
+exact step 95: answers scored 8, mean expected reward 9.218, kl coef 0.0513
+exact step 96: answers scored 8, mean expected reward 9.421, kl coef 0.0513
+exact step 97: answers scored 8, mean expected reward 9.243, kl coef 0.0513
+exact step 98: answers scored 8, mean expected reward 8.893, kl coef 0.0513
+exact step 99: answers scored 8, mean expected reward 9.445, kl coef 0.0513
+exact step 100: answers scored 8, mean expected reward 9.632, kl coef 0.0513
+exact step 101: answers scored 8, mean expected reward 9.169, kl coef 0.0513
+exact step 102: answers scored 8, mean expected reward 9.095, kl coef 0.0513
+exact step 103: answers scored 8, mean expected reward 8.748, kl coef 0.0513
+exact step 104: answers scored 8, mean expected reward 9.073, kl coef 0.0513
+exact step 105: answers scored 8, mean expected reward 9.560, kl coef 0.0513
+exact step 106: answers scored 8, mean expected reward 9.359, kl coef 0.0514
+exact step 107: answers scored 8, mean expected reward 9.005, kl coef 0.0514
+exact step 108: answers scored 8, mean expected reward 9.647, kl coef 0.0514
+exact step 109: answers scored 8, mean expected reward 9.606, kl coef 0.0514
+exact step 110: answers scored 8, mean expected reward 9.077, kl coef 0.0514
+exact step 111: answers scored 7, mean expected reward 9.818, kl coef 0.0514
+exact step 112: answers scored 7, mean expected reward 9.447, kl coef 0.0514
+exact step 113: answers scored 7, mean expected reward 9.815, kl coef 0.0514
+exact step 114: answers scored 8, mean expected reward 9.639, kl coef 0.0514
+exact step 115: answers scored 8, mean expected reward 9.597, kl coef 0.0514
+exact step 116: answers scored 8, mean expected reward 9.053, kl coef 0.0514
+exact step 117: answers scored 8, mean expected reward 9.509, kl coef 0.0514
+exact step 118: answers scored 8, mean expected reward 9.851, kl coef 0.0515
+exact step 119: answers scored 8, mean expected reward 9.586, kl coef 0.0515
+exact step 120: answers scored 8, mean expected reward 9.493, kl coef 0.0515
+exact step 121: answers scored 8, mean expected reward 9.358, kl coef 0.0515
+exact step 122: answers scored 7, mean expected reward 6.886, kl coef 0.0515
+exact step 123: answers scored 8, mean expected reward 8.343, kl coef 0.0515
+exact step 124: answers scored 8, mean expected reward 9.263, kl coef 0.0515
+exact step 125: answers scored 8, mean expected reward 9.316, kl coef 0.0515
+exact step 126: answers scored 8, mean expected reward 9.076, kl coef 0.0515
+exact step 127: answers scored 8, mean expected reward 8.864, kl coef 0.0515
+Finished epoch 1. Average reward: 9.221904938484501
+Finished Training!
+Best avg reward 9.221904938484501 in epoch 1
