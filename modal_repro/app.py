@@ -49,6 +49,7 @@ image = (
     .add_local_file(Path(__file__).parent / "frozen_eval.py", f"{CODE}/frozen_eval.py", copy=True)
     .add_local_file(Path(__file__).parent / "verify_levels.py", f"{CODE}/verify_levels.py", copy=True)
     .add_local_file(Path(__file__).parent / "debug_levels.py", f"{CODE}/debug_levels.py", copy=True)
+    .add_local_file(Path(__file__).parent / "verify_fast_levels.py", f"{CODE}/verify_fast_levels.py", copy=True)
     # Our package, so the exact objectives use the very same core.objective as the Tinker runs.
     .add_local_dir(Path(__file__).parents[1] / "src" / "rewarding_doubt", "/opt/rd/rewarding_doubt", copy=True,
                    ignore=["__pycache__"])
@@ -990,7 +991,7 @@ def verify_levels(gpu: str = "L40S", debug: bool = False):
 
 @app.local_entrypoint()
 def minimal_diff(train_limit: int = 1024, eval_limit: int = 0, seeds: str = "1,2,3", epochs: int = 2, gpu: str = "L40S",
-                 model: str = "unsloth/Qwen2.5-3B-Instruct", tag: str = ""):
+                 model: str = "unsloth/Qwen2.5-3B-Instruct", tag: str = "", objectives: str = "exact,ppo"):
     """The released Train.py with patches/exact_confidence.patch: --objective exact vs ppo, otherwise as
     released (exact-match reward grading, adaptive KL, ppo_epochs 4, lr 1e-5, batch 8), then the released
     inference + metrics on the 512 test questions (subset.py evaluate) for each final epoch adapter."""
@@ -1001,7 +1002,7 @@ def minimal_diff(train_limit: int = 1024, eval_limit: int = 0, seeds: str = "1,2
     ids = {"train": train, "validation": test}
     run = f"minimal-diff{tag}-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     jobs = []
-    for objective in ("exact", "ppo"):
+    for objective in objectives.split(","):
         for s in seeds.split(","):
             jobs.append((ids, f"{objective}-s{s}", ["subset.py", "train", "IDS_JSON", "--seed", s, "--",
                          "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", model, "--tokenizer_dir", model,
@@ -1026,4 +1027,13 @@ def minimal_diff(train_limit: int = 1024, eval_limit: int = 0, seeds: str = "1,2
     for label, m in sorted(results.items()):
         print(label, {k: round(v, 3) for k, v in m.items() if isinstance(v, float)})
     print(f"done: {out}")
+
+
+@app.local_entrypoint()
+def verify_fast(gpu: str = "L40S"):
+    """exact_fast vs exact level scoring (verify_fast_levels.py) on Qwen-2.5-3B and Llama-3-8B."""
+    run = "verify-fast-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    r = train_with_snapshots.with_options(gpu=gpu).remote({"train": [], "validation": []}, "verify",
+        ["verify_fast_levels.py", "unsloth/Qwen2.5-3B-Instruct", MODEL], run)
+    print("exit", r["exit_code"]); print("\n".join(l for l in r["log"].splitlines() if " levels fast" in l or l.startswith(("RESULT", "Traceback")) or "Error" in l))
 
