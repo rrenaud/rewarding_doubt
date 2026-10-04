@@ -55,17 +55,18 @@ ol.steps { padding-left: 22px; margin: 0; display: grid; gap: 6px; }
 .note { font-size: 15px; color: var(--muted); }
 </style>
 <main><article>
-<div class="eyebrow">Rewarding Doubt · patch review · 3 files, +110 / −6 lines</div>
+<div class="eyebrow">Rewarding Doubt · patch review · 3 files, +163 / −6 lines</div>
 <h1>Exact confidence: a minimal change to the released trainer</h1>
-<p class="lede">The released code teaches a model to state its confidence by sampling one confidence after each answer and updating with PPO. Because the confidence is one of eleven short strings, its expected reward can be computed exactly instead. The patch adds that as <code>--objective exact</code> in <code>Train.py</code>, keeping the paper's reward, format penalty, KL controller, optimizer, LoRA setup, data and evaluation.</p>
+<p class="lede">The released code teaches a model to state its confidence by sampling one confidence after each answer and updating with PPO. Because the confidence is one of eleven short strings, its expected reward can be computed exactly instead. The patch adds that as <code>--objective exact</code> in <code>Train.py</code>, plus <code>--objective exact_fast</code>, which reads all eleven from one shared forward pass. Both keep the paper's reward, format penalty, KL controller, optimizer, LoRA setup, data and evaluation.</p>
 
 <div class="tbl"><table>
-<thead><tr><th>Qwen-2.5-3B · released code + patch · 512 test questions · 3 seeds</th><th>Brier ↓</th><th>ECE ↓</th><th>AUROC ↑</th><th>Accuracy</th></tr></thead>
+<thead><tr><th>Qwen-2.5-3B · released code + patch · 512 test questions · 3 seeds</th><th>Brier ↓</th><th>ECE ↓</th><th>AUROC ↑</th><th>Accuracy</th><th>Time / iteration</th></tr></thead>
 <tbody>
-<tr><td><code>--objective exact</code></td><td class="win">0.179 ± 0.004</td><td class="win">0.088 ± 0.014</td><td class="win">0.800 ± 0.006</td><td>37.9%</td></tr>
-<tr><td><code>--objective ppo</code> (released default)</td><td>0.257 ± 0.015</td><td>0.257 ± 0.018</td><td>0.781 ± 0.018</td><td>36.0%</td></tr>
+<tr><td><code>--objective exact_fast</code></td><td class="win">0.172 ± 0.001</td><td class="win">0.056 ± 0.021</td><td class="win">0.803 ± 0.005</td><td>38.5%</td><td class="win">2.3 s</td></tr>
+<tr><td><code>--objective exact</code></td><td>0.179 ± 0.004</td><td>0.088 ± 0.014</td><td>0.800 ± 0.006</td><td>37.9%</td><td>11.2 s</td></tr>
+<tr><td><code>--objective ppo</code> (released default)</td><td>0.257 ± 0.015</td><td>0.257 ± 0.018</td><td>0.781 ± 0.018</td><td>36.0%</td><td>15.1 s</td></tr>
 </tbody></table></div>
-<p class="note">Both arms: 1,024 TriviaQA training questions, 2 epochs (256 steps), learning rate 1e-5, batch 8, the released exact-match reward grading and adaptive KL, scored with the released inference and metrics (F1 &gt; 0.5, 11-bin ECE). Per-seed ECE: exact 0.090, 0.074, 0.102; PPO 0.269, 0.236, 0.265.</p>
+<p class="note">All arms: 1,024 TriviaQA training questions, 2 epochs (256 steps), learning rate 1e-5, batch 8, the released exact-match reward grading and adaptive KL, scored with the released inference and metrics (F1 &gt; 0.5, 11-bin ECE). Per-seed ECE: exact_fast 0.078, 0.037, 0.053; exact 0.090, 0.074, 0.102; PPO 0.269, 0.236, 0.265. Malformed outputs: 0.9–1.1% in every arm. Time is the median full training iteration (answer generation plus update) on one L40S, measured in a separate 16-step run per objective.</p>
 
 <h2>The idea</h2>
 <p>After the model writes <code>Answer: …, Confidence</code>, training only cares about what comes next: one of the eleven strings <code>": 0"</code> … <code>": 10"</code> followed by end of turn, or something malformed. PPO samples one of these, scores it, and estimates a gradient from that single sample with a learned value head as the baseline. The exact objective scores all eleven and weights each reward by the probability the model gives it.</p>
@@ -118,9 +119,9 @@ loss   = −(J − β·KL)          β = ppo_trainer.kl_ctl.value (the released 
 <h2>Walking through the patch</h2>
 
 <h3>1. Hooking into <code>Train.py</code></h3>
-<p>The training loop already generates each answer up to the <code>" Confidence"</code> token. With <code>--objective exact</code>, the patch hands those answers to <code>exact_confidence_step</code> and skips the rest of the iteration: the second generation (the sampled confidence), reward computation for that sample, <code>ppo_trainer.step</code>, and <code>log_stats</code>. The default <code>ppo</code> path is untouched. The three hard-coded <code>&lt;|eot_id|&gt;</code> lookups become <code>end_of_turn(tokenizer)</code>, which returns the same token on Llama-3.</p>
+<p>The training loop already generates each answer up to the <code>" Confidence"</code> token. With <code>--objective exact</code> or <code>exact_fast</code>, the patch hands those answers to <code>exact_confidence_step</code> and skips the rest of the iteration: the second generation (the sampled confidence), reward computation for that sample, <code>ppo_trainer.step</code>, and <code>log_stats</code>. The default <code>ppo</code> path is untouched. The three hard-coded <code>&lt;|eot_id|&gt;</code> lookups become <code>end_of_turn(tokenizer)</code>, which returns the same token on Llama-3.</p>
 <div class="file">SingleAnswerSetting/Train.py</div>
-<pre><span class="hunk">@@ -19,6 +19,7 @@ from util.ResponseHandling import response_to_QAResult</span><span class="ctx"> from util.RLHelper import QAResult_to_reward</span><span class="ctx"> from util.util import remove_padding</span><span class="ctx"> from util.ModelLoader import load_lora_model_tokenizer, load_model_tokenizer</span><span class="add">+from util.ExactConfidence import end_of_turn, exact_confidence_step</span><span class="ctx"> </span><span class="ctx"> torch.manual_seed(2)</span><span class="ctx"> </span><span class="hunk">@@ -44,7 +45,7 @@ def evaluate_model(model, dataloader, tokenizer, generation_kwargs, device) -&gt; T</span><span class="ctx">     </span><span class="ctx">     return np.mean(rewards_epoch), np.std(rewards_epoch)</span><span class="ctx"> </span><span class="del">-def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str, tokenizer_dir: str, dataset: str, log_with: str = &quot;tensorboard&quot;, is_unsloth: bool = True, use_lora: bool = True) -&gt; None: </span><span class="add">+def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str, tokenizer_dir: str, dataset: str, log_with: str = &quot;tensorboard&quot;, is_unsloth: bool = True, use_lora: bool = True, objective: str = &quot;ppo&quot;) -&gt; None: </span><span class="ctx">     if not os.path.exists(out_dir):</span><span class="ctx">         os.mkdir(out_dir)</span><span class="ctx"> </span><span class="hunk">@@ -99,13 +100,13 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,</span><span class="ctx"> </span><span class="ctx">     prediction_terminators = [</span><span class="ctx">         tokenizer.eos_token_id,</span><span class="del">-        tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;),</span><span class="add">+        end_of_turn(tokenizer),</span><span class="ctx">         tokenizer.convert_tokens_to_ids(&quot;ĠConfidence&quot;)</span><span class="ctx">     ]</span><span class="ctx"> </span><span class="ctx">     ppo_terminators = [</span><span class="ctx">         tokenizer.eos_token_id,</span><span class="del">-        tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;),</span><span class="add">+        end_of_turn(tokenizer),</span><span class="ctx">     ]</span><span class="ctx"> </span><span class="ctx">     generation_kwargs_prediction = {</span><span class="hunk">@@ -130,7 +131,7 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,</span><span class="ctx"> </span><span class="ctx">     eval_terminators = [</span><span class="ctx">         tokenizer.eos_token_id,</span><span class="del">-        tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;),</span><span class="add">+        end_of_turn(tokenizer),</span><span class="ctx">     ]</span><span class="ctx"> </span><span class="ctx">     generation_kwargs_eval = {</span><span class="hunk">@@ -164,6 +165,16 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,</span><span class="ctx">             prediction = model.generate(input_ids=input_ids, attention_mask=attention_mask, **generation_kwargs_prediction)</span><span class="ctx">             prediction = [remove_padding(p, tokenizer.pad_token_id) for p in prediction]</span><span class="ctx"> </span><span class="add">+            if objective == &quot;exact&quot;:  # score all 11 confidences exactly instead of sampling one (util/ExactConfidence.py)</span><span class="add">+                if is_unsloth:</span><span class="add">+                    FastLanguageModel.for_training(model.pretrained_model)</span><span class="add">+                prompt_lengths = [int(m.sum()) for m in attention_mask]</span><span class="add">+                expected = exact_confidence_step(ppo_trainer, tokenizer, [p[len(input_ids[i]) - prompt_lengths[i]:] for i, p in enumerate(prediction)],</span><span class="add">+                                                 prompt_lengths, questions, gt_candidates, is_multiple_choice)</span><span class="add">+                rewards_epoch += expected</span><span class="add">+                print(f&quot;exact step {idx}: answers scored {len(expected)}, mean expected reward {np.mean(expected) if expected else float(&#x27;nan&#x27;):.3f}, kl coef {ppo_trainer.kl_ctl.value:.4f}&quot;, flush=True)</span><span class="add">+                continue</span><span class="add">+</span><span class="ctx">             # Generate confidence</span><span class="ctx">             if not is_unsloth:</span><span class="ctx">                 model.train()</span><span class="hunk">@@ -234,6 +245,7 @@ def setup_parser():</span><span class="ctx">     parser.add_argument(&quot;--log_with&quot;, type=str, default=&quot;tensorboard&quot;)</span><span class="ctx">     parser.add_argument(&quot;--dataset&quot;, type=str, default=&quot;medqa&quot;)</span><span class="ctx">     parser.add_argument(&quot;--is_unsloth&quot;, action=&#x27;store_true&#x27;)</span><span class="add">+    parser.add_argument(&quot;--objective&quot;, choices=[&quot;ppo&quot;, &quot;exact&quot;], default=&quot;ppo&quot;, help=&quot;exact: util/ExactConfidence.py instead of the PPO step&quot;)</span><span class="ctx"> </span><span class="ctx">     return parser</span><span class="ctx"> </span><span class="hunk">@@ -241,4 +253,4 @@ def setup_parser():</span><span class="ctx"> if __name__ == &quot;__main__&quot;:</span><span class="ctx">     parser = setup_parser()</span><span class="ctx">     args = parser.parse_args()</span><span class="del">-    train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize, model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset, log_with=args.log_with, is_unsloth=args.is_unsloth)</span><span class="add">+    train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize, model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset, log_with=args.log_with, is_unsloth=args.is_unsloth, objective=args.objective)</span></pre>
+<pre><span class="hunk">@@ -1,4 +1,5 @@</span><span class="ctx"> import argparse</span><span class="add">+import time</span><span class="ctx"> import torch</span><span class="ctx"> import os</span><span class="ctx"> import numpy as np</span><span class="hunk">@@ -19,6 +20,7 @@ from util.ResponseHandling import response_to_QAResult</span><span class="ctx"> from util.RLHelper import QAResult_to_reward</span><span class="ctx"> from util.util import remove_padding</span><span class="ctx"> from util.ModelLoader import load_lora_model_tokenizer, load_model_tokenizer</span><span class="add">+from util.ExactConfidence import end_of_turn, exact_confidence_step</span><span class="ctx"> </span><span class="ctx"> torch.manual_seed(2)</span><span class="ctx"> </span><span class="hunk">@@ -44,7 +46,7 @@ def evaluate_model(model, dataloader, tokenizer, generation_kwargs, device) -&gt; T</span><span class="ctx">     </span><span class="ctx">     return np.mean(rewards_epoch), np.std(rewards_epoch)</span><span class="ctx"> </span><span class="del">-def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str, tokenizer_dir: str, dataset: str, log_with: str = &quot;tensorboard&quot;, is_unsloth: bool = True, use_lora: bool = True) -&gt; None: </span><span class="add">+def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str, tokenizer_dir: str, dataset: str, log_with: str = &quot;tensorboard&quot;, is_unsloth: bool = True, use_lora: bool = True, objective: str = &quot;ppo&quot;) -&gt; None: </span><span class="ctx">     if not os.path.exists(out_dir):</span><span class="ctx">         os.mkdir(out_dir)</span><span class="ctx"> </span><span class="hunk">@@ -99,13 +101,13 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,</span><span class="ctx"> </span><span class="ctx">     prediction_terminators = [</span><span class="ctx">         tokenizer.eos_token_id,</span><span class="del">-        tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;),</span><span class="add">+        end_of_turn(tokenizer),</span><span class="ctx">         tokenizer.convert_tokens_to_ids(&quot;ĠConfidence&quot;)</span><span class="ctx">     ]</span><span class="ctx"> </span><span class="ctx">     ppo_terminators = [</span><span class="ctx">         tokenizer.eos_token_id,</span><span class="del">-        tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;),</span><span class="add">+        end_of_turn(tokenizer),</span><span class="ctx">     ]</span><span class="ctx"> </span><span class="ctx">     generation_kwargs_prediction = {</span><span class="hunk">@@ -130,7 +132,7 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,</span><span class="ctx"> </span><span class="ctx">     eval_terminators = [</span><span class="ctx">         tokenizer.eos_token_id,</span><span class="del">-        tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;),</span><span class="add">+        end_of_turn(tokenizer),</span><span class="ctx">     ]</span><span class="ctx"> </span><span class="ctx">     generation_kwargs_eval = {</span><span class="hunk">@@ -164,6 +166,18 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,</span><span class="ctx">             prediction = model.generate(input_ids=input_ids, attention_mask=attention_mask, **generation_kwargs_prediction)</span><span class="ctx">             prediction = [remove_padding(p, tokenizer.pad_token_id) for p in prediction]</span><span class="ctx"> </span><span class="add">+            if objective in (&quot;exact&quot;, &quot;exact_fast&quot;):  # score all 11 confidences exactly instead of sampling one (util/ExactConfidence.py)</span><span class="add">+                step_start = time.time()</span><span class="add">+                if is_unsloth:</span><span class="add">+                    FastLanguageModel.for_training(model.pretrained_model)</span><span class="add">+                prompt_lengths = [int(m.sum()) for m in attention_mask]</span><span class="add">+                expected = exact_confidence_step(ppo_trainer, tokenizer, [p[len(input_ids[i]) - prompt_lengths[i]:] for i, p in enumerate(prediction)],</span><span class="add">+                                                 prompt_lengths, questions, gt_candidates, is_multiple_choice,</span><span class="add">+                                                 fast=objective == &quot;exact_fast&quot;)</span><span class="add">+                rewards_epoch += expected</span><span class="add">+                print(f&quot;exact step {idx}: answers scored {len(expected)}, mean expected reward {np.mean(expected) if expected else float(&#x27;nan&#x27;):.3f}, kl coef {ppo_trainer.kl_ctl.value:.4f}, update {time.time() - step_start:.2f} s, wall {time.time():.1f}&quot;, flush=True)</span><span class="add">+                continue</span><span class="add">+</span><span class="ctx">             # Generate confidence</span><span class="ctx">             if not is_unsloth:</span><span class="ctx">                 model.train()</span><span class="hunk">@@ -234,6 +248,8 @@ def setup_parser():</span><span class="ctx">     parser.add_argument(&quot;--log_with&quot;, type=str, default=&quot;tensorboard&quot;)</span><span class="ctx">     parser.add_argument(&quot;--dataset&quot;, type=str, default=&quot;medqa&quot;)</span><span class="ctx">     parser.add_argument(&quot;--is_unsloth&quot;, action=&#x27;store_true&#x27;)</span><span class="add">+    parser.add_argument(&quot;--objective&quot;, choices=[&quot;ppo&quot;, &quot;exact&quot;, &quot;exact_fast&quot;], default=&quot;ppo&quot;,</span><span class="add">+                        help=&quot;exact / exact_fast: util/ExactConfidence.py instead of the PPO step&quot;)</span><span class="ctx"> </span><span class="ctx">     return parser</span><span class="ctx"> </span><span class="hunk">@@ -241,4 +257,4 @@ def setup_parser():</span><span class="ctx"> if __name__ == &quot;__main__&quot;:</span><span class="ctx">     parser = setup_parser()</span><span class="ctx">     args = parser.parse_args()</span><span class="del">-    train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize, model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset, log_with=args.log_with, is_unsloth=args.is_unsloth)</span><span class="add">+    train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize, model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset, log_with=args.log_with, is_unsloth=args.is_unsloth, objective=args.objective)</span></pre>
 <p class="note">The released loop left-pads prompts and only strips trailing padding, so <code>p[len(input_ids[i]) - prompt_lengths[i]:]</code> drops the left padding and leaves prompt + answer; <code>prompt_lengths</code> tells the step where the answer starts.</p>
 
 <h3>2. Scoring the eleven completions</h3>
@@ -140,8 +141,9 @@ loss   = −(J − β·KL)          β = ppo_trainer.kl_ctl.value (the released 
 <p class="note">Right padding with no attention mask is safe here: attention is causal and every position read comes before the padding.</p>
 
 <h3>3. Rewards and the reference, using the released code</h3>
-<p>For each answer that reached <code>" Confidence"</code>, the patch parses it with the released <code>response_to_QAResult</code>, then calls the released <code>QAResult_to_reward</code> once per confidence level. So grading (exact match by default in the released code), the log-score scaling and the +2.5 bonus for a correct answer are whatever <code>Train.py</code> already uses. Answers that never reached <code>" Confidence"</code> are skipped: every completion of them is malformed, so the confidence has nothing to learn from them. The reference log-probabilities are computed once per step with the adapter disabled.</p>
+<p>For each answer that reached <code>" Confidence"</code>, the patch parses it with the released <code>response_to_QAResult</code>, then calls the released <code>QAResult_to_reward</code> once per confidence level. So grading (exact match by default in the released code), the log-score scaling and the +2.5 bonus for a correct answer are whatever <code>Train.py</code> already uses. Answers that never reached <code>" Confidence"</code> are skipped: every completion of them is malformed, so the confidence has nothing to learn from them. The reference log-probabilities are computed once per step with the adapter disabled: per answer in <code>exact</code>, and for the whole batch in one call in <code>exact_fast</code>.</p>
 <pre>    candidates = [tokenizer.encode(f&quot;: {k}&quot;, add_special_tokens=False) + [eot] for k in range(11)]
+    levels = [c[:-1] for c in candidates]
     rows = []
     for prediction, n, question, gt, mc in zip(predictions, prompt_lengths, questions, gt_candidates, is_multiple_choice):
         prefix = prediction.tolist()
@@ -152,14 +154,24 @@ loss   = −(J − β·KL)          β = ppo_trainer.kl_ctl.value (the released 
             continue
         rewards = torch.tensor([QAResult_to_reward(QAResult(question, answer.prediction, k, gt, mc, False))
                                 for k in range(11)], device=next(lm.parameters()).device)
+        if fast:
+            rows.append([prefix, rewards, None])
+        else:
+            with torch.no_grad(), lm.disable_adapter():
+                reference = _level_logps(lm, prefix, candidates, tokenizer.pad_token_id)
+            rows.append((prefix, rewards, reference))
+    if not rows:
+        return []
+    if fast:  # the reference for the whole batch in one call
         with torch.no_grad(), lm.disable_adapter():
-            reference = _level_logps(lm, prefix, candidates, tokenizer.pad_token_id)
-        rows.append((prefix, rewards, reference))</pre>
+            for row, reference in zip(rows, _shared_level_logps(lm, [r[0] for r in rows], levels, tokenizer.pad_token_id)):
+                row[2] = reference</pre>
 
 <h3>4. The objective</h3>
-<p>Probabilities of the eleven levels, the leftover mass for "anything else", the expected reward and the KL over those twelve outcomes:</p>
-<pre>    def objective(prefix, rewards, reference):
-        logp = _level_logps(lm, prefix, candidates, tokenizer.pad_token_id)
+<p>Probabilities of the eleven levels, the leftover mass for "anything else", the expected reward and the KL over those twelve outcomes. <code>exact_fast</code> passes in level log-probabilities it has already computed for the whole minibatch; <code>exact</code> scores the eleven sequences here.</p>
+<pre>    def objective(prefix, rewards, reference, logp=None):
+        if logp is None:
+            logp = _level_logps(lm, prefix, candidates, tokenizer.pad_token_id)
         p, p_ref = logp.exp(), reference.exp()
         p_other, p_other_ref = (1 - p.sum()).clamp(min=1e-8), (1 - p_ref.sum()).clamp(min=1e-8)
         expected = (p * rewards).sum() + p_other * wrong_format_penalty
@@ -176,17 +188,53 @@ loss   = −(J − β·KL)          β = ppo_trainer.kl_ctl.value (the released 
         for start in range(0, len(order), config.mini_batch_size):
             ppo_trainer.optimizer.zero_grad()
             chunk = order[start:start + config.mini_batch_size]
-            for i in chunk:
-                expected, kl = objective(*rows[i])
-                (-(expected - beta * kl) / len(chunk)).backward()
+            shared = _shared_level_logps(lm, [rows[i][0] for i in chunk], levels, tokenizer.pad_token_id) if fast else [None] * len(chunk)
+            losses = []
+            for i, logp in zip(chunk, shared):
+                expected, kl = objective(*rows[i], logp=logp)
+                losses.append(-(expected - beta * kl) / len(chunk))
                 if epoch == 0:
                     stats.append((expected.item(), kl.item()))
+                if not fast:  # one backward per answer keeps the 11-sequence graphs small
+                    losses[-1].backward()
+            if fast:
+                torch.stack(losses).sum().backward()
             ppo_trainer.optimizer.step()
     mean_kl = sum(kl for _, kl in stats) / len(stats)
     ppo_trainer.kl_ctl.update(mean_kl, config.batch_size)
     return [expected for expected, _ in stats]</pre>
 
-<h3>6. Running on Qwen-2.5</h3>
+<h3>6. <code>exact_fast</code>: one shared pass instead of eleven</h3>
+<p>The eleven strings <code>": 0"</code> … <code>": 10"</code> share everything up to the number. One forward pass over <code>prefix + ": "</code> therefore gives the probability of every number at its last position, from a single softmax: one sequence per answer instead of eleven, and the whole minibatch in one call. When <code>"10"</code> is two tokens (Qwen splits it into <code>"1"</code>, <code>"0"</code>), the sequence also gets <code>"1"</code> appended, so the next position gives P("0" | "1") and splits level 1 from level 10:</p>
+<div class="math">p(10) = P("1")·P("0" | "1")          p(1) = P("1")·(1 − P("0" | "1"))</div>
+<pre>def _shared_level_logps(lm, prefixes, levels, pad):
+    &quot;&quot;&quot;log P(&quot;: k&quot; | prefix) for all 11 levels and every prefix, one forward pass (fast=True).&quot;&quot;&quot;
+    n_common = 0
+    while all(len(lv) &gt; n_common + 1 for lv in levels) and len({lv[n_common] for lv in levels}) == 1:
+        n_common += 1
+    common, ends = levels[0][:n_common], [lv[n_common:] for lv in levels]
+    two_token_ten = len(ends[10]) == 2  # Qwen: &quot;10&quot; is &quot;1&quot; &quot;0&quot;
+    first = [e[0] for e in ends]
+    seqs = [p + common + ([ends[10][0]] if two_token_ten else []) for p in prefixes]
+    width = max(map(len, seqs))
+    device = next(lm.parameters()).device
+    logits = lm(input_ids=torch.tensor([s + [pad] * (width - len(s)) for s in seqs], device=device)).logits
+    rows = []
+    for b, p in enumerate(prefixes):
+        n = len(p) + n_common
+        logp = logits[b, len(p) - 1:n + 1].float().log_softmax(-1)
+        common_logp = sum(logp[i, t] for i, t in enumerate(common))
+        level = common_logp + logp[n_common, torch.tensor(first, device=device)]
+        if two_token_ten:
+            p_zero = logp[n_common + 1, ends[10][1]]
+            level = torch.cat([level[:1], level[1:2] + torch.log1p(-p_zero.exp().clamp(max=1 - 1e-7)), level[2:10],
+                               level[1:2] + p_zero])
+        rows.append(level)
+    return torch.stack(rows)</pre>
+<p><b>The one approximation.</b> A level's probability here is P(<code>": k"</code>), without the end-of-turn token that <code>exact</code> includes. The end-of-turn sits one position after each number, a different place for each level, so a single shared sequence cannot read all eleven. "Anything else" therefore means malformed before the number, and stopping after the number is not trained. For this model and format it is close to certain anyway: malformed outputs stayed at 1.1%, the same as <code>exact</code>.</p>
+<p><b>Checked against direct scoring.</b> For three prompts, one at a time, every <code>exact_fast</code> level matched the same quantity computed by scoring each string token by token: largest difference 6 × 10⁻⁸ in probability on Qwen-2.5-3B and exactly 0 on Llama-3-8B.</p>
+
+<h3>7. Running on Qwen-2.5</h3>
 <p>The released code looks up Llama-3's end-of-turn token by name. Qwen-2.5 has no <code>&lt;|eot_id|&gt;</code>, so the lookup returns nothing and generation never stops at the end of the turn. The helper falls back to the tokenizer's own end-of-turn token (<code>&lt;|im_end|&gt;</code> for Qwen); the evaluation script gets the same one-line change.</p>
 <pre>def end_of_turn(tokenizer):
     &quot;&quot;&quot;Llama-3&#x27;s &lt;|eot_id|&gt;, or the tokenizer&#x27;s EOS where that token does not exist (Qwen: &lt;|im_end|&gt;).&quot;&quot;&quot;
@@ -215,12 +263,20 @@ loss   = −(J − β·KL)          β = ppo_trainer.kl_ctl.value (the released 
 </div>
 
 <h2>Cost</h2>
-<p>Per answer, the exact step runs eleven short sequences through the policy (with gradients) for each of the eight updates, plus eleven through the reference once. That is more forward work than PPO's training pass on one sampled response, but it drops the second generation. This patch keeps the implementation simple so the change is easy to audit; a faster variant reads all eleven levels from a single forward pass, since they share the prefix <code>"…, Confidence: "</code>, and only differs in bookkeeping when a level spans two tokens.</p>
+<div class="tbl"><table>
+<thead><tr><th>Qwen-2.5-3B on one L40S · median over 16 steps</th><th>Update</th><th>Full iteration</th></tr></thead>
+<tbody>
+<tr><td><code>ppo</code> (released)</td><td>13.6 s</td><td>15.1 s</td></tr>
+<tr><td><code>exact</code>: eleven sequences per answer</td><td>10.8 s</td><td>11.2 s</td></tr>
+<tr><td><code>exact_fast</code>: one shared pass</td><td class="win">1.9 s</td><td class="win">2.3 s</td></tr>
+</tbody></table></div>
+<p>Both exact objectives skip the second generation PPO needs to sample a confidence, and run the same eight updates per batch. <code>exact</code> scores eleven full sequences per answer in each update; <code>exact_fast</code> scores one, which makes each iteration about 6.5 times faster than the released PPO. Part of that margin is the released PPO's own overhead: it computes a log-softmax over the whole vocabulary at every position, logs an entropy statistic, keeps gradient checkpointing on and clears the GPU cache every step. Removing those without changing the numbers made PPO about 4 times faster on Llama-3-8B in our runs, so against an optimized PPO the speedup would be closer to 1.5–2 times.</p>
 
 <h2>Caveats</h2>
 <ul>
   <li>The comparison is short: 256 steps on 1,024 questions. The paper trains about 85 times longer on the full training set, and its Qwen-2.5-3B AUROC (0.907) is well above both arms here.</li>
   <li>Scores are on 512 test questions. At that size even a perfectly calibrated model averages ECE around 0.04, so ECE differences below that are not resolvable.</li>
+  <li><code>exact_fast</code> leaves out the end-of-turn factor (section 6), so stopping after the number is not trained; the malformed rate was unchanged here, but longer training could show drift that <code>exact</code> would catch.</li>
   <li>Answers are generated by the training policy (as released), so long training can change them; the exact objective does not penalize an answer that never reaches <code>" Confidence"</code>, since that answer has no confidence to train.</li>
   <li>The released reward grades answers by exact match, while the paper describes F1 &gt; 0.5. Both arms use the released behaviour.</li>
 </ul>
@@ -228,7 +284,7 @@ loss   = −(J − β·KL)          β = ppo_trainer.kl_ctl.value (the released 
 <h2>Applying it</h2>
 <ol class="steps">
   <li><code>git -C RewardingDoubt checkout 416c9e0 &amp;&amp; git -C RewardingDoubt apply exact_confidence.patch</code></li>
-  <li><code>python Train.py --objective exact --dataset triviaqa --is_unsloth --model_dir unsloth/Qwen2.5-3B-Instruct --tokenizer_dir unsloth/Qwen2.5-3B-Instruct --epochs 2 --lr 1e-5 --batchsize 8</code></li>
-  <li>Evaluate as usual with <code>InferenceDatasetSplit.py</code>. Dropping <code>--objective</code> (or passing <code>ppo</code>) gives the released behaviour.</li>
+  <li><code>python Train.py --objective exact_fast --dataset triviaqa --is_unsloth --model_dir unsloth/Qwen2.5-3B-Instruct --tokenizer_dir unsloth/Qwen2.5-3B-Instruct --epochs 2 --lr 1e-5 --batchsize 8</code></li>
+  <li>Evaluate as usual with <code>InferenceDatasetSplit.py</code>. <code>--objective exact</code> runs the eleven-sequence reference version; dropping <code>--objective</code> (or passing <code>ppo</code>) gives the released behaviour.</li>
 </ol>
 </article></main>
