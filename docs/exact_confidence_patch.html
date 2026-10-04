@@ -34,9 +34,10 @@ pre .hunk { display: block; color: var(--faint); }
 pre .ctx { display: block; }
 .file { font: 500 12.5px var(--mono); color: var(--muted); margin-bottom: -10px; }
 .math { font: 15px/1.7 var(--mono); background: var(--accent-soft); border-radius: 8px; padding: 14px 18px; overflow-x: auto; white-space: pre; }
+.seeds { display: block; font: 11px var(--mono); letter-spacing: -.02em; color: var(--faint); font-weight: 400; margin-top: 2px; font-variant-ligatures: none; }
 .tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
 table { border-collapse: collapse; width: 100%; font-size: 15px; }
-th, td { padding: 9px 14px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 th:first-child, td:first-child { text-align: left; white-space: normal; }
 thead th { font-size: 13px; color: var(--muted); font-weight: 600; }
 tbody tr:last-child td { border-bottom: 0; }
@@ -60,13 +61,13 @@ ol.steps { padding-left: 22px; margin: 0; display: grid; gap: 6px; }
 <p class="lede">The released code teaches a model to state its confidence by sampling one confidence token after each answer and updating with PPO. Because the confidence is one of eleven short strings, its expected reward can be computed exactly instead. The patch adds that as <code>--objective exact</code> in <code>Train.py</code>, plus <code>--objective exact_fast</code>, which reads all eleven from one shared forward pass. Both keep the paper's reward, format penalty, KL controller, optimizer, LoRA setup, data and evaluation.</p>
 
 <div class="tbl"><table>
-<thead><tr><th>Qwen-2.5-3B · released code + patch · 512 test questions · 3 seeds</th><th>Brier ↓</th><th>ECE ↓</th><th>AUROC ↑</th><th>Accuracy</th><th>Time / iteration</th></tr></thead>
+<thead><tr><th>Objective</th><th>Brier ↓</th><th>ECE ↓</th><th>AUROC ↑</th><th>Accuracy</th><th>Time / step</th></tr></thead>
 <tbody>
-<tr><td><code>--objective exact_fast</code></td><td class="win">0.172 ± 0.001</td><td class="win">0.056 ± 0.021</td><td class="win">0.803 ± 0.005</td><td>38.5%</td><td class="win">2.3 s</td></tr>
-<tr><td><code>--objective exact</code></td><td>0.179 ± 0.004</td><td>0.088 ± 0.014</td><td>0.800 ± 0.006</td><td>37.9%</td><td>11.2 s</td></tr>
-<tr><td><code>--objective ppo</code> (released default)</td><td>0.257 ± 0.015</td><td>0.257 ± 0.018</td><td>0.781 ± 0.018</td><td>36.0%</td><td>15.1 s</td></tr>
+<tr><td><code>exact_fast</code></td><td class="win">0.172 ± 0.001<span class="seeds">0.173&thinsp;·&thinsp;0.171&thinsp;·&thinsp;0.173</span></td><td class="win">0.056 ± 0.021<span class="seeds">0.078&thinsp;·&thinsp;0.037&thinsp;·&thinsp;0.053</span></td><td class="win">0.803 ± 0.005<span class="seeds">0.808&thinsp;·&thinsp;0.802&thinsp;·&thinsp;0.799</span></td><td>38.5%<span class="seeds">38.8&thinsp;·&thinsp;38.4&thinsp;·&thinsp;38.3</span></td><td class="win">2.3 s</td></tr>
+<tr><td><code>exact</code></td><td>0.179 ± 0.004<span class="seeds">0.177&thinsp;·&thinsp;0.176&thinsp;·&thinsp;0.183</span></td><td>0.088 ± 0.014<span class="seeds">0.090&thinsp;·&thinsp;0.074&thinsp;·&thinsp;0.102</span></td><td>0.800 ± 0.006<span class="seeds">0.805&thinsp;·&thinsp;0.802&thinsp;·&thinsp;0.793</span></td><td>37.9%<span class="seeds">37.6&thinsp;·&thinsp;38.5&thinsp;·&thinsp;37.4</span></td><td>11.2 s</td></tr>
+<tr><td><code>ppo</code> <span class="seeds">released default</span></td><td>0.257 ± 0.015<span class="seeds">0.267&thinsp;·&thinsp;0.240&thinsp;·&thinsp;0.264</span></td><td>0.257 ± 0.018<span class="seeds">0.269&thinsp;·&thinsp;0.236&thinsp;·&thinsp;0.265</span></td><td>0.781 ± 0.018<span class="seeds">0.799&thinsp;·&thinsp;0.762&thinsp;·&thinsp;0.781</span></td><td>36.0%<span class="seeds">35.1&thinsp;·&thinsp;35.9&thinsp;·&thinsp;37.0</span></td><td>15.1 s</td></tr>
 </tbody></table></div>
-<p class="note">All arms: 1,024 TriviaQA training questions, 2 epochs (256 steps), learning rate 1e-5, batch 8, the released exact-match reward grading and adaptive KL, scored with the released inference and metrics (F1 &gt; 0.5, 11-bin ECE). Per-seed ECE: exact_fast 0.078, 0.037, 0.053; exact 0.090, 0.074, 0.102; PPO 0.269, 0.236, 0.265. Malformed outputs: 0.9–1.1% in every arm. Time is the median full training iteration (answer generation plus update) on one L40S, measured in a separate 16-step run per objective.</p>
+<p class="note">Qwen-2.5-3B, released code plus the patch, 512 test questions; each cell is the mean ± standard deviation over 3 seeds, with the seeds' own values beneath. All arms: 1,024 TriviaQA training questions, 2 epochs (256 steps), learning rate 1e-5, batch 8, the released exact-match reward grading and adaptive KL, scored with the released inference and metrics (F1 &gt; 0.5, 11-bin ECE). Malformed outputs: 0.9–1.1% in every arm. Time is the median full training iteration (answer generation plus update) on one L40S, measured in a separate 16-step run per objective.</p>
 
 <h2>The idea</h2>
 <p>After the model writes <code>Answer: …, Confidence</code>, training only cares about what comes next: one of the eleven strings <code>": 0"</code> … <code>": 10"</code> followed by end of turn, or something malformed. PPO samples one of these, scores it, and estimates a gradient from that single sample with a learned value head as the baseline. The exact objective scores all eleven and weights each reward by the probability the model gives it.</p>
