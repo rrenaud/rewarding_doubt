@@ -1,0 +1,234 @@
+<title>Exact Confidence Patch</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column for a code-review report; wide code panels scroll on their own. */
+:root {
+  --bg: #f6f7f5; --surface: #ffffff; --fg: #1d2421; --muted: #55605a; --faint: #87918b; --line: #d9dfdb;
+  --accent: #2f6f5e; --accent-soft: #e3efea; --ppo: #a25a1c; --add: #e6f4ec; --add-fg: #1f6a43; --del: #fbe9e7; --del-fg: #9b3426;
+  --code-bg: #f1f4f2;
+  --display: "Spectral", Georgia, serif; --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121614; --surface: #19201c; --fg: #e5ebe7; --muted: #a6b2ab; --faint: #76837b; --line: #2b3530;
+  --accent: #6cc3a6; --accent-soft: #1f3129; --ppo: #e39a5c; --add: #16301f; --add-fg: #8fd8a8; --del: #3a1d19; --del-fg: #f0a598; --code-bg: #151b18; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121614; --surface: #19201c; --fg: #e5ebe7; --muted: #a6b2ab; --faint: #76837b; --line: #2b3530;
+  --accent: #6cc3a6; --accent-soft: #1f3129; --ppo: #e39a5c; --add: #16301f; --add-fg: #8fd8a8; --del: #3a1d19; --del-fg: #f0a598; --code-bg: #151b18; color-scheme: dark }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.62 var(--body); }
+main { max-width: 860px; margin: 0 auto; padding-inline: 18px; padding-block: 40px 80px; }
+article { display: grid; gap: 18px; }
+h1 { font: 600 34px/1.15 var(--display); margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h2 { font: 600 24px/1.25 var(--display); margin: 26px 0 0; text-wrap: balance; }
+h3 { font: 600 17px/1.3 var(--body); margin: 8px 0 0; }
+p, li { max-width: 68ch; }
+p { margin: 0; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.lede { font-size: 19px; color: var(--muted); }
+code, pre, .math { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+code { font: 14.5px var(--mono); background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre { margin: 0; font: 13px/1.55 var(--mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; }
+pre .add { display: block; background: var(--add); color: var(--add-fg); }
+pre .del { display: block; background: var(--del); color: var(--del-fg); }
+pre .hunk { display: block; color: var(--faint); }
+pre .ctx { display: block; }
+.file { font: 500 12.5px var(--mono); color: var(--muted); margin-bottom: -10px; }
+.math { font: 15px/1.7 var(--mono); background: var(--accent-soft); border-radius: 8px; padding: 14px 18px; overflow-x: auto; white-space: pre; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { padding: 9px 14px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; white-space: normal; }
+thead th { font-size: 13px; color: var(--muted); font-weight: 600; }
+tbody tr:last-child td { border-bottom: 0; }
+td.win { color: var(--accent); font-weight: 600; }
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 680px) { .cols { grid-template-columns: 1fr; } }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; min-width: 0; }
+.box h3 { margin: 0 0 6px; }
+.box ul { margin: 0; padding-left: 18px; }
+figure { margin: 0; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--muted); margin-top: 6px; }
+.svgt { font: 13px var(--body); fill: var(--fg); }
+.svgs { font: 12px var(--mono); fill: var(--muted); }
+ol.steps { padding-left: 22px; margin: 0; display: grid; gap: 6px; }
+.note { font-size: 15px; color: var(--muted); }
+</style>
+<main><article>
+<div class="eyebrow">Rewarding Doubt · patch review · 3 files, +110 / −6 lines</div>
+<h1>Exact confidence: a minimal change to the released trainer</h1>
+<p class="lede">The released code teaches a model to state its confidence by sampling one confidence after each answer and updating with PPO. Because the confidence is one of eleven short strings, its expected reward can be computed exactly instead. The patch adds that as <code>--objective exact</code> in <code>Train.py</code>, keeping the paper's reward, format penalty, KL controller, optimizer, LoRA setup, data and evaluation.</p>
+
+<div class="tbl"><table>
+<thead><tr><th>Qwen-2.5-3B · released code + patch · 512 test questions · 3 seeds</th><th>Brier ↓</th><th>ECE ↓</th><th>AUROC ↑</th><th>Accuracy</th></tr></thead>
+<tbody>
+<tr><td><code>--objective exact</code></td><td class="win">0.179 ± 0.004</td><td class="win">0.088 ± 0.014</td><td class="win">0.800 ± 0.006</td><td>37.9%</td></tr>
+<tr><td><code>--objective ppo</code> (released default)</td><td>0.257 ± 0.015</td><td>0.257 ± 0.018</td><td>0.781 ± 0.018</td><td>36.0%</td></tr>
+</tbody></table></div>
+<p class="note">Both arms: 1,024 TriviaQA training questions, 2 epochs (256 steps), learning rate 1e-5, batch 8, the released exact-match reward grading and adaptive KL, scored with the released inference and metrics (F1 &gt; 0.5, 11-bin ECE). Per-seed ECE: exact 0.090, 0.074, 0.102; PPO 0.269, 0.236, 0.265.</p>
+
+<h2>The idea</h2>
+<p>After the model writes <code>Answer: …, Confidence</code>, training only cares about what comes next: one of the eleven strings <code>": 0"</code> … <code>": 10"</code> followed by end of turn, or something malformed. PPO samples one of these, scores it, and estimates a gradient from that single sample with a learned value head as the baseline. The exact objective scores all eleven and weights each reward by the probability the model gives it.</p>
+
+<figure>
+<svg viewBox="0 0 820 300" role="img" aria-label="PPO samples one confidence and needs a value head; the exact objective scores all eleven confidences and sums their rewards">
+  <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g style="color: var(--muted)">
+    <text x="20" y="26" class="svgt" style="font-weight:600; fill: var(--ppo)">Released: PPO on one sampled confidence</text>
+    <rect x="20" y="40" width="170" height="44" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+    <text x="105" y="58" text-anchor="middle" class="svgt">answer</text><text x="105" y="74" text-anchor="middle" class="svgs">"…, Confidence"</text>
+    <line x1="190" y1="62" x2="232" y2="62" stroke="currentColor" marker-end="url(#arr)"/><text x="211" y="50" text-anchor="middle" class="svgs">sample</text>
+    <rect x="236" y="40" width="120" height="44" rx="6" fill="var(--surface)" stroke="var(--ppo)"/>
+    <text x="296" y="67" text-anchor="middle" class="svgt">": 7"</text>
+    <line x1="356" y1="62" x2="398" y2="62" stroke="currentColor" marker-end="url(#arr)"/>
+    <rect x="402" y="40" width="120" height="44" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+    <text x="462" y="58" text-anchor="middle" class="svgt">reward R(7)</text><text x="462" y="74" text-anchor="middle" class="svgs">one number</text>
+    <line x1="522" y1="62" x2="564" y2="62" stroke="currentColor" marker-end="url(#arr)"/>
+    <rect x="568" y="40" width="232" height="44" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+    <text x="684" y="58" text-anchor="middle" class="svgt">advantage = R − V (value head)</text><text x="684" y="74" text-anchor="middle" class="svgs">clipped PPO update</text>
+
+    <text x="20" y="146" class="svgt" style="font-weight:600; fill: var(--accent)">Patch: exact expected reward over all eleven</text>
+    <rect x="20" y="160" width="170" height="44" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+    <text x="105" y="178" text-anchor="middle" class="svgt">answer</text><text x="105" y="194" text-anchor="middle" class="svgs">"…, Confidence"</text>
+    <line x1="190" y1="182" x2="232" y2="182" stroke="currentColor" marker-end="url(#arr)"/><text x="211" y="170" text-anchor="middle" class="svgs">score</text>
+    <g>
+      <rect x="236" y="152" width="120" height="124" rx="6" fill="var(--surface)" stroke="var(--accent)"/>
+      <text x="246" y="172" class="svgs">": 0"  p₀</text><text x="246" y="190" class="svgs">": 1"  p₁</text><text x="246" y="208" class="svgs">  …</text>
+      <text x="246" y="226" class="svgs">": 10" p₁₀</text><text x="246" y="250" class="svgs">other  1−Σp</text>
+    </g>
+    <line x1="356" y1="210" x2="398" y2="210" stroke="currentColor" marker-end="url(#arr)"/>
+    <rect x="402" y="182" width="190" height="56" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+    <text x="497" y="204" text-anchor="middle" class="svgt">J = Σ pₖ R(k)</text><text x="497" y="222" text-anchor="middle" class="svgs">+ (1−Σp)·(−30)</text>
+    <line x1="592" y1="210" x2="634" y2="210" stroke="currentColor" marker-end="url(#arr)"/>
+    <rect x="638" y="182" width="162" height="56" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+    <text x="719" y="204" text-anchor="middle" class="svgt">maximize J − β·KL</text><text x="719" y="222" text-anchor="middle" class="svgs">no value head</text>
+  </g>
+</svg>
+<figcaption>Both paths start from the same generated answer and use the same reward function. PPO learns from one sampled confidence and needs a value head to reduce the variance of that estimate; the exact objective sums over all eleven, so its gradient has no sampling noise and no baseline to learn.</figcaption>
+</figure>
+
+<h2>What is optimized</h2>
+<p>For one answer, let <code>p(k)</code> be the probability the policy gives the completion <code>": k"</code> + end of turn, and <code>p_ref(k)</code> the same under the reference model (the LoRA adapter switched off, which is what TRL uses as the reference for PEFT models). <code>R(k)</code> is the released <code>QAResult_to_reward</code> for confidence <code>k</code>; anything else gets <code>wrong_format_penalty</code> (−30).</p>
+<div class="math">J      = Σₖ p(k)·R(k)  +  (1 − Σₖ p(k))·(−30)
+KL     = Σₖ p(k)·log(p(k) / p_ref(k))  +  p_other·log(p_other / p_other_ref)
+loss   = −(J − β·KL)          β = ppo_trainer.kl_ctl.value (the released adaptive controller)
+∇J     = Σₖ R(k)·∇p(k) − 30·∇p_other     exact: no sample, no advantage, no baseline</div>
+<p><code>J</code> is exactly the quantity PPO estimates: the expected reward of the response the policy would sample. The KL term is computed over the same twelve outcomes rather than per sampled token, but it plays the same role, keeping the confidence distribution near the base model's, and it feeds the same adaptive controller.</p>
+
+<h2>Walking through the patch</h2>
+
+<h3>1. Hooking into <code>Train.py</code></h3>
+<p>The training loop already generates each answer up to the <code>" Confidence"</code> token. With <code>--objective exact</code>, the patch hands those answers to <code>exact_confidence_step</code> and skips the rest of the iteration: the second generation (the sampled confidence), reward computation for that sample, <code>ppo_trainer.step</code>, and <code>log_stats</code>. The default <code>ppo</code> path is untouched. The three hard-coded <code>&lt;|eot_id|&gt;</code> lookups become <code>end_of_turn(tokenizer)</code>, which returns the same token on Llama-3.</p>
+<div class="file">SingleAnswerSetting/Train.py</div>
+<pre><span class="hunk">@@ -19,6 +19,7 @@ from util.ResponseHandling import response_to_QAResult</span><span class="ctx"> from util.RLHelper import QAResult_to_reward</span><span class="ctx"> from util.util import remove_padding</span><span class="ctx"> from util.ModelLoader import load_lora_model_tokenizer, load_model_tokenizer</span><span class="add">+from util.ExactConfidence import end_of_turn, exact_confidence_step</span><span class="ctx"> </span><span class="ctx"> torch.manual_seed(2)</span><span class="ctx"> </span><span class="hunk">@@ -44,7 +45,7 @@ def evaluate_model(model, dataloader, tokenizer, generation_kwargs, device) -&gt; T</span><span class="ctx">     </span><span class="ctx">     return np.mean(rewards_epoch), np.std(rewards_epoch)</span><span class="ctx"> </span><span class="del">-def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str, tokenizer_dir: str, dataset: str, log_with: str = &quot;tensorboard&quot;, is_unsloth: bool = True, use_lora: bool = True) -&gt; None: </span><span class="add">+def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str, tokenizer_dir: str, dataset: str, log_with: str = &quot;tensorboard&quot;, is_unsloth: bool = True, use_lora: bool = True, objective: str = &quot;ppo&quot;) -&gt; None: </span><span class="ctx">     if not os.path.exists(out_dir):</span><span class="ctx">         os.mkdir(out_dir)</span><span class="ctx"> </span><span class="hunk">@@ -99,13 +100,13 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,</span><span class="ctx"> </span><span class="ctx">     prediction_terminators = [</span><span class="ctx">         tokenizer.eos_token_id,</span><span class="del">-        tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;),</span><span class="add">+        end_of_turn(tokenizer),</span><span class="ctx">         tokenizer.convert_tokens_to_ids(&quot;ĠConfidence&quot;)</span><span class="ctx">     ]</span><span class="ctx"> </span><span class="ctx">     ppo_terminators = [</span><span class="ctx">         tokenizer.eos_token_id,</span><span class="del">-        tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;),</span><span class="add">+        end_of_turn(tokenizer),</span><span class="ctx">     ]</span><span class="ctx"> </span><span class="ctx">     generation_kwargs_prediction = {</span><span class="hunk">@@ -130,7 +131,7 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,</span><span class="ctx"> </span><span class="ctx">     eval_terminators = [</span><span class="ctx">         tokenizer.eos_token_id,</span><span class="del">-        tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;),</span><span class="add">+        end_of_turn(tokenizer),</span><span class="ctx">     ]</span><span class="ctx"> </span><span class="ctx">     generation_kwargs_eval = {</span><span class="hunk">@@ -164,6 +165,16 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,</span><span class="ctx">             prediction = model.generate(input_ids=input_ids, attention_mask=attention_mask, **generation_kwargs_prediction)</span><span class="ctx">             prediction = [remove_padding(p, tokenizer.pad_token_id) for p in prediction]</span><span class="ctx"> </span><span class="add">+            if objective == &quot;exact&quot;:  # score all 11 confidences exactly instead of sampling one (util/ExactConfidence.py)</span><span class="add">+                if is_unsloth:</span><span class="add">+                    FastLanguageModel.for_training(model.pretrained_model)</span><span class="add">+                prompt_lengths = [int(m.sum()) for m in attention_mask]</span><span class="add">+                expected = exact_confidence_step(ppo_trainer, tokenizer, [p[len(input_ids[i]) - prompt_lengths[i]:] for i, p in enumerate(prediction)],</span><span class="add">+                                                 prompt_lengths, questions, gt_candidates, is_multiple_choice)</span><span class="add">+                rewards_epoch += expected</span><span class="add">+                print(f&quot;exact step {idx}: answers scored {len(expected)}, mean expected reward {np.mean(expected) if expected else float(&#x27;nan&#x27;):.3f}, kl coef {ppo_trainer.kl_ctl.value:.4f}&quot;, flush=True)</span><span class="add">+                continue</span><span class="add">+</span><span class="ctx">             # Generate confidence</span><span class="ctx">             if not is_unsloth:</span><span class="ctx">                 model.train()</span><span class="hunk">@@ -234,6 +245,7 @@ def setup_parser():</span><span class="ctx">     parser.add_argument(&quot;--log_with&quot;, type=str, default=&quot;tensorboard&quot;)</span><span class="ctx">     parser.add_argument(&quot;--dataset&quot;, type=str, default=&quot;medqa&quot;)</span><span class="ctx">     parser.add_argument(&quot;--is_unsloth&quot;, action=&#x27;store_true&#x27;)</span><span class="add">+    parser.add_argument(&quot;--objective&quot;, choices=[&quot;ppo&quot;, &quot;exact&quot;], default=&quot;ppo&quot;, help=&quot;exact: util/ExactConfidence.py instead of the PPO step&quot;)</span><span class="ctx"> </span><span class="ctx">     return parser</span><span class="ctx"> </span><span class="hunk">@@ -241,4 +253,4 @@ def setup_parser():</span><span class="ctx"> if __name__ == &quot;__main__&quot;:</span><span class="ctx">     parser = setup_parser()</span><span class="ctx">     args = parser.parse_args()</span><span class="del">-    train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize, model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset, log_with=args.log_with, is_unsloth=args.is_unsloth)</span><span class="add">+    train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize, model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset, log_with=args.log_with, is_unsloth=args.is_unsloth, objective=args.objective)</span></pre>
+<p class="note">The released loop left-pads prompts and only strips trailing padding, so <code>p[len(input_ids[i]) - prompt_lengths[i]:]</code> drops the left padding and leaves prompt + answer; <code>prompt_lengths</code> tells the step where the answer starts.</p>
+
+<h3>2. Scoring the eleven completions</h3>
+<p>Each candidate is the tokenized <code>": k"</code> plus the end-of-turn token. All eleven are appended to the same prefix and run as one padded batch; the log-probability of a candidate is the sum over its own tokens. Because candidates are scored as token sequences, a tokenizer that splits <code>"10"</code> into <code>"1"</code>,<code>"0"</code> (Qwen) needs no special case.</p>
+<div class="file">SingleAnswerSetting/util/ExactConfidence.py</div>
+<pre>def _level_logps(lm, prefix, candidates, pad):
+    &quot;&quot;&quot;log P(candidate | prefix) for each candidate token list, one batched forward.&quot;&quot;&quot;
+    seqs = [prefix + c for c in candidates]
+    width = max(map(len, seqs))
+    ids = torch.tensor([s + [pad] * (width - len(s)) for s in seqs], device=next(lm.parameters()).device)
+    logits = lm(input_ids=ids).logits
+    out = []
+    for b, c in enumerate(candidates):
+        span = logits[b, len(prefix) - 1:len(prefix) - 1 + len(c)].float().log_softmax(-1)
+        out.append(span.gather(-1, torch.tensor(c, device=next(lm.parameters()).device)[:, None]).sum())
+    return torch.stack(out)</pre>
+<p class="note">Right padding with no attention mask is safe here: attention is causal and every position read comes before the padding.</p>
+
+<h3>3. Rewards and the reference, using the released code</h3>
+<p>For each answer that reached <code>" Confidence"</code>, the patch parses it with the released <code>response_to_QAResult</code>, then calls the released <code>QAResult_to_reward</code> once per confidence level. So grading (exact match by default in the released code), the log-score scaling and the +2.5 bonus for a correct answer are whatever <code>Train.py</code> already uses. Answers that never reached <code>" Confidence"</code> are skipped: every completion of them is malformed, so the confidence has nothing to learn from them. The reference log-probabilities are computed once per step with the adapter disabled.</p>
+<pre>    candidates = [tokenizer.encode(f&quot;: {k}&quot;, add_special_tokens=False) + [eot] for k in range(11)]
+    rows = []
+    for prediction, n, question, gt, mc in zip(predictions, prompt_lengths, questions, gt_candidates, is_multiple_choice):
+        prefix = prediction.tolist()
+        if prefix[-1] != confidence:
+            continue  # the answer never reached &quot; Confidence&quot;: every completion is malformed, no gradient
+        answer = response_to_QAResult(question, tokenizer.decode(prefix[n:], skip_special_tokens=True) + &quot;: 0&quot;, gt, mc)
+        if answer.prediction is None:
+            continue
+        rewards = torch.tensor([QAResult_to_reward(QAResult(question, answer.prediction, k, gt, mc, False))
+                                for k in range(11)], device=next(lm.parameters()).device)
+        with torch.no_grad(), lm.disable_adapter():
+            reference = _level_logps(lm, prefix, candidates, tokenizer.pad_token_id)
+        rows.append((prefix, rewards, reference))</pre>
+
+<h3>4. The objective</h3>
+<p>Probabilities of the eleven levels, the leftover mass for "anything else", the expected reward and the KL over those twelve outcomes:</p>
+<pre>    def objective(prefix, rewards, reference):
+        logp = _level_logps(lm, prefix, candidates, tokenizer.pad_token_id)
+        p, p_ref = logp.exp(), reference.exp()
+        p_other, p_other_ref = (1 - p.sum()).clamp(min=1e-8), (1 - p_ref.sum()).clamp(min=1e-8)
+        expected = (p * rewards).sum() + p_other * wrong_format_penalty
+        kl = (p * (logp - reference)).sum() + p_other * (p_other.log() - p_other_ref.log())
+        return expected, kl</pre>
+
+<h3>5. The update schedule mirrors PPO's</h3>
+<p>The released PPO configuration runs <code>ppo_epochs = 4</code> passes over each batch of 8 in minibatches of <code>mini_batch_size = 4</code>: eight optimizer steps per batch. The exact step does the same with the PPO trainer's own optimizer (the same Adam over the same LoRA parameters), then feeds the mean KL to the same adaptive controller. Reusing data across passes needs no importance weights, because the objective is a deterministic function of the answer, not of a sample.</p>
+<pre>    model.train()
+    stats = []
+    for epoch in range(config.ppo_epochs):
+        order = list(range(len(rows)))
+        rng.shuffle(order)
+        for start in range(0, len(order), config.mini_batch_size):
+            ppo_trainer.optimizer.zero_grad()
+            chunk = order[start:start + config.mini_batch_size]
+            for i in chunk:
+                expected, kl = objective(*rows[i])
+                (-(expected - beta * kl) / len(chunk)).backward()
+                if epoch == 0:
+                    stats.append((expected.item(), kl.item()))
+            ppo_trainer.optimizer.step()
+    mean_kl = sum(kl for _, kl in stats) / len(stats)
+    ppo_trainer.kl_ctl.update(mean_kl, config.batch_size)
+    return [expected for expected, _ in stats]</pre>
+
+<h3>6. Running on Qwen-2.5</h3>
+<p>The released code looks up Llama-3's end-of-turn token by name. Qwen-2.5 has no <code>&lt;|eot_id|&gt;</code>, so the lookup returns nothing and generation never stops at the end of the turn. The helper falls back to the tokenizer's own end-of-turn token (<code>&lt;|im_end|&gt;</code> for Qwen); the evaluation script gets the same one-line change.</p>
+<pre>def end_of_turn(tokenizer):
+    &quot;&quot;&quot;Llama-3&#x27;s &lt;|eot_id|&gt;, or the tokenizer&#x27;s EOS where that token does not exist (Qwen: &lt;|im_end|&gt;).&quot;&quot;&quot;
+    eot = tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;)
+    return eot if eot is not None and eot != tokenizer.unk_token_id else tokenizer.eos_token_id</pre>
+<div class="file">SingleAnswerSetting/InferenceDatasetSplit.py</div>
+<pre><span class="hunk">@@ -4,6 +4,7 @@ import torch</span><span class="ctx"> from tqdm.auto import tqdm</span><span class="ctx"> import argparse</span><span class="ctx"> from util.ModelLoader import load_model_tokenizer</span><span class="add">+from util.ExactConfidence import end_of_turn</span><span class="ctx"> </span><span class="ctx"> from util.DataHelper import DataCollatorForTokenizedQueries, load_prepared_dataset</span><span class="ctx"> from util.ResponseHandling import response_to_QAResult, save_QAResults</span><span class="hunk">@@ -21,7 +22,7 @@ def inference_dataset(model_dir: str, is_unsloth_model: bool, dataset: str, spli</span><span class="ctx">     # Prepare generation</span><span class="ctx">     generation_kwargs_prediction = {</span><span class="ctx">         &quot;max_new_tokens&quot;: 32,</span><span class="del">-        &quot;eos_token_id&quot;: [tokenizer.eos_token_id,tokenizer.convert_tokens_to_ids(&quot;&lt;|eot_id|&gt;&quot;)],</span><span class="add">+        &quot;eos_token_id&quot;: [tokenizer.eos_token_id,end_of_turn(tokenizer)],</span><span class="ctx">         &quot;do_sample&quot;: True,</span><span class="ctx">         &quot;temperature&quot;: 0.6,</span><span class="ctx">         &quot;top_p&quot;: 0.9,</span></pre>
+
+<h2>What changes and what stays</h2>
+<div class="cols">
+  <div class="box"><h3>Unchanged</h3><ul>
+    <li>Model loading, 4-bit base, LoRA (r = 8)</li>
+    <li>Prompt, data loading, answer generation</li>
+    <li>Reward function, grading, −30 format penalty</li>
+    <li>Optimizer, learning rate, batch size, 8 updates per batch</li>
+    <li>Adaptive KL controller (initial 0.05, target 6)</li>
+    <li>Epoch checkpoints, evaluation and metrics</li>
+  </ul></div>
+  <div class="box"><h3>Replaced or removed</h3><ul>
+    <li>Sampling a confidence (a second <code>generate</code> per answer)</li>
+    <li>Value head and its loss</li>
+    <li>Advantage estimation (GAE) and whitening</li>
+    <li>PPO ratio clipping</li>
+    <li>Per-token KL on the sampled response → exact KL over the 12 outcomes</li>
+  </ul></div>
+</div>
+
+<h2>Cost</h2>
+<p>Per answer, the exact step runs eleven short sequences through the policy (with gradients) for each of the eight updates, plus eleven through the reference once. That is more forward work than PPO's training pass on one sampled response, but it drops the second generation. This patch keeps the implementation simple so the change is easy to audit; a faster variant reads all eleven levels from a single forward pass, since they share the prefix <code>"…, Confidence: "</code>, and only differs in bookkeeping when a level spans two tokens.</p>
+
+<h2>Caveats</h2>
+<ul>
+  <li>The comparison is short: 256 steps on 1,024 questions. The paper trains about 85 times longer on the full training set, and its Qwen-2.5-3B AUROC (0.907) is well above both arms here.</li>
+  <li>Scores are on 512 test questions. At that size even a perfectly calibrated model averages ECE around 0.04, so ECE differences below that are not resolvable.</li>
+  <li>Answers are generated by the training policy (as released), so long training can change them; the exact objective does not penalize an answer that never reaches <code>" Confidence"</code>, since that answer has no confidence to train.</li>
+  <li>The released reward grades answers by exact match, while the paper describes F1 &gt; 0.5. Both arms use the released behaviour.</li>
+</ul>
+
+<h2>Applying it</h2>
+<ol class="steps">
+  <li><code>git -C RewardingDoubt checkout 416c9e0 &amp;&amp; git -C RewardingDoubt apply exact_confidence.patch</code></li>
+  <li><code>python Train.py --objective exact --dataset triviaqa --is_unsloth --model_dir unsloth/Qwen2.5-3B-Instruct --tokenizer_dir unsloth/Qwen2.5-3B-Instruct --epochs 2 --lr 1e-5 --batchsize 8</code></li>
+  <li>Evaluate as usual with <code>InferenceDatasetSplit.py</code>. Dropping <code>--objective</code> (or passing <code>ppo</code>) gives the released behaviour.</li>
+</ol>
+</article></main>
