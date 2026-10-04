@@ -487,10 +487,9 @@ def main():
 
         original_step = PPOTrainerNoCache.step
 
-        def step(self, *step_args, **step_kwargs):
-            current_loader[0] = self.dataloader
-            entered = time.time()
-            stats = original_step(self, *step_args, **step_kwargs)
+        def after_step(self, entered, confidences, correct, generation_rows, watched):
+            """Per-step bookkeeping shared by PPO and the exact objectives: timing, snapshots, the generation
+            log, stability checks and W&B, checkpoints, and stopping (flags, SIGTERM, --max-steps)."""
             count[0] += 1
             record = dict(step=count[0], enter=entered, exit=time.time(), batch_hash=getattr(self.dataloader, "batch_hash", None))
             if save_every and count[0] % save_every == 0:
@@ -498,15 +497,9 @@ def main():
                 record["save_seconds"] = time.time() - record["exit"]
             logs["steps"].write(json.dumps(record) + "\n")
             logs["steps"].flush()
-            batch = scored[-len(step_args[2]):] if len(step_args) > 2 else scored[-args.batchsize:]
-            scored.clear()
-            ids = getattr(self.dataloader, "question_ids", [None] * len(batch))
-            generations.write(count[0], [dict(question_id=q, **row) for q, row in zip(ids, batch)])
-            watched = {k.replace("/", "_"): scalar(stats[k]) for k in (
-                "objective/kl", "objective/entropy", "ppo/policy/approxkl", "ppo/policy/clipfrac", "ppo/loss/total",
-                "ppo/loss/policy", "ppo/loss/value", "ppo/mean_scores") if k in stats}
-            stability, events = monitor.update(count[0], [r["confidence"] for r in batch], [r["correct"] for r in batch],
-                                               **{k: v for k, v in watched.items() if v is not None})
+            if generation_rows is not None:
+                generations.write(count[0], generation_rows)
+            stability, events = monitor.update(count[0], confidences, correct, **{k: v for k, v in watched.items() if v is not None})
             logs["stability"].write(json.dumps(stability) + "\n")
             logs["stability"].flush()
             tracker.log({"seconds": record["exit"] - entered,
@@ -537,9 +530,40 @@ def main():
                 tracker.finish()
                 print(f"reached --max-steps {max_steps}", flush=True)
                 sys.exit(0)
+
+        def step(self, *step_args, **step_kwargs):
+            current_loader[0] = self.dataloader
+            entered = time.time()
+            stats = original_step(self, *step_args, **step_kwargs)
+            batch = scored[-len(step_args[2]):] if len(step_args) > 2 else scored[-args.batchsize:]
+            scored.clear()
+            ids = getattr(self.dataloader, "question_ids", [None] * len(batch))
+            watched = {k.replace("/", "_"): scalar(stats[k]) for k in (
+                "objective/kl", "objective/entropy", "ppo/policy/approxkl", "ppo/policy/clipfrac", "ppo/loss/total",
+                "ppo/loss/policy", "ppo/loss/value", "ppo/mean_scores") if k in stats}
+            after_step(self, entered, [r["confidence"] for r in batch], [r["correct"] for r in batch],
+                       [dict(question_id=q, **row) for q, row in zip(ids, batch)], watched)
             return stats
 
         PPOTrainerNoCache.step = step
+
+        # --objective exact / exact_fast (patches/exact_confidence.patch) never calls PPOTrainer.step, so its
+        # update gets the same bookkeeping here. The stability monitor sees each answer's mean stated
+        # confidence (rounded to a level) as its confidence; answer correctness is not reported by the step.
+        if hasattr(Train, "exact_confidence_step"):
+            original_exact = Train.exact_confidence_step
+
+            def exact_step(ppo_trainer, *exact_args, **exact_kwargs):
+                current_loader[0] = ppo_trainer.dataloader
+                entered = time.time()
+                results = original_exact(ppo_trainer, *exact_args, **exact_kwargs)
+                scored.clear()  # QAResult_to_reward ran once per level, not per sampled response
+                mean = lambda key: sum(r[key] for r in results) / len(results) if results else None
+                after_step(ppo_trainer, entered, [round(r["confidence"]) for r in results], [], None,
+                           dict(expected_reward=mean("expected"), kl=mean("kl"), mean_confidence=mean("confidence"),
+                                kl_coef=float(ppo_trainer.kl_ctl.value), answers_scored=float(len(results))))
+                return results
+            Train.exact_confidence_step = exact_step
         # Epochs fully trained before a resume: skip Train.py's end-of-epoch save and evaluation.
         original_evaluate = Train.evaluate_model
         Train.evaluate_model = lambda *a, **k: (0.0, 0.0) if epoch_skipped() else original_evaluate(*a, **k)

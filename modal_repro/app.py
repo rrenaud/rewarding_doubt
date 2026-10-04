@@ -1037,3 +1037,26 @@ def verify_fast(gpu: str = "L40S"):
         ["verify_fast_levels.py", "unsloth/Qwen2.5-3B-Instruct", MODEL], run)
     print("exit", r["exit_code"]); print("\n".join(l for l in r["log"].splitlines() if " levels fast" in l or l.startswith(("RESULT", "Traceback")) or "Error" in l))
 
+
+@app.local_entrypoint()
+def exact_hooks_test(gpu: str = "L40S"):
+    """--objective exact_fast through subset.py: snapshots, checkpoints, logs, then stop at step 3 and resume."""
+    root = Path(__file__).resolve().parents[1]
+    data = root / "runs/pilot-20261001T002945Z/data"
+    ids = {"train": [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()][:32],
+           "validation": json.loads((root / "runs/hparam-search-20261002T044831Z/dev_ids.json").read_text())[:16]}
+    q = "unsloth/Qwen2.5-3B-Instruct"
+    cmd = ["subset.py", "train", "IDS_JSON", "--seed", "1", "--save-every", "2", "--checkpoint-every", "2", "--", "--out_dir", "OUT_DIR",
+           "--dataset", "triviaqa", "--is_unsloth", "--model_dir", q, "--tokenizer_dir", q, "--epochs", "2", "--lr", "1e-05",
+           "--batchsize", "8", "--log_with", "tensorboard", "--objective", "exact_fast"]
+    stopped = cmd[:cmd.index("--")] + ["--stop-after", "3"] + cmd[cmd.index("--"):]
+    run = "exact-hooks-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    trainer = train_with_snapshots.with_options(gpu=gpu)
+    for label_cmd in (stopped, cmd):
+        r = trainer.remote(ids, "exact", label_cmd, run)
+        print("== exit", r["exit_code"], "snapshots", [Path(s).name for s in r["snapshots"]])
+        print("\n".join(l for l in r["log"].splitlines() if l.startswith(("resumed", "checkpoint", "stopping", "exact step", "STABILITY", "Traceback")) or "Error" in l)[-2500:])
+    files = read_files.remote([f"{VOL}/outputs/{run}/exact/{n}" for n in ("steps.jsonl", "stability.jsonl", "status.json")])
+    for path, text in files.items():
+        print("--", Path(path).name); print(text[-1200:])
+

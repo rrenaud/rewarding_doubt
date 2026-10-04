@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends git build-essen
 RUN git clone -q https://github.com/pasta99/RewardingDoubt /opt/RewardingDoubt \
     && git -C /opt/RewardingDoubt checkout -q 416c9e0de22a387c35a51260e7739fa28a37865e \
     && pip install --no-cache-dir -r /opt/RewardingDoubt/requirements.txt
+# The released Train.py with --objective exact / exact_fast (default ppo unchanged).
+COPY patches/exact_confidence.patch /opt/exact_confidence.patch
+RUN git -C /opt/RewardingDoubt apply /opt/exact_confidence.patch
 COPY modal_repro/subset.py modal_repro/exact_llama.py modal_repro/shared_prefix.py modal_repro/thinking_llama.py \
      modal_repro/frozen_eval.py \
      /opt/RewardingDoubt/SingleAnswerSetting/

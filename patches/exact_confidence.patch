@@ -20,7 +20,7 @@ index 6ae7d99..b7e3185 100644
          "temperature": 0.6,
          "top_p": 0.9,
 diff --git a/SingleAnswerSetting/Train.py b/SingleAnswerSetting/Train.py
-index 0bcc1e8..0f4c46f 100644
+index 0bcc1e8..0125253 100644
 --- a/SingleAnswerSetting/Train.py
 +++ b/SingleAnswerSetting/Train.py
 @@ -1,4 +1,5 @@
@@ -80,11 +80,11 @@ index 0bcc1e8..0f4c46f 100644
 +                if is_unsloth:
 +                    FastLanguageModel.for_training(model.pretrained_model)
 +                prompt_lengths = [int(m.sum()) for m in attention_mask]
-+                expected = exact_confidence_step(ppo_trainer, tokenizer, [p[len(input_ids[i]) - prompt_lengths[i]:] for i, p in enumerate(prediction)],
++                scored = exact_confidence_step(ppo_trainer, tokenizer, [p[len(input_ids[i]) - prompt_lengths[i]:] for i, p in enumerate(prediction)],
 +                                                 prompt_lengths, questions, gt_candidates, is_multiple_choice,
 +                                                 fast=objective == "exact_fast")
-+                rewards_epoch += expected
-+                print(f"exact step {idx}: answers scored {len(expected)}, mean expected reward {np.mean(expected) if expected else float('nan'):.3f}, kl coef {ppo_trainer.kl_ctl.value:.4f}, update {time.time() - step_start:.2f} s, wall {time.time():.1f}", flush=True)
++                rewards_epoch += [s["expected"] for s in scored]
++                print(f"exact step {idx}: answers scored {len(scored)}, mean expected reward {np.mean([s['expected'] for s in scored]) if scored else float('nan'):.3f}, kl coef {ppo_trainer.kl_ctl.value:.4f}, update {time.time() - step_start:.2f} s, wall {time.time():.1f}", flush=True)
 +                continue
 +
              # Generate confidence
@@ -107,7 +107,7 @@ index 0bcc1e8..0f4c46f 100644
 +    train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize, model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset, log_with=args.log_with, is_unsloth=args.is_unsloth, objective=args.objective)
 diff --git a/SingleAnswerSetting/util/ExactConfidence.py b/SingleAnswerSetting/util/ExactConfidence.py
 new file mode 100644
-index 0000000..9501c76
+index 0000000..301baf1
 --- /dev/null
 +++ b/SingleAnswerSetting/util/ExactConfidence.py
 @@ -0,0 +1,140 @@
@@ -188,7 +188,8 @@ index 0000000..9501c76
 +
 +def exact_confidence_step(ppo_trainer, tokenizer, predictions, prompt_lengths, questions, gt_candidates,
 +                          is_multiple_choice, rng=random.Random(0), fast=False):
-+    """One exact update on a batch of generated answers. Returns per-answer expected rewards."""
++    """One exact update on a batch of generated answers. Returns, per scored answer, its expected reward,
++    KL to the reference and mean stated confidence (sum_k k p(k) / sum_k p(k)), before the update."""
 +    model, config = ppo_trainer.model, ppo_trainer.config
 +    lm = model.pretrained_model
 +    eot = end_of_turn(tokenizer)
@@ -226,7 +227,7 @@ index 0000000..9501c76
 +        p_other, p_other_ref = (1 - p.sum()).clamp(min=1e-8), (1 - p_ref.sum()).clamp(min=1e-8)
 +        expected = (p * rewards).sum() + p_other * wrong_format_penalty
 +        kl = (p * (logp - reference)).sum() + p_other * (p_other.log() - p_other_ref.log())
-+        return expected, kl
++        return expected, kl, (p * torch.arange(11, device=p.device)).sum() / p.sum()
 +
 +    model.train()
 +    stats = []
@@ -239,15 +240,14 @@ index 0000000..9501c76
 +            shared = _shared_level_logps(lm, [rows[i][0] for i in chunk], levels, tokenizer.pad_token_id) if fast else [None] * len(chunk)
 +            losses = []
 +            for i, logp in zip(chunk, shared):
-+                expected, kl = objective(*rows[i], logp=logp)
++                expected, kl, confidence = objective(*rows[i], logp=logp)
 +                losses.append(-(expected - beta * kl) / len(chunk))
 +                if epoch == 0:
-+                    stats.append((expected.item(), kl.item()))
++                    stats.append(dict(expected=expected.item(), kl=kl.item(), confidence=confidence.item()))
 +                if not fast:  # one backward per answer keeps the 11-sequence graphs small
 +                    losses[-1].backward()
 +            if fast:
 +                torch.stack(losses).sum().backward()
 +            ppo_trainer.optimizer.step()
-+    mean_kl = sum(kl for _, kl in stats) / len(stats)
-+    ppo_trainer.kl_ctl.update(mean_kl, config.batch_size)
-+    return [expected for expected, _ in stats]
++    ppo_trainer.kl_ctl.update(sum(s["kl"] for s in stats) / len(stats), config.batch_size)
++    return stats
