@@ -57,7 +57,7 @@ ol.steps { padding-left: 22px; margin: 0; display: grid; gap: 6px; }
 <main><article>
 <div class="eyebrow">Rewarding Doubt · patch review · 3 files, +163 / −6 lines</div>
 <h1>Exact confidence: a minimal change to the released trainer</h1>
-<p class="lede">The released code teaches a model to state its confidence by sampling one confidence after each answer and updating with PPO. Because the confidence is one of eleven short strings, its expected reward can be computed exactly instead. The patch adds that as <code>--objective exact</code> in <code>Train.py</code>, plus <code>--objective exact_fast</code>, which reads all eleven from one shared forward pass. Both keep the paper's reward, format penalty, KL controller, optimizer, LoRA setup, data and evaluation.</p>
+<p class="lede">The released code teaches a model to state its confidence by sampling one confidence token after each answer and updating with PPO. Because the confidence is one of eleven short strings, its expected reward can be computed exactly instead. The patch adds that as <code>--objective exact</code> in <code>Train.py</code>, plus <code>--objective exact_fast</code>, which reads all eleven from one shared forward pass. Both keep the paper's reward, format penalty, KL controller, optimizer, LoRA setup, data and evaluation.</p>
 
 <div class="tbl"><table>
 <thead><tr><th>Qwen-2.5-3B · released code + patch · 512 test questions · 3 seeds</th><th>Brier ↓</th><th>ECE ↓</th><th>AUROC ↑</th><th>Accuracy</th><th>Time / iteration</th></tr></thead>
