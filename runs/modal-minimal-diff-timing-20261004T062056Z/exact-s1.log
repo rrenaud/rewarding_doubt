@@ -1,0 +1,127 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.392 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+WARNING:root:The `device_map` argument is not provided. We will override the device_map argument. to set the entire model on the current device. If you want to set the model on multiple devices, please provide a custom `device_map` argument.
+
+Filter:   0%|          | 0/87622 [00:00<?, ? examples/s]
+Filter:   1%|          | 1000/87622 [00:00<00:43, 2011.34 examples/s]
+Filter:   2%|▏         | 2000/87622 [00:00<00:36, 2361.02 examples/s]
+Filter:   3%|▎         | 3000/87622 [00:01<00:32, 2569.87 examples/s]
+Filter:   5%|▍         | 4000/87622 [00:01<00:30, 2718.01 examples/s]
+Filter:   6%|▌         | 5000/87622 [00:01<00:28, 2917.12 examples/s]
+Filter:   7%|▋         | 6000/87622 [00:02<00:26, 3098.37 examples/s]
+Filter:   8%|▊         | 7000/87622 [00:02<00:25, 3204.47 examples/s]
+Filter:   9%|▉         | 8000/87622 [00:02<00:24, 3265.10 examples/s]
+Filter:  10%|█         | 9000/87622 [00:02<00:23, 3368.56 examples/s]
+Filter:  11%|█▏        | 10000/87622 [00:03<00:23, 3369.53 examples/s]
+Filter:  13%|█▎        | 11000/87622 [00:03<00:22, 3403.86 examples/s]
+Filter:  14%|█▎        | 12000/87622 [00:03<00:22, 3369.24 examples/s]
+Filter:  15%|█▍        | 13000/87622 [00:04<00:22, 3390.11 examples/s]
+Filter:  16%|█▌        | 14000/87622 [00:04<00:21, 3346.68 examples/s]
+Filter:  17%|█▋        | 15000/87622 [00:04<00:21, 3380.77 examples/s]
+Filter:  18%|█▊        | 16000/87622 [00:05<00:25, 2860.71 examples/s]
+Filter:  19%|█▉        | 17000/87622 [00:05<00:23, 2971.99 examples/s]
+Filter:  21%|██        | 18000/87622 [00:05<00:22, 3153.19 examples/s]
+Filter:  22%|██▏       | 19000/87622 [00:06<00:21, 3170.32 examples/s]
+Filter:  23%|██▎       | 20000/87622 [00:06<00:26, 2535.33 examples/s]
+Filter:  24%|██▍       | 21000/87622 [00:07<00:27, 2453.60 examples/s]
+Filter:  25%|██▌       | 22000/87622 [00:07<00:26, 2444.23 examples/s]
+Filter:  26%|██▌       | 23000/87622 [00:07<00:25, 2514.16 examples/s]
+Filter:  27%|██▋       | 24000/87622 [00:08<00:25, 2528.52 examples/s]
+Filter:  29%|██▊       | 25000/87622 [00:08<00:24, 2589.84 examples/s]
+Filter:  30%|██▉       | 26000/87622 [00:09<00:23, 2618.38 examples/s]
+Filter:  31%|███       | 27000/87622 [00:09<00:22, 2679.39 examples/s]
+Filter:  32%|███▏      | 28000/87622 [00:09<00:21, 2776.21 examples/s]
+Filter:  33%|███▎      | 29000/87622 [00:10<00:20, 2883.94 examples/s]
+Filter:  34%|███▍      | 30000/87622 [00:10<00:21, 2681.64 examples/s]
+Filter:  35%|███▌      | 31000/87622 [00:10<00:21, 2673.47 examples/s]
+Filter:  37%|███▋      | 32000/87622 [00:11<00:21, 2554.12 examples/s]
+Filter:  38%|███▊      | 33000/87622 [00:11<00:24, 2262.85 examples/s]
+Filter:  39%|███▉      | 34000/87622 [00:12<00:22, 2351.59 examples/s]
+Filter:  40%|███▉      | 35000/87622 [00:12<00:20, 2535.67 examples/s]
+Filter:  41%|████      | 36000/87622 [00:12<00:20, 2574.11 examples/s]
+Filter:  42%|████▏     | 37000/87622 [00:13<00:19, 2629.89 examples/s]
+Filter:  43%|████▎     | 38000/87622 [00:13<00:18, 2681.99 examples/s]
+Filter:  45%|████▍     | 39000/87622 [00:13<00:17, 2814.40 examples/s]
+Filter:  46%|████▌     | 40000/87622 [00:14<00:16, 2919.64 examples/s]
+Filter:  47%|████▋     | 41000/87622 [00:14<00:15, 3070.31 examples/s]
+Filter:  48%|████▊     | 42000/87622 [00:14<00:14, 3231.94 examples/s]
+Filter:  49%|████▉     | 43000/87622 [00:15<00:13, 3360.01 examples/s]
+Filter:  50%|█████     | 44000/87622 [00:15<00:12, 3389.13 examples/s]
+Filter:  51%|█████▏    | 45000/87622 [00:15<00:12, 3319.28 examples/s]
+Filter:  52%|█████▏    | 46000/87622 [00:16<00:12, 3321.91 examples/s]
+Filter:  54%|█████▎    | 47000/87622 [00:16<00:12, 3295.49 examples/s]
+Filter:  55%|█████▍    | 48000/87622 [00:16<00:11, 3308.29 examples/s]
+Filter:  56%|█████▌    | 49000/87622 [00:16<00:11, 3355.05 examples/s]
+Filter:  57%|█████▋    | 50000/87622 [00:17<00:11, 3271.69 examples/s]
+Filter:  58%|█████▊    | 51000/87622 [00:17<00:13, 2784.37 examples/s]
+Filter:  59%|█████▉    | 52000/87622 [00:18<00:12, 2961.98 examples/s]
+Filter:  60%|██████    | 53000/87622 [00:18<00:11, 3108.07 examples/s]
+Filter:  62%|██████▏   | 54000/87622 [00:18<00:10, 3201.07 examples/s]
+Filter:  63%|██████▎   | 55000/87622 [00:18<00:10, 3258.93 examples/s]
+Filter:  64%|██████▍   | 56000/87622 [00:19<00:09, 3174.61 examples/s]
+Filter:  65%|██████▌   | 57000/87622 [00:19<00:09, 3218.41 examples/s]
+Filter:  66%|██████▌   | 58000/87622 [00:19<00:09, 3211.95 examples/s]
+Filter:  67%|██████▋   | 59000/87622 [00:20<00:08, 3216.09 examples/s]
+Filter:  68%|██████▊   | 60000/87622 [00:20<00:08, 3265.68 examples/s]
+Filter:  70%|██████▉   | 61000/87622 [00:20<00:08, 3260.62 examples/s]
+Filter:  71%|███████   | 62000/87622 [00:21<00:07, 3263.46 examples/s]
+Filter:  72%|███████▏  | 63000/87622 [00:21<00:07, 3291.87 examples/s]
+Filter:  73%|███████▎  | 64000/87622 [00:21<00:07, 3270.47 examples/s]
+Filter:  74%|███████▍  | 65000/87622 [00:22<00:07, 3105.34 examples/s]
+Filter:  75%|███████▌  | 66000/87622 [00:22<00:07, 2803.65 examples/s]
+Filter:  76%|███████▋  | 67000/87622 [00:22<00:07, 2904.41 examples/s]
+Filter:  78%|███████▊  | 68000/87622 [00:23<00:06, 3012.26 examples/s]
+Filter:  79%|███████▊  | 69000/87622 [00:23<00:07, 2615.81 examples/s]
+Filter:  80%|███████▉  | 70000/87622 [00:23<00:06, 2833.73 examples/s]
+Filter:  81%|████████  | 71000/87622 [00:24<00:05, 2907.87 examples/s]
+Filter:  82%|████████▏ | 72000/87622 [00:24<00:05, 3036.88 examples/s]
+Filter:  83%|████████▎ | 73000/87622 [00:24<00:04, 3177.01 examples/s]
+Filter:  84%|████████▍ | 74000/87622 [00:25<00:04, 3195.91 examples/s]
+Filter:  86%|████████▌ | 75000/87622 [00:25<00:03, 3278.15 examples/s]
+Filter:  87%|████████▋ | 76000/87622 [00:25<00:03, 3215.90 examples/s]
+Filter:  88%|████████▊ | 77000/87622 [00:25<00:03, 3205.88 examples/s]
+Filter:  89%|████████▉ | 78000/87622 [00:26<00:02, 3307.54 examples/s]
+Filter:  90%|█████████ | 79000/87622 [00:26<00:02, 3552.55 examples/s]
+Filter:  91%|█████████▏| 80000/87622 [00:26<00:02, 3722.52 examples/s]
+Filter:  92%|█████████▏| 81000/87622 [00:26<00:01, 3811.45 examples/s]
+Filter:  94%|█████████▎| 82000/87622 [00:27<00:01, 3917.16 examples/s]
+Filter:  95%|█████████▍| 83000/87622 [00:27<00:01, 3979.77 examples/s]
+Filter:  96%|█████████▌| 84000/87622 [00:27<00:00, 3951.40 examples/s]
+Filter:  97%|█████████▋| 85000/87622 [00:28<00:00, 3469.70 examples/s]
+Filter:  98%|█████████▊| 86000/87622 [00:28<00:00, 2769.91 examples/s]
+Filter:  99%|█████████▉| 87000/87622 [00:28<00:00, 2750.18 examples/s]
+Filter: 100%|██████████| 87622/87622 [00:29<00:00, 2813.46 examples/s]
+Filter: 100%|██████████| 87622/87622 [00:29<00:00, 3000.25 examples/s]
+
+Map:   0%|          | 0/128 [00:00<?, ? examples/s]
+Map: 100%|██████████| 128/128 [00:00<00:00, 4063.08 examples/s]
+
+Map:   0%|          | 0/128 [00:00<?, ? examples/s]
+Map: 100%|██████████| 128/128 [00:00<00:00, 2047.57 examples/s]
+WARNING:accelerate.utils.other:Detected kernel version 4.19.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+exact step 0: answers scored 8, mean expected reward 5.242, kl coef 0.0500, update 12.04 s, wall 1791094933.6
+exact step 1: answers scored 8, mean expected reward -7.059, kl coef 0.0500, update 10.86 s, wall 1791094945.3
+exact step 2: answers scored 7, mean expected reward -5.418, kl coef 0.0500, update 9.47 s, wall 1791094955.2
+exact step 3: answers scored 8, mean expected reward -4.245, kl coef 0.0500, update 11.21 s, wall 1791094966.9
+exact step 4: answers scored 8, mean expected reward 0.395, kl coef 0.0500, update 10.66 s, wall 1791094978.1
+exact step 5: answers scored 8, mean expected reward -1.207, kl coef 0.0500, update 10.65 s, wall 1791094989.0
+exact step 6: answers scored 8, mean expected reward 5.508, kl coef 0.0499, update 10.79 s, wall 1791095000.1
+exact step 7: answers scored 8, mean expected reward 6.102, kl coef 0.0499, update 10.71 s, wall 1791095011.2
+exact step 8: answers scored 8, mean expected reward 6.615, kl coef 0.0499, update 10.81 s, wall 1791095022.4
+exact step 9: answers scored 8, mean expected reward 5.465, kl coef 0.0499, update 10.81 s, wall 1791095033.6
+exact step 10: answers scored 8, mean expected reward 4.406, kl coef 0.0499, update 11.07 s, wall 1791095045.3
+exact step 11: answers scored 8, mean expected reward 6.632, kl coef 0.0499, update 10.83 s, wall 1791095056.5
+exact step 12: answers scored 8, mean expected reward 4.034, kl coef 0.0499, update 10.85 s, wall 1791095067.8
+exact step 13: answers scored 8, mean expected reward 6.639, kl coef 0.0499, update 10.89 s, wall 1791095079.1
+exact step 14: answers scored 8, mean expected reward 6.178, kl coef 0.0499, update 10.99 s, wall 1791095090.4
+exact step 15: answers scored 8, mean expected reward 5.530, kl coef 0.0499, update 11.19 s, wall 1791095102.7
+Finished epoch 0. Average reward: 2.8656827600922172
+Finished Training!
+Best avg reward 2.8656827600922172 in epoch 0

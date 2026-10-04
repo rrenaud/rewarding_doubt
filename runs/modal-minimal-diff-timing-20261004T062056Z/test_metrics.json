@@ -1,0 +1,29 @@
+{
+ "exact_fast-s1": {
+  "model": "/vol/outputs/minimal-diff-timing-20261004T062056Z/exact_fast-s1/model_finetuned_epoch1",
+  "n": 64,
+  "wrong_format_rate": 0.015625,
+  "ece": 0.5587306618690491,
+  "accuracy": 0.31746031746031744,
+  "auroc": 0.5232558139534884,
+  "brier": 0.5317460317460317
+ },
+ "exact-s1": {
+  "model": "/vol/outputs/minimal-diff-timing-20261004T062056Z/exact-s1/model_finetuned_epoch1",
+  "n": 64,
+  "wrong_format_rate": 0.03125,
+  "ece": 0.5612906813621521,
+  "accuracy": 0.3064516129032258,
+  "auroc": 0.5593635250917992,
+  "brier": 0.5283870967741935
+ },
+ "ppo-s1": {
+  "model": "/vol/outputs/minimal-diff-timing-20261004T062056Z/ppo-s1/model_finetuned_epoch1",
+  "n": 64,
+  "wrong_format_rate": 0.015625,
+  "ece": 0.6015872955322266,
+  "accuracy": 0.3333333333333333,
+  "auroc": 0.6020408163265306,
+  "brier": 0.5833333333333335
+ }
+}
