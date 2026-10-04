@@ -1,0 +1,20 @@
+{
+ "exact-s1": {
+  "model": "/vol/outputs/minimal-diff-smoke-20261004T030156Z/exact-s1/model_finetuned_epoch2",
+  "n": 64,
+  "wrong_format_rate": 0.015625,
+  "ece": 0.5650797486305237,
+  "accuracy": 0.31746031746031744,
+  "auroc": 0.6186046511627906,
+  "brier": 0.5311111111111111
+ },
+ "ppo-s1": {
+  "model": "/vol/outputs/minimal-diff-smoke-20261004T030156Z/ppo-s1/model_finetuned_epoch2",
+  "n": 64,
+  "wrong_format_rate": 0.015625,
+  "ece": 0.6190475821495056,
+  "accuracy": 0.3333333333333333,
+  "auroc": 0.5736961451247166,
+  "brier": 0.6111111111111113
+ }
+}

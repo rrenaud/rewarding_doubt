@@ -286,7 +286,8 @@ def unsampled_metrics(tokenizer, captured, results):
     from util.EvaluationMetrics import Metric, is_answer_correct
 
     numbers = [tokenizer.encode(f": {k}", add_special_tokens=False)[-1] for k in range(11)]
-    assert len(set(numbers)) == 11, "each level 0..10 must be a single token"
+    if len(set(numbers)) != 11:
+        return None  # "10" is several tokens (Qwen): the one-softmax readout does not apply
     confidence_token = tokenizer.convert_tokens_to_ids("ĠConfidence")
     rows = [(seq, logits) for tokens, step_logits in captured for seq, logits in zip(tokens, step_logits)]
     if len(rows) != len(results):
@@ -544,7 +545,8 @@ def main():
         Train.evaluate_model = lambda *a, **k: (0.0, 0.0) if epoch_skipped() else original_evaluate(*a, **k)
         Train.train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize,
                     model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset,
-                    log_with=args.log_with, is_unsloth=args.is_unsloth)
+                    log_with=args.log_with, is_unsloth=args.is_unsloth,
+                    **({"objective": args.objective} if hasattr(args, "objective") else {}))  # patches/exact_confidence.patch
         write_status(args.out_dir, "completed", step=count[0], flags=sorted(monitor.raised))
         tracker.finish()
     elif command == "evaluate":
@@ -594,7 +596,7 @@ def main():
                        accuracy=QAResults_to_accuracy(results, **settings),
                        auroc=QAResults_to_auroc_score(results, **settings),
                        brier=QAResults_to_brier_score(results, **settings))
-        metrics.update(unsampled_metrics(loaded["tokenizer"], captured, results))
+        metrics.update(unsampled_metrics(loaded["tokenizer"], captured, results) or {})
         json.dump(metrics, open(out_path.replace(".json", "_metrics.json"), "w"), indent=2)
         print(json.dumps(metrics))
     else:

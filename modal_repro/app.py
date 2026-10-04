@@ -35,6 +35,10 @@ image = (
         f"git -C /opt/RewardingDoubt checkout {COMMIT}",
         "pip install --no-cache-dir -r /opt/RewardingDoubt/requirements.txt",
     )
+    # The minimal-diff exact-confidence option for the released Train.py (--objective exact; default ppo
+    # leaves the released behaviour unchanged). See patches/exact_confidence.patch.
+    .add_local_file(Path(__file__).parents[1] / "patches" / "exact_confidence.patch", "/opt/exact_confidence.patch", copy=True)
+    .run_commands("git -C /opt/RewardingDoubt apply /opt/exact_confidence.patch")
     .add_local_file(Path(__file__).parent / "subset.py", f"{CODE}/subset.py", copy=True)
     .add_local_file(Path(__file__).parent / "exact_llama.py", f"{CODE}/exact_llama.py", copy=True)
     .add_local_file(Path(__file__).parent / "shared_prefix.py", f"{CODE}/shared_prefix.py", copy=True)
@@ -982,4 +986,44 @@ def verify_levels(gpu: str = "L40S", debug: bool = False):
     r = train_with_snapshots.with_options(gpu=gpu).remote({"train": [], "validation": []}, "verify",
         ["debug_levels.py", "unsloth/Qwen2.5-3B-Instruct"] if debug else ["verify_levels.py", "unsloth/Qwen2.5-3B-Instruct", MODEL], run)
     print("exit", r["exit_code"]); print("\n".join(l for l in r["log"].splitlines() if l.startswith(("{", "first", "P(", "batching")) or l[:2].strip().isdigit() or "Error" in l))
+
+
+@app.local_entrypoint()
+def minimal_diff(train_limit: int = 1024, eval_limit: int = 0, seeds: str = "1,2,3", epochs: int = 2, gpu: str = "L40S",
+                 model: str = "unsloth/Qwen2.5-3B-Instruct", tag: str = ""):
+    """The released Train.py with patches/exact_confidence.patch: --objective exact vs ppo, otherwise as
+    released (exact-match reward grading, adaptive KL, ppo_epochs 4, lr 1e-5, batch 8), then the released
+    inference + metrics on the 512 test questions (subset.py evaluate) for each final epoch adapter."""
+    root = Path(__file__).resolve().parents[1]
+    data = root / "runs/pilot-20261001T002945Z/data"
+    train = [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()][:train_limit]
+    test = [json.loads(l)["id"] for l in (data / "eval.jsonl").read_text().splitlines()][:eval_limit or None]
+    ids = {"train": train, "validation": test}
+    run = f"minimal-diff{tag}-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    jobs = []
+    for objective in ("exact", "ppo"):
+        for s in seeds.split(","):
+            jobs.append((ids, f"{objective}-s{s}", ["subset.py", "train", "IDS_JSON", "--seed", s, "--",
+                         "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", model, "--tokenizer_dir", model,
+                         "--epochs", str(epochs), "--lr", "1e-05", "--batchsize", "8", "--log_with", "tensorboard", "--objective", objective], run))
+    out = root / "runs" / f"modal-{run}"
+    out.mkdir(parents=True, exist_ok=True)
+    trained = []
+    for r in train_with_snapshots.with_options(gpu=gpu).starmap(jobs, return_exceptions=True, order_outputs=False):
+        if isinstance(r, Exception):
+            print("TRAIN FAILED", repr(r)[:800]); continue
+        (out / f"{r['label']}.log").write_text(r["log"])
+        print(f"trained {r['label']}: exit {r['exit_code']}", flush=True)
+        if r["exit_code"] == 0:
+            trained.append(r["label"])
+    results = {}
+    dirs = [f"{VOL}/outputs/{run}/{label}/model_finetuned_epoch{epochs}" for label in trained]
+    for r in evaluate_test.with_options(gpu=gpu).starmap([({"validation": test}, d) for d in dirs], return_exceptions=True):
+        if isinstance(r, Exception) or "error" in r:
+            print("EVAL FAILED", r if isinstance(r, Exception) else r["error"][-800:]); continue
+        results[r["model_dir"].split("/")[-2]] = r["metrics"]
+    (out / "test_metrics.json").write_text(json.dumps(results, indent=1) + "\n")
+    for label, m in sorted(results.items()):
+        print(label, {k: round(v, 3) for k, v in m.items() if isinstance(v, float)})
+    print(f"done: {out}")
 

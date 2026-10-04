@@ -1,0 +1,195 @@
+diff --git a/SingleAnswerSetting/InferenceDatasetSplit.py b/SingleAnswerSetting/InferenceDatasetSplit.py
+index 6ae7d99..b7e3185 100644
+--- a/SingleAnswerSetting/InferenceDatasetSplit.py
++++ b/SingleAnswerSetting/InferenceDatasetSplit.py
+@@ -4,6 +4,7 @@ import torch
+ from tqdm.auto import tqdm
+ import argparse
+ from util.ModelLoader import load_model_tokenizer
++from util.ExactConfidence import end_of_turn
+ 
+ from util.DataHelper import DataCollatorForTokenizedQueries, load_prepared_dataset
+ from util.ResponseHandling import response_to_QAResult, save_QAResults
+@@ -21,7 +22,7 @@ def inference_dataset(model_dir: str, is_unsloth_model: bool, dataset: str, spli
+     # Prepare generation
+     generation_kwargs_prediction = {
+         "max_new_tokens": 32,
+-        "eos_token_id": [tokenizer.eos_token_id,tokenizer.convert_tokens_to_ids("<|eot_id|>")],
++        "eos_token_id": [tokenizer.eos_token_id,end_of_turn(tokenizer)],
+         "do_sample": True,
+         "temperature": 0.6,
+         "top_p": 0.9,
+diff --git a/SingleAnswerSetting/Train.py b/SingleAnswerSetting/Train.py
+index 0bcc1e8..5e4f7d9 100644
+--- a/SingleAnswerSetting/Train.py
++++ b/SingleAnswerSetting/Train.py
+@@ -19,6 +19,7 @@ from util.ResponseHandling import response_to_QAResult
+ from util.RLHelper import QAResult_to_reward
+ from util.util import remove_padding
+ from util.ModelLoader import load_lora_model_tokenizer, load_model_tokenizer
++from util.ExactConfidence import end_of_turn, exact_confidence_step
+ 
+ torch.manual_seed(2)
+ 
+@@ -44,7 +45,7 @@ def evaluate_model(model, dataloader, tokenizer, generation_kwargs, device) -> T
+     
+     return np.mean(rewards_epoch), np.std(rewards_epoch)
+ 
+-def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str, tokenizer_dir: str, dataset: str, log_with: str = "tensorboard", is_unsloth: bool = True, use_lora: bool = True) -> None: 
++def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str, tokenizer_dir: str, dataset: str, log_with: str = "tensorboard", is_unsloth: bool = True, use_lora: bool = True, objective: str = "ppo") -> None: 
+     if not os.path.exists(out_dir):
+         os.mkdir(out_dir)
+ 
+@@ -99,13 +100,13 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,
+ 
+     prediction_terminators = [
+         tokenizer.eos_token_id,
+-        tokenizer.convert_tokens_to_ids("<|eot_id|>"),
++        end_of_turn(tokenizer),
+         tokenizer.convert_tokens_to_ids("ĠConfidence")
+     ]
+ 
+     ppo_terminators = [
+         tokenizer.eos_token_id,
+-        tokenizer.convert_tokens_to_ids("<|eot_id|>"),
++        end_of_turn(tokenizer),
+     ]
+ 
+     generation_kwargs_prediction = {
+@@ -130,7 +131,7 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,
+ 
+     eval_terminators = [
+         tokenizer.eos_token_id,
+-        tokenizer.convert_tokens_to_ids("<|eot_id|>"),
++        end_of_turn(tokenizer),
+     ]
+ 
+     generation_kwargs_eval = {
+@@ -164,6 +165,16 @@ def train(out_dir: str, lr: float, epochs: int, batchsize: int, model_dir: str,
+             prediction = model.generate(input_ids=input_ids, attention_mask=attention_mask, **generation_kwargs_prediction)
+             prediction = [remove_padding(p, tokenizer.pad_token_id) for p in prediction]
+ 
++            if objective == "exact":  # score all 11 confidences exactly instead of sampling one (util/ExactConfidence.py)
++                if is_unsloth:
++                    FastLanguageModel.for_training(model.pretrained_model)
++                prompt_lengths = [int(m.sum()) for m in attention_mask]
++                expected = exact_confidence_step(ppo_trainer, tokenizer, [p[len(input_ids[i]) - prompt_lengths[i]:] for i, p in enumerate(prediction)],
++                                                 prompt_lengths, questions, gt_candidates, is_multiple_choice)
++                rewards_epoch += expected
++                print(f"exact step {idx}: answers scored {len(expected)}, mean expected reward {np.mean(expected) if expected else float('nan'):.3f}, kl coef {ppo_trainer.kl_ctl.value:.4f}", flush=True)
++                continue
++
+             # Generate confidence
+             if not is_unsloth:
+                 model.train()
+@@ -234,6 +245,7 @@ def setup_parser():
+     parser.add_argument("--log_with", type=str, default="tensorboard")
+     parser.add_argument("--dataset", type=str, default="medqa")
+     parser.add_argument("--is_unsloth", action='store_true')
++    parser.add_argument("--objective", choices=["ppo", "exact"], default="ppo", help="exact: util/ExactConfidence.py instead of the PPO step")
+ 
+     return parser
+ 
+@@ -241,4 +253,4 @@ def setup_parser():
+ if __name__ == "__main__":
+     parser = setup_parser()
+     args = parser.parse_args()
+-    train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize, model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset, log_with=args.log_with, is_unsloth=args.is_unsloth)
++    train(args.out_dir, lr=args.lr, epochs=args.epochs, batchsize=args.batchsize, model_dir=args.model_dir, tokenizer_dir=args.tokenizer_dir, dataset=args.dataset, log_with=args.log_with, is_unsloth=args.is_unsloth, objective=args.objective)
+diff --git a/SingleAnswerSetting/util/ExactConfidence.py b/SingleAnswerSetting/util/ExactConfidence.py
+new file mode 100644
+index 0000000..ab0c82e
+--- /dev/null
++++ b/SingleAnswerSetting/util/ExactConfidence.py
+@@ -0,0 +1,91 @@
++"""Exact-gradient alternative to the PPO step: the confidence is one of 11 strings ": k<eot>", so
++its expected reward can be computed exactly instead of estimated from one sampled response.
++
++For each answer that ends in " Confidence", score the 11 completions with the policy and with the
++reference (the LoRA adapter disabled, as TRL's reference for PEFT models):
++    J  = sum_k p(k) R(k) + (1 - sum_k p(k)) * wrong_format_penalty
++    KL = KL(p || p_ref) over the 12 outcomes (the 11 levels and "anything else")
++    loss = -(J - beta * KL),   beta = the PPO trainer's adaptive KL coefficient
++R(k) is QAResult_to_reward for confidence k, exactly as Train.py rewards a sampled response, so the
++reward, format penalty, KL controller, optimizer, LoRA and data are all unchanged; only the gradient
++estimator differs. No value head, advantage estimate or sampling of the confidence is needed.
++The update loop mirrors PPO's: ppo_epochs passes over the batch in minibatches of mini_batch_size.
++"""
++import math
++import random
++
++import torch
++
++from util.ResponseHandling import QAResult, response_to_QAResult
++from util.RLHelper import QAResult_to_reward, wrong_format_penalty
++
++
++def end_of_turn(tokenizer):
++    """Llama-3's <|eot_id|>, or the tokenizer's EOS where that token does not exist (Qwen: <|im_end|>)."""
++    eot = tokenizer.convert_tokens_to_ids("<|eot_id|>")
++    return eot if eot is not None and eot != tokenizer.unk_token_id else tokenizer.eos_token_id
++
++
++def _level_logps(lm, prefix, candidates, pad):
++    """log P(candidate | prefix) for each candidate token list, one batched forward."""
++    seqs = [prefix + c for c in candidates]
++    width = max(map(len, seqs))
++    ids = torch.tensor([s + [pad] * (width - len(s)) for s in seqs], device=next(lm.parameters()).device)
++    logits = lm(input_ids=ids).logits
++    out = []
++    for b, c in enumerate(candidates):
++        span = logits[b, len(prefix) - 1:len(prefix) - 1 + len(c)].float().log_softmax(-1)
++        out.append(span.gather(-1, torch.tensor(c, device=next(lm.parameters()).device)[:, None]).sum())
++    return torch.stack(out)
++
++
++def exact_confidence_step(ppo_trainer, tokenizer, predictions, prompt_lengths, questions, gt_candidates,
++                          is_multiple_choice, rng=random.Random(0)):
++    """One exact update on a batch of generated answers. Returns per-answer expected rewards."""
++    model, config = ppo_trainer.model, ppo_trainer.config
++    lm = model.pretrained_model
++    eot = end_of_turn(tokenizer)
++    confidence = tokenizer.convert_tokens_to_ids("ĠConfidence")
++    candidates = [tokenizer.encode(f": {k}", add_special_tokens=False) + [eot] for k in range(11)]
++    rows = []
++    for prediction, n, question, gt, mc in zip(predictions, prompt_lengths, questions, gt_candidates, is_multiple_choice):
++        prefix = prediction.tolist()
++        if prefix[-1] != confidence:
++            continue  # the answer never reached " Confidence": every completion is malformed, no gradient
++        answer = response_to_QAResult(question, tokenizer.decode(prefix[n:], skip_special_tokens=True) + ": 0", gt, mc)
++        if answer.prediction is None:
++            continue
++        rewards = torch.tensor([QAResult_to_reward(QAResult(question, answer.prediction, k, gt, mc, False))
++                                for k in range(11)], device=next(lm.parameters()).device)
++        with torch.no_grad(), lm.disable_adapter():
++            reference = _level_logps(lm, prefix, candidates, tokenizer.pad_token_id)
++        rows.append((prefix, rewards, reference))
++    if not rows:
++        return []
++    beta = ppo_trainer.kl_ctl.value
++
++    def objective(prefix, rewards, reference):
++        logp = _level_logps(lm, prefix, candidates, tokenizer.pad_token_id)
++        p, p_ref = logp.exp(), reference.exp()
++        p_other, p_other_ref = (1 - p.sum()).clamp(min=1e-8), (1 - p_ref.sum()).clamp(min=1e-8)
++        expected = (p * rewards).sum() + p_other * wrong_format_penalty
++        kl = (p * (logp - reference)).sum() + p_other * (p_other.log() - p_other_ref.log())
++        return expected, kl
++
++    model.train()
++    stats = []
++    for epoch in range(config.ppo_epochs):
++        order = list(range(len(rows)))
++        rng.shuffle(order)
++        for start in range(0, len(order), config.mini_batch_size):
++            ppo_trainer.optimizer.zero_grad()
++            chunk = order[start:start + config.mini_batch_size]
++            for i in chunk:
++                expected, kl = objective(*rows[i])
++                (-(expected - beta * kl) / len(chunk)).backward()
++                if epoch == 0:
++                    stats.append((expected.item(), kl.item()))
++            ppo_trainer.optimizer.step()
++    mean_kl = sum(kl for _, kl in stats) / len(stats)
++    ppo_trainer.kl_ctl.update(mean_kl, config.batch_size)
++    return [expected for expected, _ in stats]
