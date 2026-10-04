@@ -1060,3 +1060,14 @@ def exact_hooks_test(gpu: str = "L40S"):
     for path, text in files.items():
         print("--", Path(path).name); print(text[-1200:])
 
+
+@app.local_entrypoint()
+def eval_one(model_dir: str, split: str = "dev", gpu: str = "L40S"):
+    """The released evaluation of one adapter directory on the volume, on the 512 dev or 512 test questions."""
+    root = Path(__file__).resolve().parents[1]
+    data = root / "runs/pilot-20261001T002945Z/data"
+    ids = (json.loads((root / "runs/hparam-search-20261002T044831Z/dev_ids.json").read_text()) if split == "dev"
+           else [json.loads(l)["id"] for l in (data / "eval.jsonl").read_text().splitlines()])
+    r = evaluate_test.with_options(gpu=gpu).remote({"validation": ids}, model_dir)
+    print(json.dumps(r.get("metrics") or r.get("error", "")[-2000:], indent=1))
+
