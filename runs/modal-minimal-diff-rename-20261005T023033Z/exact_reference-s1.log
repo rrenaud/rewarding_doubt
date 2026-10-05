@@ -1,0 +1,18 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.42 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+WARNING:root:The `device_map` argument is not provided. We will override the device_map argument. to set the entire model on the current device. If you want to set the model on multiple devices, please provide a custom `device_map` argument.
+WARNING:accelerate.utils.other:Detected kernel version 4.19.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+exact step 0: answers scored 8, mean expected reward -3.296, kl coef 0.0500, update 13.89 s, wall 1791167490.7
+exact step 1: answers scored 8, mean expected reward -0.065, kl coef 0.0500, update 12.84 s, wall 1791167504.0
+exact step 2: answers scored 8, mean expected reward 3.892, kl coef 0.0500, update 12.06 s, wall 1791167516.8
+exact step 3: answers scored 8, mean expected reward 0.997, kl coef 0.0500, update 12.50 s, wall 1791167530.3
+Finished epoch 0. Average reward: 0.3819036493077874
+Finished Training!
+Best avg reward 0.3819036493077874 in epoch 0
