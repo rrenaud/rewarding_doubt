@@ -1,0 +1,6 @@
+2026-10-04T20:05:57Z attempt start (image 8d32c44f530a305aebdfc5d48bc06a0c0bbb0e47): python subset.py train /workspace/runs/klgrid-exact-kl0/ids.json --seed 1 --save-every 500 --checkpoint-every 200 --max-steps 3000 --no-kl -- --out_dir /workspace/runs/klgrid-exact-kl0 --dataset triviaqa --is_unsloth --model_dir unsloth/Qwen2.5-3B-Instruct --tokenizer_dir unsloth/Qwen2.5-3B-Instruct --epochs 2 --lr 1e-05 --batchsize 8 --log_with tensorboard --objective exact_fast
+2026-10-04T23:37:06Z trainer exited with code 0
+2026-10-04T23:37:06Z post: python /opt/runpod/eval_snapshots.py /workspace/runs/klgrid-exact-kl0 /workspace/runs/klgrid-exact-kl0/ids.json
+2026-10-04T23:44:49Z outcome: completed
+selfstop: terminate pod cyh1f16wdlux09: HTTP 204
+2026-10-04T23:44:50Z pod terminate requested

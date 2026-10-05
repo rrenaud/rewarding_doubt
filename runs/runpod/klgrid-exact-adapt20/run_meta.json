@@ -1,0 +1,21 @@
+{
+ "expt": "klgrid",
+ "run": "klgrid-exact-adapt20",
+ "trainer": "ppo",
+ "args": {
+  "model_dir": "unsloth/Qwen2.5-3B-Instruct",
+  "tokenizer_dir": "unsloth/Qwen2.5-3B-Instruct",
+  "out_dir": "/workspace/runs/klgrid-exact-adapt20",
+  "lr": 1e-05,
+  "epochs": 2,
+  "batchsize": 8,
+  "log_with": "tensorboard",
+  "dataset": "triviaqa",
+  "is_unsloth": true,
+  "objective": "exact_fast",
+  "wrapper_options": "--seed 1 --save-every 500 --checkpoint-every 200 --max-steps 3000 --ppo target=20"
+ },
+ "image_git_sha": "8d32c44f530a305aebdfc5d48bc06a0c0bbb0e47",
+ "started": "2026-10-04T20:06:10Z",
+ "resumed_at_steps": []
+}

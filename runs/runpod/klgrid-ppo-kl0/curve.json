@@ -1,0 +1,56 @@
+{
+ "500": {
+  "model": "/workspace/runs/klgrid-ppo-kl0/snapshot-step00500",
+  "n": 512,
+  "wrong_format_rate": 0.005859375,
+  "ece": 0.13555908203125,
+  "accuracy": 0.3988212180746562,
+  "auroc": 0.8250346115457676,
+  "brier": 0.18605108055009822
+ },
+ "1000": {
+  "model": "/workspace/runs/klgrid-ppo-kl0/snapshot-step01000",
+  "n": 512,
+  "wrong_format_rate": 0.005859375,
+  "ece": 0.12082454562187195,
+  "accuracy": 0.3968565815324165,
+  "auroc": 0.8288370367981424,
+  "brier": 0.17903732809430253
+ },
+ "1500": {
+  "model": "/workspace/runs/klgrid-ppo-kl0/snapshot-step01500",
+  "n": 512,
+  "wrong_format_rate": 0.013671875,
+  "ece": 0.14138521254062653,
+  "accuracy": 0.4,
+  "auroc": 0.8428013593438551,
+  "brier": 0.17093069306930692
+ },
+ "2000": {
+  "model": "/workspace/runs/klgrid-ppo-kl0/snapshot-step02000",
+  "n": 512,
+  "wrong_format_rate": 0.005859375,
+  "ece": 0.14204229414463043,
+  "accuracy": 0.3968565815324165,
+  "auroc": 0.8263940400554715,
+  "brier": 0.18064833005893907
+ },
+ "2500": {
+  "model": "/workspace/runs/klgrid-ppo-kl0/snapshot-step02500",
+  "n": 512,
+  "wrong_format_rate": 0.0078125,
+  "ece": 0.09015733003616333,
+  "accuracy": 0.39763779527559057,
+  "auroc": 0.8673154080113894,
+  "brier": 0.15543307086614175
+ },
+ "3000": {
+  "model": "/workspace/runs/klgrid-ppo-kl0/snapshot-step03000",
+  "n": 512,
+  "wrong_format_rate": 0.0078125,
+  "ece": 0.07342527061700821,
+  "accuracy": 0.38188976377952755,
+  "auroc": 0.8799330225228184,
+  "brier": 0.14265748031496062
+ }
+}

@@ -1,0 +1,6 @@
+2026-10-04T20:05:22Z attempt start (image 8d32c44f530a305aebdfc5d48bc06a0c0bbb0e47): python subset.py train /workspace/runs/klgrid-ppo-adapt20/ids.json --seed 1 --save-every 500 --checkpoint-every 200 --max-steps 3000 --fast --ppo target=20 -- --out_dir /workspace/runs/klgrid-ppo-adapt20 --dataset triviaqa --is_unsloth --model_dir unsloth/Qwen2.5-3B-Instruct --tokenizer_dir unsloth/Qwen2.5-3B-Instruct --epochs 2 --lr 1e-05 --batchsize 8 --log_with tensorboard
+2026-10-04T22:18:24Z trainer exited with code 0
+2026-10-04T22:18:24Z post: python /opt/runpod/eval_snapshots.py /workspace/runs/klgrid-ppo-adapt20 /workspace/runs/klgrid-ppo-adapt20/ids.json
+2026-10-04T22:22:16Z outcome: completed
+selfstop: terminate pod atcunjcpql3ut9: HTTP 204
+2026-10-04T22:22:17Z pod terminate requested

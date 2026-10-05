@@ -1,0 +1,144 @@
+evaluating snapshot-step00500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:06<00:06,  6.18s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:10<00:00,  4.94s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:10<00:00,  5.13s/it]
+unsloth/qwen2.5-3b-instruct does not have a padding token! Will use pad_token = <|vision_pad|>.
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+  0%|          | 0/16 [00:00<?, ?it/s]  6%|▋         | 1/16 [00:01<00:19,  1.33s/it] 12%|█▎        | 2/16 [00:02<00:15,  1.10s/it] 19%|█▉        | 3/16 [00:03<00:14,  1.10s/it] 25%|██▌       | 4/16 [00:04<00:11,  1.07it/s] 31%|███▏      | 5/16 [00:05<00:11,  1.02s/it] 38%|███▊      | 6/16 [00:06<00:10,  1.09s/it] 44%|████▍     | 7/16 [00:07<00:09,  1.06s/it] 50%|█████     | 8/16 [00:08<00:08,  1.11s/it] 56%|█████▋    | 9/16 [00:09<00:07,  1.13s/it] 62%|██████▎   | 10/16 [00:11<00:06,  1.14s/it] 69%|██████▉   | 11/16 [00:12<00:05,  1.15s/it] 75%|███████▌  | 12/16 [00:13<00:04,  1.20s/it] 81%|████████▏ | 13/16 [00:14<00:03,  1.19s/it] 88%|████████▊ | 14/16 [00:15<00:02,  1.19s/it] 94%|█████████▍| 15/16 [00:16<00:01,  1.11s/it]100%|██████████| 16/16 [00:17<00:00,  1.06s/it]100%|██████████| 16/16 [00:17<00:00,  1.11s/it]
+{"model": "/workspace/runs/klgrid-ppo-adapt20/snapshot-step00500", "n": 512, "wrong_format_rate": 0.005859375, "ece": 0.10962703824043274, "accuracy": 0.3929273084479371, "auroc": 0.841472491909385, "brier": 0.1695088408644401}
+500 {'wrong_format_rate': 0.0059, 'ece': 0.1096, 'accuracy': 0.3929, 'auroc': 0.8415, 'brier': 0.1695}
+evaluating snapshot-step01000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.58it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.80it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.76it/s]
+unsloth/qwen2.5-3b-instruct does not have a padding token! Will use pad_token = <|vision_pad|>.
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+  0%|          | 0/16 [00:00<?, ?it/s]  6%|▋         | 1/16 [00:01<00:23,  1.55s/it] 12%|█▎        | 2/16 [00:02<00:14,  1.03s/it] 19%|█▉        | 3/16 [00:03<00:13,  1.05s/it] 25%|██▌       | 4/16 [00:04<00:13,  1.11s/it] 31%|███▏      | 5/16 [00:05<00:12,  1.13s/it] 38%|███▊      | 6/16 [00:06<00:11,  1.19s/it] 44%|████▍     | 7/16 [00:07<00:10,  1.13s/it] 50%|█████     | 8/16 [00:09<00:09,  1.15s/it] 56%|█████▋    | 9/16 [00:10<00:08,  1.16s/it] 62%|██████▎   | 10/16 [00:11<00:06,  1.16s/it] 69%|██████▉   | 11/16 [00:12<00:05,  1.16s/it] 75%|███████▌  | 12/16 [00:13<00:04,  1.20s/it] 81%|████████▏ | 13/16 [00:15<00:03,  1.19s/it] 88%|████████▊ | 14/16 [00:15<00:02,  1.08s/it] 94%|█████████▍| 15/16 [00:17<00:01,  1.10s/it]100%|██████████| 16/16 [00:18<00:00,  1.08s/it]100%|██████████| 16/16 [00:18<00:00,  1.13s/it]
+{"model": "/workspace/runs/klgrid-ppo-adapt20/snapshot-step01000", "n": 512, "wrong_format_rate": 0.005859375, "ece": 0.0783892348408699, "accuracy": 0.40078585461689586, "auroc": 0.8559787849566056, "brier": 0.15679764243614933}
+1000 {'wrong_format_rate': 0.0059, 'ece': 0.0784, 'accuracy': 0.4008, 'auroc': 0.856, 'brier': 0.1568}
+evaluating snapshot-step01500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.64it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.83it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.80it/s]
+unsloth/qwen2.5-3b-instruct does not have a padding token! Will use pad_token = <|vision_pad|>.
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+  0%|          | 0/16 [00:00<?, ?it/s]  6%|▋         | 1/16 [00:01<00:25,  1.69s/it] 12%|█▎        | 2/16 [00:02<00:19,  1.37s/it] 19%|█▉        | 3/16 [00:04<00:16,  1.28s/it] 25%|██▌       | 4/16 [00:05<00:14,  1.24s/it] 31%|███▏      | 5/16 [00:06<00:13,  1.22s/it] 38%|███▊      | 6/16 [00:07<00:12,  1.24s/it] 44%|████▍     | 7/16 [00:08<00:11,  1.23s/it] 50%|█████     | 8/16 [00:10<00:09,  1.22s/it] 56%|█████▋    | 9/16 [00:11<00:08,  1.20s/it] 62%|██████▎   | 10/16 [00:12<00:07,  1.19s/it] 69%|██████▉   | 11/16 [00:13<00:05,  1.18s/it] 75%|███████▌  | 12/16 [00:14<00:04,  1.22s/it] 81%|████████▏ | 13/16 [00:16<00:03,  1.20s/it] 88%|████████▊ | 14/16 [00:16<00:02,  1.07s/it] 94%|█████████▍| 15/16 [00:17<00:01,  1.10s/it]100%|██████████| 16/16 [00:19<00:00,  1.13s/it]100%|██████████| 16/16 [00:19<00:00,  1.20s/it]
+{"model": "/workspace/runs/klgrid-ppo-adapt20/snapshot-step01500", "n": 512, "wrong_format_rate": 0.009765625, "ece": 0.14792975783348083, "accuracy": 0.40631163708086787, "auroc": 0.8385640099345224, "brier": 0.18820512820512825}
+1500 {'wrong_format_rate': 0.0098, 'ece': 0.1479, 'accuracy': 0.4063, 'auroc': 0.8386, 'brier': 0.1882}
+evaluating snapshot-step02000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.63it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.81it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.78it/s]
+unsloth/qwen2.5-3b-instruct does not have a padding token! Will use pad_token = <|vision_pad|>.
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+  0%|          | 0/16 [00:00<?, ?it/s]  6%|▋         | 1/16 [00:01<00:25,  1.68s/it] 12%|█▎        | 2/16 [00:02<00:19,  1.38s/it] 19%|█▉        | 3/16 [00:04<00:16,  1.28s/it] 25%|██▌       | 4/16 [00:05<00:14,  1.25s/it] 31%|███▏      | 5/16 [00:06<00:13,  1.22s/it] 38%|███▊      | 6/16 [00:07<00:12,  1.24s/it] 44%|████▍     | 7/16 [00:08<00:11,  1.22s/it] 50%|█████     | 8/16 [00:10<00:09,  1.22s/it] 56%|█████▋    | 9/16 [00:11<00:08,  1.21s/it] 62%|██████▎   | 10/16 [00:12<00:07,  1.19s/it] 69%|██████▉   | 11/16 [00:13<00:05,  1.18s/it] 75%|███████▌  | 12/16 [00:14<00:04,  1.21s/it] 81%|████████▏ | 13/16 [00:16<00:03,  1.20s/it] 88%|████████▊ | 14/16 [00:17<00:02,  1.20s/it] 94%|█████████▍| 15/16 [00:18<00:01,  1.19s/it]100%|██████████| 16/16 [00:19<00:00,  1.19s/it]100%|██████████| 16/16 [00:19<00:00,  1.22s/it]
+{"model": "/workspace/runs/klgrid-ppo-adapt20/snapshot-step02000", "n": 512, "wrong_format_rate": 0.005859375, "ece": 0.11630690097808838, "accuracy": 0.3988212180746562, "auroc": 0.8547039505457357, "brier": 0.16950884086444007}
+2000 {'wrong_format_rate': 0.0059, 'ece': 0.1163, 'accuracy': 0.3988, 'auroc': 0.8547, 'brier': 0.1695}
+evaluating snapshot-step02500
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.62it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.81it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.78it/s]
+unsloth/qwen2.5-3b-instruct does not have a padding token! Will use pad_token = <|vision_pad|>.
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+  0%|          | 0/16 [00:00<?, ?it/s]  6%|▋         | 1/16 [00:01<00:24,  1.66s/it] 12%|█▎        | 2/16 [00:02<00:17,  1.27s/it] 19%|█▉        | 3/16 [00:03<00:15,  1.22s/it] 25%|██▌       | 4/16 [00:04<00:12,  1.01s/it] 31%|███▏      | 5/16 [00:05<00:11,  1.07s/it] 38%|███▊      | 6/16 [00:06<00:11,  1.15s/it] 44%|████▍     | 7/16 [00:08<00:10,  1.17s/it] 50%|█████     | 8/16 [00:09<00:09,  1.18s/it] 56%|█████▋    | 9/16 [00:10<00:08,  1.18s/it] 62%|██████▎   | 10/16 [00:11<00:07,  1.17s/it] 69%|██████▉   | 11/16 [00:12<00:05,  1.17s/it] 75%|███████▌  | 12/16 [00:14<00:04,  1.21s/it] 81%|████████▏ | 13/16 [00:15<00:03,  1.20s/it] 88%|████████▊ | 14/16 [00:16<00:02,  1.20s/it] 94%|█████████▍| 15/16 [00:17<00:01,  1.18s/it]100%|██████████| 16/16 [00:18<00:00,  1.18s/it]100%|██████████| 16/16 [00:18<00:00,  1.18s/it]
+{"model": "/workspace/runs/klgrid-ppo-adapt20/snapshot-step02500", "n": 512, "wrong_format_rate": 0.013671875, "ece": 0.1400001347064972, "accuracy": 0.39603960396039606, "auroc": 0.8632950819672132, "brier": 0.16734653465346536}
+2500 {'wrong_format_rate': 0.0137, 'ece': 0.14, 'accuracy': 0.396, 'auroc': 0.8633, 'brier': 0.1673}
+evaluating snapshot-step03000
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA GeForce RTX 4090. Max memory: 23.516 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.63it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.83it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.80it/s]
+unsloth/qwen2.5-3b-instruct does not have a padding token! Will use pad_token = <|vision_pad|>.
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+  0%|          | 0/16 [00:00<?, ?it/s]  6%|▋         | 1/16 [00:01<00:23,  1.55s/it] 12%|█▎        | 2/16 [00:02<00:18,  1.32s/it] 19%|█▉        | 3/16 [00:03<00:16,  1.25s/it] 25%|██▌       | 4/16 [00:05<00:14,  1.23s/it] 31%|███▏      | 5/16 [00:06<00:13,  1.21s/it] 38%|███▊      | 6/16 [00:07<00:12,  1.24s/it] 44%|████▍     | 7/16 [00:08<00:11,  1.23s/it] 50%|█████     | 8/16 [00:09<00:09,  1.22s/it] 56%|█████▋    | 9/16 [00:11<00:08,  1.20s/it] 62%|██████▎   | 10/16 [00:12<00:07,  1.19s/it] 69%|██████▉   | 11/16 [00:13<00:05,  1.18s/it] 75%|███████▌  | 12/16 [00:14<00:04,  1.16s/it] 81%|████████▏ | 13/16 [00:15<00:03,  1.16s/it] 88%|████████▊ | 14/16 [00:16<00:02,  1.08s/it] 94%|█████████▍| 15/16 [00:17<00:01,  1.10s/it]100%|██████████| 16/16 [00:18<00:00,  1.13s/it]100%|██████████| 16/16 [00:18<00:00,  1.19s/it]
+{"model": "/workspace/runs/klgrid-ppo-adapt20/snapshot-step03000", "n": 512, "wrong_format_rate": 0.009765625, "ece": 0.1589733213186264, "accuracy": 0.40828402366863903, "auroc": 0.8273590982286634, "brier": 0.1895463510848126}
+3000 {'wrong_format_rate': 0.0098, 'ece': 0.159, 'accuracy': 0.4083, 'auroc': 0.8274, 'brier': 0.1895}
+wandb: Currently logged in as: rrenaud (multi-tokenizer). Use `wandb login --relogin` to force relogin
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Tracking run with wandb version 0.19.2
+wandb: Run data is saved locally in /workspace/runs/klgrid-ppo-adapt20/wandb/run-20261004_222212-1ab8aa1fa75c3e54
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Resuming run klgrid-ppo-adapt20
+wandb: ⭐️ View project at https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: 🚀 View run at https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/1ab8aa1fa75c3e54
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:          eval/accuracy ▁▅▇▄▂█
+wandb:             eval/auroc ▄▇▃▆█▁
+wandb:             eval/brier ▄▁█▄▃█
+wandb:               eval/ece ▄▁▇▄▆█
+wandb:                 eval/n ▁▁▁▁▁▁
+wandb:              eval/step ▁▂▄▅▇█
+wandb: eval/wrong_format_rate ▁▁▅▁█▅
+wandb: 
+wandb: Run summary:
+wandb:                   eval/accuracy 0.40828
+wandb:                      eval/auroc 0.82736
+wandb:                      eval/brier 0.18955
+wandb:                        eval/ece 0.15897
+wandb:                          eval/n 512
+wandb:                       eval/step 3000
+wandb:          eval/wrong_format_rate 0.00977
+wandb:                         seconds 1.26761
+wandb:     stability/baseline_accuracy 0.37109
+wandb:        stability/batch_accuracy 0.375
+wandb: stability/batch_confidence_mean 3.5
+wandb:  stability/batch_confidence_std 3.16228
+wandb:    stability/batch_invalid_rate 0
+wandb:     stability/objective_entropy 0.7026
+wandb:          stability/objective_kl 14.80608
+wandb:       stability/ppo_loss_policy 0.01027
+wandb:        stability/ppo_loss_total 0.07358
+wandb:        stability/ppo_loss_value 0.63311
+wandb:       stability/ppo_mean_scores 9.4882
+wandb:   stability/ppo_policy_approxkl 0.00098
+wandb:   stability/ppo_policy_clipfrac 0
+wandb:       stability/window_accuracy 0.35156
+wandb:          stability/window_brier 0.12107
+wandb:  stability/window_calibration_n 512
+wandb: stability/window_confidence_std 3.3971
+wandb:            stability/window_ece 0.03574
+wandb:   stability/window_invalid_rate 0
+wandb:         stability/window_levels 10
+wandb:     stability/window_mode_share 0.30469
+wandb: 
+wandb: 🚀 View run klgrid-ppo-adapt20 at: https://wandb.ai/multi-tokenizer/rewarding-doubt/runs/1ab8aa1fa75c3e54
+wandb: ⭐️ View project at: https://wandb.ai/multi-tokenizer/rewarding-doubt
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /workspace/runs/klgrid-ppo-adapt20/wandb/run-20261004_222212-1ab8aa1fa75c3e54/logs
