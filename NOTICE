@@ -1,0 +1,13 @@
+Exact confidence rewards for Rewarding Doubt
+Copyright 2026 Rob Neuhaus
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It includes excerpts of TRL 0.8.6 (https://github.com/huggingface/trl), Copyright the
+Hugging Face team, licensed under the Apache License, Version 2.0, in
+tests/trl_0_8_6_reference.py.
+
+It builds on RewardingDoubt (https://github.com/pasta99/RewardingDoubt), which is
+fetched at build time and is not redistributed here, apart from the context lines of
+patches/exact_confidence.patch and short excerpts quoted in the documents. That
+repository carries no license file; its code remains its authors'.

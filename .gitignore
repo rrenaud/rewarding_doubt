@@ -13,3 +13,8 @@ node_modules/
 runs/runpod/*/checkpoint*/
 runs/runpod/*/model_finetuned*/
 runs/runpod/*/snapshot-step*/
+
+# Captured `modal run` / launcher output (progress bars; the runs keep their own logs).
+runs/**/*launcher*.log
+runs/minimal-diff-*.log
+runs/modal-bench-*.log
