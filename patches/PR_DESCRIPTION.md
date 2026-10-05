@@ -35,7 +35,7 @@ The PR also lets the code run on Qwen-2.5: the three `<|eot_id|>` lookups fall b
 
 All with this repository's settings: learning rate 1e-5, batch 8, adaptive KL (init 0.05, target 6), and the default reward grading. Scored with `InferenceDatasetSplit` and the existing metrics (F1 > 0.5, 11-bin ECE).
 
-**Qwen-2.5-3B, full TriviaQA training set, 3,000 steps**, 512 questions from the TriviaQA validation split, mean over snapshots at steps 1,000–3,000 (one seed per arm):
+**Qwen-2.5-3B, full TriviaQA training set, 3,000 steps**, 512 questions from the TriviaQA validation split, mean over snapshots at steps 1,000–3,000 (one seed per arm; `exact` was scored at steps 1,000, 2,000 and 3,000, `ppo` every 500):
 
 | `--objective` | ECE ↓ | AUROC ↑ | Brier ↓ |
 |---|---:|---:|---:|
@@ -79,3 +79,5 @@ python Train.py --objective exact --dataset triviaqa --is_unsloth \
   --model_dir unsloth/Qwen2.5-3B-Instruct --tokenizer_dir unsloth/Qwen2.5-3B-Instruct \
   --epochs 2 --lr 1e-5 --batchsize 8
 ```
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
