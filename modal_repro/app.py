@@ -1115,6 +1115,15 @@ def fast_profile(gpu: str = "L40S"):
 
 
 @app.local_entrypoint()
+def fast_profile_lora(gpu: str = "L40S"):
+    """fast_loop.py profile-lora: time and memory with adapters trained in only some layers."""
+    run = "fast-profile-lora-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "profile-lora", ["fast_loop.py", "profile-lora", FAST_CACHE], run)
+    print("exit", r["exit_code"], r["gpu"])
+    print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
+
+
+@app.local_entrypoint()
 def fast_eval(dirs: str, gpu: str = "L40S"):
     """fast_loop.py eval for comma-separated adapter dirs on the volume; prints one JSON line per dir."""
     run = "fast-eval-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")

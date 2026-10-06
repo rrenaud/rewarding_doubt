@@ -1,0 +1,1 @@
+{"cut-layers18-35-s1": ["--kl-coef", "0.05", "--seed", "1", "--batchsize", "32", "--passes", "1", "--minibatch", "32", "--lr", "3e-4", "--steps", "300", "--eval-every", "50", "--lora-layers", "18-35"]}

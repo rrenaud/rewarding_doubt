@@ -255,6 +255,37 @@ adapter; the others are frozen with B = 0, so they leave the model unchanged. De
 - These runs took 4.3–4.7 min each, the same as the baseline: frozen adapters still run, and (found
   later, section 7) the backward pass still went through every layer.
 
+## 7. Making partial adapters cheaper (Oct 6)
+
+Section 6's arms all cost the same per step, whatever they trained. `fast_loop.py profile-lora`
+(Modal entrypoint `fast_profile_lora`) times one update at minibatch 32 with adapters trained in all
+layers, layers 18–35 or layers 27–35:
+
+| layers trained | backward | forward ms / q | backward ms / q | peak memory |
+|---|---|---:|---:|---:|
+| all 36 | full | 7.2 | 9.6 | 16.0 GB |
+| 18–35 | full | 7.2 | 9.6 | 15.6 GB |
+| 18–35 | stops at layer 18 | 7.2 | **4.9** | **9.1 GB** |
+| 27–35 | full | 7.3 | 9.6 | 15.4 GB |
+| 27–35 | stops at layer 27 | 7.2 | **2.5** | 11.9 GB |
+
+- **Unsloth sends the backward pass through every layer.** Its attention picks a grouped-query
+  layout with no backward kernel (xformers) when the incoming hidden state does not require grad,
+  so it makes every layer's input require grad. The output of layer 0 requires grad even with all
+  of layers 0–17 frozen and the input-embedding hook removed, and backward then runs through all
+  36 layers. Detaching the hidden state below the first trained layer crashes for the same reason:
+  `No operator found for memory_efficient_attention_backward ... does not support BMGHK format`.
+- **Fix: cut the graph but keep the flag.** `cut_backward_below` replaces the input of the first
+  trained layer with `detach().requires_grad_(True)`, so Unsloth keeps its trainable layout and
+  backward stops there. `train` applies it whenever `--lora-layers` starts above 0. It is exact:
+  nothing below the cut trains.
+- The forward pass is unchanged: every layer still runs, frozen adapters included.
+- Cutting at 27 saves less memory than at 18: the 27 layers below still build a graph during the
+  forward pass (Unsloth's forced flag) until it is dropped at the cut.
+
+A training run with the cut (`cut-layers18-35-s1`) took the same 4.6 minutes as without it. The
+reason is in section 8.
+
 ## Defaults now in `fast_loop.py train`
 
 `--batchsize 32 --passes 1 --minibatch 32 --lr 3e-4 --steps 300 --eval-every 50 --bucket-window 64`,

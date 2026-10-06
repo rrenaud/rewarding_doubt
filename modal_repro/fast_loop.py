@@ -188,6 +188,18 @@ def restrict_lora(model, modules, layers):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
+def cut_backward_below(model, first_trained_layer):
+    """Make backward stop at the first decoder layer whose adapters train: its input is replaced by a
+    detached copy. Exact (nothing below trains) and saves the backward through the frozen layers.
+    The copy still requires grad: Unsloth's attention picks a grouped-query layout with no backward
+    kernel when its input does not, and the adapters above need gradients. Returns the hook handle."""
+    def cut(module, inputs, output):
+        if isinstance(output, tuple):
+            return (output[0].detach().requires_grad_(True), *output[1:])
+        return output.detach().requires_grad_(True)
+    return model.get_base_model().model.layers[first_trained_layer - 1].register_forward_hook(cut)
+
+
 def score_dev(model, scheme, rows, label_key="f1"):
     FastLanguageModel.for_training(model)
     levels = []
@@ -221,6 +233,8 @@ def train(args):
     modules = args.lora_modules.split(",")
     assert set(modules) <= set(LORA_MODULES), modules
     n_trainable = restrict_lora(model, modules, range(lo, hi + 1))
+    if lo > 0:  # e.g. layers 18-35: 28% less time per update, 43% less peak memory (profile-lora)
+        cut_backward_below(model, lo)
     print(json.dumps(dict(lora_modules=modules, lora_layers=[lo, hi], n_layers=n_layers, trainable_params=n_trainable)), flush=True)
     scheme = LevelScheme(tok, end_of_turn(tok))
     torch.manual_seed(args.seed)
@@ -373,6 +387,56 @@ def profile(args):
     print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=20), flush=True)
 
 
+def profile_lora(args):
+    """Time and peak memory of a training update when only some layers' adapters train, with and
+    without gradients forced onto the input embeddings (Unsloth's setting for checkpointing). If the
+    inputs do not require grad, backward can stop at the first layer whose adapters train."""
+    cache = torch.load(args.cache, weights_only=False)
+    model, tok = trainable_model(cache["model"])
+    scheme = LevelScheme(tok, end_of_turn(tok))
+    rows = sorted(cache["splits"]["train"][:512], key=lambda r: len(r["ids"]))[:256]  # bucketed-like batches
+    n_layers = model.config.num_hidden_layers
+    probe = model.get_input_embeddings()(torch.tensor([[1, 2]], device="cuda"))
+    print(json.dumps(dict(embedding_output_requires_grad=probe.requires_grad,
+                          require_grads_hook=hasattr(model.get_base_model(), "_require_grads_hook"))), flush=True)
+    for layers in ("all", f"{n_layers // 2}-{n_layers - 1}", f"{3 * n_layers // 4}-{n_layers - 1}"):
+        lo, hi = (0, n_layers - 1) if layers == "all" else map(int, layers.split("-"))
+        n = restrict_lora(model, LORA_MODULES, range(lo, hi + 1))
+        optimizer = torch.optim.Adam([p for p in model.parameters() if p.requires_grad], lr=1e-6)
+        decoder = model.get_base_model().model.layers
+        for variant in ("input_grads", "no_input_grads", "detach_below"):
+            base = model.get_base_model()
+            if variant == "input_grads":
+                base.enable_input_require_grads()
+            elif hasattr(base, "_require_grads_hook"):
+                base.disable_input_require_grads()
+            seen = {}
+            def probe(module, inputs, output):  # returns None: a forward hook's return value replaces the output
+                seen.setdefault("layer0_out_requires_grad", (output[0] if isinstance(output, tuple) else output).requires_grad)
+            probe_hook = decoder[0].register_forward_hook(probe)
+            cut = None
+            if variant == "detach_below" and lo > 0:
+                cut = cut_backward_below(model, lo)
+            fwd = bwd = 0.
+            torch.cuda.synchronize(); torch.cuda.reset_peak_memory_stats()
+            for rep in range(2):  # first pass is warmup
+                fwd = bwd = 0.
+                for start in range(0, len(rows), 32):
+                    chunk = rows[start:start + 32]
+                    torch.cuda.synchronize(); t = time.time()
+                    levels = level_logps(model, scheme, [r["ids"] for r in chunk])
+                    loss = levels.logsumexp(-1).mean()
+                    torch.cuda.synchronize(); fwd += time.time() - t; t = time.time()
+                    optimizer.zero_grad(); loss.backward(); optimizer.step()
+                    torch.cuda.synchronize(); bwd += time.time() - t
+            probe_hook.remove()
+            if cut is not None:
+                cut.remove()
+            print(json.dumps(dict(layers=layers, trainable_params=n, variant=variant, **seen,
+                                  forward_ms_per_q=round(1000 * fwd / len(rows), 1), backward_ms_per_q=round(1000 * bwd / len(rows), 1),
+                                  peak_gb=round(torch.cuda.max_memory_allocated() / 2**30, 1))), flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
@@ -408,8 +472,10 @@ def main():
     e.add_argument("cache"); e.add_argument("adapter"); e.add_argument("out")
     pr = sub.add_parser("profile")
     pr.add_argument("cache")
+    pl = sub.add_parser("profile-lora")
+    pl.add_argument("cache")
     args = parser.parse_args()
-    {"cache": build_cache, "train": train, "eval": evaluate, "profile": profile}[args.command](args)
+    {"cache": build_cache, "train": train, "eval": evaluate, "profile": profile, "profile-lora": profile_lora}[args.command](args)
 
 
 if __name__ == "__main__":
