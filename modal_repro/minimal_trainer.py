@@ -155,12 +155,15 @@ def adapters_off(lm):
     for m in lora:
         m.enable_adapters(False)
     _biases_on[0] = False
+    for p, original, _ in getattr(lm, "stock_params", []):
+        p.data.copy_(original)
     try:
         yield
     finally:
         for m in lora:
             m.enable_adapters(True)  # also sets requires_grad again; adapters exist only where they train
         _biases_on[0] = True
+        sync_stock(lm, "weights")
 
 
 def load(model_name, device="cuda"):
@@ -182,6 +185,36 @@ def add_lora(lm, modules, layers):
                         layers_to_transform=list(layers), layers_pattern="layers")
     get_peft_model(lm, config)  # injects the adapters into lm's modules in place
     return [p for n, p in lm.named_parameters() if "lora_" in n]
+
+
+def add_stock_params(lm, layers, names):
+    """Train parameters the model already has, e.g. "self_attn.v_proj.bias" or "input_layernorm.weight", in each of
+    `layers`: no hooks, so they act wherever the model runs. They are bf16, too coarse for small Adam steps, so
+    Adam updates fp32 master copies and sync_stock copies those in; adapters_off puts the originals back.
+    Returns {"<layer>.<name>": master}; lm.stock_params lists (parameter, original, master)."""
+    masters = {}
+    if not hasattr(lm, "stock_params"):
+        lm.stock_params = []
+    for i in layers:
+        for name in names:
+            path, attr = name.rsplit(".", 1)
+            module = lm.model.layers[i].get_submodule(path)
+            p = getattr(getattr(module, "base_layer", module), attr)  # under a PEFT LoRA wrapper, the base layer's
+            p.requires_grad_(True)
+            master = torch.nn.Parameter(p.detach().float().clone())
+            lm.stock_params.append((p, p.detach().clone(), master))
+            masters[f"{i}.{name}"] = master
+    return masters
+
+
+def sync_stock(lm, what):
+    """"grads": move each stock parameter's bf16 gradient to its master; "weights": copy the masters in."""
+    for p, _, master in getattr(lm, "stock_params", []):
+        if what == "grads":
+            master.grad = None if p.grad is None else p.grad.float()
+            p.grad = None
+        else:
+            p.data.copy_(master.detach().to(p.dtype))
 
 
 def add_output_biases(lm, layers, part):
@@ -466,11 +499,15 @@ def train(args):
     assert set(modules) <= set(LORA_MODULES), modules
     torch.manual_seed(args.seed)
     lora_layers, attn_layers, mlp_layers = (layer_range(s, n_layers) for s in (args.lora_layers, args.attn_bias, args.residual_bias))
+    v_layers, norm_layers = layer_range(args.v_bias, n_layers), layer_range(args.norm_gain, n_layers)
+    stock = dict(add_stock_params(lm, v_layers, ["self_attn.v_proj.bias"]),
+                 **add_stock_params(lm, norm_layers, ["input_layernorm.weight", "post_attention_layernorm.weight"]))
     trained = dict(lora=add_lora(lm, modules, lora_layers), attn_bias=add_output_biases(lm, attn_layers, "self_attn"),
-                   residual_bias=add_output_biases(lm, mlp_layers, "mlp"))
+                   residual_bias=add_output_biases(lm, mlp_layers, "mlp"), stock=list(stock.values()))
     params = [p for group in trained.values() for p in group]
     print(json.dumps(dict(lora_modules=modules, lora_layers=[lora_layers.start, lora_layers.stop - 1] if modules else None,
-                          attn_bias=args.attn_bias, residual_bias=args.residual_bias, trainable_params=sum(p.numel() for p in params),
+                          attn_bias=args.attn_bias, residual_bias=args.residual_bias, v_bias=args.v_bias, norm_gain=args.norm_gain,
+                          trainable_params=sum(p.numel() for p in params),
                           shared_prefix=not args.no_shared_prefix)), flush=True)
     levels = Levels(tok)
     rng = random.Random(args.seed)
@@ -497,6 +534,7 @@ def train(args):
     named = {n: p for n, p in lm.named_parameters() if "lora_" in n}
     named.update({f"attn_bias.{i}": p for i, p in zip(attn_layers, trained["attn_bias"])})
     named.update({f"residual_bias.{i}": p for i, p in zip(mlp_layers, trained["residual_bias"])})
+    named.update({f"stock.{k}": m for k, m in stock.items()})
     os.makedirs(args.out_dir, exist_ok=True)
     checkpoint_dir, metrics_path = os.path.join(args.out_dir, "checkpoint"), os.path.join(args.out_dir, "metrics.jsonl")
     # Resume (--checkpoint-every): rerunning the same command continues from the last checkpoint.
@@ -510,6 +548,7 @@ def train(args):
         with torch.no_grad():
             for n, value in state["params"].items():
                 named[n].copy_(value.to(named[n].device, named[n].dtype))
+        sync_stock(lm, "weights")
         optimizer.load_state_dict(state["optimizer"])
         set_rng_state(state["rng"])
         rng.setstate(state["rng_local"])
@@ -584,8 +623,10 @@ def train(args):
                 lap("loss")
                 optimizer.zero_grad()
                 torch.stack(losses).mean().backward()
+                sync_stock(lm, "grads")
                 lap("backward")
                 optimizer.step()
+                sync_stock(lm, "weights")
                 lap("optimizer")
         if kl_ctl is not None:
             kl_ctl.update(statistics.fmean(s[1] for s in stats), args.batchsize)
@@ -650,6 +691,10 @@ def main():
     t.add_argument("--lora-modules", default=",".join(LORA_MODULES), help='projections with LoRA adapters, or "none"')
     t.add_argument("--lora-layers", default="all", help='"all" or an inclusive range of decoder layers, e.g. "18-35"')
     t.add_argument("--attn-bias", default="none", help='"none", "all" or a layer range: train a vector added to each attention output')
+    t.add_argument("--v-bias", default="none",
+                   help='"none", "all" or a layer range: train the model\'s own v_proj biases; with attention weights summing to 1,'
+                        ' a change in them adds a constant vector to the attention output (in the span of o_proj)')
+    t.add_argument("--norm-gain", default="none", help='"none", "all" or a layer range: train the RMSNorm weights before attention and MLP')
     t.add_argument("--residual-bias", default="none", help='"none", "all" or a layer range: train a vector added to each MLP output')
     t.add_argument("--bucket-window", type=int, default=64, help="batches per length-sorting window; 0 = random batches")
     t.add_argument("--no-shared-prefix", action="store_true", help="full forward per row instead of a shared prefix cache")

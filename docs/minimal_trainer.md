@@ -153,6 +153,41 @@ live reference; 300 steps, 2 seeds; `runs/minimal/on-*`):
 
 Next: 3,000-step online attention-bias runs on RunPod (targets 0.5, 1, 2; `runs/runpod/online-bias-*`).
 
+## Stock parameters instead of hooks (Oct 6, evening)
+
+The attention-output bias needs a hook (and, in Unsloth, a patched decoding loop). Qwen-2.5 has a stock parameter
+with the same effect: `v_proj`'s bias. Attention weights sum to 1, so a change δ in every value adds the same
+vector O·δ to the attention output at every position (test: identical shift at every position to 1e-5). With
+2 key/value heads of 128 dimensions it reaches a subspace of at most 256 of the 2,048 residual dimensions per
+layer. `--v-bias A-B` trains it, `--norm-gain A-B` trains the RMSNorm weights before attention and MLP; both are
+bf16 weights, so Adam updates fp32 master copies that are copied in after each step, and `adapters_off`
+restores the originals. Llama-3 has no projection biases; `attention_bias=True` adds zero-initialized ones,
+whose `o_proj` bias is exactly the hooked attention-output bias (not tried).
+
+Adaptive 1-nat answer-KL target, 300 steps, 2 seeds (`runs/minimal/stock-*`):
+
+| arm | params | mode | Brier | ECE | AUROC | answer KL | worst Δ regen accuracy |
+|---|---:|---|---|---|---|---|---|
+| hooked attention bias 18–35, lr 1e-2 (reference) | 36.9k | online | 0.110 ± 0.005 | 0.057 | 0.915 | 1.11 | −0.002 |
+| `v_proj` bias 18–35, lr 1e-2 | 4.6k | online | 0.116 ± 0.004 | 0.049 | 0.910 | 1.27 | −0.006 |
+| RMSNorm gains 18–35, lr 3e-3 | 73.7k | online | 0.115 ± 0.009 | 0.061 | 0.913 | 0.86 | −0.020 |
+| `v_proj` bias 18–35, lr 3e-2 | 4.6k | online | 0.134 ± 0.000 | 0.080 | 0.892 | 1.28 | −0.018 |
+| hooked attention bias 18–35 (reference) | 36.9k | offline | 0.120 ± 0.010 | 0.061 | 0.910 | 1.19 | −0.010 |
+| `v_proj` bias 18–35, lr 1e-2 | 4.6k | offline | 0.125 ± 0.006 | 0.071 | 0.902 | 1.35 | −0.037 |
+| `v_proj` bias 18–35, lr 3e-2 | 4.6k | offline | 0.135 ± 0.004 | 0.080 | 0.898 | 1.33 | −0.006 |
+| `v_proj` bias 18–35, lr 3e-3 | 4.6k | offline | 0.144 ± 0.010 | 0.063 | 0.879 | 1.08 | −0.041 |
+| RMSNorm gains 18–35, lr 1e-3 | 73.7k | offline | 0.136 ± 0.010 | 0.054 | 0.886 | 1.25 | −0.034 |
+| RMSNorm gains 18–35, lr 3e-3 | 73.7k | offline | 0.186 ± 0.093 | 0.134 | 0.876 | 1.24 | −0.037 |
+| `v_proj` bias, all 36 layers, lr 1e-2 | 9.2k | offline | 0.219 ± 0.083 | 0.207 | 0.849 | 3.91 | −0.043 |
+
+- **Online, the stock `v_proj` bias nearly matches the hooked bias** with an eighth of the parameters and no
+  hooks; it is an ordinary weight of the checkpoint.
+- **Online beats offline** for these small adapters, as for the hooked bias.
+- **An answer KL near 1 nat is not safe for every adapter:** offline, the `v_proj` bias at lr 1e-2 or 3e-3 and the
+  norm gains lost 3–4 points of accuracy at 1.1–1.35 nats. The cost of a nat depends on the directions moved;
+  regenerated accuracy has to be measured, not inferred from the KL.
+- On all 36 layers the controller did not hold the target (KL 3.9) and a seed degraded.
+
 ## Differences from the fast loop, and what is not done
 
 - bf16 weights instead of 4-bit; fp32 LoRA weights where the fast loop's were bf16 (TRL casts them).

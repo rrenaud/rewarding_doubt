@@ -142,3 +142,40 @@ def test_topk_answer_kl_bounds_exact():
         else:
             assert bool((coarse <= exact + 1e-5).all()) and bool((coarse >= -1e-6).all())
     assert float(mt.topk_answer_kl(reference, data).abs().max()) < 1e-5  # policy = reference
+
+
+def test_v_bias_shifts_attention_output_by_a_constant():
+    """Attention weights sum to 1, so a change in v_proj's bias adds the same vector at every position."""
+    lm = tiny_qwen(torch.float32)
+    attn = lm.model.layers[2].self_attn
+    seen = []
+    handle = attn.register_forward_hook(lambda m, i, o: seen.append(o[0].detach().clone()))
+    ids = torch.tensor([rows()[0]["ids"]])
+    with torch.no_grad():
+        lm(input_ids=ids)
+        attn.v_proj.bias.add_(torch.randn_like(attn.v_proj.bias))
+        lm(input_ids=ids)
+    handle.remove()
+    shift = seen[1] - seen[0]  # [1, T, hidden]
+    assert float(shift.abs().max()) > 1e-2
+    assert torch.allclose(shift, shift[:, :1].expand_as(shift), atol=1e-5)
+
+
+def test_stock_params_train_through_masters_and_switch_off():
+    lm = tiny_qwen(torch.float32)
+    data = rows()
+    masters = mt.add_stock_params(lm, range(1, 4), ["self_attn.v_proj.bias", "input_layernorm.weight"])
+    with torch.no_grad():
+        base_levels = scored(lm, data)[0]
+        for m in masters.values():
+            m.add_(0.1 * torch.randn_like(m))
+        mt.sync_stock(lm, "weights")
+        changed = scored(lm, data)[0]
+        with mt.adapters_off(lm):
+            off = scored(lm, data)[0]
+        back = scored(lm, data)[0]
+    assert float((changed - base_levels).abs().max()) > 1e-3
+    assert float((off - base_levels).abs().max()) < 1e-6 and torch.equal(back, changed)
+    scored(lm, data)[0].sum().backward()  # gradients reach the bf16/fp32 weights, then the masters
+    mt.sync_stock(lm, "grads")
+    assert all(m.grad is not None and float(m.grad.abs().sum()) > 0 for m in masters.values())
