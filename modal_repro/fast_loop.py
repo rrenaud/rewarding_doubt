@@ -28,6 +28,7 @@ Approximations versus the released protocol: answers are the base model's (train
 them), the stop after the number is not modelled, and one cached answer per question.
 """
 import argparse
+import collections
 import json
 import math
 import os
@@ -234,6 +235,18 @@ def train(args):
     curve = {0: score_dev(model, scheme, dev_rows)}
     print(json.dumps(dict(step=0, **curve[0])), flush=True)
     batches, t0 = [], time.time()
+    phase_seconds = collections.Counter()
+    last = [time.time()]
+
+    def lap(phase=None):
+        """--time-steps: accumulate seconds per phase of an update (synchronizes the GPU, so slightly slower)."""
+        if not args.time_steps:
+            return
+        torch.cuda.synchronize()
+        now = time.time()
+        if phase:
+            phase_seconds[phase] += now - last[0]
+        last[0] = now
     for step in range(1, args.steps + 1):
         if not batches:
             batches = epoch_batches([len(r["ids"]) for r in train_rows], args.batchsize, args.bucket_window, rng)
@@ -244,22 +257,29 @@ def train(args):
             rng.shuffle(idx)
             for mb in range(0, len(idx), args.minibatch):
                 chunk = [batch[i] for i in idx[mb:mb + args.minibatch]]
+                lap()
+                scored = level_logps(model, scheme, [r["ids"] for r in chunk])
+                lap("forward")
                 losses = []
-                for r, levels in zip(chunk, level_logps(model, scheme, [r["ids"] for r in chunk])):
+                for r, levels in zip(chunk, scored):
                     J, kl = baseline_matched_objective(levels.double(), float(r[args.grading]), "discrete-exact", "released",
                                                        -30.0, ref_logq=r["ref"].to(levels.device).double(),
                                                        brier_mix=args.brier_mix)
                     losses.append(-(J - beta * kl))
                     if p == 0:
                         stats.append((J.item(), kl.item(), float((levels.double().softmax(-1) * torch.arange(11, device=levels.device)).sum())))
+                lap("loss")
                 optimizer.zero_grad()
                 torch.stack(losses).mean().backward()
+                lap("backward")
                 optimizer.step()
+                lap("optimizer")
         if kl_ctl is not None:
             kl_ctl.update(statistics.fmean(s[1] for s in stats), args.batchsize)
             beta = kl_ctl.value
         record = dict(step=step, expected_reward=statistics.fmean(s[0] for s in stats), kl=statistics.fmean(s[1] for s in stats),
-                      mean_confidence=statistics.fmean(s[2] for s in stats), beta=beta, seconds=time.time() - t0)
+                      mean_confidence=statistics.fmean(s[2] for s in stats), beta=beta, seconds=time.time() - t0,
+                      **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
         log.write(json.dumps(record) + "\n")
         if step % args.eval_every == 0 or step == args.steps:
             curve[step] = score_dev(model, scheme, dev_rows)
@@ -381,6 +401,7 @@ def main():
     t.add_argument("--seed", type=int, default=1)
     t.add_argument("--lora-modules", default=",".join(LORA_MODULES), help="projections whose adapters train")
     t.add_argument("--lora-layers", default="all", help='"all" or an inclusive range of decoder layers, e.g. "18-35"')
+    t.add_argument("--time-steps", action="store_true", help="log cumulative seconds per update phase (adds GPU syncs)")
     t.add_argument("--bucket-window", type=int, default=64, help="batches per length-sorting window; 0 = random batches")
     t.add_argument("--save", action="store_true")
     e = sub.add_parser("eval")
