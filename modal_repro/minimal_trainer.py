@@ -43,12 +43,16 @@ import math
 import os
 import random
 import re
+import signal
 import statistics
+import sys
 import time
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache
 
+from rewarding_doubt.checkpoint import (announce_saved, load_checkpoint, rng_state, save_checkpoint, set_rng_state,
+                                        truncate_jsonl, write_status)
 from rewarding_doubt.core import baseline_matched_objective
 from rewarding_doubt.paper_ppo import AdaptiveKLController, evaluation_metrics, is_correct_exact, is_correct_f1
 
@@ -489,13 +493,45 @@ def train(args):
         if args.regen_every and step % args.regen_every == 0:
             metrics.update(regenerate_dev(lm, tok, dev_rows, gt_candidates))
         return metrics
+    # Every trained tensor by a stable name, for checkpoints: PEFT's LoRA names, and the bias vectors by layer.
+    named = {n: p for n, p in lm.named_parameters() if "lora_" in n}
+    named.update({f"attn_bias.{i}": p for i, p in zip(attn_layers, trained["attn_bias"])})
+    named.update({f"residual_bias.{i}": p for i, p in zip(mlp_layers, trained["residual_bias"])})
     os.makedirs(args.out_dir, exist_ok=True)
-    log = open(os.path.join(args.out_dir, "metrics.jsonl"), "w")
-    curve = {0: dev_metrics(0)}
-    print(json.dumps(dict(step=0, **curve[0])), flush=True)
-    batches, t0 = [], time.time()
+    checkpoint_dir, metrics_path = os.path.join(args.out_dir, "checkpoint"), os.path.join(args.out_dir, "metrics.jsonl")
+    # Resume (--checkpoint-every): rerunning the same command continues from the last checkpoint.
+    state = load_checkpoint(checkpoint_dir) if args.checkpoint_every and not args.no_resume else None
     phase_seconds = collections.Counter()
+    if state is None:
+        log = open(metrics_path, "w")
+        curve, batches, start, elapsed = {0: dev_metrics(0)}, [], 1, 0.0
+        print(json.dumps(dict(step=0, **curve[0])), flush=True)
+    else:
+        with torch.no_grad():
+            for n, value in state["params"].items():
+                named[n].copy_(value.to(named[n].device, named[n].dtype))
+        optimizer.load_state_dict(state["optimizer"])
+        set_rng_state(state["rng"])
+        rng.setstate(state["rng_local"])
+        curve, batches, start, elapsed = state["curve"], state["batches"], state["step"] + 1, state["seconds"]
+        beta, answer_w = state["beta"], state["answer_w"]
+        if kl_ctl is not None:
+            kl_ctl.value = beta
+        phase_seconds.update(state["phase_seconds"])
+        truncate_jsonl(metrics_path, state["step"])
+        log = open(metrics_path, "a")
+        print(f"resumed from {checkpoint_dir} at step {state['step']}", flush=True)
+    t0 = time.time() - elapsed
     last = [time.time()]
+    stopping = []  # SIGTERM (a preempted pod or container): checkpoint after the current step and exit 143
+    signal.signal(signal.SIGTERM, lambda signum, frame: stopping.append("SIGTERM"))
+
+    def save(step):
+        save_checkpoint(checkpoint_dir, dict(
+            step=step, seconds=time.time() - t0, params={n: p.detach().cpu().clone() for n, p in named.items()},
+            optimizer=optimizer.state_dict(), rng=rng_state(), rng_local=rng.getstate(), batches=batches, curve=curve,
+            beta=beta, answer_w=answer_w, phase_seconds=dict(phase_seconds)))
+        announce_saved(checkpoint_dir)
 
     def lap(phase=None):
         """--time-steps: accumulate seconds per phase of an update (synchronizes the GPU, so slightly slower)."""
@@ -506,7 +542,7 @@ def train(args):
         if phase:
             phase_seconds[phase] += now - last[0]
         last[0] = now
-    for step in range(1, args.steps + 1):
+    for step in range(start, args.steps + 1):
         if not batches:
             batches = epoch_batches([len(r["ids"]) for r in train_rows], args.batchsize, args.bucket_window, rng)
         batch = [train_rows[i] for i in batches.pop()]
@@ -567,7 +603,16 @@ def train(args):
             print(json.dumps(dict(step=step, minutes=round((time.time() - t0) / 60, 1), beta=round(beta, 4),
                                   peak_gb=round(torch.cuda.max_memory_allocated() / 2**30, 1), **curve[step])), flush=True)
             log.flush()
+        if step == args.stop_after:  # testing: behave as if preempted here
+            stopping.append("--stop-after")
+        if args.checkpoint_every and (step % args.checkpoint_every == 0 or stopping):
+            log.flush()
+            save(step)
+        if stopping:
+            print(f"stopping after step {step}: {stopping[0]}", flush=True)
+            sys.exit(143)
     json.dump({str(k): v for k, v in curve.items()}, open(os.path.join(args.out_dir, "curve.json"), "w"), indent=1)
+    write_status(args.out_dir, "completed", step=args.steps)
     if args.save:
         torch.save(dict(args=vars(args), lora={n: p.detach().cpu() for n, p in lm.named_parameters() if "lora_" in n},
                         attn_bias=[p.detach().cpu() for p in trained["attn_bias"]],
@@ -620,6 +665,10 @@ def main():
                    help="train on answers the policy generates for each batch (graded with --gt) instead of the cached ones")
     t.add_argument("--time-steps", action="store_true", help="log cumulative seconds per update phase (adds GPU syncs)")
     t.add_argument("--save", action="store_true", help="save the trained parameters to OUT_DIR/trained.pt")
+    t.add_argument("--checkpoint-every", type=int, default=0,
+                   help="resumable checkpoint every N steps and on SIGTERM (exit 143); rerunning the same command resumes")
+    t.add_argument("--no-resume", action="store_true", help="ignore an existing checkpoint")
+    t.add_argument("--stop-after", type=int, default=0, help="testing: checkpoint and exit 143 after this step, as if preempted")
     args = parser.parse_args()
     {"ref": make_ref, "answer-ref": make_answer_ref, "diagnose": diagnose, "memory": memory, "train": train}[args.command](args)
 

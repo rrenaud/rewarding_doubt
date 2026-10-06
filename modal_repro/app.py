@@ -1335,6 +1335,24 @@ def minimal_answer_ref(gpu: str = "L40S", k: int = 64):
 
 
 @app.local_entrypoint()
+def minimal_restart_check(gpu: str = "L40S"):
+    """minimal_trainer.py resume: online training stopped by --stop-after 12 (checkpoints every 5 steps), then
+    the same command again, which must resume at step 12 and complete at step 20 with each step logged once."""
+    run = "minimal-restart-check-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    command = ["minimal_trainer.py", "train", TOPK_CACHE, "OUT_DIR", "--steps", "20", "--eval-every", "10", "--checkpoint-every", "5",
+               "--online", "--gt", GT, "--lora-modules", "none", "--attn-bias", "18-35", "--lr", "1e-2", "--answer-kl", "0.1"]
+    first = train_with_snapshots.with_options(gpu=gpu).remote({}, "run", command + ["--stop-after", "12"], run)
+    second = train_with_snapshots.with_options(gpu=gpu).remote({}, "run", command, run)
+    print("first exit", first["exit_code"], "second exit", second["exit_code"])
+    print("\n".join(l for l in second["log"].splitlines() if l.startswith(("===", "resumed", "stopping", "RD_SAVED")) or "Error" in l))
+    files = read_files.remote([f"{VOL}/outputs/{run}/run/{n}" for n in ("metrics.jsonl", "status.json", "curve.json")])
+    steps = [json.loads(l)["step"] for l in files.get(f"{VOL}/outputs/{run}/run/metrics.jsonl", "").splitlines()]
+    print("logged steps", steps, "unique and complete:", steps == list(range(1, 21)))
+    print("curve steps", sorted(json.loads(files.get(f"{VOL}/outputs/{run}/run/curve.json", "{}"))))
+    print("status", files.get(f"{VOL}/outputs/{run}/run/status.json", "missing").replace("\n", " ")[:120])
+
+
+@app.local_entrypoint()
 def minimal_diagnose(rows: int = 64, gpu: str = "L40S"):
     """minimal_trainer.py diagnose on the fast cache (4-bit reference): shared prefix vs full forward vs
     one row at a time, bf16 and fp32."""
