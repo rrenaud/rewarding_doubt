@@ -1,0 +1,2 @@
+{"answerkl-smoke-attnbias": ["--seed", "1", "--steps", "20", "--eval-every", "10", "--regen-every", "10", "--lora-modules", "none", "--attn-bias", "18-35", "--lr", "1e-2", "--answer-kl", "1"],
+ "answerkl-smoke-lora": ["--seed", "1", "--steps", "20", "--eval-every", "10", "--regen-every", "10"]}

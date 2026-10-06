@@ -13,7 +13,7 @@ train: answers stay frozen at the cached ones, so the exact objective (released 
 the leftover mass, exact KL to the cached reference; core.baseline_matched_objective, the same
 objective as --objective exact in patches/exact_confidence.patch) is one batched forward and
 backward per update: no generation, no reference pass. Logits are computed only at the positions
-the levels read (level_logps). Default schedule: one Adam update per 32 length-bucketed questions,
+the levels read (score_rows). Default schedule: one Adam update per 32 length-bucketed questions,
 lr 3e-4, 300 steps (~5 min on an L40S; most of the gain by step 150). In a 3-seed comparison it
 matched or beat Muon, Scaled AdamW and PoLoRA, and 1e-3 collapses some seeds; see
 docs/fast_loop_log.md, which describes those optimizers (not kept in the code). The released
@@ -40,6 +40,7 @@ import torch
 from xformers.ops.fmha import attn_bias
 from unsloth import FastLanguageModel  # must precede transformers imports
 
+from rewarding_doubt import attn_bias as attention_biases
 from rewarding_doubt.core import baseline_matched_objective
 from rewarding_doubt.paper_ppo import AdaptiveKLController, evaluation_metrics, is_correct_exact, is_correct_f1
 from shared_prefix import LevelScheme, end_of_turn
@@ -126,10 +127,12 @@ def dev_metrics_from_levels(levels, labels, temperature=0.6, seed=0):
     return out
 
 
-def level_logps(model, scheme, queries):
-    """[B, 11] log q over the levels: LevelScheme.batch with k* = None, but with logits only at the
-    positions it reads (common, the number, and P("0" | "1") for a two-token "10") instead of the full
-    vocabulary at every position, which dominated the backward pass."""
+def score_rows(model, scheme, queries, answer_starts):
+    """One forward pass over each query + the confidence prefix, with logits only at the positions read:
+    (levels [B, 11], answers [B][T_b, V]). levels is log q over the confidence levels (LevelScheme.batch
+    with k* = None); answers[b] is the log-softmax at the positions that predict query b's answer
+    tokens, answer_starts[b] through the final " Confidence" (empty when answer_starts[b] = len(query)).
+    Full-vocabulary logits at every position dominated the backward pass, hence the gathering."""
     device = next(model.parameters()).device
     base = model.get_base_model()
     tail = [] if scheme.single else [scheme.one]
@@ -147,11 +150,37 @@ def level_logps(model, scheme, queries):
     common = torch.tensor(scheme.common, device=device)
     common_logp = logp[:, :c].gather(-1, common[None, :, None].expand(len(queries), c, 1)).sum((1, 2))
     if scheme.single:
-        return common_logp[:, None] + logp[:, c, scheme.numbers]
-    levels = common_logp[:, None] + logp[:, c, scheme.digits]
-    log_zero = logp[:, c + 1, scheme.zero]
-    log_not_zero = torch.log1p(-log_zero.exp().clamp(max=1 - 1e-7))
-    return torch.cat([levels[:, :1], levels[:, 1:2] + log_not_zero[:, None], levels[:, 2:], levels[:, 1:2] + log_zero[:, None]], 1)
+        levels = common_logp[:, None] + logp[:, c, scheme.numbers]
+    else:
+        levels = common_logp[:, None] + logp[:, c, scheme.digits]
+        log_zero = logp[:, c + 1, scheme.zero]
+        log_not_zero = torch.log1p(-log_zero.exp().clamp(max=1 - 1e-7))
+        levels = torch.cat([levels[:, :1], levels[:, 1:2] + log_not_zero[:, None], levels[:, 2:], levels[:, 1:2] + log_zero[:, None]], 1)
+    spans = [range(start - 1, len(q) - 1) for q, start in zip(queries, answer_starts)]
+    flat_rows = torch.tensor([b for b, span in enumerate(spans) for _ in span], device=device, dtype=torch.long)
+    flat_pos = torch.tensor([t for span in spans for t in span], device=device, dtype=torch.long)
+    flat = base.lm_head(hidden[flat_rows, flat_pos].to(base.lm_head.weight.dtype)).float().log_softmax(-1)
+    return levels, list(flat.split([len(span) for span in spans]))
+
+
+def answer_start(ids, tokenizer):
+    """Index of the first answer token in a cached row: right after the last "<|im_start|>assistant\n"
+    (rows are the chat prompt, ending with that header, followed by the generated answer)."""
+    start = len(ids) - 1 - ids[::-1].index(tokenizer.convert_tokens_to_ids("<|im_start|>")) + 3
+    assert tokenizer.decode(ids[start - 3:start]) == "<|im_start|>assistant\n", tokenizer.decode(ids[start - 3:start])
+    return start
+
+
+def answer_kl(policy, reference):
+    """KL(policy || reference) over the vocabulary, summed over each answer's positions: [B]."""
+    return torch.stack([(p.exp() * (p - r)).sum() for p, r in zip(policy, reference)])
+
+
+def reference_answers(model, scheme, rows):
+    """The reference model's answer log-probs: LoRA and attention biases off (disable_adapter; see
+    rewarding_doubt.attn_bias). Gate and MLP-output biases do not switch off, so they are not supported."""
+    with torch.no_grad(), model.disable_adapter():
+        return score_rows(model, scheme, [r["ids"] for r in rows], [r["answer_start"] for r in rows])[1]
 
 
 def set_gradient_checkpointing(model, on):
@@ -222,26 +251,6 @@ def add_residual_biases(model, layers):
     return len(layers) * model.config.hidden_size
 
 
-def add_attention_biases(model, layers):
-    """A trainable vector added to the attention output (its write to the residual stream) in each of
-    `layers`, zero-initialized. Wraps the attention forward (Unsloth's), which returns a tuple whose
-    first element is the output. Returns the number of parameters."""
-    device = next(model.parameters()).device
-    decoder = model.get_base_model().model.layers
-    for i in layers:
-        attn = decoder[i].self_attn
-        attn.residual_bias = torch.nn.Parameter(torch.zeros(model.config.hidden_size, device=device))
-        inner = attn.forward
-
-        def forward(*args, inner=inner, attn=attn, **kwargs):
-            out = inner(*args, **kwargs)
-            if isinstance(out, tuple):
-                return (out[0] + attn.residual_bias.to(out[0].dtype), *out[1:])
-            return out + attn.residual_bias.to(out.dtype)
-        attn.forward = forward
-    return len(layers) * model.config.hidden_size
-
-
 def cut_backward_below(model, first_trained_layer):
     """Make backward stop at the first decoder layer whose adapters train: its input is replaced by a
     detached copy. Exact (nothing below trains) and saves the backward through the frozen layers.
@@ -254,15 +263,59 @@ def cut_backward_below(model, first_trained_layer):
     return model.get_base_model().model.layers[first_trained_layer - 1].register_forward_hook(cut)
 
 
-def score_dev(model, scheme, rows, label_key="f1"):
+def score_dev(model, scheme, rows, label_key="f1", with_answer_kl=True):
+    """Dev metrics of the stated confidence on the cached answers, plus (with_answer_kl) how far the
+    policy has moved on the answers themselves: KL(policy || reference) over the vocabulary at each
+    answer token, per answer (answer_kl) and per token (answer_kl_token)."""
     FastLanguageModel.for_training(model)
     set_gradient_checkpointing(model, False)  # for_training turns it back on, which roughly doubled backward time
-    levels = []
+    levels, kls, tokens = [], [], 0
     with torch.no_grad():
         for start in range(0, len(rows), 32):
             chunk = rows[start:start + 32]
-            levels += list(level_logps(model, scheme, [r["ids"] for r in chunk]).float().cpu())
-    return dev_metrics_from_levels(levels, [r[label_key] for r in rows])
+            lv, answers = score_rows(model, scheme, [r["ids"] for r in chunk], [r["answer_start"] for r in chunk])
+            levels += list(lv.float().cpu())
+            if with_answer_kl:
+                kls += answer_kl(answers, reference_answers(model, scheme, chunk)).tolist()
+                tokens += sum(len(a) for a in answers)
+    metrics = dev_metrics_from_levels(levels, [r[label_key] for r in rows])
+    if with_answer_kl:
+        metrics.update(answer_kl=statistics.fmean(kls), answer_kl_token=sum(kls) / tokens)
+    return metrics
+
+
+def regenerate_dev(model, tokenizer, rows, gt_candidates, batch=64):
+    """Answer the dev questions again with the current policy (released sampling: T=0.6, top-p 0.9, stop
+    at " Confidence"; the sampler seeded per batch, so policies are compared on the same draws) and grade
+    them with F1 > 0.5: regen_accuracy over all questions, regen_malformed for answers that never
+    reached " Confidence" or did not parse."""
+    eot, confidence = end_of_turn(tokenizer), tokenizer.convert_tokens_to_ids("ĠConfidence")
+    pad = tokenizer.eos_token_id
+    FastLanguageModel.for_inference(model)
+    correct = malformed = 0
+    for start in range(0, len(rows), batch):
+        part = rows[start:start + batch]
+        prompts = [r["ids"][:r["answer_start"]] for r in part]
+        width = max(map(len, prompts))
+        ids = torch.tensor([[pad] * (width - len(p)) + p for p in prompts]).cuda()
+        mask = torch.tensor([[0] * (width - len(p)) + [1] * len(p) for p in prompts]).cuda()
+        torch.manual_seed(start)
+        with torch.no_grad():
+            out = model.generate(input_ids=ids, attention_mask=mask, max_new_tokens=96, do_sample=True, temperature=0.6,
+                                 top_p=0.9, eos_token_id=[pad, eot, confidence], pad_token_id=pad)
+        for r, row in zip(part, out[:, width:].tolist()):
+            while row and row[-1] == pad:
+                row.pop()
+            prediction = None
+            if row and row[-1] == confidence:
+                prediction, _ = parse_answer_confidence(tokenizer.decode(row, skip_special_tokens=True) + ": 0", False)
+            if prediction is None:
+                malformed += 1
+            else:
+                correct += bool(is_correct_f1(prediction, gt_candidates[r["qid"]]))
+    FastLanguageModel.for_training(model)
+    set_gradient_checkpointing(model, False)
+    return dict(regen_accuracy=correct / len(rows), regen_malformed=malformed / len(rows))
 
 
 def epoch_batches(lengths, batchsize, window, rng):
@@ -292,7 +345,9 @@ def train(args):
     def layer_range(spec):
         return range(0) if spec == "none" else range(int(spec.split("-")[0]), int(spec.split("-")[1]) + 1)
     rb, ab = layer_range(args.residual_bias), layer_range(args.attn_bias)
-    n_residual_biases = add_residual_biases(model, rb) + add_attention_biases(model, ab)
+    # attention biases: rewarding_doubt.attn_bias, which also acts in Unsloth's decoding loop (--regen-every)
+    # and switches off under disable_adapter() (the reference for --answer-kl)
+    n_residual_biases = add_residual_biases(model, rb) + sum(b.numel() for b in attention_biases.install(model, ab).values())
     # backward stops at the first layer where anything trains (section 7-8 of the log: ~28% per step for layers 18-35)
     first = min([lo] * bool(modules) + [0] * args.gate_bias + [rb.start] * bool(rb) + [ab.start] * bool(ab), default=0)
     if first > 0:
@@ -304,13 +359,30 @@ def train(args):
     torch.manual_seed(args.seed)
     rng = random.Random(args.seed)
     train_rows, dev_rows = cache["splits"]["train"], cache["splits"]["dev"]
+    for r in train_rows + dev_rows:
+        r["answer_start"] = answer_start(r["ids"], tok)
+    print("first dev answer:", repr(tok.decode(dev_rows[0]["ids"][dev_rows[0]["answer_start"]:])), flush=True)
+    if args.regen_every:
+        gt_candidates = {d["question_id"]: d["gt_candidates"] for d in
+                         subset_loader({"validation": [r["qid"] for r in dev_rows]})("triviaqa", "validation", "verbalize", tok)}
+
+    # the reference (disable_adapter) switches LoRA and attention biases off, but not gate or MLP-output biases
+    reference_ok = not (args.gate_bias or rb)
+    if args.answer_kl and not reference_ok:
+        raise SystemExit("--answer-kl needs a reference without the trained parameters: not with --gate-bias / --residual-bias")
+
+    def evaluate_dev(step):
+        metrics = score_dev(model, scheme, dev_rows, with_answer_kl=reference_ok)
+        if args.regen_every and step % args.regen_every == 0:
+            metrics.update(regenerate_dev(model, tok, dev_rows, gt_candidates))
+        return metrics
     # Adam as in the released code (TRL 0.8.6 PPOTrainer: torch.optim.Adam, default betas, no weight decay).
     optimizer = torch.optim.Adam([p for p in model.parameters() if p.requires_grad], lr=args.lr)
     kl_ctl = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon) if args.adaptive_kl else None
     beta = args.kl_coef
     os.makedirs(args.out_dir, exist_ok=True)
     log = open(os.path.join(args.out_dir, "metrics.jsonl"), "w")
-    curve = {0: score_dev(model, scheme, dev_rows)}
+    curve = {0: evaluate_dev(0)}
     print(json.dumps(dict(step=0, **curve[0])), flush=True)
     batches, t0 = [], time.time()
     phase_seconds = collections.Counter()
@@ -336,16 +408,18 @@ def train(args):
             for mb in range(0, len(idx), args.minibatch):
                 chunk = [batch[i] for i in idx[mb:mb + args.minibatch]]
                 lap()
-                scored = level_logps(model, scheme, [r["ids"] for r in chunk])
+                scored, answers = score_rows(model, scheme, [r["ids"] for r in chunk], [r["answer_start"] for r in chunk])
+                kls = answer_kl(answers, reference_answers(model, scheme, chunk)) if args.answer_kl else torch.zeros(len(chunk), device=scored.device)
                 lap("forward")
                 losses = []
-                for r, levels in zip(chunk, scored):
+                for r, levels, a_kl in zip(chunk, scored, kls):
                     J, kl = baseline_matched_objective(levels.double(), float(r[args.grading]), "discrete-exact", "released",
                                                        -30.0, ref_logq=r["ref"].to(levels.device).double(),
                                                        brier_mix=args.brier_mix)
-                    losses.append(-(J - beta * kl))
+                    losses.append(-(J - beta * kl) + args.answer_kl * a_kl)
                     if p == 0:
-                        stats.append((J.item(), kl.item(), float((levels.double().softmax(-1) * torch.arange(11, device=levels.device)).sum())))
+                        stats.append((J.item(), kl.item(), float((levels.double().softmax(-1) * torch.arange(11, device=levels.device)).sum()),
+                                      float(a_kl)))
                 lap("loss")
                 optimizer.zero_grad()
                 torch.stack(losses).mean().backward()
@@ -356,11 +430,12 @@ def train(args):
             kl_ctl.update(statistics.fmean(s[1] for s in stats), args.batchsize)
             beta = kl_ctl.value
         record = dict(step=step, expected_reward=statistics.fmean(s[0] for s in stats), kl=statistics.fmean(s[1] for s in stats),
-                      mean_confidence=statistics.fmean(s[2] for s in stats), beta=beta, seconds=time.time() - t0,
+                      mean_confidence=statistics.fmean(s[2] for s in stats), answer_kl=statistics.fmean(s[3] for s in stats),
+                      beta=beta, seconds=time.time() - t0,
                       **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
         log.write(json.dumps(record) + "\n")
         if step % args.eval_every == 0 or step == args.steps:
-            curve[step] = score_dev(model, scheme, dev_rows)
+            curve[step] = evaluate_dev(step)
             print(json.dumps(dict(step=step, minutes=round((time.time() - t0) / 60, 1), beta=round(beta, 4), **curve[step])), flush=True)
             log.flush()
     json.dump({str(k): v for k, v in curve.items()}, open(os.path.join(args.out_dir, "curve.json"), "w"), indent=1)
@@ -381,7 +456,11 @@ def evaluate(args):
     from peft import PeftModel
     model, tok = load(cache["model"])
     model = PeftModel.from_pretrained(model, policy_dir)
-    metrics = score_dev(model, LevelScheme(tok, end_of_turn(tok)), cache["splits"]["dev"])
+    attention_biases.load(model, args.adapter)
+    rows = cache["splits"]["dev"]
+    for r in rows:
+        r["answer_start"] = answer_start(r["ids"], tok)
+    metrics = score_dev(model, LevelScheme(tok, end_of_turn(tok)), rows)
     json.dump(metrics, open(args.out, "w"), indent=1)
     print(json.dumps(metrics), flush=True)
 
@@ -431,9 +510,9 @@ def profile(args):
                               peak_gb=round(torch.cuda.max_memory_allocated() / 2**30, 1))), flush=True)
 
     current = lambda qs: [lv for lv, _ in scheme.batch(model, qs, [None] * len(qs))]
-    selective = lambda qs: list(level_logps(model, scheme, qs))
+    selective = lambda qs: list(score_rows(model, scheme, qs, [len(q) for q in qs])[0])
     with torch.no_grad():  # the selective path must give the same levels
-        a = torch.stack(current([r["ids"] for r in rows[:8]])).float(); b = level_logps(model, scheme, [r["ids"] for r in rows[:8]]).float()
+        a = torch.stack(current([r["ids"] for r in rows[:8]])).float(); b = torch.stack(selective([r["ids"] for r in rows[:8]])).float()
         print(json.dumps(dict(selective_max_abs_diff=float((a - b).abs().max()))), flush=True)
     timed("current", 4, current)
     for gc in (True, False):
@@ -488,7 +567,7 @@ def profile_lora(args):
                 for start in range(0, len(rows), 32):
                     chunk = rows[start:start + 32]
                     torch.cuda.synchronize(); t = time.time()
-                    levels = level_logps(model, scheme, [r["ids"] for r in chunk])
+                    levels = score_rows(model, scheme, [r["ids"] for r in chunk], [len(r["ids"]) for r in chunk])[0]
                     loss = levels.logsumexp(-1).mean()
                     torch.cuda.synchronize(); fwd += time.time() - t; t = time.time()
                     optimizer.zero_grad(); loss.backward(); optimizer.step()
@@ -499,6 +578,20 @@ def profile_lora(args):
             print(json.dumps(dict(layers=layers, trainable_params=n, variant=variant, **seen,
                                   forward_ms_per_q=round(1000 * fwd / len(rows), 1), backward_ms_per_q=round(1000 * bwd / len(rows), 1),
                                   peak_gb=round(torch.cuda.max_memory_allocated() / 2**30, 1))), flush=True)
+
+
+def dev_gt(args):
+    """{question_id: gt_candidates} for the cache's dev rows, from the released data loader, so trainers
+    without the released code can grade regenerated answers (minimal_trainer.py --dev-gt)."""
+    cache = torch.load(args.cache, weights_only=False)
+    from transformers import AutoTokenizer
+    tok = AutoTokenizer.from_pretrained(cache["model"])
+    qids = [r["qid"] for r in cache["splits"]["dev"]]
+    data = subset_loader({"validation": qids})("triviaqa", "validation", "verbalize", tok)
+    gt = {str(d["question_id"]): d["gt_candidates"] for d in data}
+    missing = [q for q in qids if str(q) not in gt]
+    json.dump(gt, open(args.out, "w"))
+    print(json.dumps(dict(dev_rows=len(qids), written=len(gt), missing=len(missing))), flush=True)
 
 
 def main():
@@ -532,6 +625,10 @@ def main():
     t.add_argument("--residual-bias", default="none", help='"none" or a layer range, e.g. "18-35": train a vector added to each MLP output')
     t.add_argument("--attn-bias", default="none", help='"none" or a layer range: train a vector added to each attention output')
     t.add_argument("--lora-layers", default="all", help='"all" or an inclusive range of decoder layers, e.g. "18-35"')
+    t.add_argument("--answer-kl", type=float, default=0.0,
+                   help="weight of KL(policy || reference) summed over each answer's tokens (reference: LoRA and attention biases off)")
+    t.add_argument("--regen-every", type=int, default=0,
+                   help="also regenerate and grade the dev answers with the policy every N steps (and at step 0)")
     t.add_argument("--time-steps", action="store_true", help="log cumulative seconds per update phase (adds GPU syncs)")
     t.add_argument("--bucket-window", type=int, default=64, help="batches per length-sorting window; 0 = random batches")
     t.add_argument("--save", action="store_true")
@@ -539,10 +636,12 @@ def main():
     e.add_argument("cache"); e.add_argument("adapter"); e.add_argument("out")
     pr = sub.add_parser("profile")
     pr.add_argument("cache")
+    g = sub.add_parser("dev-gt")
+    g.add_argument("cache"); g.add_argument("out")
     pl = sub.add_parser("profile-lora")
     pl.add_argument("cache")
     args = parser.parse_args()
-    {"cache": build_cache, "train": train, "eval": evaluate, "profile": profile, "profile-lora": profile_lora}[args.command](args)
+    {"cache": build_cache, "train": train, "eval": evaluate, "profile": profile, "profile-lora": profile_lora, "dev-gt": dev_gt}[args.command](args)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,38 @@
+=== attempt 2026-10-06T19:57:01Z on NVIDIA L40S ===
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.42 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+{"lora_modules": [], "lora_layers": [0, 35], "n_layers": 36, "gate_biases": 0, "residual_biases": 36864, "backward_cut_at": 18, "trainable_params": 36864}
+first dev answer: 'Answer: Snoopy, Confidence'
+
+Filter:   0%|          | 0/11313 [00:00<?, ? examples/s]
+Filter:   9%|▉         | 1000/11313 [00:00<00:08, 1279.95 examples/s]
+Filter:  18%|█▊        | 2000/11313 [00:01<00:05, 1804.95 examples/s]
+Filter:  27%|██▋       | 3000/11313 [00:01<00:04, 1862.78 examples/s]
+Filter:  35%|███▌      | 4000/11313 [00:02<00:03, 1896.26 examples/s]
+Filter:  44%|████▍     | 5000/11313 [00:02<00:03, 1930.38 examples/s]
+Filter:  53%|█████▎    | 6000/11313 [00:03<00:02, 2197.72 examples/s]
+Filter:  62%|██████▏   | 7000/11313 [00:03<00:01, 2414.48 examples/s]
+Filter:  71%|███████   | 8000/11313 [00:03<00:01, 2590.77 examples/s]
+Filter:  80%|███████▉  | 9000/11313 [00:04<00:00, 2622.65 examples/s]
+Filter:  88%|████████▊ | 10000/11313 [00:04<00:00, 2681.27 examples/s]
+Filter:  97%|█████████▋| 11000/11313 [00:04<00:00, 2857.32 examples/s]
+Filter: 100%|██████████| 11313/11313 [00:04<00:00, 2884.29 examples/s]
+Filter: 100%|██████████| 11313/11313 [00:04<00:00, 2345.00 examples/s]
+
+Map:   0%|          | 0/507 [00:00<?, ? examples/s]
+Map: 100%|██████████| 507/507 [00:00<00:00, 6853.59 examples/s]
+
+Map:   0%|          | 0/507 [00:00<?, ? examples/s]
+Map:  43%|████▎     | 217/507 [00:00<00:00, 2141.60 examples/s]
+Map:  88%|████████▊ | 445/507 [00:00<00:00, 2218.00 examples/s]
+Map: 100%|██████████| 507/507 [00:00<00:00, 2002.93 examples/s]
+{"step": 0, "ece_expected": 0.5734571814537048, "auroc_expected": 0.7874538262887778, "brier_expected": 0.5663957722987639, "ece_sampled": 0.5747534036636353, "auroc_sampled": 0.561284364682423, "brier_sampled": 0.5710453648915187, "accuracy": 0.3905325443786982, "level_mass": 0.9999999976404796, "n": 507, "answer_kl": 0.0, "answer_kl_token": 0.0, "regen_accuracy": 0.39644970414201186, "regen_malformed": 0.0039447731755424065}
+{"step": 10, "minutes": 0.6, "beta": 0.05, "ece_expected": 0.1283368468284607, "auroc_expected": 0.7854761204275768, "brier_expected": 0.2097260366288047, "ece_sampled": 0.11538496613502502, "auroc_sampled": 0.7486433918472752, "brier_sampled": 0.2129191321499014, "accuracy": 0.3905325443786982, "level_mass": 0.9999984541780197, "n": 507, "answer_kl": 0.8186814746872837, "answer_kl_token": 0.10428932353428463, "regen_accuracy": 0.3865877712031558, "regen_malformed": 0.0019723865877712033}
+{"step": 20, "minutes": 1.2, "beta": 0.05, "ece_expected": 0.07741254568099976, "auroc_expected": 0.8047628387434212, "brier_expected": 0.1836900708048676, "ece_sampled": 0.09546388685703278, "auroc_sampled": 0.8070510934588605, "brier_sampled": 0.17885601577909271, "accuracy": 0.3905325443786982, "level_mass": 0.9999986771857324, "n": 507, "answer_kl": 0.9127931646195349, "answer_kl_token": 0.11627792323168447, "regen_accuracy": 0.39644970414201186, "regen_malformed": 0.0039447731755424065}

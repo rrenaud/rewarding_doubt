@@ -358,6 +358,44 @@ anything trains (section 7). 2 seeds per arm, mean ± sd.
 - Seed 1 spikes at step 200 in most arms (Brier up to 0.17–0.22, then back): batch order depends
   only on the seed, so it is a hard batch rather than any one method's instability.
 
+## 10. The fast loop's adapters break the answers (Oct 6)
+
+The fast loop scores frozen cached answers, so it never looked at what training does to the answers
+themselves, although every adapter acts at every token. A 3,000-step attention-bias run of the released
+pipeline with policy-generated answers dropped to 0.315 dev accuracy by step 500 (about 0.40 for LoRA runs at
+lr 1e-5). Two measurements and a penalty, all from the forward pass that scores the confidence:
+
+- **answer_kl** (every dev evaluation): KL(policy ‖ reference) over the vocabulary at each token of the
+  cached dev answers, summed per answer, with the reference = the same model under `disable_adapter()`
+  (LoRA and attention biases off; `rewarding_doubt.attn_bias`, which the fast loop now uses for
+  `--attn-bias`). 0 at step 0.
+- **regen_accuracy** (`--regen-every N`): the 507 dev questions answered again by the policy (released
+  sampling, seeded per batch) and graded by F1; regen_malformed counts answers that never reach
+  " Confidence" or do not parse. 0.396 at step 0, against 0.391 for the cached answers.
+- **`--answer-kl W`**: W × answer_kl of each training row added to its loss (one extra reference forward
+  without grad per minibatch).
+
+Default schedule (Adam, 32 questions per update, 300 steps), 2 seeds:
+
+| arm | Brier @300 | ECE @300 | AUROC @300 | answer KL @300 | regen accuracy @0 / 100 / 200 / 300 | malformed @300 |
+|---|---|---|---|---|---|---|
+| attention bias 18–35, lr 1e-2, W=0 | 0.116 ± 0.002 | 0.047 ± 0.007 | 0.904 ± 0.003 | 14.9 | 0.396 / 0.229 / 0.194 / 0.139 | 25% |
+| W=0.1 | 0.135 ± 0.006 | 0.081 ± 0.002 | 0.895 ± 0.004 | 1.35 | 0.396 / 0.403 / 0.400 / 0.380 | 1.3% |
+| W=1 | 0.135 ± 0.009 | 0.061 ± 0.026 | 0.888 ± 0.009 | 1.05 | 0.396 / 0.392 / 0.400 / 0.398 | 0.9% |
+| W=10 | 0.174 ± 0.010 | 0.094 ± 0.033 | 0.827 ± 0.006 | 0.65 | 0.396 / 0.388 / 0.393 / 0.396 | 0.5% |
+| all-layer LoRA, lr 3e-4, W=0 | 0.154 ± 0.001 | 0.090 ± 0.013 | 0.886 ± 0.009 | 22.0 | 0.396 / 0.319 / 0.256 / 0.239 | 28% |
+| all-layer LoRA, W=1 | 0.135 ± 0.000 | 0.078 ± 0.018 | 0.903 ± 0.005 | 0.26 | 0.396 / 0.406 / 0.403 / 0.403 | 0.2% |
+
+- **Unpenalized, both adapters destroy the answers** at the fast loop's learning rates: the attention bias's
+  regenerated accuracy falls from 0.396 to 0.139 with a quarter of the answers malformed; all-layer LoRA's
+  to 0.239. The calibration numbers of sections 3–9 are of the stated confidence on the base model's
+  answers, not of what these policies would answer.
+- **W = 1 keeps the answers** (0.398 for the bias, 0.403 for LoRA at step 300) at a cost in calibration:
+  Brier 0.135 against 0.116 for the unpenalized bias. All-layer LoRA with W = 1 keeps AUROC 0.903, the
+  attention bias 0.888. W = 10 holds the answers no better and costs much more calibration.
+- This is still the fast loop: training uses the cached answers, so it shows the side effect on answers
+  but not the compounding of training on one's own drifted answers.
+
 ## Defaults now in `fast_loop.py train`
 
 `--batchsize 32 --passes 1 --minibatch 32 --lr 3e-4 --steps 300 --eval-every 50 --bucket-window 64`,
@@ -366,6 +404,8 @@ L40S including 7 dev evaluations; runs before section 8 took 4.7 minutes with ch
 released schedule is `--batchsize 8 --passes 4 --minibatch 4 --lr 1e-5`.
 `--lora-modules` and `--lora-layers` restrict which adapters train (section 6).
 `--gate-bias`, `--residual-bias` and `--attn-bias` train bias vectors instead (section 9).
+`--answer-kl W` penalizes drift of the answers and `--regen-every N` measures it by regenerating them
+(section 10); without the penalty these adapters degrade the answers.
 
 ## Caveats and open items
 
