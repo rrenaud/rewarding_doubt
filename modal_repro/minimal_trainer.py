@@ -33,7 +33,7 @@ answers the dev questions again with the policy and grades them (regen_accuracy;
 answer-ref stores the reference's top-k log-probs at every cached answer token, so the penalty needs no
 reference pass: topk_answer_kl is the KL between the two distributions coarse-grained to those k tokens
 plus one bucket for the rest, which is never more than the exact KL. --answer-kl-target T adapts W after
-each step to hold the batch's answer KL near T.
+each step, within [--answer-kl-min, --answer-kl-max], to hold a moving average of the batch answer KL near T.
 """
 import argparse
 import collections
@@ -519,7 +519,7 @@ def train(args):
     optimizer = torch.optim.Adam(params, lr=args.lr)
     kl_ctl = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon) if args.adaptive_kl else None
     beta = args.kl_coef
-    answer_w = args.answer_kl
+    answer_w, kl_ema = args.answer_kl, None
     if answer_w and args.answer_ref == "topk" and not args.online and "answer_ref_idx" not in train_rows[0]:
         raise SystemExit("--answer-ref topk needs a cache from `minimal_trainer.py answer-ref`")
     if args.answer_kl_target and not answer_w:
@@ -553,7 +553,7 @@ def train(args):
         set_rng_state(state["rng"])
         rng.setstate(state["rng_local"])
         curve, batches, start, elapsed = state["curve"], state["batches"], state["step"] + 1, state["seconds"]
-        beta, answer_w = state["beta"], state["answer_w"]
+        beta, answer_w, kl_ema = state["beta"], state["answer_w"], state.get("kl_ema")
         if kl_ctl is not None:
             kl_ctl.value = beta
         phase_seconds.update(state["phase_seconds"])
@@ -569,7 +569,7 @@ def train(args):
         save_checkpoint(checkpoint_dir, dict(
             step=step, seconds=time.time() - t0, params={n: p.detach().cpu().clone() for n, p in named.items()},
             optimizer=optimizer.state_dict(), rng=rng_state(), rng_local=rng.getstate(), batches=batches, curve=curve,
-            beta=beta, answer_w=answer_w, phase_seconds=dict(phase_seconds)))
+            beta=beta, answer_w=answer_w, kl_ema=kl_ema, phase_seconds=dict(phase_seconds)))
         announce_saved(checkpoint_dir)
 
     def lap(phase=None):
@@ -631,10 +631,14 @@ def train(args):
         if kl_ctl is not None:
             kl_ctl.update(statistics.fmean(s[1] for s in stats), args.batchsize)
             beta = kl_ctl.value
-        if args.answer_kl_target:  # multiplicative: W *= exp(rate * clip(KL / T - 1, -1, 1))
-            error = statistics.fmean(s[3] for s in stats) / args.answer_kl_target - 1
-            answer_w *= math.exp(args.answer_kl_rate * max(-1.0, min(1.0, error)))
-        record = dict(step=step, answer_w=answer_w, **online, expected_reward=statistics.fmean(s[0] for s in stats), kl=statistics.fmean(s[1] for s in stats),
+        if args.answer_kl_target:
+            # multiplicative on a moving average of the batch KL, bounded: unbounded, W grew to 1e30 in 3,000-step
+            # online runs whose KL stayed above target (Adam's step does not shrink as W grows, so the KL has a
+            # floor at a given lr) and wrecked them
+            kl_ema = statistics.fmean(s[3] for s in stats) if kl_ema is None else 0.9 * kl_ema + 0.1 * statistics.fmean(s[3] for s in stats)
+            error = kl_ema / args.answer_kl_target - 1
+            answer_w = min(args.answer_kl_max, max(args.answer_kl_min, answer_w * math.exp(args.answer_kl_rate * max(-1.0, min(1.0, error)))))
+        record = dict(step=step, answer_w=answer_w, answer_kl_ema=kl_ema, **online, expected_reward=statistics.fmean(s[0] for s in stats), kl=statistics.fmean(s[1] for s in stats),
                       mean_confidence=statistics.fmean(s[2] for s in stats), answer_kl=statistics.fmean(s[3] for s in stats),
                       beta=beta, seconds=time.time() - t0,
                       **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
@@ -704,6 +708,8 @@ def main():
                    help="reference for --answer-kl: the cache's top-k (answer-ref, no extra pass) or a live pass with adapters off")
     t.add_argument("--answer-kl-target", type=float, default=0.0, help="adapt the --answer-kl weight to hold the answer KL near this (nats per answer)")
     t.add_argument("--answer-kl-rate", type=float, default=0.05, help="per-step log change of the weight at full error")
+    t.add_argument("--answer-kl-max", type=float, default=10.0, help="upper bound of the adapted weight")
+    t.add_argument("--answer-kl-min", type=float, default=1e-3, help="lower bound of the adapted weight")
     t.add_argument("--regen-every", type=int, default=0, help="also answer the dev questions again and grade them every N steps (and at 0)")
     t.add_argument("--gt", default="", help="JSON {question_id: gt_candidates} for --regen-every and --online (fast_loop.py gt)")
     t.add_argument("--online", action="store_true",
