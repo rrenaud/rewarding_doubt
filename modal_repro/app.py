@@ -722,17 +722,18 @@ def hparam_round(search_dir: str, round: str, score_test: bool = False, gpu: str
 
 
 @app.function(volumes={VOL: volume}, timeout=HOUR)
-def evaluate_test(ids_by_split: dict, model_dir: str) -> dict:
-    """The released evaluation on the test questions, writing to eval_test*.json beside the checkpoint."""
+def evaluate_test(ids_by_split: dict, model_dir: str, frozen: bool = False) -> dict:
+    """The released evaluation on the test questions, writing to eval_test*.json beside the checkpoint;
+    with `frozen`, frozen_eval.py (base-model answers, adapted confidence) to eval_test_frozen*.json."""
     import subprocess
 
     volume.reload()
     Path("/tmp/ids.json").write_text(json.dumps(ids_by_split))
-    out_json = f"{model_dir}/eval_test.json"
+    out_json = f"{model_dir}/eval_test{'_frozen' if frozen else ''}.json"
     if Path(out_json.replace(".json", "_metrics.json")).exists():  # already evaluated (e.g. before a restart)
         return dict(model_dir=model_dir, metrics=json.loads(Path(out_json.replace(".json", "_metrics.json")).read_text()))
-    proc = subprocess.run(["python", "subset.py", "evaluate", "/tmp/ids.json", model_dir, out_json], cwd=CODE,
-                          capture_output=True, text=True)
+    command = ["frozen_eval.py", "/tmp/ids.json", model_dir, out_json] if frozen else ["subset.py", "evaluate", "/tmp/ids.json", model_dir, out_json]
+    proc = subprocess.run(["python", *command], cwd=CODE, capture_output=True, text=True)
     volume.commit()
     if proc.returncode:
         return dict(model_dir=model_dir, error=proc.stdout[-3000:] + proc.stderr[-3000:])
@@ -1147,7 +1148,7 @@ def attn_bias_check(gpu: str = "L40S"):
 
 
 @app.local_entrypoint()
-def attn_bias_smoke(gpu: str = "L40S", steps: int = 20, lr: str = "2e-4"):
+def attn_bias_smoke(gpu: str = "L40S", steps: int = 20, lr: str = "2e-4", frozen: bool = False):
     """subset.py train --attn-bias 18-35 for a few steps (patched released code, --objective exact), then
     the released evaluation of the last snapshot: biases train alone, are saved and are loaded."""
     root = Path(__file__).resolve().parents[1]
@@ -1158,7 +1159,8 @@ def attn_bias_smoke(gpu: str = "L40S", steps: int = 20, lr: str = "2e-4"):
     model = "unsloth/Qwen2.5-3B-Instruct"
     r = train_with_snapshots.with_options(gpu=gpu).remote({"train": train, "validation": test}, "smoke", [
         "subset.py", "train", "IDS_JSON", "--seed", "1", "--save-every", str(steps // 2), "--max-steps", str(steps),
-        "--attn-bias", "18-35", "--", "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", model,
+        "--attn-bias", "18-35", *(["--frozen-answers"] if frozen else []), "--", "--out_dir", "OUT_DIR", "--dataset", "triviaqa",
+        "--is_unsloth", "--model_dir", model,
         "--tokenizer_dir", model, "--epochs", "1", "--lr", lr, "--batchsize", "8", "--log_with", "tensorboard", "--objective", "exact"], run)
     print("exit", r["exit_code"], "snapshots", r["snapshots"])
     print("\n".join(l for l in r["log"].splitlines() if "attention-output" in l or "Error" in l or "Traceback" in l))
@@ -1166,12 +1168,13 @@ def attn_bias_smoke(gpu: str = "L40S", steps: int = 20, lr: str = "2e-4"):
     if r["snapshots"]:
         snap = r["snapshots"][-1]
         print("snapshot:", snap)
-        e = evaluate_test.with_options(gpu=gpu).remote({"validation": test}, snap)
+        e = evaluate_test.with_options(gpu=gpu).remote({"validation": test}, snap, frozen)
         print("eval:", e.get("error") or {k: (round(v, 3) if isinstance(v, float) else v) for k, v in e["metrics"].items()})
 
 
 @app.function(volumes={VOL: volume}, timeout=12 * HOUR, nonpreemptible=True)
-def train_then_eval(ids_by_split: dict, label: str, command: list[str], run_name: str, gpu: str = "L40S") -> dict:
+def train_then_eval(ids_by_split: dict, label: str, command: list[str], run_name: str, gpu: str = "L40S",
+                    frozen: bool = False) -> dict:
     """Train (train_with_snapshots), then the released evaluation of every snapshot on the validation
     split (evaluate_test, in parallel); writes {step: metrics} to the run's curve.json on the volume.
     Runs remotely, so a long run does not depend on the local client staying connected.
@@ -1187,7 +1190,7 @@ def train_then_eval(ids_by_split: dict, label: str, command: list[str], run_name
     else:
         r = train_with_snapshots.with_options(gpu=gpu).remote(ids_by_split, label, command, run_name)
     curve = {}
-    jobs = [({"validation": ids_by_split["validation"]}, snap) for snap in r["snapshots"]]
+    jobs = [({"validation": ids_by_split["validation"]}, snap, frozen) for snap in r["snapshots"]]
     for e in evaluate_test.with_options(gpu=gpu).starmap(jobs, return_exceptions=True):
         if isinstance(e, Exception) or "error" in e:
             print("EVAL FAILED", repr(e)[:500] if isinstance(e, Exception) else e["error"][-500:])
@@ -1200,24 +1203,30 @@ def train_then_eval(ids_by_split: dict, label: str, command: list[str], run_name
 
 
 @app.local_entrypoint()
-def attn_bias_full(lrs: str = "1e-4,2e-4", layers: str = "18-35", steps: int = 3000, gpu: str = "L40S"):
+def attn_bias_full(lrs: str = "1e-4,2e-4", layers: str = "18-35", steps: int = 3000, gpu: str = "L40S",
+                   frozen_answers: bool = True):
     """Released code + patch, --objective exact, answers generated by the policy, training only
     attention-output biases (subset.py --attn-bias) on the full training set, as the KL-grid runs
     (seed 1, batch 8, 2 epochs capped at `steps`, snapshots every 500, adaptive KL as released);
     then every snapshot on the same 512 dev questions. Spawned remotely: run with `modal run --detach`
-    and read outputs/<run>/<label>/curve.json from the volume."""
+    and read outputs/<run>/<label>/curve.json from the volume.
+
+    frozen_answers (default): answers come from the base model, with LoRA and biases off, in training
+    (--frozen-answers) and in evaluation (frozen_eval.py). Without it, a policy-generated run lost answer
+    accuracy (0.315 at step 500 against about 0.40 for LoRA runs), since the biases act on every token
+    but only the confidence is trained."""
     root = Path(__file__).resolve().parents[1]
     ids = json.loads((root / "runs/runpod/klgrid-exact-adapt20/ids.json").read_text())  # {"train": "all", "validation": 512 dev ids}
     run = "attn-bias-full-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     model = "unsloth/Qwen2.5-3B-Instruct"
     calls = []
     for lr in lrs.split(","):
-        label = f"attnbias{layers}-lr{lr}-s1"
+        label = f"attnbias{layers}-lr{lr}{'-frozen' if frozen_answers else ''}-s1"
         command = ["subset.py", "train", "IDS_JSON", "--seed", "1", "--save-every", "500", "--checkpoint-every", "100",
-                   "--max-steps", str(steps), "--attn-bias", layers, "--", "--out_dir", "OUT_DIR", "--dataset", "triviaqa",
-                   "--is_unsloth", "--model_dir", model, "--tokenizer_dir", model, "--epochs", "2", "--lr", lr,
+                   "--max-steps", str(steps), "--attn-bias", layers, *(["--frozen-answers"] if frozen_answers else []),
+                   "--", "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", model, "--tokenizer_dir", model, "--epochs", "2", "--lr", lr,
                    "--batchsize", "8", "--log_with", "tensorboard", "--objective", "exact"]
-        calls.append(train_then_eval.spawn(ids, label, command, run, gpu))
+        calls.append(train_then_eval.spawn(ids, label, command, run, gpu, frozen_answers))
         print(f"spawned {run}/{label}")
     for c in calls:
         print("call id", c.object_id)

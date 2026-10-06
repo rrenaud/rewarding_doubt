@@ -6,7 +6,8 @@ Same settings as the released evaluation (InferenceDatasetSplit + util.Evaluatio
 16-bit base model under the adapter, as ModelLoader loads it) except
 that generation is split where training split it:
 1. answer: the adapter disabled, the released prompt, T=0.6, top-p 0.9, up to 256 tokens, stopping
-   at " Confidence" (Train.py's prediction terminators);
+   at " Confidence" (Train.py's prediction terminators), with the sampler seeded per batch so every
+   adapter gets the same answers;
 2. confidence: the adapter enabled, continuing from prompt + answer at T=0.6, top-p 0.9.
 The text is parsed with the released parse_answer_confidence and graded with F1 > 0.5;
 metrics come from rewarding_doubt.paper_ppo.evaluation_metrics (torchmetrics ECE, sklearn AUROC
@@ -46,6 +47,10 @@ def main(ids_path, model_dir, out_path, batch=32):
     # puts the adapter on the 16-bit base model, although training used the 4-bit one.
     model, tokenizer = FastLanguageModel.from_pretrained(model_name=model_dir, max_seq_length=1048, dtype=None,
                                                          load_in_4bit=False)
+    # Attention-output biases saved beside the adapter (subset.py --attn-bias); disable_adapter() also
+    # switches them off (rewarding_doubt.attn_bias), so the answers below stay the base model's.
+    from rewarding_doubt import attn_bias
+    bias_layers = attn_bias.load(model, model_dir)
     FastLanguageModel.for_inference(model)
     pad, eot = tokenizer.eos_token_id, end_of_turn(tokenizer)
     confidence_token = tokenizer.convert_tokens_to_ids("ĠConfidence")
@@ -58,6 +63,9 @@ def main(ids_path, model_dir, out_path, batch=32):
         part = [data[i] for i in range(start, min(start + batch, len(data)))]
         prompts = [d["query"] for d in part]
         ids, mask, width = left_pad(prompts, pad)
+        # Seeded per batch, so the base-model answers are the same for every adapter evaluated on these
+        # questions (paired comparisons across snapshots) whatever the confidence stage consumed.
+        torch.manual_seed(start)
         with torch.no_grad(), base_answers():
             out = model.generate(input_ids=ids, attention_mask=mask, max_new_tokens=256, do_sample=True,
                                  temperature=0.6, top_p=0.9, eos_token_id=[pad, eot, confidence_token], pad_token_id=pad)
@@ -97,6 +105,8 @@ def main(ids_path, model_dir, out_path, batch=32):
                                         for r in with_pi])
         metrics.update({f"{k}_unsampled": unsampled[k] for k in ("ece", "auroc", "brier")})
     metrics["protocol"] = "frozen-answers"
+    if bias_layers:
+        metrics["attn_bias_layers"] = bias_layers
     json.dump(rows, open(out_path, "w"))
     json.dump(metrics, open(out_path.replace(".json", "_metrics.json"), "w"), indent=1)
     print(json.dumps(metrics), flush=True)
