@@ -1301,22 +1301,18 @@ def minimal_diagnose(rows: int = 64, gpu: str = "L40S"):
 
 @app.local_entrypoint()
 def minimal_memory(gpu: str = "L40S"):
-    """minimal_trainer.py memory: peak memory of one all-layer LoRA update, bf16 and 4-bit, with and without
-    the shared prefix."""
+    """minimal_trainer.py memory: peak memory of one all-layer LoRA update, with and without the shared prefix."""
     run = "minimal-memory-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    jobs = [({}, "bf16", ["minimal_trainer.py", "memory", MINIMAL_CACHE], run),
-            ({}, "4bit", ["minimal_trainer.py", "memory", FAST_CACHE, "--model", "unsloth/Qwen2.5-3B-Instruct-bnb-4bit"], run)]
-    for r in train_with_snapshots.with_options(gpu=gpu).starmap(jobs):
-        print("==", r["label"], "exit", r["exit_code"])
-        print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
+    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "memory", ["minimal_trainer.py", "memory", MINIMAL_CACHE], run)
+    print("exit", r["exit_code"], r["gpu"])
+    print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
 
 
 @app.local_entrypoint()
-def minimal_train(configs: str, gpu: str = "L40S", fetch: str = "", four_bit: bool = False):
+def minimal_train(configs: str, gpu: str = "L40S", fetch: str = ""):
     """minimal_trainer.py train for each {label: [args]} in a JSON file, in parallel, on the bf16-reference
-    cache; train.log, metrics.jsonl and curve.json to runs/minimal/<label>/. --four-bit trains the fast loop's
-    4-bit weights on its original cache (4-bit reference). With --fetch RUN (same configs), only copies a
-    finished run's outputs from the volume, for when the local client was cut off."""
+    cache; train.log, metrics.jsonl and curve.json to runs/minimal/<label>/. With --fetch RUN (same configs),
+    only copies a finished run's outputs from the volume, for when the local client was cut off."""
     root = Path(__file__).resolve().parents[1]
     cfg = json.loads(Path(configs).read_text())
     run = fetch or "minimal-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -1335,9 +1331,7 @@ def minimal_train(configs: str, gpu: str = "L40S", fetch: str = "", four_bit: bo
         for label in cfg:
             save(label)
         return
-    model = ["--model", "unsloth/Qwen2.5-3B-Instruct-bnb-4bit"] if four_bit else []
-    jobs = [({}, label, ["minimal_trainer.py", "train", FAST_CACHE if four_bit else MINIMAL_CACHE, "OUT_DIR", *model, *args], run)
-            for label, args in cfg.items()]
+    jobs = [({}, label, ["minimal_trainer.py", "train", MINIMAL_CACHE, "OUT_DIR", *args], run) for label, args in cfg.items()]
     for r in train_with_snapshots.with_options(gpu=gpu).starmap(jobs, return_exceptions=True, order_outputs=False):
         if isinstance(r, Exception):
             print("FAILED", repr(r)[:800]); continue

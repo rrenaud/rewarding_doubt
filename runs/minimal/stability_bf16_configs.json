@@ -1,0 +1,26 @@
+{
+ "lora-all-s4": [
+  "--seed",
+  "4"
+ ],
+ "lora-all-s5": [
+  "--seed",
+  "5"
+ ],
+ "lora-all-s6": [
+  "--seed",
+  "6"
+ ],
+ "lora-all-s7": [
+  "--seed",
+  "7"
+ ],
+ "lora-all-s8": [
+  "--seed",
+  "8"
+ ],
+ "lora-all-s9": [
+  "--seed",
+  "9"
+ ]
+}

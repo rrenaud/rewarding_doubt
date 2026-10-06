@@ -92,8 +92,6 @@ def level_logps(lm, levels, queries, pad, shared_prefix=True):
 
 
 def load(model_name, device="cuda"):
-    """bf16, or 4-bit for a pre-quantized checkpoint such as unsloth/Qwen2.5-3B-Instruct-bnb-4bit (the weights
-    Unsloth loads for unsloth/Qwen2.5-3B-Instruct with load_in_4bit: bitsandbytes NF4, double quantization)."""
     lm = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16, attn_implementation="sdpa",
                                               device_map={"": device})
     lm.requires_grad_(False)
@@ -101,20 +99,17 @@ def load(model_name, device="cuda"):
     return lm, tok
 
 
-def add_lora(lm, modules, layers, dtype=torch.float32):
+def add_lora(lm, modules, layers):
     """Rank-8 LoRA (alpha 8, no dropout, no bias) on `modules` in decoder `layers`; adapters elsewhere would
-    be frozen at B = 0 and change nothing, so they are not created. PEFT keeps adapter weights in fp32;
-    the fast loop's were bf16 (TRL's peft_module_casting_to_bf16), so Adam's updates were rounded to bf16."""
+    be frozen at B = 0 and change nothing, so they are not created. PEFT keeps adapter weights in fp32
+    (the fast loop's were bf16: TRL's peft_module_casting_to_bf16)."""
     from peft import LoraConfig, get_peft_model
     if not modules or not layers:
         return []
     config = LoraConfig(r=8, lora_alpha=8, lora_dropout=0.0, bias="none", target_modules=[f"{m}_proj" for m in modules],
                         layers_to_transform=list(layers), layers_pattern="layers")
     get_peft_model(lm, config)  # injects the adapters into lm's modules in place
-    params = [p for n, p in lm.named_parameters() if "lora_" in n]
-    for p in params:
-        p.data = p.data.to(dtype)
-    return params
+    return [p for n, p in lm.named_parameters() if "lora_" in n]
 
 
 def add_output_biases(lm, layers, part):
@@ -220,7 +215,7 @@ def memory(args):
     """Peak GPU memory of one training update on a bucketed batch, after forward and after backward, for all-layer
     LoRA with and without the shared prefix."""
     cache = torch.load(args.cache, weights_only=False)
-    lm, tok = load(args.model or cache["model"])
+    lm, tok = load(cache["model"])
     params = add_lora(lm, list(LORA_MODULES), range(lm.config.num_hidden_layers))
     levels, pad = Levels(tok), tok.eos_token_id
     rows = cache["splits"]["train"]
@@ -243,7 +238,7 @@ def memory(args):
 
 def make_ref(args):
     cache = torch.load(args.cache, weights_only=False)
-    lm, tok = load(args.model or cache["model"])
+    lm, tok = load(cache["model"])
     levels = Levels(tok)
     dev = cache["splits"]["dev"]
     for split, rows in cache["splits"].items():
@@ -256,7 +251,7 @@ def make_ref(args):
         print(json.dumps(dict(split=split, rows=len(rows), seconds=round(time.time() - t0, 1),
                               vs_4bit_ref_mean_abs=float(diff.mean()), vs_4bit_ref_max_abs=float(diff.max()))), flush=True)
     print(json.dumps(dict(untrained_bf16_dev=dev_metrics_from_levels([r["ref"] for r in dev], [r["f1"] for r in dev]))), flush=True)
-    cache.update(ref_model=f"{args.model or cache['model']} bf16 (minimal_trainer.py ref)", ref_created=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
+    cache.update(ref_model=f"{cache['model']} bf16 (minimal_trainer.py ref)", ref_created=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
     torch.save(cache, args.out)
 
 
@@ -275,14 +270,14 @@ def epoch_batches(lengths, batchsize, window, rng):
 
 def train(args):
     cache = torch.load(args.cache, weights_only=False)
-    lm, tok = load(args.model or cache["model"])
+    lm, tok = load(cache["model"])
     pad = tok.eos_token_id
     n_layers = lm.config.num_hidden_layers
     modules = [] if args.lora_modules == "none" else args.lora_modules.split(",")
     assert set(modules) <= set(LORA_MODULES), modules
     torch.manual_seed(args.seed)
     lora_layers, attn_layers, mlp_layers = (layer_range(s, n_layers) for s in (args.lora_layers, args.attn_bias, args.residual_bias))
-    trained = dict(lora=add_lora(lm, modules, lora_layers, getattr(torch, args.adapter_dtype)), attn_bias=add_output_biases(lm, attn_layers, "self_attn"),
+    trained = dict(lora=add_lora(lm, modules, lora_layers), attn_bias=add_output_biases(lm, attn_layers, "self_attn"),
                    residual_bias=add_output_biases(lm, mlp_layers, "mlp"))
     params = [p for group in trained.values() for p in group]
     print(json.dumps(dict(lora_modules=modules, lora_layers=[lora_layers.start, lora_layers.stop - 1] if modules else None,
@@ -365,17 +360,13 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     r = sub.add_parser("ref")
     r.add_argument("cache"); r.add_argument("out")
-    r.add_argument("--model", default=None, help="default: the cache's model")
     d = sub.add_parser("diagnose")
     d.add_argument("cache")
     d.add_argument("--rows", type=int, default=64)
     m = sub.add_parser("memory")
     m.add_argument("cache")
-    m.add_argument("--model", default=None)
     t = sub.add_parser("train")
     t.add_argument("cache"); t.add_argument("out_dir")
-    t.add_argument("--model", default=None, help="default: the cache's model; unsloth/Qwen2.5-3B-Instruct-bnb-4bit for "
-                                                 "the 4-bit weights the fast loop trained (with the 4-bit-reference cache)")
     # Defaults: fast_loop's schedule. The released one is --batchsize 8 --passes 4 --minibatch 4 --lr 1e-5.
     t.add_argument("--steps", type=int, default=300)
     t.add_argument("--batchsize", type=int, default=32)
@@ -391,8 +382,6 @@ def main():
     t.add_argument("--seed", type=int, default=1)
     t.add_argument("--lora-modules", default=",".join(LORA_MODULES), help='projections with LoRA adapters, or "none"')
     t.add_argument("--lora-layers", default="all", help='"all" or an inclusive range of decoder layers, e.g. "18-35"')
-    t.add_argument("--adapter-dtype", choices=["float32", "bfloat16"], default="float32",
-                   help="LoRA weight dtype; the fast loop's were bfloat16")
     t.add_argument("--attn-bias", default="none", help='"none", "all" or a layer range: train a vector added to each attention output')
     t.add_argument("--residual-bias", default="none", help='"none", "all" or a layer range: train a vector added to each MLP output')
     t.add_argument("--bucket-window", type=int, default=64, help="batches per length-sorting window; 0 = random batches")

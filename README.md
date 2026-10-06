@@ -43,7 +43,7 @@ The change is available as an opt-in flag for the released code: [pasta99/Reward
 | [`docs/grading.md`](docs/grading.md) | F1 versus exact-match answer grading, with every disagreement judged |
 | [`docs/thinking_experiment.md`](docs/thinking_experiment.md) | An experiment with unscored reasoning before the confidence (no gain) |
 | [`docs/fast_loop_log.md`](docs/fast_loop_log.md) | A 5-minute training loop on cached rollouts: where the time went, length bucketing, and an optimizer comparison (Adam, Muon, Scaled AdamW, PoLoRA) |
-| [`docs/minimal_trainer.md`](docs/minimal_trainer.md) | The fast loop rewritten with Hugging Face, PEFT and PyTorch only: shared-prompt-prefix scoring, validation against the fast loop, time and memory, 4-bit weights |
+| [`docs/minimal_trainer.md`](docs/minimal_trainer.md) | The fast loop rewritten with Hugging Face, PEFT and PyTorch only: shared-prompt-prefix scoring, validation against the fast loop, time and memory |
 | [`docs/tinker_phase.md`](docs/tinker_phase.md) | The first phase: Qwen3-8B on the Tinker API |
 | [`runs/hparam-search-20261002T044831Z/PROTOCOL.md`](runs/hparam-search-20261002T044831Z/PROTOCOL.md) | The hyperparameter search protocol and its amendments |
 
