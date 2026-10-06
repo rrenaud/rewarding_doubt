@@ -1,0 +1,5 @@
+2026-10-06T22:07:14Z attempt start (image ac72b80d2eee558d9a8bff8602413a02f927f040): python minimal_trainer.py train /workspace/fast/qwen25-3b-cache-bf16ref-top64.pt /workspace/runs/online-bias-t2-s1 --online --gt /workspace/fast/gt.json --lora-modules none --attn-bias 18-35 --lr 1e-2 --answer-kl 0.1 --answer-kl-target 2 --seed 1 --steps 3000 --eval-every 100 --regen-every 500 --checkpoint-every 100
+2026-10-06T22:57:16Z trainer exited with code 0
+2026-10-06T22:57:16Z outcome: completed
+selfstop: terminate pod m2qa6r1yuhnhec: HTTP 204
+2026-10-06T22:57:16Z pod terminate requested

@@ -151,8 +151,6 @@ live reference; 300 steps, 2 seeds; `runs/minimal/on-*`):
 - Step times (L40S): online attention bias about 1.2 s per step of 32 questions (1.0 s generating),
   all-layer LoRA about 2.8 s (PEFT applies unmerged adapters at every decoding step).
 
-Next: 3,000-step online attention-bias runs on RunPod (targets 0.5, 1, 2; `runs/runpod/online-bias-*`).
-
 ## Stock parameters instead of hooks (Oct 6, evening)
 
 The attention-output bias needs a hook (and, in Unsloth, a patched decoding loop). Qwen-2.5 has a stock parameter
@@ -187,6 +185,27 @@ Adaptive 1-nat answer-KL target, 300 steps, 2 seeds (`runs/minimal/stock-*`):
   norm gains lost 3–4 points of accuracy at 1.1–1.35 nats. The cost of a nat depends on the directions moved;
   regenerated accuracy has to be measured, not inferred from the KL.
 - On all 36 layers the controller did not hold the target (KL 3.9) and a seed degraded.
+
+## 3,000-step online runs on RunPod (Oct 6, evening)
+
+Online, layers 18–35, lr 1e-2, adaptive answer-KL target, seed 1, one RTX 4090 each (`runs/runpod/online-*`).
+The first launch (hooked attention bias, targets 0.5, 1 and 2) exposed an unbounded controller: with targets 1
+and 0.5 the answer KL stayed above target (Adam's step does not shrink as the weight grows, so at this lr the
+KL has a floor of a few nats) and the weight grew to 1e22–1e33, wrecking those three runs by step ~1,800; they
+were stopped. The weight is now bounded to [1e-3, 10] and follows a moving average of the KL
+(`runs/minimal/controller-cap-check`: with an unreachable target it rises to 10 and stays). Target 2 ran to the
+end. Regenerated dev accuracy at step 0 is 0.440 on these GPUs (0.426 on Modal's L40S).
+
+| run (target 2) | params | Brier, mean of steps 1k–3k | ECE | AUROC | answer KL | regenerated accuracy | worst malformed | 3,000 steps |
+|---|---:|---|---|---|---|---|---|---|
+| hooked attention bias | 36.9k | 0.122 | 0.050 | 0.909 | 2.69 | 0.422–0.458 | 3.0% | 49 min |
+| `v_proj` bias (stock, no hooks) | 4.6k | 0.108 | 0.044 | 0.919 | 2.54 | 0.404–0.428 | 1.8% | 55 min |
+
+- Both are stable for 3,000 steps; the bounded controller holds the answer KL near 2 (weight 0.005–0.21).
+- The stock `v_proj` bias is better calibrated (final Brier 0.109, ECE 0.041, AUROC 0.913) at a small accuracy
+  cost (1–3.6 points below the start), while the hooked bias stayed within about 2 points; late in the run the
+  `v_proj` controller's weight fell to near its floor. A lower target (1–1.5) or a higher minimum weight would
+  likely close the gap. One seed each, proxy metrics.
 
 ## Differences from the fast loop, and what is not done
 

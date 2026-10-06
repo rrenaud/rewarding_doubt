@@ -1,0 +1,11 @@
+{
+ "outcome": "completed",
+ "exit_code": 0,
+ "detail": null,
+ "time": "2026-10-06T22:57:16Z",
+ "trainer_status": {
+  "status": "completed",
+  "step": 3000,
+  "healthy_checkpoint": null
+ }
+}
