@@ -1107,6 +1107,14 @@ def fast_train(configs: str, gpu: str = "L40S"):
 
 
 @app.local_entrypoint()
+def fast_profile(gpu: str = "L40S"):
+    """fast_loop.py profile: where a training update's time goes."""
+    run = "fast-profile-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "profile", ["fast_loop.py", "profile", FAST_CACHE], run)
+    print("exit", r["exit_code"], r["gpu"]); print(r["log"][-12000:])
+
+
+@app.local_entrypoint()
 def fast_eval(dirs: str, gpu: str = "L40S"):
     """fast_loop.py eval for comma-separated adapter dirs on the volume; prints one JSON line per dir."""
     run = "fast-eval-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")

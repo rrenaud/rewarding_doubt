@@ -1,7 +1,7 @@
 """A fast, approximate loop for iterating on confidence objectives (no generation after caching).
 
     python fast_loop.py cache IDS_JSON OUT.pt --model M --n-train 8000
-    python fast_loop.py train CACHE.pt OUT_DIR [--steps 1000 --kl-coef 0.05 --adaptive-kl ...]
+    python fast_loop.py train CACHE.pt OUT_DIR [--steps 300 --lr 3e-4 --kl-coef 0.05 --adaptive-kl ...]
     python fast_loop.py eval CACHE.pt ADAPTER_DIR OUT.json
 
 cache: the base model answers each question once, as the released training does (released prompt,
@@ -12,8 +12,12 @@ log-probabilities of the 11 confidence levels (LevelScheme, adapter-free base mo
 train: answers stay frozen at the cached ones, so the exact objective (released reward, -30 for
 the leftover mass, exact KL to the cached reference; core.baseline_matched_objective, the same
 objective as --objective exact in patches/exact_confidence.patch) is one batched forward and
-backward per update: no generation, no reference pass. Same schedule as the released PPO config:
-batches of 8, 4 passes in minibatches of 4. The dev split is scored every --eval-every steps.
+backward per update: no generation, no reference pass. Logits are computed only at the positions
+the levels read (level_logps). Default schedule: one Adam update per 32 length-bucketed questions,
+lr 3e-4, 300 steps (~5 min on an L40S; most of the gain by step 150). In a 3-seed comparison it
+matched or beat Muon, Scaled AdamW and PoLoRA, and 1e-3 collapses some seeds; see
+docs/fast_loop_log.md, which describes those optimizers (not kept in the code). The released
+schedule (batches of 8, 4 passes in minibatches of 4, lr 1e-5) is available by flags.
 
 eval: the confidence on each cached dev answer comes from one forward pass: the level
 distribution q. Reported: ECE / AUROC / Brier of the expected confidence sum_k k q_k ("expected")
@@ -32,6 +36,7 @@ import statistics
 import time
 
 import torch
+from xformers.ops.fmha import attn_bias
 from unsloth import FastLanguageModel  # must precede transformers imports
 
 from rewarding_doubt.core import baseline_matched_objective
@@ -120,28 +125,86 @@ def dev_metrics_from_levels(levels, labels, temperature=0.6, seed=0):
     return out
 
 
+def level_logps(model, scheme, queries):
+    """[B, 11] log q over the levels: LevelScheme.batch with k* = None, but with logits only at the
+    positions it reads (common, the number, and P("0" | "1") for a two-token "10") instead of the full
+    vocabulary at every position, which dominated the backward pass."""
+    device = next(model.parameters()).device
+    base = model.get_base_model()
+    tail = [] if scheme.single else [scheme.one]
+    seqs = [q + scheme.common + tail for q in queries]
+    width = max(map(len, seqs))
+    # As Unsloth's CausalLM forward does before calling the inner model: no labels, and its causal mask
+    # (without the mask, attention is bidirectional).
+    base.model._has_no_labels = True
+    hidden = base.model(input_ids=torch.tensor([s + [scheme.stop] * (width - len(s)) for s in seqs], device=device),
+                        causal_mask=attn_bias.LowerTriangularMask())[0]
+    c = len(scheme.common)
+    rows = torch.arange(len(queries), device=device)[:, None]
+    pos = torch.tensor([[len(q) - 1 + i for i in range(c + 1 + len(tail))] for q in queries], device=device)
+    logp = base.lm_head(hidden[rows, pos].to(base.lm_head.weight.dtype)).float().log_softmax(-1)
+    common = torch.tensor(scheme.common, device=device)
+    common_logp = logp[:, :c].gather(-1, common[None, :, None].expand(len(queries), c, 1)).sum((1, 2))
+    if scheme.single:
+        return common_logp[:, None] + logp[:, c, scheme.numbers]
+    levels = common_logp[:, None] + logp[:, c, scheme.digits]
+    log_zero = logp[:, c + 1, scheme.zero]
+    log_not_zero = torch.log1p(-log_zero.exp().clamp(max=1 - 1e-7))
+    return torch.cat([levels[:, :1], levels[:, 1:2] + log_not_zero[:, None], levels[:, 2:], levels[:, 1:2] + log_zero[:, None]], 1)
+
+
+def set_gradient_checkpointing(model, on):
+    """Unsloth turns checkpointing on even with use_gradient_checkpointing=False; off is ~1.4x faster
+    per update at ~3x the activation memory (10 GB at minibatch 16, 164-token rows)."""
+    for m in model.modules():
+        if hasattr(m, "gradient_checkpointing"):
+            m.gradient_checkpointing = on
+
+
+def trainable_model(model_name):
+    model, tok = load(model_name)
+    model = FastLanguageModel.get_peft_model(model, r=8, lora_alpha=8, lora_dropout=0, bias="none",
+                                             use_gradient_checkpointing=False, random_state=3407)
+    import trl
+    trl.trainer.peft_module_casting_to_bf16(model)
+    FastLanguageModel.for_training(model)
+    set_gradient_checkpointing(model, False)
+    return model, tok
+
+
 def score_dev(model, scheme, rows, label_key="f1"):
     FastLanguageModel.for_training(model)
     levels = []
     with torch.no_grad():
         for start in range(0, len(rows), 32):
             chunk = rows[start:start + 32]
-            levels += [lv.float().cpu() for lv, _ in scheme.batch(model, [r["ids"] for r in chunk], [None] * len(chunk))]
+            levels += list(level_logps(model, scheme, [r["ids"] for r in chunk]).float().cpu())
     return dev_metrics_from_levels(levels, [r[label_key] for r in rows])
+
+
+def epoch_batches(lengths, batchsize, window, rng):
+    """One epoch of batches (every row once, ragged tail dropped). With window > 0, length bucketing:
+    the shuffled epoch is cut into windows of `window` batches, each window is sorted by length before
+    being cut into batches, and the batch order is shuffled. Rows are right-padded to the longest in a
+    batch; random batches of 32 are 17% padding, bucketed ones 0.2%. Which rows train is unchanged;
+    only which rows share a batch (shorter answers are correct more often, so batches are less mixed)."""
+    order = rng.sample(range(len(lengths)), len(lengths))
+    if window > 0:
+        span = window * batchsize
+        order = [i for s in range(0, len(order), span) for i in sorted(order[s:s + span], key=lengths.__getitem__)]
+    batches = [order[s:s + batchsize] for s in range(0, len(order) - batchsize + 1, batchsize)]
+    rng.shuffle(batches)
+    return batches
 
 
 def train(args):
     cache = torch.load(args.cache, weights_only=False)
-    model, tok = load(cache["model"])
-    model = FastLanguageModel.get_peft_model(model, r=8, lora_alpha=8, lora_dropout=0, bias="none",
-                                             use_gradient_checkpointing=False, random_state=3407)
-    import trl
-    trl.trainer.peft_module_casting_to_bf16(model)
-    FastLanguageModel.for_training(model)
+    model, tok = trainable_model(cache["model"])
     scheme = LevelScheme(tok, end_of_turn(tok))
     torch.manual_seed(args.seed)
     rng = random.Random(args.seed)
     train_rows, dev_rows = cache["splits"]["train"], cache["splits"]["dev"]
+    # Adam as in the released code (TRL 0.8.6 PPOTrainer: torch.optim.Adam, default betas, no weight decay).
     optimizer = torch.optim.Adam([p for p in model.parameters() if p.requires_grad], lr=args.lr)
     kl_ctl = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon) if args.adaptive_kl else None
     beta = args.kl_coef
@@ -149,21 +212,19 @@ def train(args):
     log = open(os.path.join(args.out_dir, "metrics.jsonl"), "w")
     curve = {0: score_dev(model, scheme, dev_rows)}
     print(json.dumps(dict(step=0, **curve[0])), flush=True)
-    order, t0 = [], time.time()
+    batches, t0 = [], time.time()
     for step in range(1, args.steps + 1):
-        if len(order) < args.batchsize:
-            order += rng.sample(range(len(train_rows)), len(train_rows))
-        batch = [train_rows[i] for i in order[:args.batchsize]]
-        del order[:args.batchsize]
+        if not batches:
+            batches = epoch_batches([len(r["ids"]) for r in train_rows], args.batchsize, args.bucket_window, rng)
+        batch = [train_rows[i] for i in batches.pop()]
         stats = []
         for p in range(args.passes):
             idx = list(range(len(batch)))
             rng.shuffle(idx)
             for mb in range(0, len(idx), args.minibatch):
                 chunk = [batch[i] for i in idx[mb:mb + args.minibatch]]
-                scored = scheme.batch(model, [r["ids"] for r in chunk], [None] * len(chunk))
                 losses = []
-                for r, (levels, _) in zip(chunk, scored):
+                for r, levels in zip(chunk, level_logps(model, scheme, [r["ids"] for r in chunk])):
                     J, kl = baseline_matched_objective(levels.double(), float(r[args.grading]), "discrete-exact", "released",
                                                        -30.0, ref_logq=r["ref"].to(levels.device).double(),
                                                        brier_mix=args.brier_mix)
@@ -206,6 +267,71 @@ def evaluate(args):
     print(json.dumps(metrics), flush=True)
 
 
+def profile(args):
+    """Time one training update's parts on the cached rows: forward, loss, backward, optimizer."""
+    cache = torch.load(args.cache, weights_only=False)
+    model, tok = trainable_model(cache["model"])
+    scheme = LevelScheme(tok, end_of_turn(tok))
+    rows = cache["splits"]["train"][:256]
+    lens = [len(r["ids"]) for r in rows]
+    print(json.dumps(dict(tokens_mean=statistics.fmean(lens), tokens_max=max(lens), tokens_min=min(lens),
+                          shared_prefix=len(os.path.commonprefix([r["ids"] for r in rows])),
+                          logits_dtype=str(model(input_ids=torch.tensor([rows[0]["ids"]], device="cuda")).logits.dtype))), flush=True)
+    optimizer = torch.optim.Adam([p for p in model.parameters() if p.requires_grad], lr=1e-5)
+
+    def loss_of(chunk, levels_list):
+        losses = []
+        for r, levels in zip(chunk, levels_list):
+            J, kl = baseline_matched_objective(levels.double(), float(r["em"]), "discrete-exact", "released", -30.0,
+                                               ref_logq=r["ref"].to(levels.device).double())
+            losses.append(-(J - 0.05 * kl))
+        return torch.stack(losses).mean()
+
+    def timed(name, mb, scorer, backward=True, n=64):
+        times = dict(forward=0., loss=0., backward=0., step=0.)
+        sync = torch.cuda.synchronize
+        torch.cuda.reset_peak_memory_stats()
+        for rep in range(2):  # the first pass is warmup
+            for k in times: times[k] = 0.
+            for start in range(0, n, mb):
+                chunk = rows[start:start + mb]
+                sync(); t = time.time()
+                with torch.set_grad_enabled(backward):
+                    levels = scorer([r["ids"] for r in chunk])
+                sync(); times["forward"] += time.time() - t; t = time.time()
+                if not backward:
+                    continue
+                loss = loss_of(chunk, levels)
+                sync(); times["loss"] += time.time() - t; t = time.time()
+                optimizer.zero_grad(); loss.backward()
+                sync(); times["backward"] += time.time() - t; t = time.time()
+                optimizer.step()
+                sync(); times["step"] += time.time() - t
+        per_q = {k: round(1000 * v / n, 1) for k, v in times.items()}
+        print(json.dumps(dict(variant=name, minibatch=mb, ms_per_question=per_q, total=round(sum(per_q.values()), 1),
+                              peak_gb=round(torch.cuda.max_memory_allocated() / 2**30, 1))), flush=True)
+
+    current = lambda qs: [lv for lv, _ in scheme.batch(model, qs, [None] * len(qs))]
+    selective = lambda qs: list(level_logps(model, scheme, qs))
+    with torch.no_grad():  # the selective path must give the same levels
+        a = torch.stack(current([r["ids"] for r in rows[:8]])).float(); b = level_logps(model, scheme, [r["ids"] for r in rows[:8]]).float()
+        print(json.dumps(dict(selective_max_abs_diff=float((a - b).abs().max()))), flush=True)
+    timed("current", 4, current)
+    for gc in (True, False):
+        set_gradient_checkpointing(model, gc)
+        for mb in (8, 16, 32, 64):
+            timed(f"selective_gc_{gc}", mb, selective)
+    set_gradient_checkpointing(model, True)
+    from torch.profiler import profile as torch_profile, ProfilerActivity
+    with torch_profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
+        for start in range(0, 16, 4):
+            chunk = rows[start:start + 4]
+            loss = loss_of(chunk, current([r["ids"] for r in chunk]))
+            optimizer.zero_grad(); loss.backward(); optimizer.step()
+        torch.cuda.synchronize()
+    print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=20), flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
@@ -217,24 +343,29 @@ def main():
     c.add_argument("--seed", type=int, default=0)
     t = sub.add_parser("train")
     t.add_argument("cache"); t.add_argument("out_dir")
-    t.add_argument("--steps", type=int, default=1000)
-    t.add_argument("--batchsize", type=int, default=8)
-    t.add_argument("--passes", type=int, default=4)
-    t.add_argument("--minibatch", type=int, default=4)
-    t.add_argument("--lr", type=float, default=1e-5)
+    # Defaults: the fast schedule (runs/fast/seed_sweep_configs.json, 3 seeds, 4.7 min on an L40S). The released
+    # schedule is --batchsize 8 --passes 4 --minibatch 4 --lr 1e-5 (overhead-bound: 48 min per 1,000 steps).
+    t.add_argument("--steps", type=int, default=300)
+    t.add_argument("--batchsize", type=int, default=32)
+    t.add_argument("--passes", type=int, default=1)
+    t.add_argument("--minibatch", type=int, default=32)
+    t.add_argument("--lr", type=float, default=3e-4)
     t.add_argument("--kl-coef", type=float, default=0.05)
     t.add_argument("--adaptive-kl", action="store_true", help="the released controller: target 6, horizon 10000")
     t.add_argument("--kl-target", type=float, default=6.0)
     t.add_argument("--kl-horizon", type=float, default=10000.0)
     t.add_argument("--grading", choices=["em", "f1"], default="em", help="training label (released default: exact match)")
     t.add_argument("--brier-mix", type=float, default=0.0)
-    t.add_argument("--eval-every", type=int, default=250)
+    t.add_argument("--eval-every", type=int, default=50)
     t.add_argument("--seed", type=int, default=1)
+    t.add_argument("--bucket-window", type=int, default=64, help="batches per length-sorting window; 0 = random batches")
     t.add_argument("--save", action="store_true")
     e = sub.add_parser("eval")
     e.add_argument("cache"); e.add_argument("adapter"); e.add_argument("out")
+    pr = sub.add_parser("profile")
+    pr.add_argument("cache")
     args = parser.parse_args()
-    {"cache": build_cache, "train": train, "eval": evaluate}[args.command](args)
+    {"cache": build_cache, "train": train, "eval": evaluate, "profile": profile}[args.command](args)
 
 
 if __name__ == "__main__":

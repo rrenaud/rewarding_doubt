@@ -1,0 +1,17 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.42 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+Matplotlib is building the font cache; this may take a moment.
+{"step": 0, "ece_expected": 0.5734571814537048, "auroc_expected": 0.7874538262887778, "brier_expected": 0.5663957722987639, "ece_sampled": 0.5747534036636353, "auroc_sampled": 0.561284364682423, "brier_sampled": 0.5710453648915187, "accuracy": 0.3905325443786982, "level_mass": 0.9999999976404796, "n": 507}
+{"step": 50, "minutes": 0.8, "beta": 0.05, "ece_expected": 0.23099660873413086, "auroc_expected": 0.884263345428394, "brier_expected": 0.2105122157325969, "ece_sampled": 0.23431962728500366, "auroc_sampled": 0.8241149357654212, "brier_sampled": 0.2109270216962524, "accuracy": 0.3905325443786982, "level_mass": 0.9999998247949956, "n": 507}
+{"step": 100, "minutes": 1.6, "beta": 0.05, "ece_expected": 0.06125221401453018, "auroc_expected": 0.4494622601418718, "brier_expected": 0.23976379491186117, "ece_sampled": 0.1270209699869156, "auroc_sampled": 0.4712088522768135, "brier_sampled": 0.25325443786982244, "accuracy": 0.3905325443786982, "level_mass": 0.9972354237198896, "n": 507}
+{"step": 150, "minutes": 2.4, "beta": 0.05, "ece_expected": 0.0050044674426317215, "auroc_expected": 0.5025170801869832, "brier_expected": 0.238109677811054, "ece_sampled": 0.10631157457828522, "auroc_sampled": 0.49635513713183615, "brier_sampled": 0.2487376725838264, "accuracy": 0.3905325443786982, "level_mass": 1.4821744904144377e-24, "n": 507}
+{"step": 200, "minutes": 3.2, "beta": 0.05, "ece_expected": 0.03119674324989319, "auroc_expected": 0.5194256480664248, "brier_expected": 0.23875607774943913, "ece_sampled": 0.11262241005897522, "auroc_sampled": 0.48327939590075514, "brier_sampled": 0.25031558185404335, "accuracy": 0.3905325443786982, "level_mass": 4.576084122136044e-25, "n": 507}
+{"step": 250, "minutes": 4.0, "beta": 0.05, "ece_expected": 0.031170345842838287, "auroc_expected": 0.5085809551828969, "brier_expected": 0.2388327181710205, "ece_sampled": 0.10867764055728912, "auroc_sampled": 0.4874145990650845, "brier_sampled": 0.2495266272189349, "accuracy": 0.3905325443786982, "level_mass": 4.606314535091994e-25, "n": 507}
+{"step": 300, "minutes": 4.8, "beta": 0.05, "ece_expected": 0.03118084743618965, "auroc_expected": 0.5093654996567618, "brier_expected": 0.2388252018425344, "ece_sampled": 0.10867764055728912, "auroc_sampled": 0.4874145990650845, "brier_sampled": 0.2495266272189349, "accuracy": 0.3905325443786982, "level_mass": 4.595252309512628e-25, "n": 507}

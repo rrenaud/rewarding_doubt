@@ -1,0 +1,15 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Qwen2 patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.42 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 36 layers with 36 QKV layers, 36 O layers and 36 MLP layers.
+Matplotlib is building the font cache; this may take a moment.
+{"step": 0, "ece_expected": 0.5734571814537048, "auroc_expected": 0.7874538262887778, "brier_expected": 0.5663957722987639, "ece_sampled": 0.5747534036636353, "auroc_sampled": 0.561284364682423, "brier_sampled": 0.5710453648915187, "accuracy": 0.3905325443786982, "level_mass": 0.9999999976404796, "n": 507}
+{"step": 250, "minutes": 11.9, "beta": 0.05, "ece_expected": 0.03475688770413399, "auroc_expected": 0.8446765388512961, "brier_expected": 0.15887525737190125, "ece_sampled": 0.046548712998628616, "auroc_sampled": 0.8144715766074988, "brier_sampled": 0.16339250493096644, "accuracy": 0.3905325443786982, "level_mass": 0.9999997237073674, "n": 507}
+{"step": 500, "minutes": 24.1, "beta": 0.05, "ece_expected": 0.1522182822227478, "auroc_expected": 0.8571802164035174, "brier_expected": 0.18669123280049876, "ece_sampled": 0.1611437350511551, "auroc_sampled": 0.7909842764211696, "brier_sampled": 0.18680473372781065, "accuracy": 0.3905325443786982, "level_mass": 0.9999995941775311, "n": 507}
+{"step": 750, "minutes": 36.3, "beta": 0.05, "ece_expected": 0.06439607590436935, "auroc_expected": 0.8706318851949919, "brier_expected": 0.1398878067994164, "ece_sampled": 0.06548330187797546, "auroc_sampled": 0.8433934817429963, "brier_sampled": 0.14591715976331363, "accuracy": 0.3905325443786982, "level_mass": 0.999999446167751, "n": 507}
+{"step": 1000, "minutes": 48.1, "beta": 0.05, "ece_expected": 0.025166720151901245, "auroc_expected": 0.8765976921316728, "brier_expected": 0.13274110507788284, "ece_sampled": 0.014990195631980896, "auroc_sampled": 0.864796835670622, "brier_sampled": 0.1336094674556213, "accuracy": 0.3905325443786982, "level_mass": 0.9999997747969597, "n": 507}

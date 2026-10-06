@@ -1,0 +1,22 @@
+{
+ "speed-fixed005-s1": [
+  "--kl-coef",
+  "0.05",
+  "--seed",
+  "1",
+  "--steps",
+  "250",
+  "--batchsize",
+  "8",
+  "--passes",
+  "4",
+  "--minibatch",
+  "4",
+  "--lr",
+  "1e-5",
+  "--eval-every",
+  "250",
+  "--bucket-window",
+  "0"
+ ]
+}

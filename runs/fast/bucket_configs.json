@@ -1,0 +1,1 @@
+{"b32-lr1e-4-bucketed": ["--kl-coef", "0.05", "--seed", "1", "--batchsize", "32", "--passes", "1", "--minibatch", "32", "--lr", "1e-4", "--steps", "300", "--eval-every", "50"]}

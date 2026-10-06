@@ -18,3 +18,4 @@ runs/runpod/*/snapshot-step*/
 runs/**/*launcher*.log
 runs/minimal-diff-*.log
 runs/modal-bench-*.log
+runs/fast/*.log

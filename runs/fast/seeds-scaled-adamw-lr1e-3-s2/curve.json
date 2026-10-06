@@ -1,0 +1,79 @@
+{
+ "0": {
+  "ece_expected": 0.5734571814537048,
+  "auroc_expected": 0.7874538262887778,
+  "brier_expected": 0.5663957722987639,
+  "ece_sampled": 0.5747534036636353,
+  "auroc_sampled": 0.561284364682423,
+  "brier_sampled": 0.5710453648915187,
+  "accuracy": 0.3905325443786982,
+  "level_mass": 0.9999999976404796,
+  "n": 507
+ },
+ "50": {
+  "ece_expected": 0.09053099155426025,
+  "auroc_expected": 0.6069759079467817,
+  "brier_expected": 0.2462130152844894,
+  "ece_sampled": 0.09053099155426025,
+  "auroc_sampled": 0.5,
+  "brier_sampled": 0.24621301775147922,
+  "accuracy": 0.3905325443786982,
+  "level_mass": 0.9999998200200145,
+  "n": 507
+ },
+ "100": {
+  "ece_expected": 0.09053099155426025,
+  "auroc_expected": 0.5977738550554085,
+  "brier_expected": 0.24621301697309608,
+  "ece_sampled": 0.09053099155426025,
+  "auroc_sampled": 0.5,
+  "brier_sampled": 0.24621301775147922,
+  "accuracy": 0.3905325443786982,
+  "level_mass": 1.0000000092849803,
+  "n": 507
+ },
+ "150": {
+  "ece_expected": 0.09053099155426025,
+  "auroc_expected": 0.5950606387499592,
+  "brier_expected": 0.24621301699119635,
+  "ece_sampled": 0.09053099155426025,
+  "auroc_sampled": 0.5,
+  "brier_sampled": 0.24621301775147922,
+  "accuracy": 0.3905325443786982,
+  "level_mass": 1.0000000095376342,
+  "n": 507
+ },
+ "200": {
+  "ece_expected": 0.09053099155426025,
+  "auroc_expected": 0.5918734268248832,
+  "brier_expected": 0.24621301695658981,
+  "ece_sampled": 0.09053099155426025,
+  "auroc_sampled": 0.5,
+  "brier_sampled": 0.24621301775147922,
+  "accuracy": 0.3905325443786982,
+  "level_mass": 1.0000000087905239,
+  "n": 507
+ },
+ "250": {
+  "ece_expected": 0.09053099155426025,
+  "auroc_expected": 0.5922983884148932,
+  "brier_expected": 0.2462130169426153,
+  "ece_sampled": 0.09053099155426025,
+  "auroc_sampled": 0.5,
+  "brier_sampled": 0.24621301775147922,
+  "accuracy": 0.3905325443786982,
+  "level_mass": 1.0000000093932906,
+  "n": 507
+ },
+ "300": {
+  "ece_expected": 0.09053099155426025,
+  "auroc_expected": 0.5988852930600504,
+  "brier_expected": 0.24621301691794395,
+  "ece_sampled": 0.09053099155426025,
+  "auroc_sampled": 0.5,
+  "brier_sampled": 0.24621301775147922,
+  "accuracy": 0.3905325443786982,
+  "level_mass": 1.0000000097844521,
+  "n": 507
+ }
+}
