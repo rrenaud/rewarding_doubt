@@ -188,6 +188,60 @@ def restrict_lora(model, modules, layers):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
+def add_gate_biases(model):
+    """A trainable bias on every MLP gate's pre-activation, zero-initialized (the model is unchanged
+    at the start): down(act(gate(x) + b) * up(x)). Qwen-2.5's MLP has no biases, and Unsloth's fused
+    LoRA MLP kernel ignores them, so these MLPs get a plain forward. Returns the number of biases."""
+    import types
+
+    def forward(self, x):
+        return self.down_proj(self.act_fn(self.gate_proj(x) + self.gate_bias.to(x.dtype)) * self.up_proj(x))
+
+    device = next(model.parameters()).device
+    for layer in model.get_base_model().model.layers:
+        layer.mlp.gate_bias = torch.nn.Parameter(torch.zeros(model.config.intermediate_size, device=device))
+        layer.mlp.forward = types.MethodType(forward, layer.mlp)
+    return len(model.get_base_model().model.layers) * model.config.intermediate_size
+
+
+def add_residual_biases(model, layers):
+    """A trainable vector added to the MLP output (so to the residual stream) in each of `layers`,
+    zero-initialized: h + mlp(x) + b. Wraps whatever forward the MLP has (Unsloth's fused kernel).
+    Returns the number of parameters."""
+    device = next(model.parameters()).device
+    decoder = model.get_base_model().model.layers
+    for i in layers:
+        mlp = decoder[i].mlp
+        mlp.residual_bias = torch.nn.Parameter(torch.zeros(model.config.hidden_size, device=device))
+        inner = mlp.forward
+
+        def forward(x, inner=inner, mlp=mlp):
+            out = inner(x)
+            return out + mlp.residual_bias.to(out.dtype)
+        mlp.forward = forward
+    return len(layers) * model.config.hidden_size
+
+
+def add_attention_biases(model, layers):
+    """A trainable vector added to the attention output (its write to the residual stream) in each of
+    `layers`, zero-initialized. Wraps the attention forward (Unsloth's), which returns a tuple whose
+    first element is the output. Returns the number of parameters."""
+    device = next(model.parameters()).device
+    decoder = model.get_base_model().model.layers
+    for i in layers:
+        attn = decoder[i].self_attn
+        attn.residual_bias = torch.nn.Parameter(torch.zeros(model.config.hidden_size, device=device))
+        inner = attn.forward
+
+        def forward(*args, inner=inner, attn=attn, **kwargs):
+            out = inner(*args, **kwargs)
+            if isinstance(out, tuple):
+                return (out[0] + attn.residual_bias.to(out[0].dtype), *out[1:])
+            return out + attn.residual_bias.to(out.dtype)
+        attn.forward = forward
+    return len(layers) * model.config.hidden_size
+
+
 def cut_backward_below(model, first_trained_layer):
     """Make backward stop at the first decoder layer whose adapters train: its input is replaced by a
     detached copy. Exact (nothing below trains) and saves the backward through the frozen layers.
@@ -231,12 +285,21 @@ def train(args):
     model, tok = trainable_model(cache["model"])
     n_layers = model.config.num_hidden_layers
     lo, hi = (0, n_layers - 1) if args.lora_layers == "all" else map(int, args.lora_layers.split("-"))
-    modules = args.lora_modules.split(",")
+    modules = [] if args.lora_modules == "none" else args.lora_modules.split(",")
     assert set(modules) <= set(LORA_MODULES), modules
-    n_trainable = restrict_lora(model, modules, range(lo, hi + 1))
-    if lo > 0:  # e.g. layers 18-35: 28% less time per update, 43% less peak memory (profile-lora)
-        cut_backward_below(model, lo)
-    print(json.dumps(dict(lora_modules=modules, lora_layers=[lo, hi], n_layers=n_layers, trainable_params=n_trainable)), flush=True)
+    restrict_lora(model, modules, range(lo, hi + 1))
+    n_gate_biases = add_gate_biases(model) if args.gate_bias else 0
+    def layer_range(spec):
+        return range(0) if spec == "none" else range(int(spec.split("-")[0]), int(spec.split("-")[1]) + 1)
+    rb, ab = layer_range(args.residual_bias), layer_range(args.attn_bias)
+    n_residual_biases = add_residual_biases(model, rb) + add_attention_biases(model, ab)
+    # backward stops at the first layer where anything trains (section 7-8 of the log: ~28% per step for layers 18-35)
+    first = min([lo] * bool(modules) + [0] * args.gate_bias + [rb.start] * bool(rb) + [ab.start] * bool(ab), default=0)
+    if first > 0:
+        cut_backward_below(model, first)
+    n_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(json.dumps(dict(lora_modules=modules, lora_layers=[lo, hi], n_layers=n_layers, gate_biases=n_gate_biases,
+                          residual_biases=n_residual_biases, backward_cut_at=first, trainable_params=n_trainable)), flush=True)
     scheme = LevelScheme(tok, end_of_turn(tok))
     torch.manual_seed(args.seed)
     rng = random.Random(args.seed)
@@ -464,7 +527,10 @@ def main():
     t.add_argument("--brier-mix", type=float, default=0.0)
     t.add_argument("--eval-every", type=int, default=50)
     t.add_argument("--seed", type=int, default=1)
-    t.add_argument("--lora-modules", default=",".join(LORA_MODULES), help="projections whose adapters train")
+    t.add_argument("--lora-modules", default=",".join(LORA_MODULES), help='projections whose adapters train, or "none"')
+    t.add_argument("--gate-bias", action="store_true", help="also train a bias on every MLP gate pre-activation (all layers)")
+    t.add_argument("--residual-bias", default="none", help='"none" or a layer range, e.g. "18-35": train a vector added to each MLP output')
+    t.add_argument("--attn-bias", default="none", help='"none" or a layer range: train a vector added to each attention output')
     t.add_argument("--lora-layers", default="all", help='"all" or an inclusive range of decoder layers, e.g. "18-35"')
     t.add_argument("--time-steps", action="store_true", help="log cumulative seconds per update phase (adds GPU syncs)")
     t.add_argument("--bucket-window", type=int, default=64, help="batches per length-sorting window; 0 = random batches")

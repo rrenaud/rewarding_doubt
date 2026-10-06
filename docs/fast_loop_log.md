@@ -314,6 +314,50 @@ the same seed; from step 2 on, runs drift by similar amounts whether they differ
 checkpointing, or by nothing, which points at nondeterministic GPU kernels in the backward pass
 amplified at lr 3e-4. Seed-to-seed spread is the yardstick, as in the tables above.
 
+## 9. How little has to train (Oct 6)
+
+Building on section 6: the o projection in fewer layers, and adapters with no low-rank matrices
+at all. `--gate-bias` trains a vector added to every MLP gate's pre-activation,
+down(silu(gate(x) + b) · up(x)) (36 × 11,008 = 396k values; those MLPs get a plain forward, since
+Unsloth's fused MLP kernel ignores biases). `--residual-bias A-B` adds a trained vector to each MLP
+output and `--attn-bias A-B` to each attention output, that is to the residual stream, in layers
+A–B (2,048 values per layer). All start at zero, so training starts from the base model;
+`--lora-modules none` freezes every LoRA adapter. The backward pass stops at the first layer where
+anything trains (section 7). 2 seeds per arm, mean ± sd.
+
+| what trains | layers | params | lr | Brier @150 | AUROC @150 | Brier @300 | ECE @300 | AUROC @300 | time |
+|---|---|---:|---|---|---|---|---|---|---:|
+| all 7 LoRA (baseline, 3 seeds) | all | 15.0M | 3e-4 | 0.116 ± 0.006 | 0.907 ± 0.007 | 0.120 ± 0.004 | 0.040 ± 0.014 | 0.915 ± 0.005 | 4.7 min |
+| o LoRA | all | 1.2M | 3e-4 | 0.145 ± 0.000 | 0.890 ± 0.005 | 0.115 ± 0.001 | 0.032 ± 0.019 | 0.912 ± 0.001 | 4.7 min |
+| o LoRA | 18–35 | 590k | 3e-4 | 0.153 ± 0.011 | 0.866 ± 0.001 | 0.118 ± 0.004 | 0.044 ± 0.010 | 0.905 ± 0.001 | 2.6 min |
+| o LoRA | 27–35 | 295k | 3e-4 | 0.206 ± 0.044 | 0.828 ± 0.008 | 0.166 ± 0.008 | 0.076 ± 0.039 | 0.836 ± 0.001 | 2.2 min |
+| gate biases | all | 396k | 3e-4 | 0.172 ± 0.005 | 0.811 ± 0.000 | 0.151 ± 0.003 | 0.043 ± 0.002 | 0.851 ± 0.009 | 4.0 min |
+| gate biases | all | 396k | 3e-3 | 0.126 ± 0.005 | 0.896 ± 0.005 | **0.114 ± 0.001** | 0.036 ± 0.009 | **0.913 ± 0.001** | 4.0 min |
+| gate biases | all | 396k | 3e-2 | 0.134 ± 0.015 | 0.892 ± 0.013 | 0.161 ± 0.005 | 0.078 ± 0.006 | 0.847 ± 0.003 | 4.0 min |
+| MLP-output bias | 18–35 | 36.9k | 3e-3 | 0.161 ± 0.020 | 0.866 ± 0.001 | 0.135 ± 0.007 | 0.055 ± 0.000 | 0.889 ± 0.003 | 2.5 min |
+| MLP-output bias | 18–35 | 36.9k | 1e-2 | 0.148 ± 0.030 | 0.878 ± 0.023 | 0.130 ± 0.018 | 0.065 ± 0.044 | 0.902 ± 0.005 | 2.7 min |
+| MLP-output bias | 18–35 | 36.9k | 3e-2 | 0.145 ± 0.028 | 0.887 ± 0.006 | 0.138 ± 0.007 | 0.077 ± 0.038 | 0.908 ± 0.007 | 2.7 min |
+| attention-output bias | 18–35 | 36.9k | 1e-2 | 0.147 ± 0.034 | 0.891 ± 0.008 | **0.114 ± 0.002** | 0.050 ± 0.022 | **0.908 ± 0.001** | 2.7 min |
+| attention + MLP bias | 18–35 | 73.7k | 1e-2 | 0.144 ± 0.033 | 0.899 ± 0.004 | 0.128 ± 0.007 | 0.074 ± 0.034 | 0.908 ± 0.008 | 2.7 min |
+| MLP-output bias | 27–35 | 18.4k | 1e-2 | 0.203 ± 0.045 | 0.819 ± 0.006 | 0.203 ± 0.044 | 0.125 ± 0.049 | 0.827 ± 0.000 | 2.2 min |
+| attention-output bias | 27–35 | 18.4k | 1e-2 | 0.194 ± 0.023 | 0.828 ± 0.002 | 0.169 ± 0.007 | 0.062 ± 0.060 | 0.836 ± 0.004 | 2.2 min |
+| attention + MLP bias | 27–35 | 36.9k | 1e-2 | 0.216 ± 0.034 | 0.828 ± 0.002 | 0.182 ± 0.029 | 0.088 ± 0.078 | 0.833 ± 0.001 | 2.2 min |
+
+- **A constant vector per layer is nearly enough.** One trained vector on each attention output
+  in layers 18–35 (36,864 values, 0.25% of the LoRA parameters) matches all-layer LoRA on Brier at
+  step 300 (0.114 against 0.120), with AUROC 0.908 against 0.915. Gate biases (396k) match it on
+  everything.
+- **A fixed shift improves ranking, not only calibration.** The same vector is added for every
+  question, yet AUROC rises from 0.787 to about 0.91: the shift acts through the later layers,
+  whose response depends on the input.
+- **Attention output beats MLP output in the same layers** (0.114 ± 0.002 against 0.130 ± 0.018
+  Brier), as o was the best single LoRA projection in section 6. Both together did not help at
+  lr 1e-2 (not tuned).
+- **The last quarter fails for every kind of adapter:** layers 27–35 reach AUROC 0.83–0.86
+  whatever trains there. What has to change lies earlier.
+- Seed 1 spikes at step 200 in most arms (Brier up to 0.17–0.22, then back): batch order depends
+  only on the seed, so it is a hard batch rather than any one method's instability.
+
 ## Defaults now in `fast_loop.py train`
 
 `--batchsize 32 --passes 1 --minibatch 32 --lr 3e-4 --steps 300 --eval-every 50 --bucket-window 64`,
@@ -321,6 +365,7 @@ Adam, gradient checkpointing off (since section 8). A step takes 0.61 s, so abou
 L40S including 7 dev evaluations; runs before section 8 took 4.7 minutes with checkpointing on. The
 released schedule is `--batchsize 8 --passes 4 --minibatch 4 --lr 1e-5`.
 `--lora-modules` and `--lora-layers` restrict which adapters train (section 6).
+`--gate-bias`, `--residual-bias` and `--attn-bias` train bias vectors instead (section 9).
 
 ## Caveats and open items
 
