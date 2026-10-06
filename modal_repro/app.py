@@ -210,8 +210,11 @@ def train_with_snapshots(ids_by_split: dict, label: str, command: list[str], run
     ids_path = f"{out_dir}/ids.json"
     Path(ids_path).write_text(json.dumps(ids_by_split))
     command = [arg.replace("OUT_DIR", out_dir).replace("IDS_JSON", ids_path) for arg in command]
-    gpu = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
-                         capture_output=True, text=True).stdout.strip()
+    try:
+        gpu = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+                             capture_output=True, text=True).stdout.strip()
+    except FileNotFoundError:  # a CPU-only call
+        gpu = "none"
     # A preempted container is restarted with the same input; the trainer then resumes from its last
     # checkpoint (subset.py, exact_llama.py), so checkpoints must reach the volume as soon as they exist:
     # commit whenever the trainer announces a saved checkpoint, snapshot or status (RD_SAVED lines).
@@ -1274,6 +1277,38 @@ def fast_eval(dirs: str, gpu: str = "L40S"):
 
 
 MINIMAL_CACHE = f"{VOL}/fast/qwen25-3b-cache-bf16ref.pt"
+DEV_GT = f"{VOL}/fast/dev_gt.json"  # {question_id: gt_candidates} of the cache's dev rows (fast_loop.py dev-gt)
+
+
+@app.local_entrypoint()
+def fast_dev_gt():
+    """fast_loop.py dev-gt: the dev rows' gold answers for minimal_trainer.py --dev-gt."""
+    # a GPU only because fast_loop.py imports Unsloth, which needs one at import
+    r = train_with_snapshots.with_options(gpu="T4").remote({}, "dev-gt", ["fast_loop.py", "dev-gt", FAST_CACHE, DEV_GT], "fast-dev-gt")
+    print("exit", r["exit_code"]); print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
+
+
+@app.function(timeout=HOUR)
+def run_tests(files: dict, target: str) -> str:
+    """pytest in the image (transformers / peft pins) on test files sent from the local checkout."""
+    import os
+    import subprocess
+    root = Path("/tmp/rd_tests")
+    for name, text in files.items():
+        (root / name).parent.mkdir(parents=True, exist_ok=True)
+        (root / name).write_text(text)
+    subprocess.run(["python", "-m", "pip", "install", "-q", "pytest"], capture_output=True)
+    proc = subprocess.run(["python", "-m", "pytest", "-q", str(root / target)], cwd=CODE, capture_output=True, text=True,
+                          env={**os.environ, "PYTHONPATH": f"{CODE}:/opt/rd"})
+    return proc.stdout[-6000:] + proc.stderr[-3000:]
+
+
+@app.local_entrypoint()
+def minimal_tests():
+    """tests/test_minimal_trainer.py in the Modal image (CPU), against the image's minimal_trainer.py."""
+    root = Path(__file__).resolve().parents[1]
+    print(run_tests.remote({"tests/test_minimal_trainer.py": (root / "tests/test_minimal_trainer.py").read_text()},
+                           "tests/test_minimal_trainer.py"))
 
 
 @app.local_entrypoint()
