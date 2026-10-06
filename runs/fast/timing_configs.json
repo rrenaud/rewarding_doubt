@@ -1,0 +1,42 @@
+{
+ "timing-full": [
+  "--kl-coef",
+  "0.05",
+  "--seed",
+  "1",
+  "--batchsize",
+  "32",
+  "--passes",
+  "1",
+  "--minibatch",
+  "32",
+  "--lr",
+  "3e-4",
+  "--steps",
+  "60",
+  "--eval-every",
+  "1000",
+  "--time-steps"
+ ],
+ "timing-layers18-35-cut": [
+  "--kl-coef",
+  "0.05",
+  "--seed",
+  "1",
+  "--batchsize",
+  "32",
+  "--passes",
+  "1",
+  "--minibatch",
+  "32",
+  "--lr",
+  "3e-4",
+  "--steps",
+  "60",
+  "--eval-every",
+  "1000",
+  "--time-steps",
+  "--lora-layers",
+  "18-35"
+ ]
+}

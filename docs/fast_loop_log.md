@@ -8,7 +8,9 @@ that launched them are in `runs/fast/`.
 length-bucketed questions at learning rate 3e-4, for 300 steps. That reaches dev Brier 0.120 ± 0.004
 and AUROC 0.915 ± 0.005 (3 seeds), better than 1,000 steps of the released schedule (0.133 / 0.877).
 Most of the gain is in by step 150. The speedup comes from computing logits only where they are
-read, turning gradient checkpointing off, and replacing many small updates with fewer large ones.
+read and replacing many small updates with fewer large ones. Gradient checkpointing was meant to
+be off as well, but every run until section 8 trained with it on; with it off, a step is another
+28% faster (section 8).
 Muon, Scaled AdamW and PoLoRA were tried as optimizers and did not beat Adam at a matched learning
 rate; only Adam is kept in the code.
 
@@ -73,6 +75,8 @@ Three causes:
    2.9 s.
 3. **Gradient checkpointing forced on.** Unsloth enables it even with `use_gradient_checkpointing=False`,
    so backward recomputes the forward pass. Fix: switched off on every module (`set_gradient_checkpointing`).
+   *Correction (section 8):* the dev scoring at step 0 turned it back on, so training runs kept it
+   on until that was fixed; the profiler's numbers above are with it off.
 
 Two bugs found on the way, both from calling Unsloth's inner model directly:
 - Without the `causal_mask` that Unsloth's `CausalLM` forward passes (xformers `LowerTriangularMask`),
@@ -286,10 +290,35 @@ layers, layers 18–35 or layers 27–35:
 A training run with the cut (`cut-layers18-35-s1`) took the same 4.6 minutes as without it. The
 reason is in section 8.
 
+## 8. Gradient checkpointing was back on during training (Oct 6)
+
+`--time-steps` on 60-step runs showed backward at 575 ms per step of 32 questions, 18 ms per question,
+where the profiler measured 9.6 with checkpointing off and about 20 with it on. `score_dev` calls
+Unsloth's `FastLanguageModel.for_training`, which turns gradient checkpointing back on, and it runs at
+step 0 before any update. Every training run since section 2 therefore trained with checkpointing
+on. Results are unaffected (checkpointing is exact); time was not. `score_dev` now switches it off
+again.
+
+| run (32 questions per step) | forward | loss | backward | optimizer | ms per step |
+|---|---:|---:|---:|---:|---:|
+| all layers, checkpointing on (all earlier runs) | 245 | 20 | 575 | 5 | 845 |
+| all layers, fixed | 252 | 15 | 339 | 5 | **611** |
+| layers 18–35 with the cut, fixed | 248 | 14 | 177 | 3 | **442** |
+
+Mean over steps 11–60 (`runs/fast/timing-*`). With checkpointing on, the cut of section 7 saved
+nothing measurable; with it off, training only the last half is 28% cheaper per step than all
+layers.
+
+**Training is not bitwise reproducible.** Step 1 matches to every printed digit across runs with
+the same seed; from step 2 on, runs drift by similar amounts whether they differ by the cut, by
+checkpointing, or by nothing, which points at nondeterministic GPU kernels in the backward pass
+amplified at lr 3e-4. Seed-to-seed spread is the yardstick, as in the tables above.
+
 ## Defaults now in `fast_loop.py train`
 
 `--batchsize 32 --passes 1 --minibatch 32 --lr 3e-4 --steps 300 --eval-every 50 --bucket-window 64`,
-Adam, gradient checkpointing off. About 4.7 minutes on an L40S, including 7 dev evaluations. The
+Adam, gradient checkpointing off (since section 8). A step takes 0.61 s, so about 3.5 minutes on an
+L40S including 7 dev evaluations; runs before section 8 took 4.7 minutes with checkpointing on. The
 released schedule is `--batchsize 8 --passes 4 --minibatch 4 --lr 1e-5`.
 `--lora-modules` and `--lora-layers` restrict which adapters train (section 6).
 

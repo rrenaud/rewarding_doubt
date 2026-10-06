@@ -202,6 +202,7 @@ def cut_backward_below(model, first_trained_layer):
 
 def score_dev(model, scheme, rows, label_key="f1"):
     FastLanguageModel.for_training(model)
+    set_gradient_checkpointing(model, False)  # for_training turns it back on, which roughly doubled backward time
     levels = []
     with torch.no_grad():
         for start in range(0, len(rows), 32):
