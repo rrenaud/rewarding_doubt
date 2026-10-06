@@ -36,6 +36,8 @@ Options before "--" change PPO from outside Train.py, which stays unmodified:
              can only change the confidence; TRL's confidence generation (the call with
              min_length=-1) keeps the adapter. Evaluate with frozen_eval.py. Malformed answers are
              still scored -30 by Train.py's reward, as released.
+  --attn-bias A-B  train only a vector added to the attention output of layers A..B (LoRA frozen);
+             saved as attn_biases.pt beside each adapter, loaded by evaluate (rewarding_doubt.attn_bias)
   --stop-on FLAGS  stability flags (rewarding_doubt.stability) that checkpoint and end the run
              (exit 3); default nonfinite. Every step also appends to stability.jsonl.
     python subset.py evaluate IDS_JSON MODEL_DIR OUT_JSON
@@ -389,6 +391,8 @@ def main():
         stop_on = {f for f in option("--stop-on", str, "nonfinite").split(",") if f}
         if stop_on - set(FLAGS):
             raise SystemExit(f"unknown --stop-on flags: {sorted(stop_on - set(FLAGS))}")
+        attn_bias_spec = option("--attn-bias", str, "")  # e.g. 18-35: train only attention-output biases there
+        attn_bias_layers = list(range(int(attn_bias_spec.split("-")[0]), int(attn_bias_spec.split("-")[1]) + 1)) if attn_bias_spec else []
         checkpoint_dir = os.path.join(args.out_dir, "checkpoint")
         resume = None if "--no-resume" in ours else load_checkpoint(checkpoint_dir)
         if hinge_weight:  # hinge.jsonl has one line per minibatch and no step; a resume appends to it
@@ -436,6 +440,22 @@ def main():
         original_init = PPOTrainerNoCache.__init__
 
         def init(self, *init_args, **init_kwargs):
+            if attn_bias_layers:  # before TRL builds its optimizer from the trainable parameters
+                from rewarding_doubt import attn_bias
+                policy = next(a for a in [*init_args, *init_kwargs.values()] if hasattr(a, "pretrained_model"))
+                lm = policy.pretrained_model
+                for name, p in lm.named_parameters():
+                    if "lora_" in name:
+                        p.requires_grad_(False)
+                attn_bias.install(lm, attn_bias_layers)
+                save = lm.save_pretrained
+
+                def save_with_biases(directory, *a, **k):
+                    save(directory, *a, **k)
+                    attn_bias.save(lm, directory)
+                lm.save_pretrained = save_with_biases
+                print(f"attention-output biases in layers {attn_bias_layers[0]}-{attn_bias_layers[-1]}, LoRA frozen: "
+                      f"{sum(p.numel() for p in lm.parameters() if p.requires_grad)} trainable parameters", flush=True)
             original_init(self, *init_args, **init_kwargs)
             self.dataloader = ResumableLoader(self.dataloader, samplers[-1], resume["consumed"] if resume else 0)
             current_loader[0] = self.dataloader
@@ -596,6 +616,8 @@ def main():
 
         def keep_model(*load_args, **load_kwargs):
             model, tokenizer = original_loader(*load_args, **load_kwargs)
+            from rewarding_doubt import attn_bias
+            loaded["attn_bias_layers"] = attn_bias.load(model, sys.argv[3])
             original_generate = model.generate
 
             def generate(*gen_args, **gen_kwargs):
@@ -621,6 +643,8 @@ def main():
                        auroc=QAResults_to_auroc_score(results, **settings),
                        brier=QAResults_to_brier_score(results, **settings))
         metrics.update(unsampled_metrics(loaded["tokenizer"], captured, results) or {})
+        if loaded["attn_bias_layers"]:
+            metrics["attn_bias_layers"] = loaded["attn_bias_layers"]
         json.dump(metrics, open(out_path.replace(".json", "_metrics.json"), "w"), indent=2)
         print(json.dumps(metrics))
     else:

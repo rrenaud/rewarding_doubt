@@ -51,6 +51,7 @@ image = (
     .add_local_file(Path(__file__).parent / "debug_levels.py", f"{CODE}/debug_levels.py", copy=True)
     .add_local_file(Path(__file__).parent / "verify_fast_levels.py", f"{CODE}/verify_fast_levels.py", copy=True)
     .add_local_file(Path(__file__).parent / "fast_loop.py", f"{CODE}/fast_loop.py", copy=True)
+    .add_local_file(Path(__file__).parent / "attn_bias_check.py", f"{CODE}/attn_bias_check.py", copy=True)
     # Our package, so the exact objectives use the very same core.objective as the Tinker runs.
     .add_local_dir(Path(__file__).parents[1] / "src" / "rewarding_doubt", "/opt/rd/rewarding_doubt", copy=True,
                    ignore=["__pycache__"])
@@ -1121,6 +1122,38 @@ def fast_profile_lora(gpu: str = "L40S"):
     r = train_with_snapshots.with_options(gpu=gpu).remote({}, "profile-lora", ["fast_loop.py", "profile-lora", FAST_CACHE], run)
     print("exit", r["exit_code"], r["gpu"])
     print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
+
+
+@app.local_entrypoint()
+def attn_bias_check(gpu: str = "L40S"):
+    """attn_bias_check.py: attention-output biases through Unsloth training, decoding and disable_adapter."""
+    run = "attn-bias-check-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "check", ["attn_bias_check.py"], run)
+    print("exit", r["exit_code"]); print(r["log"][-4000:])
+
+
+@app.local_entrypoint()
+def attn_bias_smoke(gpu: str = "L40S", steps: int = 20, lr: str = "2e-4"):
+    """subset.py train --attn-bias 18-35 for a few steps (patched released code, --objective exact), then
+    the released evaluation of the last snapshot: biases train alone, are saved and are loaded."""
+    root = Path(__file__).resolve().parents[1]
+    data = root / "runs/pilot-20261001T002945Z/data"
+    train = [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()][:256]
+    test = [json.loads(l)["id"] for l in (data / "eval.jsonl").read_text().splitlines()][:64]
+    run = "attn-bias-smoke-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    model = "unsloth/Qwen2.5-3B-Instruct"
+    r = train_with_snapshots.with_options(gpu=gpu).remote({"train": train, "validation": test}, "smoke", [
+        "subset.py", "train", "IDS_JSON", "--seed", "1", "--save-every", str(steps // 2), "--max-steps", str(steps),
+        "--attn-bias", "18-35", "--", "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", model,
+        "--tokenizer_dir", model, "--epochs", "1", "--lr", lr, "--batchsize", "8", "--log_with", "tensorboard", "--objective", "exact"], run)
+    print("exit", r["exit_code"], "snapshots", r["snapshots"])
+    print("\n".join(l for l in r["log"].splitlines() if "attention-output" in l or "Error" in l or "Traceback" in l))
+    print("steps:", "\n".join(r["timing"].splitlines()[:3] + r["timing"].splitlines()[-2:]))
+    if r["snapshots"]:
+        snap = r["snapshots"][-1]
+        print("snapshot:", snap)
+        e = evaluate_test.with_options(gpu=gpu).remote({"validation": test}, snap)
+        print("eval:", e.get("error") or {k: (round(v, 3) if isinstance(v, float) else v) for k, v in e["metrics"].items()})
 
 
 @app.local_entrypoint()
