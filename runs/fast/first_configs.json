@@ -1,0 +1,2 @@
+{"exact-adaptive6-s1": ["--adaptive-kl", "--seed", "1"],
+ "exact-fixed005-s1": ["--kl-coef", "0.05", "--seed", "1"]}

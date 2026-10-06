@@ -50,6 +50,7 @@ image = (
     .add_local_file(Path(__file__).parent / "verify_levels.py", f"{CODE}/verify_levels.py", copy=True)
     .add_local_file(Path(__file__).parent / "debug_levels.py", f"{CODE}/debug_levels.py", copy=True)
     .add_local_file(Path(__file__).parent / "verify_fast_levels.py", f"{CODE}/verify_fast_levels.py", copy=True)
+    .add_local_file(Path(__file__).parent / "fast_loop.py", f"{CODE}/fast_loop.py", copy=True)
     # Our package, so the exact objectives use the very same core.objective as the Tinker runs.
     .add_local_dir(Path(__file__).parents[1] / "src" / "rewarding_doubt", "/opt/rd/rewarding_doubt", copy=True,
                    ignore=["__pycache__"])
@@ -1070,4 +1071,50 @@ def eval_one(model_dir: str, split: str = "dev", gpu: str = "L40S"):
            else [json.loads(l)["id"] for l in (data / "eval.jsonl").read_text().splitlines()])
     r = evaluate_test.with_options(gpu=gpu).remote({"validation": ids}, model_dir)
     print(json.dumps(r.get("metrics") or r.get("error", "")[-2000:], indent=1))
+
+
+FAST_CACHE = f"{VOL}/fast/qwen25-3b-cache.pt"
+
+
+@app.local_entrypoint()
+def fast_cache(n_train: int = 8000, gpu: str = "L40S"):
+    """Build the fast loop's rollout cache (fast_loop.py cache): base-model answers for n_train random
+    training questions and the 512 dev questions, graded, with reference level log-probs."""
+    root = Path(__file__).resolve().parents[1]
+    ids = {"train": "all", "validation": json.loads((root / "runs/hparam-search-20261002T044831Z/dev_ids.json").read_text())}
+    r = train_with_snapshots.with_options(gpu=gpu).remote(ids, "cache", ["fast_loop.py", "cache", "IDS_JSON", FAST_CACHE,
+                                                                          "--n-train", str(n_train)], "fast-cache")
+    print("exit", r["exit_code"]); print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
+
+
+@app.local_entrypoint()
+def fast_train(configs: str, gpu: str = "L40S"):
+    """Run fast_loop.py train for each {label: [args]} in a JSON file, in parallel; curves to runs/fast/<label>/."""
+    root = Path(__file__).resolve().parents[1]
+    cfg = json.loads(Path(configs).read_text())
+    run = "fast-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    jobs = [({}, label, ["fast_loop.py", "train", FAST_CACHE, "OUT_DIR", *args], run) for label, args in cfg.items()]
+    for r in train_with_snapshots.with_options(gpu=gpu).starmap(jobs, return_exceptions=True, order_outputs=False):
+        if isinstance(r, Exception):
+            print("FAILED", repr(r)[:800]); continue
+        out = root / "runs" / "fast" / r["label"]
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "train.log").write_text(r["log"])
+        for path, text in read_files.remote([f"{VOL}/outputs/{run}/{r['label']}/{n}" for n in ("curve.json", "metrics.jsonl")]).items():
+            (out / Path(path).name).write_text(text)
+        print(f"== {r['label']} exit {r['exit_code']}")
+        print("\n".join(l for l in r["log"].splitlines() if l.startswith('{"step"'))[-1500:])
+
+
+@app.local_entrypoint()
+def fast_eval(dirs: str, gpu: str = "L40S"):
+    """fast_loop.py eval for comma-separated adapter dirs on the volume; prints one JSON line per dir."""
+    run = "fast-eval-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    jobs = [({}, f"e{i}", ["fast_loop.py", "eval", FAST_CACHE, d, "OUT_DIR/fast_eval.json"], run) for i, d in enumerate(dirs.split(","))]
+    names = dirs.split(",")
+    for r in train_with_snapshots.with_options(gpu=gpu).starmap(jobs, return_exceptions=True):
+        if isinstance(r, Exception):
+            print("FAILED", repr(r)[:500]); continue
+        line = next((l for l in r["log"].splitlines() if l.startswith("{")), r["log"][-800:])
+        print("RESULT", names[int(r["label"][1:])], line)
 
