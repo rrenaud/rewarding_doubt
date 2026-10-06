@@ -1,0 +1,49 @@
+{
+ "timing-lora-all": [
+  "--steps",
+  "60",
+  "--eval-every",
+  "1000",
+  "--time-steps"
+ ],
+ "timing-lora-18-35": [
+  "--steps",
+  "60",
+  "--eval-every",
+  "1000",
+  "--time-steps",
+  "--lora-layers",
+  "18-35"
+ ],
+ "timing-lora-all-noprefix": [
+  "--steps",
+  "60",
+  "--eval-every",
+  "1000",
+  "--time-steps",
+  "--no-shared-prefix"
+ ],
+ "timing-lora-18-35-noprefix": [
+  "--steps",
+  "60",
+  "--eval-every",
+  "1000",
+  "--time-steps",
+  "--lora-layers",
+  "18-35",
+  "--no-shared-prefix"
+ ],
+ "timing-attnbias18-35": [
+  "--steps",
+  "60",
+  "--eval-every",
+  "1000",
+  "--time-steps",
+  "--lora-modules",
+  "none",
+  "--attn-bias",
+  "18-35",
+  "--lr",
+  "1e-2"
+ ]
+}

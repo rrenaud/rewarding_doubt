@@ -1,0 +1,34 @@
+{
+ "lora-all-s1": [
+  "--seed",
+  "1"
+ ],
+ "lora-all-s2": [
+  "--seed",
+  "2"
+ ],
+ "lora-all-s3": [
+  "--seed",
+  "3"
+ ],
+ "attnbias18-35-lr1e-2-s1": [
+  "--lora-modules",
+  "none",
+  "--attn-bias",
+  "18-35",
+  "--lr",
+  "1e-2",
+  "--seed",
+  "1"
+ ],
+ "attnbias18-35-lr1e-2-s2": [
+  "--lora-modules",
+  "none",
+  "--attn-bias",
+  "18-35",
+  "--lr",
+  "1e-2",
+  "--seed",
+  "2"
+ ]
+}

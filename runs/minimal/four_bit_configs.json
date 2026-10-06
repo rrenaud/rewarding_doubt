@@ -1,0 +1,43 @@
+{
+ "4bit-lora-all-s1": [
+  "--seed",
+  "1"
+ ],
+ "4bit-lora-all-s2": [
+  "--seed",
+  "2"
+ ],
+ "4bit-lora-all-s3": [
+  "--seed",
+  "3"
+ ],
+ "4bit-timing-lora-all": [
+  "--steps",
+  "60",
+  "--eval-every",
+  "1000",
+  "--time-steps"
+ ],
+ "4bit-timing-lora-18-35": [
+  "--steps",
+  "60",
+  "--eval-every",
+  "1000",
+  "--time-steps",
+  "--lora-layers",
+  "18-35"
+ ],
+ "4bit-timing-attnbias18-35": [
+  "--steps",
+  "60",
+  "--eval-every",
+  "1000",
+  "--time-steps",
+  "--lora-modules",
+  "none",
+  "--attn-bias",
+  "18-35",
+  "--lr",
+  "1e-2"
+ ]
+}

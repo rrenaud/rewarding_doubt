@@ -1,0 +1,32 @@
+{
+ "4bit-lora-all-s4": [
+  "--seed",
+  "4"
+ ],
+ "4bit-lora-all-s5": [
+  "--seed",
+  "5"
+ ],
+ "4bit-lora-all-s6": [
+  "--seed",
+  "6"
+ ],
+ "4bit-lora-all-bf16adapters-s1": [
+  "--adapter-dtype",
+  "bfloat16",
+  "--seed",
+  "1"
+ ],
+ "4bit-lora-all-bf16adapters-s2": [
+  "--adapter-dtype",
+  "bfloat16",
+  "--seed",
+  "2"
+ ],
+ "4bit-lora-all-bf16adapters-s3": [
+  "--adapter-dtype",
+  "bfloat16",
+  "--seed",
+  "3"
+ ]
+}

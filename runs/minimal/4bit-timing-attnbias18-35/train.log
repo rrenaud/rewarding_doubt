@@ -1,0 +1,4 @@
+Unused kwargs: ['_load_in_4bit', '_load_in_8bit', 'quant_method']. These kwargs are not used in <class 'transformers.utils.quantization_config.BitsAndBytesConfig'>.
+{"lora_modules": [], "lora_layers": null, "attn_bias": "18-35", "residual_bias": "none", "trainable_params": 36864, "shared_prefix": true}
+{"step": 0, "ece_expected": 0.5731865167617798, "auroc_expected": 0.7854924651041156, "brier_expected": 0.5657296721585293, "ece_sampled": 0.5745561718940735, "auroc_sampled": 0.5609738158281847, "brier_sampled": 0.5703550295857989, "accuracy": 0.3905325443786982, "level_mass": 0.9999999973262351, "n": 507}
+{"step": 60, "minutes": 0.3, "beta": 0.05, "peak_gb": 10.5, "ece_expected": 0.06570204347372055, "auroc_expected": 0.8640613252263737, "brier_expected": 0.147679494843572, "ece_sampled": 0.04773196205496788, "auroc_sampled": 0.8494818737537183, "brier_sampled": 0.14891518737672585, "accuracy": 0.3905325443786982, "level_mass": 0.9999990175949618, "n": 507}

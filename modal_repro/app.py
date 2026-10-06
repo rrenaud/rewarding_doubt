@@ -51,6 +51,7 @@ image = (
     .add_local_file(Path(__file__).parent / "debug_levels.py", f"{CODE}/debug_levels.py", copy=True)
     .add_local_file(Path(__file__).parent / "verify_fast_levels.py", f"{CODE}/verify_fast_levels.py", copy=True)
     .add_local_file(Path(__file__).parent / "fast_loop.py", f"{CODE}/fast_loop.py", copy=True)
+    .add_local_file(Path(__file__).parent / "minimal_trainer.py", f"{CODE}/minimal_trainer.py", copy=True)
     .add_local_file(Path(__file__).parent / "attn_bias_check.py", f"{CODE}/attn_bias_check.py", copy=True)
     # Our package, so the exact objectives use the very same core.objective as the Tinker runs.
     .add_local_dir(Path(__file__).parents[1] / "src" / "rewarding_doubt", "/opt/rd/rewarding_doubt", copy=True,
@@ -1270,4 +1271,76 @@ def fast_eval(dirs: str, gpu: str = "L40S"):
             print("FAILED", repr(r)[:500]); continue
         line = next((l for l in r["log"].splitlines() if l.startswith("{")), r["log"][-800:])
         print("RESULT", names[int(r["label"][1:])], line)
+
+
+MINIMAL_CACHE = f"{VOL}/fast/qwen25-3b-cache-bf16ref.pt"
+
+
+@app.local_entrypoint()
+def minimal_ref(gpu: str = "L40S"):
+    """minimal_trainer.py ref: the fast cache with reference levels recomputed by the bf16 model, the
+    untrained bf16 dev metrics, and the shared-prefix check against a full forward; log to runs/minimal/ref/."""
+    run = "minimal-ref-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "ref", ["minimal_trainer.py", "ref", FAST_CACHE, MINIMAL_CACHE], run)
+    print("exit", r["exit_code"], r["gpu"])
+    out = Path(__file__).resolve().parents[1] / "runs" / "minimal" / "ref"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "train.log").write_text(r["log"])
+    print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
+
+
+@app.local_entrypoint()
+def minimal_diagnose(rows: int = 64, gpu: str = "L40S"):
+    """minimal_trainer.py diagnose on the fast cache (4-bit reference): shared prefix vs full forward vs
+    one row at a time, bf16 and fp32."""
+    run = "minimal-diagnose-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "diagnose", ["minimal_trainer.py", "diagnose", FAST_CACHE, "--rows", str(rows)], run)
+    print("exit", r["exit_code"], r["gpu"])
+    print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
+
+
+@app.local_entrypoint()
+def minimal_memory(gpu: str = "L40S"):
+    """minimal_trainer.py memory: peak memory of one all-layer LoRA update, bf16 and 4-bit, with and without
+    the shared prefix."""
+    run = "minimal-memory-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    jobs = [({}, "bf16", ["minimal_trainer.py", "memory", MINIMAL_CACHE], run),
+            ({}, "4bit", ["minimal_trainer.py", "memory", FAST_CACHE, "--model", "unsloth/Qwen2.5-3B-Instruct-bnb-4bit"], run)]
+    for r in train_with_snapshots.with_options(gpu=gpu).starmap(jobs):
+        print("==", r["label"], "exit", r["exit_code"])
+        print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
+
+
+@app.local_entrypoint()
+def minimal_train(configs: str, gpu: str = "L40S", fetch: str = "", four_bit: bool = False):
+    """minimal_trainer.py train for each {label: [args]} in a JSON file, in parallel, on the bf16-reference
+    cache; train.log, metrics.jsonl and curve.json to runs/minimal/<label>/. --four-bit trains the fast loop's
+    4-bit weights on its original cache (4-bit reference). With --fetch RUN (same configs), only copies a
+    finished run's outputs from the volume, for when the local client was cut off."""
+    root = Path(__file__).resolve().parents[1]
+    cfg = json.loads(Path(configs).read_text())
+    run = fetch or "minimal-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    print("run", run, flush=True)
+
+    def save(label):
+        out = root / "runs" / "minimal" / label
+        out.mkdir(parents=True, exist_ok=True)
+        files = read_files.remote([f"{VOL}/outputs/{run}/{label}/{n}" for n in ("train.log", "curve.json", "metrics.jsonl")])
+        for path, text in files.items():
+            (out / Path(path).name).write_text(text)
+        log = files.get(f"{VOL}/outputs/{run}/{label}/train.log", "")
+        print(f"== {label}")
+        print("\n".join(l for l in log.splitlines() if l.startswith('{"step"') or "Error" in l)[-1500:])
+    if fetch:
+        for label in cfg:
+            save(label)
+        return
+    model = ["--model", "unsloth/Qwen2.5-3B-Instruct-bnb-4bit"] if four_bit else []
+    jobs = [({}, label, ["minimal_trainer.py", "train", FAST_CACHE if four_bit else MINIMAL_CACHE, "OUT_DIR", *model, *args], run)
+            for label, args in cfg.items()]
+    for r in train_with_snapshots.with_options(gpu=gpu).starmap(jobs, return_exceptions=True, order_outputs=False):
+        if isinstance(r, Exception):
+            print("FAILED", repr(r)[:800]); continue
+        print(f"exit {r['exit_code']} on {r['gpu']}")
+        save(r["label"])
 
