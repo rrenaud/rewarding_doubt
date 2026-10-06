@@ -2,14 +2,14 @@
 
     python minimal_trainer.py ref CACHE.pt OUT.pt          # bf16 reference levels, untrained dev metrics
     python minimal_trainer.py diagnose CACHE.pt            # shared prefix vs full forward, bf16 and fp32
-    python minimal_trainer.py train CACHE.pt OUT_DIR [--steps 300 --lr 3e-4 --attn-bias 18-35 ...]
+    python minimal_trainer.py train CACHE.pt OUT_DIR [--steps 300 --lr 3e-4 --attn-bias 18-35 --answer-kl 1 ...]
 
 The data, objective, schedule and metrics are fast_loop.py's (docs/fast_loop_log.md) without Unsloth or TRL:
 the model is bf16 with PyTorch SDPA attention, gradient checkpointing is off, and inputs never require grad,
 so backward stops by itself at the first layer with anything to train.
 
 Scoring: the 11 levels ": k" from one forward pass, with logits only at the positions they read (as
-fast_loop.level_logps). Qwen-2.5 splits "10" into "1" "0", so one extra position gives P("0" | "1"):
+fast_loop.score_rows). Qwen-2.5 splits "10" into "1" "0", so one extra position gives P("0" | "1"):
     log q(10) = log P(common) + log P("1") + log P("0" | "1")
     log q(1)  = log P(common) + log P("1") + log(1 - P("0" | "1"))
     log q(d)  = log P(common) + log P(d)            for the other digits.
@@ -22,12 +22,20 @@ rows (`diagnose`), so bf16 scoring carries that much noise whichever way it is c
 
 ref: the cache's reference levels came from the 4-bit Unsloth model, which differs from bf16 by up to 10 nats;
 this recomputes them with the bf16 model (no adapters) and saves a copy of the cache with them.
+
+Answer drift: the adapters act at every position, so they can move the answers too, while the objective
+trains only the confidence. The same forward pass gives the log-softmax at each answer token, and the
+reference is the model with adapters off (adapters_off): dev metrics report KL(policy || reference) over the
+vocabulary per answer (answer_kl), --answer-kl W adds W times it to each row's loss, and --regen-every N
+answers the dev questions again with the policy and grades them (regen_accuracy; needs --dev-gt).
 """
 import argparse
 import collections
+import contextlib
 import json
 import os
 import random
+import re
 import statistics
 import time
 
@@ -35,9 +43,12 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache
 
 from rewarding_doubt.core import baseline_matched_objective
-from rewarding_doubt.paper_ppo import AdaptiveKLController, evaluation_metrics
+from rewarding_doubt.paper_ppo import AdaptiveKLController, evaluation_metrics, is_correct_f1
 
 LORA_MODULES = ("q", "k", "v", "o", "gate", "up", "down")
+# The released util.ResponseHandling.parse_answer_confidence, applied to the decoded answer + ": 0".
+ANSWER_PATTERN = re.compile(r"Answer:\s*(?P<answer>.*?),\s*Confidence:\s*(?P<confidence>\d+)")
+_biases_on = [True]
 
 
 class Levels:
@@ -70,13 +81,16 @@ class Levels:
         return torch.cat([levels[:, :1], levels[:, 1:2] + log_not_zero[:, None], levels[:, 2:], levels[:, 1:2] + log_zero[:, None]], 1)
 
 
-def level_logps(lm, levels, queries, pad, shared_prefix=True):
-    """[B, 11] log q over the levels after each query. With shared_prefix, the queries' common prefix runs
-    once and its key/value cache is expanded over the batch; otherwise one full forward."""
+def score_rows(lm, levels, queries, answer_starts, pad, shared_prefix=True):
+    """One forward pass over each query + the levels' tokens, with logits only at the positions read:
+    (levels [B, 11] log q, answers [B][T_b, V]). answers[b] is the log-softmax at the positions predicting
+    query b's tokens from answer_starts[b] on, through the final " Confidence" (empty when it is len(query)).
+    With shared_prefix, the queries' common prefix runs once and its key/value cache is expanded over the
+    batch; otherwise one full forward."""
     device = lm.lm_head.weight.device
     seqs = [q + levels.common + levels.tail for q in queries]
-    # The prefix stops before the first read position of the shortest query.
-    n = min(len(os.path.commonprefix(queries)), min(map(len, queries)) - 1) if shared_prefix else 0
+    # The prefix stops before the first position read: the shortest query's last token or the earliest answer.
+    n = min(len(os.path.commonprefix(queries)), min(map(len, queries)) - 1, min(answer_starts) - 1) if shared_prefix else 0
     cache = None
     if n:
         prefix = lm.model(input_ids=torch.tensor([queries[0][:n]], device=device), use_cache=True).past_key_values
@@ -88,7 +102,40 @@ def level_logps(lm, levels, queries, pad, shared_prefix=True):
     hidden = lm.model(input_ids=ids, past_key_values=cache, use_cache=cache is not None).last_hidden_state
     rows = torch.arange(len(queries), device=device)[:, None]
     pos = torch.tensor([[len(q) - 1 - n + i for i in range(levels.reads)] for q in queries], device=device)
-    return levels.from_logp(lm.lm_head(hidden[rows, pos]).float().log_softmax(-1))
+    spans = [range(start - 1 - n, len(q) - 1 - n) for q, start in zip(queries, answer_starts)]
+    flat_rows = torch.tensor([b for b, span in enumerate(spans) for _ in span], device=device, dtype=torch.long)
+    flat_pos = torch.tensor([t for span in spans for t in span], device=device, dtype=torch.long)
+    answers = lm.lm_head(hidden[flat_rows, flat_pos]).float().log_softmax(-1).split([len(span) for span in spans])
+    return levels.from_logp(lm.lm_head(hidden[rows, pos]).float().log_softmax(-1)), list(answers)
+
+
+def answer_start(ids, tokenizer):
+    """Index of a cached row's first answer token: right after the last "<|im_start|>assistant\\n" (rows are
+    the chat prompt, which ends with that header, then the generated answer)."""
+    start = len(ids) - 1 - ids[::-1].index(tokenizer.convert_tokens_to_ids("<|im_start|>")) + 3
+    assert tokenizer.decode(ids[start - 3:start]) == "<|im_start|>assistant\n", tokenizer.decode(ids[start - 3:start])
+    return start
+
+
+def answer_kl(policy, reference):
+    """KL(policy || reference) over the vocabulary, summed over each answer's positions: [B]."""
+    return torch.stack([(p.exp() * (p - r)).sum() for p, r in zip(policy, reference)])
+
+
+@contextlib.contextmanager
+def adapters_off(lm):
+    """The reference model: LoRA layers disabled and the output-bias hooks passing outputs through."""
+    from peft.tuners.tuners_utils import BaseTunerLayer
+    lora = [m for m in lm.modules() if isinstance(m, BaseTunerLayer)]
+    for m in lora:
+        m.enable_adapters(False)
+    _biases_on[0] = False
+    try:
+        yield
+    finally:
+        for m in lora:
+            m.enable_adapters(True)  # also sets requires_grad again; adapters exist only where they train
+        _biases_on[0] = True
 
 
 def load(model_name, device="cuda"):
@@ -121,6 +168,8 @@ def add_output_biases(lm, layers, part):
         bias = torch.nn.Parameter(torch.zeros(lm.config.hidden_size, device=lm.lm_head.weight.device))
 
         def hook(module, inputs, out, bias=bias):
+            if not _biases_on[0]:  # adapters_off: the output passes through unchanged
+                return None
             if isinstance(out, tuple):  # attention returns (output, weights)
                 return (out[0] + bias.to(out[0].dtype), *out[1:])
             return out + bias.to(out.dtype)
@@ -157,7 +206,58 @@ def dev_metrics_from_levels(levels, labels, temperature=0.6, seed=0):
 
 @torch.no_grad()
 def score(lm, levels, rows, pad, chunk=64):
-    return [lv for s in range(0, len(rows), chunk) for lv in level_logps(lm, levels, [r["ids"] for r in rows[s:s + chunk]], pad).float().cpu()]
+    """Level log-probs of every row, no answers."""
+    out = []
+    for s in range(0, len(rows), chunk):
+        queries = [r["ids"] for r in rows[s:s + chunk]]
+        out += list(score_rows(lm, levels, queries, list(map(len, queries)), pad)[0].float().cpu())
+    return out
+
+
+@torch.no_grad()
+def score_dev(lm, levels, rows, pad, chunk=32):
+    """Dev metrics of the stated confidence, plus KL(policy || reference) on the cached answers, per answer
+    (answer_kl) and per token (answer_kl_token)."""
+    lvs, kls, tokens = [], [], 0
+    for s in range(0, len(rows), chunk):
+        part = rows[s:s + chunk]
+        queries, starts = [r["ids"] for r in part], [r["answer_start"] for r in part]
+        lv, answers = score_rows(lm, levels, queries, starts, pad)
+        with adapters_off(lm):
+            reference = score_rows(lm, levels, queries, starts, pad)[1]
+        lvs += list(lv.float().cpu())
+        kls += answer_kl(answers, reference).tolist()
+        tokens += sum(len(a) for a in answers)
+    return dict(dev_metrics_from_levels(lvs, [r["f1"] for r in rows]), answer_kl=statistics.fmean(kls), answer_kl_token=sum(kls) / tokens)
+
+
+@torch.no_grad()
+def regenerate_dev(lm, tokenizer, rows, gt_candidates, batch=64):
+    """Answer the dev questions again with the current model (the released sampling: T=0.6, top-p 0.9, stop at
+    " Confidence"; seeded per batch, so models are compared on the same draws), parse with the released
+    pattern and grade with F1 > 0.5: regen_accuracy over all questions, regen_malformed for answers that
+    never reached " Confidence" or did not parse."""
+    pad, confidence = tokenizer.eos_token_id, tokenizer.convert_tokens_to_ids("ĠConfidence")
+    stops = [pad, tokenizer.convert_tokens_to_ids("<|im_end|>"), confidence]
+    correct = malformed = 0
+    for s in range(0, len(rows), batch):
+        part = rows[s:s + batch]
+        prompts = [r["ids"][:r["answer_start"]] for r in part]
+        width = max(map(len, prompts))
+        ids = torch.tensor([[pad] * (width - len(p)) + p for p in prompts], device=lm.lm_head.weight.device)
+        mask = (torch.arange(width, device=ids.device)[None, :] >= torch.tensor([width - len(p) for p in prompts], device=ids.device)[:, None]).long()
+        torch.manual_seed(s)
+        out = lm.generate(input_ids=ids, attention_mask=mask, max_new_tokens=96, do_sample=True, temperature=0.6, top_p=0.9,
+                          eos_token_id=stops, pad_token_id=pad)
+        for r, row in zip(part, out[:, width:].tolist()):
+            while row and row[-1] == pad:
+                row.pop()
+            match = ANSWER_PATTERN.search(tokenizer.decode(row, skip_special_tokens=True) + ": 0") if row and row[-1] == confidence else None
+            if match is None:
+                malformed += 1
+            else:
+                correct += bool(is_correct_f1(match.group("answer"), gt_candidates[str(r["qid"])]))
+    return dict(regen_accuracy=correct / len(rows), regen_malformed=malformed / len(rows))
 
 
 def check(lm, levels, rows, pad, params=()):
@@ -168,7 +268,8 @@ def check(lm, levels, rows, pad, params=()):
     for shared in (True, False):
         for p in params:
             p.grad = None
-        lv = level_logps(lm, levels, [r["ids"] for r in rows], pad, shared_prefix=shared)
+        queries = [r["ids"] for r in rows]
+        lv = score_rows(lm, levels, queries, list(map(len, queries)), pad, shared_prefix=shared)[0]
         if params:
             lv.sum().backward()
             grads.append(torch.cat([p.grad.flatten() for p in params]))
@@ -201,9 +302,10 @@ def diagnose(args):
         tok = AutoTokenizer.from_pretrained(cache["model"])
         levels, pad = Levels(tok), tok.eos_token_id
         with torch.no_grad():
-            full = level_logps(lm, levels, queries, pad, shared_prefix=False)
-            shared = level_logps(lm, levels, queries, pad)
-            single = torch.cat([level_logps(lm, levels, [q], pad, shared_prefix=False) for q in queries])
+            lens = list(map(len, queries))
+            full = score_rows(lm, levels, queries, lens, pad, shared_prefix=False)[0]
+            shared = score_rows(lm, levels, queries, lens, pad)[0]
+            single = torch.cat([score_rows(lm, levels, [q], [len(q)], pad, shared_prefix=False)[0] for q in queries])
         print(json.dumps(dict(dtype=str(dtype), shared_vs_full=compare(shared, full), batched_vs_single=compare(full, single),
                               shared_vs_single=compare(shared, single),
                               cache_ref_vs_single=compare(torch.stack([r["ref"] for r in rows]), single))), flush=True)
@@ -225,7 +327,7 @@ def memory(args):
                           lengths=[min(map(len, queries)), max(map(len, queries))])), flush=True)
     for shared in (True, False):
         torch.cuda.reset_peak_memory_stats()
-        lv = level_logps(lm, levels, queries, pad, shared_prefix=shared)
+        lv = score_rows(lm, levels, queries, list(map(len, queries)), pad, shared_prefix=shared)[0]
         after_forward = torch.cuda.max_memory_allocated() / 2**30
         lv.logsumexp(-1).sum().backward()
         for p in params:
@@ -286,16 +388,22 @@ def train(args):
     levels = Levels(tok)
     rng = random.Random(args.seed)
     train_rows, dev_rows = cache["splits"]["train"], cache["splits"]["dev"]
+    for r in train_rows + dev_rows:
+        r["answer_start"] = answer_start(r["ids"], tok)
+    gt_candidates = json.load(open(args.dev_gt)) if args.regen_every else None
     # Adam as in the released code (TRL 0.8.6 PPOTrainer: torch.optim.Adam, default betas, no weight decay).
     optimizer = torch.optim.Adam(params, lr=args.lr)
     kl_ctl = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon) if args.adaptive_kl else None
     beta = args.kl_coef
 
-    def dev_metrics():
-        return dev_metrics_from_levels(score(lm, levels, dev_rows, pad), [r["f1"] for r in dev_rows])
+    def dev_metrics(step):
+        metrics = score_dev(lm, levels, dev_rows, pad)
+        if args.regen_every and step % args.regen_every == 0:
+            metrics.update(regenerate_dev(lm, tok, dev_rows, gt_candidates))
+        return metrics
     os.makedirs(args.out_dir, exist_ok=True)
     log = open(os.path.join(args.out_dir, "metrics.jsonl"), "w")
-    curve = {0: dev_metrics()}
+    curve = {0: dev_metrics(0)}
     print(json.dumps(dict(step=0, **curve[0])), flush=True)
     batches, t0 = [], time.time()
     phase_seconds = collections.Counter()
@@ -321,15 +429,23 @@ def train(args):
             for mb in range(0, len(idx), args.minibatch):
                 chunk = [batch[i] for i in idx[mb:mb + args.minibatch]]
                 lap()
-                scored = level_logps(lm, levels, [r["ids"] for r in chunk], pad, shared_prefix=not args.no_shared_prefix)
+                queries, starts = [r["ids"] for r in chunk], [r["answer_start"] for r in chunk]
+                scored, answers = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)
+                if args.answer_kl:
+                    with torch.no_grad(), adapters_off(lm):
+                        reference = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)[1]
+                    kls = answer_kl(answers, reference)
+                else:
+                    kls = torch.zeros(len(chunk), device=scored.device)
                 lap("forward")
                 losses = []
-                for r, lv in zip(chunk, scored):
+                for r, lv, a_kl in zip(chunk, scored, kls):
                     J, kl = baseline_matched_objective(lv.double(), float(r[args.grading]), "discrete-exact", "released",
                                                        -30.0, ref_logq=r["ref"].to(lv.device).double())
-                    losses.append(-(J - beta * kl))
+                    losses.append(-(J - beta * kl) + args.answer_kl * a_kl)
                     if p == 0:
-                        stats.append((J.item(), kl.item(), float((lv.double().softmax(-1) * torch.arange(11, device=lv.device)).sum())))
+                        stats.append((J.item(), kl.item(), float((lv.double().softmax(-1) * torch.arange(11, device=lv.device)).sum()),
+                                      float(a_kl)))
                 lap("loss")
                 optimizer.zero_grad()
                 torch.stack(losses).mean().backward()
@@ -340,11 +456,12 @@ def train(args):
             kl_ctl.update(statistics.fmean(s[1] for s in stats), args.batchsize)
             beta = kl_ctl.value
         record = dict(step=step, expected_reward=statistics.fmean(s[0] for s in stats), kl=statistics.fmean(s[1] for s in stats),
-                      mean_confidence=statistics.fmean(s[2] for s in stats), beta=beta, seconds=time.time() - t0,
+                      mean_confidence=statistics.fmean(s[2] for s in stats), answer_kl=statistics.fmean(s[3] for s in stats),
+                      beta=beta, seconds=time.time() - t0,
                       **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
         log.write(json.dumps(record) + "\n")
         if step % args.eval_every == 0 or step == args.steps:
-            curve[step] = dev_metrics()
+            curve[step] = dev_metrics(step)
             print(json.dumps(dict(step=step, minutes=round((time.time() - t0) / 60, 1), beta=round(beta, 4),
                                   peak_gb=round(torch.cuda.max_memory_allocated() / 2**30, 1), **curve[step])), flush=True)
             log.flush()
@@ -386,6 +503,10 @@ def main():
     t.add_argument("--residual-bias", default="none", help='"none", "all" or a layer range: train a vector added to each MLP output')
     t.add_argument("--bucket-window", type=int, default=64, help="batches per length-sorting window; 0 = random batches")
     t.add_argument("--no-shared-prefix", action="store_true", help="full forward per row instead of a shared prefix cache")
+    t.add_argument("--answer-kl", type=float, default=0.0,
+                   help="weight of KL(policy || reference) over the vocabulary, summed over each answer's tokens (reference: adapters off)")
+    t.add_argument("--regen-every", type=int, default=0, help="also answer the dev questions again and grade them every N steps (and at 0)")
+    t.add_argument("--dev-gt", default="", help="JSON {question_id: gt_candidates} for --regen-every (fast_loop.py dev-gt)")
     t.add_argument("--time-steps", action="store_true", help="log cumulative seconds per update phase (adds GPU syncs)")
     t.add_argument("--save", action="store_true", help="save the trained parameters to OUT_DIR/trained.pt")
     args = parser.parse_args()

@@ -1,6 +1,6 @@
 """CPU checks of modal_repro/minimal_trainer.py on a tiny random Qwen2: shared-prefix scoring equals a full
-forward (levels and gradients, with LoRA and output biases), and the level arithmetic matches scoring
-each level's tokens directly."""
+forward (levels, answer log-probs and gradients, with LoRA and output biases), the level arithmetic matches
+scoring each level's tokens directly, and adapters_off gives the model without adapters."""
 import pathlib
 import random
 import sys
@@ -32,9 +32,19 @@ def tiny_qwen(dtype):
 
 
 def rows(n=6, prefix=40, seed=0):
+    """Rows sharing a `prefix`, then 3-14 more tokens of which the last 2-6 play the answer (answer_start)."""
     rng = random.Random(seed)
     shared = [rng.randrange(20, 64) for _ in range(prefix)]
-    return [dict(ids=shared + [rng.randrange(20, 64) for _ in range(rng.randrange(3, 15))]) for _ in range(n)]
+    out = []
+    for _ in range(n):
+        ids = shared + [rng.randrange(20, 64) for _ in range(rng.randrange(8, 15))]
+        out.append(dict(ids=ids, answer_start=len(ids) - rng.randrange(2, 7)))
+    return out
+
+
+def scored(lm, data, shared_prefix=True):
+    return mt.score_rows(lm, mt.Levels(DigitTokenizer()), [r["ids"] for r in data], [r["answer_start"] for r in data],
+                         pad=1, shared_prefix=shared_prefix)
 
 
 def trained_model(dtype):
@@ -55,12 +65,42 @@ def test_shared_prefix_matches_full_forward(dtype, tol):
     assert result["max_rel_grad_diff"] < (1e-4 if dtype == torch.float32 else 5e-2)
 
 
-def test_levels_match_direct_scoring():
-    lm, _ = trained_model(torch.float32)
-    levels = mt.Levels(DigitTokenizer())
+@pytest.mark.parametrize("dtype, tol", [(torch.float32, 1e-5), (torch.bfloat16, 2e-2)])
+def test_shared_prefix_answers_match_full_forward(dtype, tol):
+    lm, _ = trained_model(dtype)
     data = rows()
     with torch.no_grad():
-        got = mt.level_logps(lm, levels, [r["ids"] for r in data], pad=1)
+        shared, full = scored(lm, data)[1], scored(lm, data, shared_prefix=False)[1]
+        logits = lm(input_ids=torch.tensor([data[0]["ids"]])).logits[0].float().log_softmax(-1)
+    for r, a, b in zip(data, shared, full):
+        assert a.shape == (len(r["ids"]) - r["answer_start"], 64)
+        assert float((a - b).abs().max()) < tol
+    start = data[0]["answer_start"]  # position t predicts token t + 1
+    assert float((full[0] - logits[start - 1:len(data[0]["ids"]) - 1]).abs().max()) < tol
+
+
+def test_adapters_off_is_the_base_model():
+    lm, _ = trained_model(torch.float32)
+    base = tiny_qwen(torch.float32)
+    data = rows()
+    with torch.no_grad():
+        with mt.adapters_off(lm):
+            off_levels, off_answers = scored(lm, data)
+        on_levels, on_answers = scored(lm, data)
+        base_levels, base_answers = scored(base, data)
+    assert float((off_levels - base_levels).abs().max()) < 1e-5
+    assert max(float((a - b).abs().max()) for a, b in zip(off_answers, base_answers)) < 1e-5
+    assert float((on_levels - base_levels).abs().max()) > 1e-3  # the adapters matter when on
+    kl = mt.answer_kl(on_answers, off_answers)
+    assert bool((kl > 0).all()) and float(mt.answer_kl(off_answers, off_answers).abs().max()) < 1e-6
+    assert all(p.requires_grad for n, p in lm.named_parameters() if "lora_" in n)  # restored after adapters_off
+
+
+def test_levels_match_direct_scoring():
+    lm, _ = trained_model(torch.float32)
+    data = rows()
+    with torch.no_grad():
+        got = scored(lm, data)[0]
         for b, r in enumerate(data):
             for k in range(11):
                 tokens = DigitTokenizer().encode(f": {k}")
@@ -75,11 +115,10 @@ def test_levels_match_direct_scoring():
 def test_bias_hooks_start_at_identity():
     lm = tiny_qwen(torch.float32)
     data = rows()
-    levels = mt.Levels(DigitTokenizer())
     with torch.no_grad():
-        before = mt.level_logps(lm, levels, [r["ids"] for r in data], pad=1)
+        before = scored(lm, data)[0]
         mt.add_lora(lm, ["o"], range(4))
         mt.add_output_biases(lm, range(4), "self_attn")
         mt.add_output_biases(lm, range(4), "mlp")
-        after = mt.level_logps(lm, levels, [r["ids"] for r in data], pad=1)
+        after = scored(lm, data)[0]
     assert torch.equal(before, after)

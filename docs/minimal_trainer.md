@@ -68,11 +68,44 @@ Peak memory for one batch of 32 rows, all-layer LoRA: 14.1 GB with the shared pr
 200 KB per token per layer, nearly half of it PEFT's fp32 copies of the LoRA inputs; the fast loop's Unsloth
 kernels used less. All-layer LoRA without the shared prefix does not fit in 48 GB.
 
+## Answer drift and `--answer-kl` (Oct 6, afternoon)
+
+Every adapter acts at every token, so training the confidence also moves the answers, which nothing in the
+objective protects (`docs/fast_loop_log.md` section 10). The scoring pass now also returns the log-softmax at
+each cached answer token (`score_rows`), and `adapters_off` gives the reference (PEFT LoRA layers disabled,
+bias hooks passing through):
+
+- `answer_kl` in the dev metrics: KL(policy ‖ reference) over the vocabulary, summed per dev answer.
+- `--regen-every N --dev-gt /vol/fast/dev_gt.json`: the dev questions answered again with `generate` (released
+  sampling and answer pattern, seeded per batch) and graded by F1; `dev_gt.json` comes from `fast_loop.py dev-gt`.
+- `--answer-kl W`: W × the answer KL of each row added to its loss; one extra reference pass without grad
+  (an attention-bias step goes from 172 to 256 ms).
+
+Default schedule, 2 seeds, step 300 (`runs/minimal/akl-*`). The regenerated accuracy of the bf16 base model is
+0.426:
+
+| arm | Brier | ECE | AUROC | answer KL | regen accuracy @0 / 100 / 200 / 300 | malformed @300 |
+|---|---|---|---|---|---|---|
+| attention bias 18–35, lr 1e-2, W=0 | 0.114 ± 0.007 | 0.060 ± 0.024 | 0.912 ± 0.001 | 11.5 | 0.426 / 0.288 / 0.262 / 0.217 | 18% |
+| W=0.1 | 0.115 ± 0.005 | 0.045 ± 0.040 | 0.908 ± 0.011 | 1.19 | 0.426 / 0.427 / 0.427 / 0.423 | 0.2% |
+| W=1 | 0.128 ± 0.018 | 0.064 ± 0.037 | 0.900 ± 0.013 | 0.78 | 0.426 / 0.425 / 0.444 / 0.439 | 0% |
+| W=10 | 0.156 ± 0.009 | 0.060 ± 0.003 | 0.843 ± 0.004 | 0.89 | 0.426 / 0.432 / 0.428 / 0.430 | 0.7% |
+| all-layer LoRA, lr 3e-4, W=0 | 0.112 ± 0.011 | 0.051 ± 0.005 | 0.917 ± 0.015 | 5.66 | 0.426 / 0.275 / 0.223 / 0.404 | 7.1% |
+| all-layer LoRA, W=1 | 0.112 ± 0.002 | 0.031 ± 0.011 | 0.912 ± 0.004 | 0.28 | 0.426 / 0.443 / 0.423 / 0.439 | 0.6% |
+
+- Unpenalized, the answers degrade as in the fast loop (attention bias: 0.426 → 0.217; LoRA dips to 0.223 at
+  step 200 and is back to 0.404 at 300).
+- W = 0.1 (bias) and W = 1 (LoRA) keep the answers at or above the base model's and cost no calibration within
+  seed noise; all-layer LoRA with W = 1 has the best ECE of any arm (0.031). In the fast loop (4-bit) the same
+  penalties cost about 0.02 Brier; with 2 seeds the difference may be noise.
+- Training still uses the cached base-model answers, so this measures the side effect, not the compounding of
+  training on one's own answers.
+
 ## Differences from the fast loop, and what is not done
 
 - bf16 weights instead of 4-bit; fp32 LoRA weights where the fast loop's were bf16 (TRL casts them).
 - Not carried over: gate biases, building the cache (`fast_loop.py cache` still does it), and online mode
-  (answers regenerated during training).
+  (answers regenerated during training; `--regen-every` only measures them on dev).
 - The loss is 32 separate calls of the objective (20–30 ms per step); not batched yet.
 - All numbers are the fast loop's dev proxy, not the released evaluation.
 
@@ -85,5 +118,7 @@ modal run modal_repro/app.py::minimal_memory      # peak memory
 modal run --detach modal_repro/app.py::minimal_train --configs runs/minimal/validation_configs.json
 modal run --detach modal_repro/app.py::minimal_train --configs runs/minimal/stability_bf16_configs.json
 modal run --detach modal_repro/app.py::minimal_train --configs runs/minimal/timing_configs.json
-pytest tests/test_minimal_trainer.py              # needs transformers 4.48 and peft (the Modal image's pins)
+modal run modal_repro/app.py::fast_dev_gt         # gold answers of the dev rows, for --regen-every
+modal run --detach modal_repro/app.py::minimal_train --configs runs/minimal/answerkl_configs.json
+modal run modal_repro/app.py::minimal_tests       # tests/test_minimal_trainer.py in the Modal image
 ```
