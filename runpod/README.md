@@ -49,3 +49,31 @@ For PPO, `subset.py train IDS_JSON --frozen-answers ...` does the same for Train
 Tested 2026-10-03 (`runs/runpod/resume-test-{1,image}`): 32 questions, stop at step 3 as if
 preempted; RunPod restarted the container within 7 s, the run resumed and finished 8 steps,
 and the pod terminated itself.
+
+## The minimal trainer
+
+`modal_repro/minimal_trainer.py` (plain transformers + PEFT; `docs/minimal_trainer.md`) is in the image and
+reads its data from the network volume: `/workspace/fast/qwen25-3b-cache-bf16ref-top64.pt` (the cached
+rollouts with bf16 reference levels and the answer reference top-64) and `/workspace/fast/gt.json` (gold
+answers of every cached question). They come from the Modal volume; to refresh them:
+
+```bash
+modal volume get rewarding-doubt-repro fast/qwen25-3b-cache-bf16ref-top64.pt /tmp/top64.pt
+python scripts/runpod_sync.py --push /tmp/top64.pt fast/qwen25-3b-cache-bf16ref-top64.pt
+```
+
+With `--checkpoint-every N` it checkpoints every N steps and on SIGTERM (exit 143), so a preempted pod
+resumes. It reports its own dev metrics, so no `--post-cmd` is needed (the launcher's question IDs are
+unused). Example, an online attention-bias run:
+
+```bash
+python scripts/runpod_launch.py online-bias-s1 --max-hours 4 \
+  --train-cmd "python minimal_trainer.py train /workspace/fast/qwen25-3b-cache-bf16ref-top64.pt OUT_DIR \
+    --online --gt /workspace/fast/gt.json --lora-modules none --attn-bias 18-35 --lr 1e-2 --answer-kl 0.1 \
+    --steps 3000 --eval-every 100 --regen-every 500 --checkpoint-every 100"
+```
+
+Memory: all-layer LoRA peaks at about 33 GB over a run, so it needs a 48 GB GPU
+(`--gpu "NVIDIA RTX A6000" --gpu "NVIDIA L40S"`); attention biases and LoRA on fewer layers fit a 24 GB 4090.
+Tested on Modal (`minimal_restart_check`): stopped at step 12 of 20, the same command resumed at step 12
+and finished with every step logged once.

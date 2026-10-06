@@ -30,7 +30,7 @@ fi
 export CODE_DIR=/opt/rd/SingleAnswerSetting
 rm -rf /opt/rd && mkdir -p /opt/rd
 cp -r "$ROOT/RewardingDoubt/SingleAnswerSetting" "$CODE_DIR"
-cp /opt/code/modal_repro/{subset,exact_llama,shared_prefix,thinking_llama}.py "$CODE_DIR/"
+cp /opt/code/modal_repro/{subset,exact_llama,shared_prefix,thinking_llama,minimal_trainer}.py "$CODE_DIR/"
 export PATH="$ROOT/venv/bin:$PATH" PYTHONPATH=/opt/code/src HF_HOME=/workspace/hf HF_HUB_ENABLE_HF_TRANSFER=1 \
   TOKENIZERS_PARALLELISM=false PYTHONUNBUFFERED=1 WANDB_MODE=disabled
 if [ "${SETUP_ONLY:-0}" = 1 ]; then

@@ -3,6 +3,7 @@
     python scripts/runpod_sync.py                 # every run under /workspace/runs
     python scripts/runpod_sync.py NAME [NAME...]  # selected runs
     python scripts/runpod_sync.py --list          # runs on the volume with their outcome
+    python scripts/runpod_sync.py --push LOCAL VOLUME_PATH   # upload a file, e.g. fast/gt.json (-> /workspace/fast/gt.json)
 
 Skips files whose local copy has the same size, and the resumable checkpoints (checkpoint/,
 checkpoint-healthy/, ~130 MB each) unless --checkpoints. Credentials: the S3 secret in
@@ -49,8 +50,15 @@ def main():
     parser.add_argument("names", nargs="*")
     parser.add_argument("--list", action="store_true")
     parser.add_argument("--checkpoints", action="store_true")
+    parser.add_argument("--push", nargs=2, metavar=("LOCAL", "VOLUME_PATH"), help="upload LOCAL to /workspace/VOLUME_PATH")
     args = parser.parse_args()
     s3 = client()
+    if args.push:
+        local, key = args.push
+        s3.upload_file(local, VOLUME_ID, key.lstrip("/"))
+        size = next(objects(s3, key.lstrip("/")))["Size"]
+        print(f"uploaded {local} -> /workspace/{key.lstrip('/')} ({size} bytes)")
+        return
     names = args.names or [p["Prefix"].split("/")[1] for page in s3.get_paginator("list_objects_v2").paginate(
         Bucket=VOLUME_ID, Prefix="runs/", Delimiter="/") for p in page.get("CommonPrefixes", [])]
     for name in names:

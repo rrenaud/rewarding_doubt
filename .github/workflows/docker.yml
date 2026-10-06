@@ -6,7 +6,7 @@ on:
     branches: [main]
     paths: ["runpod/Dockerfile", "runpod/entry.sh", "runpod/selfstop.py", "runpod/eval_snapshots.py", "modal_repro/subset.py",
             "modal_repro/exact_llama.py", "modal_repro/shared_prefix.py", "modal_repro/thinking_llama.py", "modal_repro/frozen_eval.py",
-            "src/rewarding_doubt/**", "patches/**", ".github/workflows/docker.yml"]
+            "modal_repro/minimal_trainer.py", "src/rewarding_doubt/**", "patches/**", ".github/workflows/docker.yml"]
   workflow_dispatch:
 permissions:
   contents: read

@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[1]
 API = "https://rest.runpod.io/v1"
 VOLUME_ID = "591nr7jbh1"  # "rewarding-doubt", 75 GB, EU-RO-1
 CODE = ["modal_repro/subset.py", "modal_repro/exact_llama.py", "modal_repro/shared_prefix.py",
-        "modal_repro/thinking_llama.py", "src/rewarding_doubt", "runpod"]
+        "modal_repro/thinking_llama.py", "modal_repro/minimal_trainer.py", "src/rewarding_doubt", "runpod"]
 BOOT = 'mkdir -p /opt/code && echo "$CODE_B64" | base64 -d | tar xz -C /opt/code && exec bash /opt/code/runpod/bootstrap.sh'
 
 

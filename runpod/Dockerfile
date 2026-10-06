@@ -13,7 +13,7 @@ RUN git clone -q https://github.com/pasta99/RewardingDoubt /opt/RewardingDoubt \
 COPY patches/exact_confidence.patch /opt/exact_confidence.patch
 RUN git -C /opt/RewardingDoubt apply /opt/exact_confidence.patch
 COPY modal_repro/subset.py modal_repro/exact_llama.py modal_repro/shared_prefix.py modal_repro/thinking_llama.py \
-     modal_repro/frozen_eval.py \
+     modal_repro/frozen_eval.py modal_repro/minimal_trainer.py \
      /opt/RewardingDoubt/SingleAnswerSetting/
 COPY src/rewarding_doubt /opt/rd/rewarding_doubt
 COPY runpod/entry.sh runpod/selfstop.py runpod/eval_snapshots.py /opt/runpod/
