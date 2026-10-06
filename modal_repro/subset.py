@@ -390,8 +390,9 @@ def main():
             Train.PPOConfig = lambda **kwargs: original_config(**{**kwargs, **config_overrides})
         # Stability monitor, resumable checkpoints and per-step timestamps, without touching Train.py.
         import torch
-        from rewarding_doubt.checkpoint import (load_checkpoint, load_trainable_state, rng_state, save_rotating_checkpoint,
-                                                set_rng_state, trainable_state, truncate_jsonl, write_status)
+        from rewarding_doubt.checkpoint import (announce_saved, load_checkpoint, load_trainable_state, rng_state,
+                                                save_rotating_checkpoint, set_rng_state, trainable_state, truncate_jsonl,
+                                                write_status)
         from rewarding_doubt.paper_ppo import is_correct_f1
         from rewarding_doubt.stability import FLAGS, StabilityMonitor
         from rewarding_doubt.tracking import Tracker
@@ -526,6 +527,7 @@ def main():
             record = dict(step=count[0], enter=entered, exit=time.time(), batch_hash=getattr(self.dataloader, "batch_hash", None))
             if save_every and count[0] % save_every == 0:
                 original_save(self, os.path.join(args.out_dir, f"snapshot-step{count[0]:05d}"))
+                announce_saved(os.path.join(args.out_dir, f"snapshot-step{count[0]:05d}"))
                 record["save_seconds"] = time.time() - record["exit"]
             logs["steps"].write(json.dumps(record) + "\n")
             logs["steps"].flush()

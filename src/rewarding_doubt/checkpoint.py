@@ -66,6 +66,15 @@ def save_checkpoint(directory, state):
     shutil.rmtree(old, ignore_errors=True)
 
 
+SAVED_MARKER = "RD_SAVED"  # printed once a checkpoint, snapshot or status file is on disk
+
+
+def announce_saved(path):
+    """Tell a runner reading our stdout that `path` is complete, so it can persist it now (Modal commits
+    its volume on this line; train_with_snapshots), instead of on a timer or only at exit."""
+    print(f"{SAVED_MARKER} {path}", flush=True)
+
+
 def save_rotating_checkpoint(directory, state, previous_was_healthy):
     """Save `state` as the latest checkpoint; first promote the current latest to `<dir>-healthy`
     if nothing went wrong since it was written."""
@@ -78,6 +87,7 @@ def save_rotating_checkpoint(directory, state, previous_was_healthy):
         os.rename(healthy + ".tmp", healthy)
         shutil.rmtree(healthy + ".old", ignore_errors=True)
     save_checkpoint(directory, state)
+    announce_saved(directory)
 
 
 def write_status(out_dir, status, **details):
@@ -88,6 +98,7 @@ def write_status(out_dir, status, **details):
     with open(os.path.join(out_dir, "status.json.tmp"), "w") as f:
         json.dump(info, f, indent=1)
     os.replace(os.path.join(out_dir, "status.json.tmp"), os.path.join(out_dir, "status.json"))
+    announce_saved(os.path.join(out_dir, "status.json"))
 
 
 def load_checkpoint(directory):

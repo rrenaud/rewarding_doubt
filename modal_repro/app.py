@@ -211,8 +211,20 @@ def train_with_snapshots(ids_by_split: dict, label: str, command: list[str], run
     command = [arg.replace("OUT_DIR", out_dir).replace("IDS_JSON", ids_path) for arg in command]
     gpu = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
                          capture_output=True, text=True).stdout.strip()
-    with open(f"{out_dir}/train.log", "w") as log:
-        code = subprocess.run(["python", *command], cwd=CODE, stdout=log, stderr=subprocess.STDOUT).returncode
+    # A preempted container is restarted with the same input; the trainer then resumes from its last
+    # checkpoint (subset.py, exact_llama.py), so checkpoints must reach the volume as soon as they exist:
+    # commit whenever the trainer announces a saved checkpoint, snapshot or status (RD_SAVED lines).
+    from rewarding_doubt.checkpoint import SAVED_MARKER
+    with open(f"{out_dir}/train.log", "a") as log:
+        log.write(f"=== attempt {datetime.datetime.now(datetime.timezone.utc):%Y-%m-%dT%H:%M:%SZ} on {gpu} ===\n")
+        proc = subprocess.Popen(["python", *command], cwd=CODE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                text=True, bufsize=1)
+        for line in proc.stdout:
+            log.write(line)
+            if line.startswith(SAVED_MARKER):
+                log.flush()
+                volume.commit()
+        code = proc.wait()
     volume.commit()
     timing = next((Path(out_dir) / name for name in ["metrics.jsonl", "steps.jsonl"]
                    if (Path(out_dir) / name).exists()), None)
@@ -717,6 +729,8 @@ def evaluate_test(ids_by_split: dict, model_dir: str) -> dict:
     volume.reload()
     Path("/tmp/ids.json").write_text(json.dumps(ids_by_split))
     out_json = f"{model_dir}/eval_test.json"
+    if Path(out_json.replace(".json", "_metrics.json")).exists():  # already evaluated (e.g. before a restart)
+        return dict(model_dir=model_dir, metrics=json.loads(Path(out_json.replace(".json", "_metrics.json")).read_text()))
     proc = subprocess.run(["python", "subset.py", "evaluate", "/tmp/ids.json", model_dir, out_json], cwd=CODE,
                           capture_output=True, text=True)
     volume.commit()
@@ -1156,12 +1170,22 @@ def attn_bias_smoke(gpu: str = "L40S", steps: int = 20, lr: str = "2e-4"):
         print("eval:", e.get("error") or {k: (round(v, 3) if isinstance(v, float) else v) for k, v in e["metrics"].items()})
 
 
-@app.function(volumes={VOL: volume}, timeout=12 * HOUR)
+@app.function(volumes={VOL: volume}, timeout=12 * HOUR, nonpreemptible=True)
 def train_then_eval(ids_by_split: dict, label: str, command: list[str], run_name: str, gpu: str = "L40S") -> dict:
     """Train (train_with_snapshots), then the released evaluation of every snapshot on the validation
     split (evaluate_test, in parallel); writes {step: metrics} to the run's curve.json on the volume.
-    Runs remotely, so a long run does not depend on the local client staying connected."""
-    r = train_with_snapshots.with_options(gpu=gpu).remote(ids_by_split, label, command, run_name)
+    Runs remotely, so a long run does not depend on the local client staying connected.
+
+    Non-preemptible: a preempted orchestrator is restarted and calls training again, which cancels the
+    running training call (it then resumes from its last committed checkpoint). If it is restarted
+    anyway, a run whose status.json says completed is not trained again."""
+    volume.reload()
+    out_dir = Path(f"{VOL}/outputs/{run_name}/{label}")
+    status = json.loads((out_dir / "status.json").read_text()) if (out_dir / "status.json").exists() else {}
+    if status.get("status") == "completed":
+        r = dict(exit_code=0, snapshots=sorted(str(p) for p in out_dir.iterdir() if p.name.startswith("snapshot-step")))
+    else:
+        r = train_with_snapshots.with_options(gpu=gpu).remote(ids_by_split, label, command, run_name)
     curve = {}
     jobs = [({"validation": ids_by_split["validation"]}, snap) for snap in r["snapshots"]]
     for e in evaluate_test.with_options(gpu=gpu).starmap(jobs, return_exceptions=True):
@@ -1189,7 +1213,7 @@ def attn_bias_full(lrs: str = "1e-4,2e-4", layers: str = "18-35", steps: int = 3
     calls = []
     for lr in lrs.split(","):
         label = f"attnbias{layers}-lr{lr}-s1"
-        command = ["subset.py", "train", "IDS_JSON", "--seed", "1", "--save-every", "500", "--checkpoint-every", "200",
+        command = ["subset.py", "train", "IDS_JSON", "--seed", "1", "--save-every", "500", "--checkpoint-every", "100",
                    "--max-steps", str(steps), "--attn-bias", layers, "--", "--out_dir", "OUT_DIR", "--dataset", "triviaqa",
                    "--is_unsloth", "--model_dir", model, "--tokenizer_dir", model, "--epochs", "2", "--lr", lr,
                    "--batchsize", "8", "--log_with", "tensorboard", "--objective", "exact"]
@@ -1197,6 +1221,33 @@ def attn_bias_full(lrs: str = "1e-4,2e-4", layers: str = "18-35", steps: int = 3
         print(f"spawned {run}/{label}")
     for c in calls:
         print("call id", c.object_id)
+
+
+@app.local_entrypoint()
+def restart_check(gpu: str = "L40S"):
+    """Resume after a simulated preemption: train --stop-after 12 (checkpoints every 5 steps, committed
+    on the trainer's RD_SAVED lines), then the same command again, which must resume and finish at
+    step 20. Also shows the exact objective's per-step answer accuracy in stability.jsonl."""
+    root = Path(__file__).resolve().parents[1]
+    data = root / "runs/pilot-20261001T002945Z/data"
+    ids = {"train": [json.loads(l)["id"] for l in (data / "train.jsonl").read_text().splitlines()][:256],
+           "validation": [json.loads(l)["id"] for l in (data / "eval.jsonl").read_text().splitlines()][:64]}
+    run = "restart-check-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    model = "unsloth/Qwen2.5-3B-Instruct"
+    base = ["subset.py", "train", "IDS_JSON", "--seed", "1", "--save-every", "10", "--checkpoint-every", "5", "--max-steps", "20",
+            "--attn-bias", "18-35"]
+    tail = ["--", "--out_dir", "OUT_DIR", "--dataset", "triviaqa", "--is_unsloth", "--model_dir", model, "--tokenizer_dir", model,
+            "--epochs", "1", "--lr", "2e-4", "--batchsize", "8", "--log_with", "tensorboard", "--objective", "exact"]
+    first = train_with_snapshots.with_options(gpu=gpu).remote(ids, "run", base + ["--stop-after", "12"] + tail, run)
+    second = train_with_snapshots.with_options(gpu=gpu).remote(ids, "run", base + tail, run)
+    for name, r in (("first", first), ("second", second)):
+        print(name, "exit", r["exit_code"], "snapshots", [p.split("/")[-1] for p in r["snapshots"]])
+    print("\n".join(l for l in second["log"].splitlines() if l.startswith("===") or "resumed" in l or l.startswith("RD_SAVED")))
+    files = read_files.remote([f"{VOL}/outputs/{run}/run/stability.jsonl", f"{VOL}/outputs/{run}/run/status.json"])
+    rows = [json.loads(l) for l in files.get(f"{VOL}/outputs/{run}/run/stability.jsonl", "").splitlines()]
+    print("stability steps", [r["step"] for r in rows])
+    print("batch accuracy", [r.get("batch_accuracy") for r in rows])
+    print("status", files.get(f"{VOL}/outputs/{run}/run/status.json", "missing"))
 
 
 @app.local_entrypoint()
