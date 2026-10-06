@@ -76,8 +76,9 @@ each cached answer token (`score_rows`), and `adapters_off` gives the reference 
 bias hooks passing through):
 
 - `answer_kl` in the dev metrics: KL(policy ‖ reference) over the vocabulary, summed per dev answer.
-- `--regen-every N --dev-gt /vol/fast/dev_gt.json`: the dev questions answered again with `generate` (released
-  sampling and answer pattern, seeded per batch) and graded by F1; `dev_gt.json` comes from `fast_loop.py dev-gt`.
+- `--regen-every N --gt /vol/fast/gt.json`: the dev questions answered again with `generate` (released
+  sampling and answer pattern, seeded per batch) and graded by F1; `gt.json` (gold answers of every cached
+  question) comes from `fast_loop.py gt` (the runs below used its dev-only predecessor, `--dev-gt`).
 - `--answer-kl W`: W × the answer KL of each row added to its loss; one extra reference pass without grad
   (an attention-bias step goes from 172 to 256 ms).
 
@@ -118,7 +119,7 @@ modal run modal_repro/app.py::minimal_memory      # peak memory
 modal run --detach modal_repro/app.py::minimal_train --configs runs/minimal/validation_configs.json
 modal run --detach modal_repro/app.py::minimal_train --configs runs/minimal/stability_bf16_configs.json
 modal run --detach modal_repro/app.py::minimal_train --configs runs/minimal/timing_configs.json
-modal run modal_repro/app.py::fast_dev_gt         # gold answers of the dev rows, for --regen-every
+modal run modal_repro/app.py::fast_gt             # gold answers of every cached question, for --regen-every / --online
 modal run --detach modal_repro/app.py::minimal_train --configs runs/minimal/answerkl_configs.json
 modal run modal_repro/app.py::minimal_tests       # tests/test_minimal_trainer.py in the Modal image
 ```

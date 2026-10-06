@@ -1,2 +1,2 @@
-{"akl-smoke-attnbias": ["--seed", "1", "--steps", "20", "--eval-every", "10", "--regen-every", "10", "--dev-gt", "/vol/fast/dev_gt.json", "--lora-modules", "none", "--attn-bias", "18-35", "--lr", "1e-2", "--answer-kl", "1", "--time-steps"],
- "akl-smoke-lora": ["--seed", "1", "--steps", "20", "--eval-every", "10", "--regen-every", "10", "--dev-gt", "/vol/fast/dev_gt.json", "--time-steps"]}
+{"akl-smoke-attnbias": ["--seed", "1", "--steps", "20", "--eval-every", "10", "--regen-every", "10", "--gt", "/vol/fast/gt.json", "--lora-modules", "none", "--attn-bias", "18-35", "--lr", "1e-2", "--answer-kl", "1", "--time-steps"],
+ "akl-smoke-lora": ["--seed", "1", "--steps", "20", "--eval-every", "10", "--regen-every", "10", "--gt", "/vol/fast/gt.json", "--time-steps"]}

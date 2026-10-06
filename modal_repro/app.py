@@ -1277,14 +1277,15 @@ def fast_eval(dirs: str, gpu: str = "L40S"):
 
 
 MINIMAL_CACHE = f"{VOL}/fast/qwen25-3b-cache-bf16ref.pt"
-DEV_GT = f"{VOL}/fast/dev_gt.json"  # {question_id: gt_candidates} of the cache's dev rows (fast_loop.py dev-gt)
+TOPK_CACHE = f"{VOL}/fast/qwen25-3b-cache-bf16ref-top64.pt"  # MINIMAL_CACHE + answer reference top-64 (answer-ref)
+GT = f"{VOL}/fast/gt.json"  # {question_id: gt_candidates} of every cached row (fast_loop.py gt)
 
 
 @app.local_entrypoint()
-def fast_dev_gt():
-    """fast_loop.py dev-gt: the dev rows' gold answers for minimal_trainer.py --dev-gt."""
+def fast_gt():
+    """fast_loop.py gt: the cached rows' gold answers (train and dev) for minimal_trainer.py --gt."""
     # a GPU only because fast_loop.py imports Unsloth, which needs one at import
-    r = train_with_snapshots.with_options(gpu="T4").remote({}, "dev-gt", ["fast_loop.py", "dev-gt", FAST_CACHE, DEV_GT], "fast-dev-gt")
+    r = train_with_snapshots.with_options(gpu="T4").remote({}, "gt", ["fast_loop.py", "gt", FAST_CACHE, GT], "fast-gt")
     print("exit", r["exit_code"]); print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
 
 
@@ -1325,6 +1326,15 @@ def minimal_ref(gpu: str = "L40S"):
 
 
 @app.local_entrypoint()
+def minimal_answer_ref(gpu: str = "L40S", k: int = 64):
+    """minimal_trainer.py answer-ref: TOPK_CACHE, the bf16 cache plus the reference's top-k log-probs at every
+    cached answer token (for --answer-kl without a reference pass)."""
+    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "answer-ref", ["minimal_trainer.py", "answer-ref", MINIMAL_CACHE,
+                                                                             TOPK_CACHE, "--k", str(k)], "minimal-answer-ref")
+    print("exit", r["exit_code"], r["gpu"]); print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
+
+
+@app.local_entrypoint()
 def minimal_diagnose(rows: int = 64, gpu: str = "L40S"):
     """minimal_trainer.py diagnose on the fast cache (4-bit reference): shared prefix vs full forward vs
     one row at a time, bf16 and fp32."""
@@ -1344,7 +1354,7 @@ def minimal_memory(gpu: str = "L40S"):
 
 
 @app.local_entrypoint()
-def minimal_train(configs: str, gpu: str = "L40S", fetch: str = ""):
+def minimal_train(configs: str, gpu: str = "L40S", fetch: str = "", cache: str = MINIMAL_CACHE):
     """minimal_trainer.py train for each {label: [args]} in a JSON file, in parallel, on the bf16-reference
     cache; train.log, metrics.jsonl and curve.json to runs/minimal/<label>/. With --fetch RUN (same configs),
     only copies a finished run's outputs from the volume, for when the local client was cut off."""
@@ -1366,7 +1376,7 @@ def minimal_train(configs: str, gpu: str = "L40S", fetch: str = ""):
         for label in cfg:
             save(label)
         return
-    jobs = [({}, label, ["minimal_trainer.py", "train", MINIMAL_CACHE, "OUT_DIR", *args], run) for label, args in cfg.items()]
+    jobs = [({}, label, ["minimal_trainer.py", "train", cache, "OUT_DIR", *args], run) for label, args in cfg.items()]
     for r in train_with_snapshots.with_options(gpu=gpu).starmap(jobs, return_exceptions=True, order_outputs=False):
         if isinstance(r, Exception):
             print("FAILED", repr(r)[:800]); continue

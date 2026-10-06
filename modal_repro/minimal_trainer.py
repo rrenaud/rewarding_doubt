@@ -2,6 +2,7 @@
 
     python minimal_trainer.py ref CACHE.pt OUT.pt          # bf16 reference levels, untrained dev metrics
     python minimal_trainer.py diagnose CACHE.pt            # shared prefix vs full forward, bf16 and fp32
+    python minimal_trainer.py answer-ref CACHE.pt OUT.pt   # reference top-k log-probs at every answer token
     python minimal_trainer.py train CACHE.pt OUT_DIR [--steps 300 --lr 3e-4 --attn-bias 18-35 --answer-kl 1 ...]
 
 The data, objective, schedule and metrics are fast_loop.py's (docs/fast_loop_log.md) without Unsloth or TRL:
@@ -27,12 +28,18 @@ Answer drift: the adapters act at every position, so they can move the answers t
 trains only the confidence. The same forward pass gives the log-softmax at each answer token, and the
 reference is the model with adapters off (adapters_off): dev metrics report KL(policy || reference) over the
 vocabulary per answer (answer_kl), --answer-kl W adds W times it to each row's loss, and --regen-every N
-answers the dev questions again with the policy and grades them (regen_accuracy; needs --dev-gt).
+answers the dev questions again with the policy and grades them (regen_accuracy; needs --gt).
+
+answer-ref stores the reference's top-k log-probs at every cached answer token, so the penalty needs no
+reference pass: topk_answer_kl is the KL between the two distributions coarse-grained to those k tokens
+plus one bucket for the rest, which is never more than the exact KL. --answer-kl-target T adapts W after
+each step to hold the batch's answer KL near T.
 """
 import argparse
 import collections
 import contextlib
 import json
+import math
 import os
 import random
 import re
@@ -43,7 +50,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache
 
 from rewarding_doubt.core import baseline_matched_objective
-from rewarding_doubt.paper_ppo import AdaptiveKLController, evaluation_metrics, is_correct_f1
+from rewarding_doubt.paper_ppo import AdaptiveKLController, evaluation_metrics, is_correct_exact, is_correct_f1
 
 LORA_MODULES = ("q", "k", "v", "o", "gate", "up", "down")
 # The released util.ResponseHandling.parse_answer_confidence, applied to the decoded answer + ": 0".
@@ -120,6 +127,20 @@ def answer_start(ids, tokenizer):
 def answer_kl(policy, reference):
     """KL(policy || reference) over the vocabulary, summed over each answer's positions: [B]."""
     return torch.stack([(p.exp() * (p - r)).sum() for p, r in zip(policy, reference)])
+
+
+def topk_answer_kl(policy, rows):
+    """answer_kl against the cached reference top-k (answer-ref): at each position the two distributions are
+    coarse-grained to the reference's k most likely tokens plus one bucket for all others, which can only
+    lower the KL (it is at most the exact one). [B]."""
+    out = []
+    for p, r in zip(policy, rows):
+        idx, ref = r["answer_ref_idx"].to(p.device).long(), r["answer_ref_logp"].to(p.device)
+        top = p.gather(-1, idx)
+        rest_p = torch.log1p(-top.exp().sum(-1).clamp(max=1 - 1e-6))
+        rest_r = torch.log1p(-ref.exp().sum(-1).clamp(max=1 - 1e-6))
+        out.append((top.exp() * (top - ref)).sum() + (rest_p.exp() * (rest_p - rest_r)).sum())
+    return torch.stack(out)
 
 
 @contextlib.contextmanager
@@ -217,8 +238,9 @@ def score(lm, levels, rows, pad, chunk=64):
 @torch.no_grad()
 def score_dev(lm, levels, rows, pad, chunk=32):
     """Dev metrics of the stated confidence, plus KL(policy || reference) on the cached answers, per answer
-    (answer_kl) and per token (answer_kl_token)."""
-    lvs, kls, tokens = [], [], 0
+    (answer_kl, against a live reference pass) and per token (answer_kl_token), and against the cached
+    top-k reference when the cache has it (answer_kl_topk)."""
+    lvs, kls, topk, tokens = [], [], [], 0
     for s in range(0, len(rows), chunk):
         part = rows[s:s + chunk]
         queries, starts = [r["ids"] for r in part], [r["answer_start"] for r in part]
@@ -227,37 +249,72 @@ def score_dev(lm, levels, rows, pad, chunk=32):
             reference = score_rows(lm, levels, queries, starts, pad)[1]
         lvs += list(lv.float().cpu())
         kls += answer_kl(answers, reference).tolist()
+        if "answer_ref_idx" in part[0]:
+            topk += topk_answer_kl(answers, part).tolist()
         tokens += sum(len(a) for a in answers)
-    return dict(dev_metrics_from_levels(lvs, [r["f1"] for r in rows]), answer_kl=statistics.fmean(kls), answer_kl_token=sum(kls) / tokens)
+    metrics = dict(dev_metrics_from_levels(lvs, [r["f1"] for r in rows]), answer_kl=statistics.fmean(kls), answer_kl_token=sum(kls) / tokens)
+    if topk:
+        metrics["answer_kl_topk"] = statistics.fmean(topk)
+    return metrics
 
 
 @torch.no_grad()
-def regenerate_dev(lm, tokenizer, rows, gt_candidates, batch=64):
-    """Answer the dev questions again with the current model (the released sampling: T=0.6, top-p 0.9, stop at
-    " Confidence"; seeded per batch, so models are compared on the same draws), parse with the released
-    pattern and grade with F1 > 0.5: regen_accuracy over all questions, regen_malformed for answers that
-    never reached " Confidence" or did not parse."""
+def generate_answers(lm, tokenizer, prompts, seed):
+    """Answers to `prompts` with the current model, the released way (T=0.6, top-p 0.9, up to 96 tokens, stopping
+    at " Confidence"), sampled with the given seed: per prompt (tokens, answer text), answer text None when the
+    answer never reached " Confidence" or does not match the released pattern."""
     pad, confidence = tokenizer.eos_token_id, tokenizer.convert_tokens_to_ids("ĠConfidence")
-    stops = [pad, tokenizer.convert_tokens_to_ids("<|im_end|>"), confidence]
+    width = max(map(len, prompts))
+    ids = torch.tensor([[pad] * (width - len(p)) + p for p in prompts], device=lm.lm_head.weight.device)
+    mask = (torch.arange(width, device=ids.device)[None, :] >= torch.tensor([width - len(p) for p in prompts], device=ids.device)[:, None]).long()
+    torch.manual_seed(seed)
+    out = lm.generate(input_ids=ids, attention_mask=mask, max_new_tokens=96, do_sample=True, temperature=0.6, top_p=0.9,
+                      eos_token_id=[pad, tokenizer.convert_tokens_to_ids("<|im_end|>"), confidence], pad_token_id=pad)
+    answers = []
+    for row in out[:, width:].tolist():
+        while row and row[-1] == pad:
+            row.pop()
+        match = ANSWER_PATTERN.search(tokenizer.decode(row, skip_special_tokens=True) + ": 0") if row and row[-1] == confidence else None
+        answers.append((row, match.group("answer") if match else None))
+    return answers
+
+
+def regenerate_dev(lm, tokenizer, rows, gt_candidates, batch=64):
+    """Answer the dev questions again with the current model (generate_answers, seeded per batch, so models are
+    compared on the same draws) and grade with F1 > 0.5: regen_accuracy over all questions, regen_malformed
+    for answers that never reached " Confidence" or did not parse."""
     correct = malformed = 0
     for s in range(0, len(rows), batch):
         part = rows[s:s + batch]
-        prompts = [r["ids"][:r["answer_start"]] for r in part]
-        width = max(map(len, prompts))
-        ids = torch.tensor([[pad] * (width - len(p)) + p for p in prompts], device=lm.lm_head.weight.device)
-        mask = (torch.arange(width, device=ids.device)[None, :] >= torch.tensor([width - len(p) for p in prompts], device=ids.device)[:, None]).long()
-        torch.manual_seed(s)
-        out = lm.generate(input_ids=ids, attention_mask=mask, max_new_tokens=96, do_sample=True, temperature=0.6, top_p=0.9,
-                          eos_token_id=stops, pad_token_id=pad)
-        for r, row in zip(part, out[:, width:].tolist()):
-            while row and row[-1] == pad:
-                row.pop()
-            match = ANSWER_PATTERN.search(tokenizer.decode(row, skip_special_tokens=True) + ": 0") if row and row[-1] == confidence else None
-            if match is None:
+        for r, (_, answer) in zip(part, generate_answers(lm, tokenizer, [r["ids"][:r["answer_start"]] for r in part], s)):
+            if answer is None:
                 malformed += 1
             else:
-                correct += bool(is_correct_f1(match.group("answer"), gt_candidates[str(r["qid"])]))
+                correct += bool(is_correct_f1(answer, gt_candidates[str(r["qid"])]))
     return dict(regen_accuracy=correct / len(rows), regen_malformed=malformed / len(rows))
+
+
+@torch.no_grad()
+def online_rows(lm, tokenizer, levels, batch, gt_candidates, seed, pad):
+    """--online: the batch's questions answered by the current model (generate_answers) and graded; answers that
+    are malformed are dropped, as the exact objective gives them no gradient. Each kept row gets its reference
+    from one pass with adapters off: levels (ref) and the full answer log-probs (answer_ref_live).
+    Returns (rows, {online_accuracy, online_malformed, online_answer_tokens})."""
+    prompts = [r["ids"][:r["answer_start"]] for r in batch]
+    rows = []
+    for r, prompt, (tokens, answer) in zip(batch, prompts, generate_answers(lm, tokenizer, prompts, seed)):
+        if answer is not None:
+            gt = gt_candidates[str(r["qid"])]
+            rows.append(dict(qid=r["qid"], ids=prompt + tokens, answer_start=len(prompt),
+                             f1=bool(is_correct_f1(answer, gt)), em=bool(is_correct_exact(answer, gt))))
+    stats = dict(online_accuracy=sum(r["f1"] for r in rows) / len(batch), online_malformed=1 - len(rows) / len(batch),
+                 online_answer_tokens=statistics.fmean(len(r["ids"]) - r["answer_start"] for r in rows) if rows else 0.0)
+    if rows:
+        with adapters_off(lm):
+            ref_levels, ref_answers = score_rows(lm, levels, [r["ids"] for r in rows], [r["answer_start"] for r in rows], pad)
+        for r, lv, a in zip(rows, ref_levels, ref_answers):
+            r["ref"], r["answer_ref_live"] = lv.float(), a
+    return rows, stats
 
 
 def check(lm, levels, rows, pad, params=()):
@@ -357,6 +414,32 @@ def make_ref(args):
     torch.save(cache, args.out)
 
 
+def make_answer_ref(args):
+    """The bf16 reference model's top-k log-probs at every cached answer token, saved into a copy of the
+    cache (answer_ref_idx [T, k] int32, answer_ref_logp [T, k]); reports how much mass the top k cover."""
+    cache = torch.load(args.cache, weights_only=False)
+    lm, tok = load(cache["model"])
+    levels, pad = Levels(tok), tok.eos_token_id
+    for split, rows in cache["splits"].items():
+        t0, covered = time.time(), []
+        for s in range(0, len(rows), 32):
+            part = rows[s:s + 32]
+            for r in part:
+                r["answer_start"] = answer_start(r["ids"], tok)
+            with torch.no_grad():
+                answers = score_rows(lm, levels, [r["ids"] for r in part], [r["answer_start"] for r in part], pad)[1]
+            for r, a in zip(part, answers):
+                logp, idx = a.topk(args.k, dim=-1)
+                r["answer_ref_logp"], r["answer_ref_idx"] = logp.cpu(), idx.to(torch.int32).cpu()
+                covered += logp.exp().sum(-1).tolist()
+        covered.sort()
+        print(json.dumps(dict(split=split, rows=len(rows), seconds=round(time.time() - t0, 1), k=args.k,
+                              topk_mass_mean=statistics.fmean(covered), topk_mass_p01=covered[len(covered) // 100],
+                              topk_mass_min=covered[0])), flush=True)
+    cache.update(answer_ref_k=args.k)
+    torch.save(cache, args.out)
+
+
 def epoch_batches(lengths, batchsize, window, rng):
     """One epoch of batches (every row once, ragged tail dropped). With window > 0, length bucketing:
     the shuffled epoch is cut into windows of `window` batches, each window is sorted by length before
@@ -390,11 +473,16 @@ def train(args):
     train_rows, dev_rows = cache["splits"]["train"], cache["splits"]["dev"]
     for r in train_rows + dev_rows:
         r["answer_start"] = answer_start(r["ids"], tok)
-    gt_candidates = json.load(open(args.dev_gt)) if args.regen_every else None
+    gt_candidates = json.load(open(args.gt)) if args.regen_every or args.online else None
     # Adam as in the released code (TRL 0.8.6 PPOTrainer: torch.optim.Adam, default betas, no weight decay).
     optimizer = torch.optim.Adam(params, lr=args.lr)
     kl_ctl = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon) if args.adaptive_kl else None
     beta = args.kl_coef
+    answer_w = args.answer_kl
+    if answer_w and args.answer_ref == "topk" and not args.online and "answer_ref_idx" not in train_rows[0]:
+        raise SystemExit("--answer-ref topk needs a cache from `minimal_trainer.py answer-ref`")
+    if args.answer_kl_target and not answer_w:
+        raise SystemExit("--answer-kl-target adapts --answer-kl, which must start above 0")
 
     def dev_metrics(step):
         metrics = score_dev(lm, levels, dev_rows, pad)
@@ -422,6 +510,13 @@ def train(args):
         if not batches:
             batches = epoch_batches([len(r["ids"]) for r in train_rows], args.batchsize, args.bucket_window, rng)
         batch = [train_rows[i] for i in batches.pop()]
+        online = {}
+        if args.online:  # the questions answered now by the policy instead of the cached base-model answers
+            lap()
+            batch, online = online_rows(lm, tok, levels, batch, gt_candidates, step, pad)
+            lap("generate")
+            if not batch:
+                continue
         stats = []
         for p in range(args.passes):
             idx = list(range(len(batch)))
@@ -431,18 +526,22 @@ def train(args):
                 lap()
                 queries, starts = [r["ids"] for r in chunk], [r["answer_start"] for r in chunk]
                 scored, answers = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)
-                if args.answer_kl:
+                if not answer_w:
+                    kls = torch.zeros(len(chunk), device=scored.device)
+                elif args.online:  # the reference pass ran with the generation (online_rows)
+                    kls = answer_kl(answers, [r["answer_ref_live"] for r in chunk])
+                elif args.answer_ref == "topk":
+                    kls = topk_answer_kl(answers, chunk)
+                else:
                     with torch.no_grad(), adapters_off(lm):
                         reference = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)[1]
                     kls = answer_kl(answers, reference)
-                else:
-                    kls = torch.zeros(len(chunk), device=scored.device)
                 lap("forward")
                 losses = []
                 for r, lv, a_kl in zip(chunk, scored, kls):
                     J, kl = baseline_matched_objective(lv.double(), float(r[args.grading]), "discrete-exact", "released",
                                                        -30.0, ref_logq=r["ref"].to(lv.device).double())
-                    losses.append(-(J - beta * kl) + args.answer_kl * a_kl)
+                    losses.append(-(J - beta * kl) + answer_w * a_kl)
                     if p == 0:
                         stats.append((J.item(), kl.item(), float((lv.double().softmax(-1) * torch.arange(11, device=lv.device)).sum()),
                                       float(a_kl)))
@@ -455,7 +554,10 @@ def train(args):
         if kl_ctl is not None:
             kl_ctl.update(statistics.fmean(s[1] for s in stats), args.batchsize)
             beta = kl_ctl.value
-        record = dict(step=step, expected_reward=statistics.fmean(s[0] for s in stats), kl=statistics.fmean(s[1] for s in stats),
+        if args.answer_kl_target:  # multiplicative: W *= exp(rate * clip(KL / T - 1, -1, 1))
+            error = statistics.fmean(s[3] for s in stats) / args.answer_kl_target - 1
+            answer_w *= math.exp(args.answer_kl_rate * max(-1.0, min(1.0, error)))
+        record = dict(step=step, answer_w=answer_w, **online, expected_reward=statistics.fmean(s[0] for s in stats), kl=statistics.fmean(s[1] for s in stats),
                       mean_confidence=statistics.fmean(s[2] for s in stats), answer_kl=statistics.fmean(s[3] for s in stats),
                       beta=beta, seconds=time.time() - t0,
                       **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
@@ -480,6 +582,9 @@ def main():
     d = sub.add_parser("diagnose")
     d.add_argument("cache")
     d.add_argument("--rows", type=int, default=64)
+    a = sub.add_parser("answer-ref")
+    a.add_argument("cache"); a.add_argument("out")
+    a.add_argument("--k", type=int, default=64)
     m = sub.add_parser("memory")
     m.add_argument("cache")
     t = sub.add_parser("train")
@@ -505,12 +610,18 @@ def main():
     t.add_argument("--no-shared-prefix", action="store_true", help="full forward per row instead of a shared prefix cache")
     t.add_argument("--answer-kl", type=float, default=0.0,
                    help="weight of KL(policy || reference) over the vocabulary, summed over each answer's tokens (reference: adapters off)")
+    t.add_argument("--answer-ref", choices=["topk", "live"], default="topk",
+                   help="reference for --answer-kl: the cache's top-k (answer-ref, no extra pass) or a live pass with adapters off")
+    t.add_argument("--answer-kl-target", type=float, default=0.0, help="adapt the --answer-kl weight to hold the answer KL near this (nats per answer)")
+    t.add_argument("--answer-kl-rate", type=float, default=0.05, help="per-step log change of the weight at full error")
     t.add_argument("--regen-every", type=int, default=0, help="also answer the dev questions again and grade them every N steps (and at 0)")
-    t.add_argument("--dev-gt", default="", help="JSON {question_id: gt_candidates} for --regen-every (fast_loop.py dev-gt)")
+    t.add_argument("--gt", default="", help="JSON {question_id: gt_candidates} for --regen-every and --online (fast_loop.py gt)")
+    t.add_argument("--online", action="store_true",
+                   help="train on answers the policy generates for each batch (graded with --gt) instead of the cached ones")
     t.add_argument("--time-steps", action="store_true", help="log cumulative seconds per update phase (adds GPU syncs)")
     t.add_argument("--save", action="store_true", help="save the trained parameters to OUT_DIR/trained.pt")
     args = parser.parse_args()
-    {"ref": make_ref, "diagnose": diagnose, "memory": memory, "train": train}[args.command](args)
+    {"ref": make_ref, "answer-ref": make_answer_ref, "diagnose": diagnose, "memory": memory, "train": train}[args.command](args)
 
 
 if __name__ == "__main__":

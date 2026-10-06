@@ -580,18 +580,21 @@ def profile_lora(args):
                                   peak_gb=round(torch.cuda.max_memory_allocated() / 2**30, 1))), flush=True)
 
 
-def dev_gt(args):
-    """{question_id: gt_candidates} for the cache's dev rows, from the released data loader, so trainers
-    without the released code can grade regenerated answers (minimal_trainer.py --dev-gt)."""
+def gold_answers(args):
+    """{question_id: gt_candidates} for every cached row (train and dev), from the released data loader, so
+    trainers without the released code can grade generated answers (minimal_trainer.py --gt)."""
     cache = torch.load(args.cache, weights_only=False)
     from transformers import AutoTokenizer
     tok = AutoTokenizer.from_pretrained(cache["model"])
-    qids = [r["qid"] for r in cache["splits"]["dev"]]
-    data = subset_loader({"validation": qids})("triviaqa", "validation", "verbalize", tok)
-    gt = {str(d["question_id"]): d["gt_candidates"] for d in data}
-    missing = [q for q in qids if str(q) not in gt]
+    gt, report = {}, {}
+    for split, hf_split in (("train", "train"), ("dev", "validation")):
+        qids = [r["qid"] for r in cache["splits"][split]]
+        data = subset_loader({hf_split: qids})("triviaqa", hf_split, "verbalize", tok)
+        found = {str(d["question_id"]): d["gt_candidates"] for d in data}
+        gt.update(found)
+        report[split] = dict(rows=len(qids), missing=sum(str(q) not in found for q in qids))
     json.dump(gt, open(args.out, "w"))
-    print(json.dumps(dict(dev_rows=len(qids), written=len(gt), missing=len(missing))), flush=True)
+    print(json.dumps(dict(written=len(gt), **report)), flush=True)
 
 
 def main():
@@ -636,12 +639,12 @@ def main():
     e.add_argument("cache"); e.add_argument("adapter"); e.add_argument("out")
     pr = sub.add_parser("profile")
     pr.add_argument("cache")
-    g = sub.add_parser("dev-gt")
+    g = sub.add_parser("gt")
     g.add_argument("cache"); g.add_argument("out")
     pl = sub.add_parser("profile-lora")
     pl.add_argument("cache")
     args = parser.parse_args()
-    {"cache": build_cache, "train": train, "eval": evaluate, "profile": profile, "profile-lora": profile_lora, "dev-gt": dev_gt}[args.command](args)
+    {"cache": build_cache, "train": train, "eval": evaluate, "profile": profile, "profile-lora": profile_lora, "gt": gold_answers}[args.command](args)
 
 
 if __name__ == "__main__":

@@ -122,3 +122,23 @@ def test_bias_hooks_start_at_identity():
         mt.add_output_biases(lm, range(4), "mlp")
         after = scored(lm, data)[0]
     assert torch.equal(before, after)
+
+
+def test_topk_answer_kl_bounds_exact():
+    lm, _ = trained_model(torch.float32)
+    base = tiny_qwen(torch.float32)
+    data = rows()
+    with torch.no_grad():
+        policy = scored(lm, data)[1]
+        reference = scored(base, data)[1]
+    exact = mt.answer_kl(policy, reference)
+    for k, check in ((64, "equal"), (8, "below"), (1, "below")):  # the tiny vocabulary has 64 tokens
+        for r, ref in zip(data, reference):
+            logp, idx = ref.topk(k, dim=-1)
+            r["answer_ref_logp"], r["answer_ref_idx"] = logp, idx.to(torch.int32)
+        coarse = mt.topk_answer_kl(policy, data)
+        if check == "equal":
+            assert torch.allclose(coarse, exact, atol=1e-4)
+        else:
+            assert bool((coarse <= exact + 1e-5).all()) and bool((coarse >= -1e-6).all())
+    assert float(mt.topk_answer_kl(reference, data).abs().max()) < 1e-5  # policy = reference
