@@ -5,6 +5,7 @@
 !modal_repro/shared_prefix.py
 !modal_repro/thinking_llama.py
 !modal_repro/frozen_eval.py
+!modal_repro/minimal_trainer.py
 !src/rewarding_doubt
 !runpod/entry.sh
 !patches/exact_confidence.patch
