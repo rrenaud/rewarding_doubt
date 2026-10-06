@@ -102,11 +102,61 @@ Default schedule, 2 seeds, step 300 (`runs/minimal/akl-*`). The regenerated accu
 - Training still uses the cached base-model answers, so this measures the side effect, not the compounding of
   training on one's own answers.
 
+## Search with the cached top-k reference, then online trials (Oct 6, evening)
+
+**Top-k reference.** `minimal_trainer.py answer-ref` stores the bf16 reference's top-64 log-probs at every
+cached answer token (99.3% of the mass on average, 83–86% at the 1st percentile); `--answer-kl` then needs no
+reference pass. The coarse-grained KL (those 64 tokens plus one bucket) is 0.000 at step 0 in every run and
+within about 10% of the exact KL (`answer_kl_topk` beside `answer_kl` in the dev metrics). `--answer-kl-target
+T` adapts the weight multiplicatively toward an answer KL of T.
+
+**Offline search** (cached answers, top-k penalty, 2 seeds, step 300; `runs/minimal/hs-*`). Safe = answer KL
+at most 2, no regeneration more than 1.5 points below step 0, malformed at most 2%:
+
+| arm | Brier | ECE | AUROC | answer KL | Δ accuracy @300 | safe |
+|---|---|---|---|---|---|---|
+| all-layer LoRA, lr 3e-4, W=1 | 0.108 ± 0.002 | 0.037 | 0.920 | 0.29 | +0.015 | yes |
+| attention bias, lr 3e-2, W=0.3 | 0.113 ± 0.008 | 0.041 | 0.914 | 2.57 | −0.007 | no (KL) |
+| all-layer LoRA, lr 3e-4, W=0.3 | 0.120 ± 0.012 | 0.043 | 0.905 | 0.61 | +0.012 | yes |
+| attention bias, lr 1e-2, target 1 | 0.120 ± 0.010 | 0.061 | 0.910 | 1.19 | +0.012 | yes |
+| attention bias, lr 3e-3, W=0.03 | 0.121 ± 0.004 | 0.058 | 0.907 | 0.69 | +0.001 | yes |
+| all-layer LoRA, lr 3e-4, target 1 | 0.221 ± 0.143 | 0.161 | 0.730 | 0.72 | +0.028 | one seed collapsed |
+| all-layer LoRA, lr 1e-3, W=0.3 | 0.246 ± 0.157 | 0.209 | 0.697 | 2.86 | +0.021 | no |
+
+All 22 arms are in `runs/minimal/hs-*` (summary rows: Brier at step 300, mean of 2 seeds). For LoRA the penalty
+also steadies the confidence: with too little of it, or at lr 1e-3, a seed can collapse to one confidence.
+The adaptive target does not suit LoRA, whose answer KL (about 0.3) sits below the target, so the
+controller weakens the penalty.
+
+**Online trials** (`--online`: each batch's questions answered by the policy, graded, and trained on, with a
+live reference; 300 steps, 2 seeds; `runs/minimal/on-*`):
+
+| arm | Brier @300 | AUROC @300 | mean Brier, steps 150–300 | answer KL | worst Δ regen accuracy | malformed (training) | answer tokens |
+|---|---|---|---|---|---|---|---|
+| attention bias, lr 1e-2, target 1 | 0.110 ± 0.005 | 0.915 | 0.125 | 1.11 | −0.002 | 0.5% | 7.3 |
+| attention bias, lr 3e-3, W=0.03 | 0.136 ± 0.015 | 0.896 | 0.128 | 0.83 | −0.006 | 0.8% | 7.4 |
+| all-layer LoRA, lr 3e-4, W=1 | 0.159 ± 0.041 | 0.851 | 0.141 | 0.33 | −0.004 | 0.5% | 7.3 |
+| all-layer LoRA, lr 3e-4, no penalty | 0.112 ± 0.000 | 0.921 | 0.113 | 3.99 | −0.148 | 4% | 7–9 |
+| attention bias, lr 1e-2, no penalty | 0.127 ± 0.008 | 0.899 | 0.132 | 15.4 | −0.323 | 33–42% | 26–35 |
+
+- **Without the penalty, training on its own answers compounds the drift.** The unpenalized attention bias's
+  answers fall apart from the first steps: training-time accuracy 0.20–0.33 against about 0.41, a third or
+  more malformed, answers growing from 7 to 26–35 tokens, and regenerated dev accuracy down by up to 32
+  points. Unpenalized LoRA's training-time accuracy dips to 0.30 around steps 150–200.
+- **With it, the answers hold online too**: every penalized arm stays within half a point of its starting
+  regenerated accuracy, and training-time accuracy stays at 0.39–0.44.
+- **The attention bias with an adaptive 1-nat target is the best online arm** (Brier 0.110, AUROC 0.915),
+  better than the same arm offline (0.120). LoRA with W=1, best offline (0.108), is unsteady online: its
+  dev calibration swings between evaluations (ECE 0.02 to 0.16) and one seed ends at Brier 0.188.
+- Step times (L40S): online attention bias about 1.2 s per step of 32 questions (1.0 s generating),
+  all-layer LoRA about 2.8 s (PEFT applies unmerged adapters at every decoding step).
+
+Next: 3,000-step online attention-bias runs on RunPod (targets 0.5, 1, 2; `runs/runpod/online-bias-*`).
+
 ## Differences from the fast loop, and what is not done
 
 - bf16 weights instead of 4-bit; fp32 LoRA weights where the fast loop's were bf16 (TRL casts them).
-- Not carried over: gate biases, building the cache (`fast_loop.py cache` still does it), and online mode
-  (answers regenerated during training; `--regen-every` only measures them on dev).
+- Not carried over: gate biases and building the cache (`fast_loop.py cache` still does it).
 - The loss is 32 separate calls of the objective (20–30 ms per step); not batched yet.
 - All numbers are the fast loop's dev proxy, not the released evaluation.
 

@@ -1,0 +1,2 @@
+{"online-smoke-bias-w0.1": ["--seed", "1", "--steps", "30", "--eval-every", "15", "--regen-every", "15", "--gt", "/vol/fast/gt.json", "--online", "--lora-modules", "none", "--attn-bias", "18-35", "--lr", "1e-2", "--answer-kl", "0.1", "--time-steps"],
+ "online-smoke-lora-w1": ["--seed", "1", "--steps", "30", "--eval-every", "15", "--regen-every", "15", "--gt", "/vol/fast/gt.json", "--online", "--lr", "3e-4", "--answer-kl", "1", "--time-steps"]}
