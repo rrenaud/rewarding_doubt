@@ -101,6 +101,18 @@ def mixed_reward(brier_mix, grading="exact"):
     return QAResult_to_reward
 
 
+def set_reward(train_module, fn):
+    """Replace QAResult_to_reward wherever Train.py's training calls it: Train.py's own name, and
+    util.ExactConfidence's (patches/exact_confidence.patch), which imports it from util.RLHelper
+    itself, so replacing only Train's would leave --objective exact on the original reward."""
+    train_module.QAResult_to_reward = fn
+    try:
+        import util.ExactConfidence as exact_confidence
+    except ImportError:  # unpatched released code
+        return
+    exact_confidence.QAResult_to_reward = fn
+
+
 def add_ppo_speedups(trainer_class):
     """Numerically equivalent speedups for TRL 0.8.6 PPO as used by Train.py.
 
@@ -353,7 +365,7 @@ def main():
         if grading not in ("exact", "f1"):
             raise SystemExit(f"--grading must be exact or f1, not {grading}")
         if reward_mix or grading == "f1":
-            Train.QAResult_to_reward = mixed_reward(reward_mix, grading)
+            set_reward(Train, mixed_reward(reward_mix, grading))
         if seed is not None:
             import random
             import numpy as np
@@ -424,7 +436,7 @@ def main():
                                correct=bool(result.prediction) and is_correct_f1(result.prediction, result.gt_candidates),
                                reward=float(reward)))
             return reward
-        Train.QAResult_to_reward = recording_reward
+        set_reward(Train, recording_reward)
 
         # Deterministic per-epoch order, a counting/skipping loader, and state restore after init.
         original_prepare = PPOTrainerNoCache.prepare_dataloader
@@ -569,7 +581,7 @@ def main():
 
         # --objective exact / exact_fast (patches/exact_confidence.patch) never calls PPOTrainer.step, so its
         # update gets the same bookkeeping here. The stability monitor sees each answer's mean stated
-        # confidence (rounded to a level) as its confidence; answer correctness is not reported by the step.
+        # confidence (rounded to a level) as its confidence and the answer's F1 correctness.
         if hasattr(Train, "exact_confidence_step"):
             original_exact = Train.exact_confidence_step
 
@@ -577,9 +589,12 @@ def main():
                 current_loader[0] = ppo_trainer.dataloader
                 entered = time.time()
                 results = original_exact(ppo_trainer, *exact_args, **exact_kwargs)
-                scored.clear()  # QAResult_to_reward ran once per level, not per sampled response
+                # QAResult_to_reward ran 11 times per scored answer (once per level, in order), so every 11th
+                # record is one answer, in the order of `results`: its F1 correctness feeds the accuracy window.
+                correct = [r["correct"] for r in scored[::11]] if len(scored) == 11 * len(results) else []
+                scored.clear()
                 mean = lambda key: sum(r[key] for r in results) / len(results) if results else None
-                after_step(ppo_trainer, entered, [round(r["confidence"]) for r in results], [], None,
+                after_step(ppo_trainer, entered, [round(r["confidence"]) for r in results], correct, None,
                            dict(expected_reward=mean("expected"), kl=mean("kl"), mean_confidence=mean("confidence"),
                                 kl_coef=float(ppo_trainer.kl_ctl.value), answers_scored=float(len(results))))
                 return results
