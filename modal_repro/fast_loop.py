@@ -172,6 +172,21 @@ def trainable_model(model_name):
     return model, tok
 
 
+LORA_MODULES = ("q", "k", "v", "o", "gate", "up", "down")
+
+
+def restrict_lora(model, modules, layers):
+    """Train only the LoRA adapters on `modules` (subset of LORA_MODULES) in decoder layers `layers`
+    (a range of indices); freeze the rest. Frozen adapters keep B = 0, so they leave the model unchanged.
+    Returns the number of trainable parameters."""
+    import re
+    for name, p in model.named_parameters():
+        m = re.search(r"\.layers\.(\d+)\..*\.(\w+)_proj\.lora_[AB]\.", name)
+        if m:
+            p.requires_grad_(m.group(2) in modules and int(m.group(1)) in layers)
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
 def score_dev(model, scheme, rows, label_key="f1"):
     FastLanguageModel.for_training(model)
     levels = []
@@ -200,6 +215,12 @@ def epoch_batches(lengths, batchsize, window, rng):
 def train(args):
     cache = torch.load(args.cache, weights_only=False)
     model, tok = trainable_model(cache["model"])
+    n_layers = model.config.num_hidden_layers
+    lo, hi = (0, n_layers - 1) if args.lora_layers == "all" else map(int, args.lora_layers.split("-"))
+    modules = args.lora_modules.split(",")
+    assert set(modules) <= set(LORA_MODULES), modules
+    n_trainable = restrict_lora(model, modules, range(lo, hi + 1))
+    print(json.dumps(dict(lora_modules=modules, lora_layers=[lo, hi], n_layers=n_layers, trainable_params=n_trainable)), flush=True)
     scheme = LevelScheme(tok, end_of_turn(tok))
     torch.manual_seed(args.seed)
     rng = random.Random(args.seed)
@@ -358,6 +379,8 @@ def main():
     t.add_argument("--brier-mix", type=float, default=0.0)
     t.add_argument("--eval-every", type=int, default=50)
     t.add_argument("--seed", type=int, default=1)
+    t.add_argument("--lora-modules", default=",".join(LORA_MODULES), help="projections whose adapters train")
+    t.add_argument("--lora-layers", default="all", help='"all" or an inclusive range of decoder layers, e.g. "18-35"')
     t.add_argument("--bucket-window", type=int, default=64, help="batches per length-sorting window; 0 = random batches")
     t.add_argument("--save", action="store_true")
     e = sub.add_parser("eval")

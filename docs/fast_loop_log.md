@@ -207,11 +207,60 @@ This matches PoLoRA's own finding for per-factor Muon. Our objective, a small 11
 anchored by a KL term, may simply be insensitive to the optimizer beyond its step size. The
 optimizer code was removed; the descriptions above are the record.
 
+## 6. Which adapters are needed (Oct 6)
+
+`--lora-modules` (any of q, k, v, o, gate, up, down) and `--lora-layers` (an inclusive range of
+Qwen-2.5-3B's 36 decoder layers) choose which LoRA adapters train. Every module still carries an
+adapter; the others are frozen with B = 0, so they leave the model unchanged. Default schedule,
+2 seeds per arm (mean ± sd); the baseline is the 3 seeds of Adam 3e-4 from section 5.
+
+**Components, all layers:**
+
+| adapters | trainable params | Brier @150 | AUROC @150 | Brier @300 | ECE @300 | AUROC @300 |
+|---|---:|---|---|---|---|---|
+| all 7 (baseline) | 15.0M | 0.116 ± 0.006 | 0.907 ± 0.007 | 0.120 ± 0.004 | 0.040 ± 0.014 | 0.915 ± 0.005 |
+| gate, up, down | 11.3M | 0.121 ± 0.011 | 0.908 ± 0.001 | 0.113 ± 0.002 | 0.039 ± 0.014 | 0.913 ± 0.001 |
+| q, k, v, o | 3.7M | 0.144 ± 0.029 | 0.892 ± 0.003 | 0.122 ± 0.006 | 0.048 ± 0.025 | 0.916 ± 0.001 |
+| o, down | 4.9M | 0.136 ± 0.018 | 0.897 ± 0.002 | 0.118 ± 0.016 | 0.050 ± 0.012 | 0.911 ± 0.008 |
+| q, v | 1.8M | 0.136 ± 0.002 | 0.885 ± 0.003 | 0.120 ± 0.003 | 0.048 ± 0.025 | 0.907 ± 0.003 |
+| gate | 3.8M | 0.137 ± 0.009 | 0.895 ± 0.006 | 0.117 ± 0.005 | 0.043 ± 0.013 | 0.907 ± 0.005 |
+| up | 3.8M | 0.144 ± 0.023 | 0.900 ± 0.002 | 0.118 ± 0.006 | 0.059 ± 0.021 | 0.913 ± 0.000 |
+| down | 3.8M | 0.133 ± 0.003 | 0.893 ± 0.000 | 0.121 ± 0.018 | 0.064 ± 0.014 | 0.907 ± 0.008 |
+| o | 1.2M | 0.145 ± 0.000 | 0.890 ± 0.005 | 0.115 ± 0.001 | 0.032 ± 0.019 | 0.912 ± 0.001 |
+| q | 1.2M | 0.167 ± 0.005 | 0.855 ± 0.006 | 0.129 ± 0.002 | 0.044 ± 0.003 | 0.887 ± 0.003 |
+| v | 0.7M | 0.163 ± 0.005 | 0.867 ± 0.006 | 0.129 ± 0.002 | 0.059 ± 0.009 | 0.897 ± 0.002 |
+| k | 0.7M | 0.161 ± 0.009 | 0.835 ± 0.002 | 0.145 ± 0.001 | 0.052 ± 0.002 | 0.870 ± 0.001 |
+
+**Depth, all 7 projections:**
+
+| layers | trainable params | Brier @150 | AUROC @150 | Brier @300 | ECE @300 | AUROC @300 |
+|---|---:|---|---|---|---|---|
+| 0–35 (baseline) | 15.0M | 0.116 ± 0.006 | 0.907 ± 0.007 | 0.120 ± 0.004 | 0.040 ± 0.014 | 0.915 ± 0.005 |
+| 0–17 | 7.5M | 0.130 ± 0.001 | 0.891 ± 0.009 | 0.117 ± 0.005 | 0.034 ± 0.010 | 0.908 ± 0.004 |
+| 18–35 | 7.5M | 0.140 ± 0.009 | 0.896 ± 0.001 | 0.117 ± 0.007 | 0.067 ± 0.032 | 0.917 ± 0.003 |
+| 27–35 | 3.7M | 0.167 ± 0.011 | 0.818 ± 0.025 | 0.152 ± 0.005 | 0.042 ± 0.018 | 0.855 ± 0.010 |
+| 32–35 | 1.7M | 0.243 ± 0.001 | 0.805 ± 0.013 | 0.233 ± 0.002 | 0.189 ± 0.008 | 0.826 ± 0.002 |
+
+- **A single projection is enough if it writes into the residual stream.** The attention output (o,
+  1.2M parameters, 8% of the baseline) matches all seven at step 300, and so does any single MLP
+  projection. q, k or v alone lag; k is weakest. q and o have the same size: 0.129 / 0.887 against
+  0.115 / 0.912.
+- **Smaller adapters are slower, not worse,** at the shared learning rate: every subset trails at
+  step 150 and catches up by step 300, except q, k, v alone and the late-layer arms.
+- **Either half of the network is enough; the last layers alone are not.** Layers 0–17 or 18–35
+  match the baseline. The last 9 layers end at 0.152 / 0.855, and the last 4 barely move (Brier near
+  0.24 at both steps 150 and 300). The last-4 arm (1.66M parameters) and q, v in every layer (1.84M)
+  are the same size: one fails, the other matches the baseline. Placement matters, not size.
+- Not checked: whether a higher learning rate closes the gap for the late-layer arms.
+- These runs took 4.3–4.7 min each, the same as the baseline: frozen adapters still run, and (found
+  later, section 7) the backward pass still went through every layer.
+
 ## Defaults now in `fast_loop.py train`
 
 `--batchsize 32 --passes 1 --minibatch 32 --lr 3e-4 --steps 300 --eval-every 50 --bucket-window 64`,
 Adam, gradient checkpointing off. About 4.7 minutes on an L40S, including 7 dev evaluations. The
 released schedule is `--batchsize 8 --passes 4 --minibatch 4 --lr 1e-5`.
+`--lora-modules` and `--lora-layers` restrict which adapters train (section 6).
 
 ## Caveats and open items
 
