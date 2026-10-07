@@ -172,6 +172,8 @@ def main():
     parser.add_argument("--dump", action="store_true",
                         help="rerun a finished RunPod run in place with --dump-examples: it resumes from its final checkpoint and "
                              "only writes examples.jsonl (per-example losses, fitted vs base)")
+    parser.add_argument("--force-resume", action="store_true",
+                        help="rerun a RunPod run that ended (e.g. crashed) in place: it resumes from its last checkpoint")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     launch = json.loads((ROOT / "runs/minimal" / args.label / "launch.json").read_text())
@@ -198,7 +200,7 @@ def main():
             launcher += ["--post-cmd", post]
         if args.dry_run:
             launcher.append("--dry-run")
-        if args.dump:
+        if args.dump or args.force_resume:
             launcher.append("--force-resume")  # entry.sh does not rerun a finished run otherwise
         print(f"trying {', '.join(g.replace('NVIDIA ', '') for g in gpus)} with --accumulate {accumulate or 'as in the run'}", flush=True)
         launched_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -220,7 +222,7 @@ def main():
             record.mkdir(parents=True, exist_ok=True)
             # pod_created and cost_per_hr feed scripts/run_costs.py (billing runs from creation to termination);
             # only these pod fields are kept: the pod's env holds keys
-            (record / ("dumped_by.json" if args.dump else "promoted_from.json")).write_text(json.dumps(dict(
+            (record / ("dumped_by.json" if args.dump else "resumed_by.json" if args.force_resume else "promoted_from.json")).write_text(json.dumps(dict(
                 launch, image_sha=image_sha, runpod_command=command, gpus=gpus, post_cmd=post, pod_id=pod.get("id"),
                 cost_per_hr=pod.get("costPerHr"), gpu_type=(pod.get("machine") or {}).get("gpuTypeId"),
                 pod_created=launched_at), indent=1) + "\n")
