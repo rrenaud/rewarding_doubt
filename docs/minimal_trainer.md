@@ -207,6 +207,32 @@ end. Regenerated dev accuracy at step 0 is 0.440 on these GPUs (0.426 on Modal's
   `v_proj` controller's weight fell to near its floor. A lower target (1–1.5) or a higher minimum weight would
   likely close the gap. One seed each, proxy metrics.
 
+## Recovering the `v_proj` run's answers (Oct 6, evening)
+
+`--init` starts a run from another run's trained tensors (fresh optimizer; the reference stays the base model).
+From the 3,000-step online `v_proj` run (step 0 here: Brier 0.108, AUROC 0.914, answer KL 2.06, regenerated dev
+accuracy 0.418 against 0.426 for the base model on Modal), offline training with a fixed answer-KL weight, 300
+steps, 2 seeds (`runs/minimal/recover-*`):
+
+| lr, W | regenerated accuracy @0 / 50 / 100 / 150 / 200 / 250 / 300 | Brier @300 | ECE | AUROC | answer KL |
+|---|---|---|---|---|---|
+| 1e-2, 0 | 0.418 / 0.424 / 0.414 / 0.413 / 0.409 / 0.403 / 0.416 | 0.106 | 0.051 | 0.919 | 3.13 |
+| 1e-2, 0.3 | 0.418 / 0.429 / 0.430 / 0.436 / 0.416 / 0.427 / 0.412 | 0.106 | 0.043 | 0.921 | 1.46 |
+| 1e-2, 1 | 0.418 / 0.444 / 0.434 / 0.440 / 0.440 / 0.440 / 0.433 | 0.116 | 0.050 | 0.912 | 0.97 |
+| 1e-2, 3 | 0.418 / 0.441 / 0.434 / 0.443 / 0.438 / 0.438 / 0.435 | 0.121 | 0.035 | 0.903 | 0.91 |
+| 1e-2, 10 | 0.418 / 0.437 / 0.435 / 0.435 / 0.440 / 0.448 / 0.440 | 0.124 | 0.032 | 0.895 | 0.83 |
+| 1e-2, 30 | 0.418 / 0.441 / 0.435 / 0.445 / 0.442 / 0.436 / 0.445 | 0.122 | 0.029 | 0.895 | 0.81 |
+| 3e-3, 3 | 0.418 / 0.437 / 0.436 / 0.433 / 0.429 / 0.436 / 0.435 | 0.108 | 0.039 | 0.911 | 1.31 |
+| 3e-3, 10 | 0.418 / 0.434 / 0.434 / 0.428 / 0.433 / 0.435 / 0.434 | 0.107 | 0.042 | 0.910 | 1.28 |
+
+- Unpenalized, the drift continues (accuracy 0.403–0.416, answer KL 3.1).
+- With W ≥ 1 the answers are back at base level within 50 steps; beyond that W barely matters.
+- At lr 1e-2 the recovery costs calibration (Brier 0.116–0.124, AUROC 0.895–0.912); at lr 3e-3 with W = 3–10 it is
+  close to free (Brier 0.107–0.108, AUROC 0.910–0.911, accuracy 0.434–0.435), settling near 1.3 nats.
+- So only part of the 2 nats of drift hurts the answers: a short, gentle penalized phase after online training
+  (about 50–100 steps at lr 3e-3, W ≈ 3) keeps the calibration and restores the answers. Offline, 2 seeds, proxy
+  metrics; not yet tried online.
+
 ## Differences from the fast loop, and what is not done
 
 - bf16 weights instead of 4-bit; fp32 LoRA weights where the fast loop's were bf16 (TRL casts them).

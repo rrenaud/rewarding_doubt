@@ -535,6 +535,16 @@ def train(args):
     named.update({f"attn_bias.{i}": p for i, p in zip(attn_layers, trained["attn_bias"])})
     named.update({f"residual_bias.{i}": p for i, p in zip(mlp_layers, trained["residual_bias"])})
     named.update({f"stock.{k}": m for k, m in stock.items()})
+    if args.init:  # start from another run's trained tensors (a checkpoint's state.pt or its directory); fresh optimizer
+        source = torch.load(os.path.join(args.init, "state.pt") if os.path.isdir(args.init) else args.init,
+                            map_location="cpu", weights_only=False)["params"]
+        if set(source) != set(named):
+            raise SystemExit(f"--init has {sorted(set(source) ^ set(named))[:4]}... unlike this run's trained tensors")
+        with torch.no_grad():
+            for n, value in source.items():
+                named[n].copy_(value.to(named[n].device, named[n].dtype))
+        sync_stock(lm, "weights")
+        print(f"initialized {len(source)} tensors from {args.init}", flush=True)
     os.makedirs(args.out_dir, exist_ok=True)
     checkpoint_dir, metrics_path = os.path.join(args.out_dir, "checkpoint"), os.path.join(args.out_dir, "metrics.jsonl")
     # Resume (--checkpoint-every): rerunning the same command continues from the last checkpoint.
@@ -719,6 +729,7 @@ def main():
     t.add_argument("--checkpoint-every", type=int, default=0,
                    help="resumable checkpoint every N steps and on SIGTERM (exit 143); rerunning the same command resumes")
     t.add_argument("--no-resume", action="store_true", help="ignore an existing checkpoint")
+    t.add_argument("--init", default="", help="start from another run's trained tensors (checkpoint dir or state.pt); the reference stays the base model")
     t.add_argument("--stop-after", type=int, default=0, help="testing: checkpoint and exit 143 after this step, as if preempted")
     args = parser.parse_args()
     {"ref": make_ref, "answer-ref": make_answer_ref, "diagnose": diagnose, "memory": memory, "train": train}[args.command](args)
