@@ -1416,13 +1416,16 @@ def git_state():
 
 
 @app.local_entrypoint()
-def minimal_train(configs: str, gpu: str = "L40S", fetch: str = "", cache: str = MINIMAL_CACHE):
+def minimal_train(configs: str, gpu: str = "L40S", fetch: str = "", cache: str = MINIMAL_CACHE, resume: str = ""):
     """minimal_trainer.py train for each {label: [args]} in a JSON file, in parallel, on the bf16-reference
     cache; train.log, metrics.jsonl and curve.json to runs/minimal/<label>/. With --fetch RUN (same configs),
-    only copies a finished run's outputs from the volume, for when the local client was cut off."""
+    only copies a finished run's outputs from the volume, for when the local client was cut off. With --resume RUN,
+    trains into that run's directories, so each config carries on from its last checkpoint (e.g. after the client
+    died: with several configs, `modal run --detach` keeps only one function alive once the client is gone, so
+    keep the client running)."""
     root = Path(__file__).resolve().parents[1]
     cfg = json.loads(Path(configs).read_text())
-    run = fetch or "minimal-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run = fetch or resume or "minimal-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     print("run", run, flush=True)
 
     def save(label):
