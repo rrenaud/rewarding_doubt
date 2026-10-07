@@ -167,6 +167,9 @@ def main():
     parser.add_argument("--allow-dirty-source", action="store_true")
     parser.add_argument("--continue", dest="resume", action="store_true",
                         help="copy the Modal run's latest checkpoint into the RunPod run, which then resumes from it")
+    parser.add_argument("--dump", action="store_true",
+                        help="rerun a finished RunPod run in place with --dump-examples: it resumes from its final checkpoint and "
+                             "only writes examples.jsonl (per-example losses, fitted vs base)")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     launch = json.loads((ROOT / "runs/minimal" / args.label / "launch.json").read_text())
@@ -182,7 +185,9 @@ def main():
         copy_to_runpod(f"/vol/outputs/{launch['modal_run']}/{args.label}/checkpoint", args.dry_run, dest_rel=f"runs/{name}/checkpoint", replace=True)
     for gpus, accumulate in tiers(launch["command"], args.gpu, args.accumulate):
         command, _ = translate(launch["command"], args.steps, accumulate)
-        post = "python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON" if "--save-adapter-every" in command else ""
+        if args.dump:
+            command.append("--dump-examples")
+        post = "python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON" if "--save-adapter-every" in command and not args.dump else ""
         launcher = ["python3", str(ROOT / "scripts/runpod_launch.py"), name, "--expt", name.split("-")[0], "--max-hours",
                     str(args.max_hours), "--image", f"ghcr.io/rrenaud/rewarding-doubt:{image_sha}", "--train-cmd", "python " + " ".join(command)]
         for g in gpus:
@@ -191,6 +196,8 @@ def main():
             launcher += ["--post-cmd", post]
         if args.dry_run:
             launcher.append("--dry-run")
+        if args.dump:
+            launcher.append("--force-resume")  # entry.sh does not rerun a finished run otherwise
         print(f"trying {', '.join(g.replace('NVIDIA ', '') for g in gpus)} with --accumulate {accumulate or 'as in the run'}", flush=True)
         launched_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         result = subprocess.run(launcher, capture_output=True, text=True)
@@ -211,7 +218,7 @@ def main():
             record.mkdir(parents=True, exist_ok=True)
             # pod_created and cost_per_hr feed scripts/run_costs.py (billing runs from creation to termination);
             # only these pod fields are kept: the pod's env holds keys
-            (record / "promoted_from.json").write_text(json.dumps(dict(
+            (record / ("dumped_by.json" if args.dump else "promoted_from.json")).write_text(json.dumps(dict(
                 launch, image_sha=image_sha, runpod_command=command, gpus=gpus, post_cmd=post, pod_id=pod.get("id"),
                 cost_per_hr=pod.get("costPerHr"), gpu_type=(pod.get("machine") or {}).get("gpuTypeId"),
                 pod_created=launched_at), indent=1) + "\n")

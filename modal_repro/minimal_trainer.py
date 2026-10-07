@@ -536,6 +536,46 @@ def save_adapter(lm, tokenizer, directory):
     announce_saved(directory)
 
 
+def question_text(tokenizer, ids):
+    """The user's message in a chat prompt (Llama-3 or Qwen template), else the prompt's last 300 characters."""
+    text = tokenizer.decode(ids)
+    for start, end in (("<|start_header_id|>user<|end_header_id|>", "<|eot_id|>"), ("<|im_start|>user", "<|im_end|>")):
+        if start in text:
+            return text.rsplit(start, 1)[1].split(end, 1)[0].strip()
+    return text[-300:]
+
+
+@torch.no_grad()
+def dump_examples(lm, tokenizer, levels, rows, pad, grading, beta, answer_w, path, split, chunk=32):
+    """One JSON line per example: the label, the stated-confidence distribution and the training objective's terms
+    under the fitted model and under the reference (adapters off: the base model), and the per-example loss
+    -(J - beta KL) + W answer_KL as trained (the reference's is -J: both KLs are 0). Sort by delta_loss."""
+    with open(path, "a") as f:
+        for s in range(0, len(rows), chunk):
+            part = rows[s:s + chunk]
+            queries, starts = [r["ids"] for r in part], [r["answer_start"] for r in part]
+            fitted, answers = score_rows(lm, levels, queries, starts, pad)
+            with adapters_off(lm):
+                base, reference = score_rows(lm, levels, queries, starts, pad)
+            kls = answer_kl(answers, reference).tolist()
+            for r, lf, lb, a_kl in zip(part, fitted, base, kls):
+                label, out = float(r[grading]), dict(split=split, qid=r.get("qid"), label=int(r[grading]), answer=r.get("answer"),
+                                                     question=question_text(tokenizer, r["ids"][:r["answer_start"]]))
+                for tag, lv in (("fitted", lf), ("base", lb)):
+                    J, kl = baseline_matched_objective(lv.double(), label, "discrete-exact", "released", -30.0,
+                                                       ref_logq=r["ref"].to(lv.device).double())
+                    probs = lv.double().softmax(-1)
+                    conf = float((probs * torch.arange(11, device=lv.device)).sum()) / 10
+                    out[tag] = dict(J=J.item(), conf_kl=kl.item(), expected_conf=conf, brier=(conf - label) ** 2,
+                                    probs=[round(x, 4) for x in probs.tolist()])
+                out["fitted"]["answer_kl"], out["base"]["answer_kl"] = a_kl, 0.0
+                out["fitted"]["loss"] = -(out["fitted"]["J"] - beta * out["fitted"]["conf_kl"]) + answer_w * a_kl
+                out["base"]["loss"] = -out["base"]["J"]
+                out["delta_loss"] = out["fitted"]["loss"] - out["base"]["loss"]
+                out["delta_brier"] = out["fitted"]["brier"] - out["base"]["brier"]
+                f.write(json.dumps(out) + "\n")
+
+
 def epoch_batches(lengths, batchsize, window, rng):
     """One epoch of batches (every row once, ragged tail dropped). With window > 0, length bucketing:
     the shuffled epoch is cut into windows of `window` batches, each window is sorted by length before
@@ -756,6 +796,16 @@ def train(args):
                           seconds=round(seconds, 1), eval_seconds=round(phase_seconds["dev_eval"], 1),
                           save_seconds=round(phase_seconds["save"], 1),
                           train_seconds=round(seconds - phase_seconds["dev_eval"] - phase_seconds["save"], 1))), flush=True)
+    # After the done event, so its time is not counted as training. A finished run resumed with --dump-examples
+    # (same command) has no steps left and comes straight here.
+    if args.dump_examples:
+        path = os.path.join(args.out_dir, "examples.jsonl")
+        if os.path.exists(path):
+            os.remove(path)
+        for split, rows in (("train", train_rows), ("dev", dev_rows)):
+            dump_examples(lm, tok, levels, rows, pad, args.grading, beta, answer_w, path, split)
+        print(f"per-example losses -> {path}", flush=True)
+        announce_saved(args.out_dir)
     write_status(args.out_dir, "completed", step=args.steps)
     if args.save:
         torch.save(dict(args=vars(args), lora={n: p.detach().cpu() for n, p in lm.named_parameters() if "lora_" in n},
@@ -787,6 +837,8 @@ def main():
     t.add_argument("--accumulate", type=int, default=1,
                    help="split each minibatch into this many parts and accumulate their gradients: same update, lower peak memory")
     t.add_argument("--lr", type=float, default=3e-4)
+    t.add_argument("--dump-examples", action="store_true",
+                   help="at the end, write examples.jsonl: per-example losses under the fitted and the base model (train and dev)")
     t.add_argument("--bias-lr", type=float, default=0, help="learning rate of bias vectors and stock parameters (default: --lr)")
     t.add_argument("--kl-coef", type=float, default=0.05)
     t.add_argument("--adaptive-kl", action="store_true", help="the released controller: target 6, horizon 10000")

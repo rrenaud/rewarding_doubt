@@ -1,0 +1,1 @@
+{"llama-dump-smoke": ["--steps", "10", "--eval-every", "10", "--gt", "/vol/fast/llama3-8b-gt.json", "--lora-layers", "16-31", "--lora-rank", "4", "--residual-bias", "16-31", "--bias-lr", "1e-4", "--answer-kl", "1", "--checkpoint-every", "5", "--dump-examples"]}
