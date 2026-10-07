@@ -233,6 +233,32 @@ steps, 2 seeds (`runs/minimal/recover-*`):
   (about 50–100 steps at lr 3e-3, W ≈ 3) keeps the calibration and restores the answers. Offline, 2 seeds, proxy
   metrics; not yet tried online.
 
+## A floor on the adaptive weight (Oct 6, night)
+
+In the 3,000-step `v_proj` run the adaptive weight sank to about 0.001–0.06 late in training, and the answers
+drifted (`docs/answer_kl_vs_accuracy.png`: accuracy falls past about 2 nats per answer). `--answer-kl-min` sets a
+floor. Stock `v_proj` bias 18–35, lr 1e-2, offline, 1,000 steps, 2 seeds; regenerated accuracy 0.426 at step 0
+(`runs/minimal/floor-*`):
+
+| target, floor | regen accuracy @0 / 500 / 1,000 | Brier, steps 500–1,000 | ECE | AUROC | answer KL @1,000 | late weight |
+|---|---|---|---|---|---|---|
+| 1.5, 0.001 | 0.426 / 0.417 / 0.420 | 0.113 | 0.045 | 0.916 | 1.68 | 0.037 |
+| 2, 0.001 | 0.426 / 0.388 / 0.420 | 0.113 | 0.044 | 0.916 | 2.26 | 0.013 |
+| 1.5, 0.1 | 0.426 / 0.428 / 0.430 | 0.118 | 0.044 | 0.910 | 1.05 | 0.100 |
+| 2, 0.1 | 0.426 / 0.425 / 0.427 | 0.114 | 0.034 | 0.911 | 1.08 | 0.100 |
+| 1.5, 0.3 | 0.426 / 0.436 / 0.432 | 0.120 | 0.041 | 0.904 | 0.65 | 0.300 |
+| 2, 0.3 | 0.426 / 0.439 / 0.441 | 0.123 | 0.044 | 0.903 | 0.61 | 0.300 |
+| 1.5, 1 | 0.426 / 0.444 / 0.439 | 0.133 | 0.050 | 0.889 | 0.33 | 1.000 |
+| 2, 1 | 0.426 / 0.444 / 0.436 | 0.131 | 0.050 | 0.892 | 0.34 | 1.000 |
+| 1.5, 3 | 0.426 / 0.417 / 0.435 | 0.144 | 0.044 | 0.867 | 0.20 | 3.000 |
+| 2, 3 | 0.426 / 0.426 / 0.427 | 0.144 | 0.050 | 0.868 | 0.22 | 3.000 |
+
+- From a floor of 0.1 up, the weight sits on the floor (the controller wants less), so the target stops
+  mattering and the floor sets the trade-off.
+- Floor 0.1 keeps accuracy at base (0.427–0.430) with the KL near 1 nat, below the knee, for about 0.003 Brier;
+  higher floors buy a little accuracy for up to 0.03 Brier. One training phase, no polish step. Offline; an online
+  check and a 3,000-step run are next.
+
 ## Differences from the fast loop, and what is not done
 
 - bf16 weights instead of 4-bit; fp32 LoRA weights where the fast loop's were bf16 (TRL casts them).
