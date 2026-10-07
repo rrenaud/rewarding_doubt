@@ -55,6 +55,17 @@ def load(model_name, adapter=None):
     return model, tokenizer
 
 
+def merge_caches(args):
+    parts = [torch.load(p, weights_only=False) for p in args.shards]
+    cache = dict(parts[0], created=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), shards=args.shards)
+    cache["splits"] = dict(train=[r for c in parts for r in c["splits"]["train"]], dev=parts[0]["splits"]["dev"])
+    qids = [r["qid"] for r in cache["splits"]["train"]]
+    assert len(set(qids)) == len(qids), "shards overlap"
+    torch.save(cache, args.out)
+    print(json.dumps(dict(saved=args.out, train=len(qids), dev=len(cache["splits"]["dev"]),
+                          accuracy_f1=statistics.fmean(r["f1"] for r in cache["splits"]["train"]))), flush=True)
+
+
 def build_cache(args):
     ids = json.load(open(args.ids))
     model, tok = load(args.model)
@@ -64,8 +75,12 @@ def build_cache(args):
     rng = random.Random(args.seed)
     cache = dict(model=args.model, created=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), splits={})
     for split, hf_split, limit in (("train", "train", args.n_train), ("dev", "validation", 0)):
+        if split == "dev" and args.shard:  # --n-shards: shard 0 answers the dev questions, the others only training ones
+            continue
         data = subset_loader(ids)("triviaqa", hf_split, "verbalize", tok)
         order = list(range(len(data)))
+        if split == "train" and args.n_shards > 1:  # every K-th training question from the I-th (--n-train 0: all of them)
+            order = order[args.shard::args.n_shards]
         if limit:
             rng.shuffle(order)
             order = order[:int(limit * 1.05) + 32]  # a few answers miss " Confidence"
@@ -606,6 +621,10 @@ def main():
     c.add_argument("--n-train", type=int, default=8000)
     c.add_argument("--batch", type=int, default=64)
     c.add_argument("--seed", type=int, default=0)
+    c.add_argument("--shard", type=int, default=0, help="with --n-shards K: this job's share of the training questions")
+    c.add_argument("--n-shards", type=int, default=1)
+    m = sub.add_parser("merge", help="join cache shards: training rows of all, dev rows of shard 0")
+    m.add_argument("out"); m.add_argument("shards", nargs="+")
     t = sub.add_parser("train")
     t.add_argument("cache"); t.add_argument("out_dir")
     # Defaults: the fast schedule (runs/fast/seed_sweep_configs.json, 3 seeds, 4.7 min on an L40S). The released
@@ -644,7 +663,7 @@ def main():
     pl = sub.add_parser("profile-lora")
     pl.add_argument("cache")
     args = parser.parse_args()
-    {"cache": build_cache, "train": train, "eval": evaluate, "profile": profile, "profile-lora": profile_lora, "gt": gold_answers}[args.command](args)
+    {"cache": build_cache, "train": train, "eval": evaluate, "profile": profile, "profile-lora": profile_lora, "gt": gold_answers, "merge": merge_caches}[args.command](args)
 
 
 if __name__ == "__main__":

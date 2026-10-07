@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import datetime
 import json
+import time
 from pathlib import Path
 
 import modal
@@ -791,10 +792,10 @@ def evaluate_base_remote(ids_by_split: dict) -> dict:
 
 
 @app.function(volumes={VOL: volume}, timeout=600)
-def read_files(paths: list) -> dict:
-    """Text of each existing file on the volume."""
+def read_files(paths: list, exists_only: bool = False) -> dict:
+    """Text of each existing file on the volume (exists_only: just which exist, as {path: ""}, e.g. for binaries)."""
     volume.reload()
-    return {p: Path(p).read_text() for p in paths if Path(p).exists()}
+    return {p: "" if exists_only else Path(p).read_text() for p in paths if Path(p).exists()}
 
 
 @app.local_entrypoint()
@@ -1131,6 +1132,68 @@ def fast_cache(n_train: int = 8000, gpu: str = "L40S", model: str = "unsloth/Qwe
                                                                           "--n-train", str(n_train), "--model", model],
                                                           "fast-cache-" + Path(out).stem)
     print("exit", r["exit_code"]); print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
+
+
+@app.local_entrypoint()
+def full_cache(n_shards: int = 8, gpu: str = "L40S", name: str = "llama3-8b-full",
+               model: str = "unsloth/llama-3-8b-Instruct-bnb-4bit", ref_model: str = "unsloth/llama-3-8b-Instruct"):
+    """The minimal trainer's cache for the whole TriviaQA training split (87,622 questions; the released code's
+    training set) plus the 512 dev questions: base answers generated in n_shards parallel jobs (fast_loop.py cache
+    --n-train 0 --shard i), merged, reference levels recomputed in bf16 (ref --model), top-64 answer reference
+    (answer-ref) and gold answers (gt). Writes /vol/fast/<name>{,-bf16ref,-bf16ref-top64}.pt and <name>-gt.json.
+    Keep the client running: it drives the stages in order."""
+    root = Path(__file__).resolve().parents[1]
+    ids = {"train": "all", "validation": json.loads((root / "runs/hparam-search-20261002T044831Z/dev_ids.json").read_text())}
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    shards = [f"/vol/fast/shards/{name}-{i}of{n_shards}.pt" for i in range(n_shards)]
+    merged, ref, topk, gt = (f"/vol/fast/{name}.pt", f"/vol/fast/{name}-bf16ref.pt", f"/vol/fast/{name}-bf16ref-top64.pt",
+                             f"/vol/fast/{name}-gt.json")
+
+    def report(stage, r):
+        print(f"== {stage}: exit {r['exit_code']} on {r['gpu']}", flush=True)
+        print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l)[-2000:], flush=True)
+        if r["exit_code"]:
+            raise SystemExit(f"{stage} failed")
+
+    done = set(read_files.remote([*shards, merged, ref, topk, gt], exists_only=True))  # stages already done are skipped
+    jobs = [(ids, f"shard{i}", ["fast_loop.py", "cache", "IDS_JSON", path, "--n-train", "0", "--model", model,
+                                "--shard", str(i), "--n-shards", str(n_shards)], f"full-cache-{stamp}")
+            for i, path in enumerate(shards) if path not in done]
+    # Shards start a few seconds apart and failed ones are retried: 8 containers loading the model from the shared
+    # Hugging Face cache at once failed with "No such file or directory". One failure must not cancel the others.
+    for attempt in range(3):
+        calls = []
+        for i, job in enumerate(jobs):
+            calls.append((job, train_with_snapshots.with_options(gpu=gpu).spawn(*job)))
+            if i < len(jobs) - 1:
+                time.sleep(20)  # scheduling: staggers the model loads (not waiting for a result)
+        failed = []
+        for job, call in calls:
+            try:
+                r = call.get()
+                print(f"== shard {r['label']}: exit {r['exit_code']} on {r['gpu']}", flush=True)
+                print("\n".join(l for l in r["log"].splitlines() if l.startswith('{"split"')), flush=True)
+                if r["exit_code"]:
+                    failed.append(job)
+            except Exception as exc:
+                print(f"== shard {job[1]}: {exc!r}"[:500], flush=True)
+                failed.append(job)
+        jobs = failed
+        if not jobs:
+            break
+        print(f"retrying {[j[1] for j in jobs]}", flush=True)
+    if jobs:
+        raise SystemExit(f"shards failed 3 times: {[j[1] for j in jobs]}")
+    # merge and gt only need a GPU because fast_loop.py imports Unsloth
+    if merged not in done:
+        report("merge", train_with_snapshots.with_options(gpu="T4").remote({}, "merge", ["fast_loop.py", "merge", merged, *shards], f"full-cache-{stamp}"))
+    if ref not in done:
+        report("ref", train_with_snapshots.with_options(gpu=gpu).remote({}, "ref", ["minimal_trainer.py", "ref", merged, ref, "--model", ref_model], f"full-cache-{stamp}"))
+    if topk not in done:
+        report("answer-ref", train_with_snapshots.with_options(gpu=gpu).remote({}, "answer-ref", ["minimal_trainer.py", "answer-ref", ref, topk, "--k", "64"], f"full-cache-{stamp}"))
+    if gt not in done:
+        report("gt", train_with_snapshots.with_options(gpu="T4").remote({}, "gt", ["fast_loop.py", "gt", topk, gt], f"full-cache-{stamp}"))
+    print("done:", topk, gt, flush=True)
 
 
 @app.local_entrypoint()
