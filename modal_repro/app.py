@@ -1402,6 +1402,19 @@ def minimal_memory(gpu: str = "L40S"):
     print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
 
 
+CODE_PATHS = ["modal_repro", "src", "runpod", "patches"]  # what Modal images and the RunPod image are built from
+
+
+def git_state():
+    """The local checkout's commit and whether code under CODE_PATHS has uncommitted changes, recorded with each
+    launch: Modal builds from the working directory, so a run is reproducible elsewhere only from a clean commit."""
+    import subprocess
+    root = Path(__file__).resolve().parents[1]
+    sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True).stdout.strip()
+    dirty = subprocess.run(["git", "status", "--porcelain", "--", *CODE_PATHS], cwd=root, capture_output=True, text=True).stdout.strip()
+    return dict(git_sha=sha, git_dirty=bool(dirty))
+
+
 @app.local_entrypoint()
 def minimal_train(configs: str, gpu: str = "L40S", fetch: str = "", cache: str = MINIMAL_CACHE):
     """minimal_trainer.py train for each {label: [args]} in a JSON file, in parallel, on the bf16-reference
@@ -1426,6 +1439,12 @@ def minimal_train(configs: str, gpu: str = "L40S", fetch: str = "", cache: str =
             save(label)
         return
     jobs = [({}, label, ["minimal_trainer.py", "train", cache, "OUT_DIR", *args], run) for label, args in cfg.items()]
+    launched = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    for _, label, command, _ in jobs:  # read by scripts/promote_to_runpod.py
+        out = root / "runs" / "minimal" / label
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "launch.json").write_text(json.dumps(dict(label=label, modal_run=run, command=command, gpu=gpu, launched=launched,
+                                                         **git_state()), indent=1) + "\n")
     for r in train_with_snapshots.with_options(gpu=gpu).starmap(jobs, return_exceptions=True, order_outputs=False):
         if isinstance(r, Exception):
             print("FAILED", repr(r)[:800]); continue
