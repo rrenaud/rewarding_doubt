@@ -1,6 +1,7 @@
 """Answer KL against the change in regenerated dev accuracy, for every evaluation that measured both.
 
     python scripts/plot_answer_kl.py        # docs/answer_kl_vs_accuracy{.png,_zoom.png,.html}; prints a binned table
+    python scripts/plot_answer_kl.py llama  # Llama-3-8B runs (runs/minimal/llama-*) -> docs/answer_kl_vs_accuracy_llama.png
 
 answer_kl: KL(policy || base model) over the vocabulary, summed over each cached dev answer's tokens (nats per
 answer, about 7-8 tokens). Δ accuracy: regenerated dev accuracy (the policy answers the 507 dev questions again,
@@ -177,5 +178,58 @@ below 2 nats. The black line is the median in 0.25-nat bins.</p>
     print(f"-> {out.relative_to(ROOT)}")
 
 
+def llama():
+    """Llama-3-8B: every run starts from the base model, so Δ accuracy is against the run's own step 0. One color
+    per adapter family; unpenalized drift runs (llama-drift-*) trace the curve, the others are penalized."""
+    import collections
+    families = collections.defaultdict(list)
+    for f in sorted(glob.glob(str(ROOT / "runs/minimal/llama-*/train.log"))):
+        name = Path(f).parent.name
+        curve = [json.loads(l) for l in open(f) if l.startswith('{"step"')]
+        base = next((r["regen_accuracy"] for r in curve if r["step"] == 0 and "regen_accuracy" in r), None)
+        if base is None:
+            continue
+        family = ("o_proj bias" if "obias" in name or "hookbias" in name else "RMSNorm gains" if "norm" in name
+                  else "LoRA o_proj" if "lora" in name else "other")
+        for r in curve:
+            if r["step"] > 0 and "regen_accuracy" in r:
+                families[family].append(dict(run=name, step=r["step"], kl=r["answer_kl"], dacc=r["regen_accuracy"] - base,
+                                             malformed=r.get("regen_malformed", 0.0), drift="drift" in name))
+    everything = [p for ps in families.values() for p in ps]
+    colors = {"o_proj bias": "#e45756", "RMSNorm gains": "#4c78a8", "LoRA o_proj": "#54a24b", "other": "#9aa5b1"}
+    fig, ax = plt.subplots(figsize=(11, 6))
+    for family, ps in families.items():
+        for drift in (True, False):
+            sel = [p for p in ps if p["drift"] == drift]
+            if sel:
+                ax.scatter([max(p["kl"], 1e-3) for p in sel], [p["dacc"] for p in sel], c=colors[family], s=28 if drift else 14,
+                           marker="o" if drift else "x", alpha=0.8, label=f"{family}, {'unpenalized drift' if drift else 'penalized / other'} ({len(sel)})")
+    edges = [0.001, 0.1, 0.3, 0.5, 1, 1.5, 2, 3, 4, 6, 10, 40]
+    centers, medians = [], []
+    print(f"Llama-3-8B: {len(everything)} points")
+    print(f"{'answer KL (nats/answer)':>24} {'n':>4} {'median Δacc':>12} {'10th pct Δacc':>14} {'mean malformed':>15}")
+    for lo, hi in zip(edges, edges[1:]):
+        b = sorted(p["dacc"] for p in everything if lo <= p["kl"] < hi)
+        if len(b) >= 3:
+            centers.append((lo * hi) ** 0.5)
+            medians.append(st.median(b))
+            mal = st.fmean(p["malformed"] for p in everything if lo <= p["kl"] < hi)
+            print(f"{f'[{lo}, {hi})':>24} {len(b):>4} {st.median(b):>+12.3f} {b[len(b) // 10]:>+14.3f} {mal:>15.3f}")
+    ax.plot(centers, medians, c="black", lw=2, label="binned median")
+    ax.set_xscale("log")
+    ax.axhline(0, c="black", lw=0.8)
+    ax.axhspan(-0.02, 0.02, color="#cccccc", alpha=0.35, lw=0, label="±2 points")
+    ax.set_xlabel("answer KL to the base model (nats per answer)")
+    ax.set_ylabel("Δ regenerated dev accuracy vs the run's step 0")
+    ax.set_title("Llama-3-8B: answer accuracy against answer KL")
+    ax.grid(alpha=0.3)
+    ax.legend(fontsize=7.5, loc="lower left")
+    fig.tight_layout()
+    out = ROOT / "docs/answer_kl_vs_accuracy_llama.png"
+    fig.savefig(out, dpi=130)
+    print(f"-> {out.relative_to(ROOT)}")
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    llama() if sys.argv[1:] == ["llama"] else main()

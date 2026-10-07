@@ -1,0 +1,11 @@
+=== attempt 2026-10-07T04:35:19Z on NVIDIA L40S ===
+
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:08,  2.80s/it]
+Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.76s/it]
+Loading checkpoint shards:  75%|███████▌  | 3/4 [00:08<00:02,  2.70s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  1.96s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  2.24s/it]
+{"lora_modules": [], "lora_layers": null, "attn_bias": "none", "residual_bias": "none", "v_bias": "none", "norm_gain": "16-31", "o_bias": "none", "model": "unsloth/llama-3-8b-Instruct", "n_layers": 32, "trainable_params": 131072, "shared_prefix": true}
+{"step": 0, "ece_expected": 0.3235341012477875, "auroc_expected": 0.7388309908005352, "brier_expected": 0.3202819874571456, "ece_sampled": 0.3344489336013794, "auroc_sampled": 0.6414190628767734, "brier_sampled": 0.33068897637795275, "accuracy": 0.6240157480314961, "level_mass": 0.9999912546868992, "n": 508, "answer_kl": 0.0, "answer_kl_token": 0.0, "answer_kl_topk": 0.0, "regen_accuracy": 0.6692913385826772, "regen_malformed": 0.0}
+RD_SAVED /vol/outputs/minimal-20261007T043510Z/llama-baseseed-0/status.json

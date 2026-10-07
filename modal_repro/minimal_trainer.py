@@ -344,14 +344,14 @@ def generate_answers(lm, tokenizer, prompts, seed):
     return answers
 
 
-def regenerate_dev(lm, tokenizer, rows, gt_candidates, batch=64):
+def regenerate_dev(lm, tokenizer, rows, gt_candidates, batch=64, seed=0):
     """Answer the dev questions again with the current model (generate_answers, seeded per batch, so models are
     compared on the same draws) and grade with F1 > 0.5: regen_accuracy over all questions, regen_malformed
     for answers that never reached " Confidence" or did not parse."""
     correct = malformed = 0
     for s in range(0, len(rows), batch):
         part = rows[s:s + batch]
-        for r, (_, answer) in zip(part, generate_answers(lm, tokenizer, [r["ids"][:r["answer_start"]] for r in part], s)):
+        for r, (_, answer) in zip(part, generate_answers(lm, tokenizer, [r["ids"][:r["answer_start"]] for r in part], seed + s)):
             if answer is None:
                 malformed += 1
             else:
@@ -562,7 +562,7 @@ def train(args):
     def dev_metrics(step):
         metrics = score_dev(lm, levels, dev_rows, pad)
         if args.regen_every and step % args.regen_every == 0:
-            metrics.update(regenerate_dev(lm, tok, dev_rows, gt_candidates))
+            metrics.update(regenerate_dev(lm, tok, dev_rows, gt_candidates, seed=args.regen_seed))
         return metrics
     # Every trained tensor by a stable name, for checkpoints: PEFT's LoRA names, and the bias vectors by layer.
     named = {n: p for n, p in lm.named_parameters() if "lora_" in n}
@@ -759,6 +759,7 @@ def main():
     t.add_argument("--answer-kl-max", type=float, default=10.0, help="upper bound of the adapted weight")
     t.add_argument("--answer-kl-min", type=float, default=1e-3, help="lower bound of the adapted weight")
     t.add_argument("--regen-every", type=int, default=0, help="also answer the dev questions again and grade them every N steps (and at 0)")
+    t.add_argument("--regen-seed", type=int, default=0, help="offset of the regeneration's per-batch sampling seeds")
     t.add_argument("--gt", default="", help="JSON {question_id: gt_candidates} for --regen-every and --online (fast_loop.py gt)")
     t.add_argument("--online", action="store_true",
                    help="train on answers the policy generates for each batch (graded with --gt) instead of the cached ones")

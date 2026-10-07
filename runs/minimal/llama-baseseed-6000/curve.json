@@ -1,0 +1,18 @@
+{
+ "0": {
+  "ece_expected": 0.3235341012477875,
+  "auroc_expected": 0.7388309908005352,
+  "brier_expected": 0.3202819874571456,
+  "ece_sampled": 0.3344489336013794,
+  "auroc_sampled": 0.6414190628767734,
+  "brier_sampled": 0.33068897637795275,
+  "accuracy": 0.6240157480314961,
+  "level_mass": 0.9999912546868992,
+  "n": 508,
+  "answer_kl": 0.0,
+  "answer_kl_token": 0.0,
+  "answer_kl_topk": 0.0,
+  "regen_accuracy": 0.655511811023622,
+  "regen_malformed": 0.0
+ }
+}
