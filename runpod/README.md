@@ -106,4 +106,4 @@ the newest image with no image-relevant changes since, copies the `/vol/...` inp
 launches with GPUs chosen by model and the adapter evaluation as the post command. `--steps N` to train longer,
 `--continue` to start from the Modal run's latest checkpoint, `--dry-run` to see the plan. Llama runs need a
 48 GB card; when EU-RO-1 has none the launch fails with "no instances currently available" (retry later, or pass
-`--gpu "NVIDIA GeForce RTX 4090"` with an `--accumulate` that fits 24 GB).
+`--gpu "NVIDIA GeForce RTX 4090" --accumulate 4`).

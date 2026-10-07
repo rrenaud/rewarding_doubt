@@ -108,13 +108,18 @@ def copy_to_runpod(modal_path, dry_run, dest_rel=None):
             s3.upload_file(str(f), VOLUME_ID, key)
 
 
-def translate(command, steps, model):
+def translate(command, steps, model, accumulate=0):
     """The RunPod train command: /vol paths rewritten, --steps / --checkpoint-every / --accumulate set."""
     args = list(command)
     if steps and "--steps" in args:
         args[args.index("--steps") + 1] = str(steps)
     elif steps:
         args += ["--steps", str(steps)]
+    if accumulate:  # e.g. to fit a 24 GB card
+        if "--accumulate" in args:
+            args[args.index("--accumulate") + 1] = str(accumulate)
+        else:
+            args += ["--accumulate", str(accumulate)]
     if "--checkpoint-every" not in args:
         args += ["--checkpoint-every", "100"]
     lora_all = "--lora-modules" not in args or args[args.index("--lora-modules") + 1] != "none"
@@ -133,6 +138,7 @@ def main():
     parser.add_argument("--name", default="", help="RunPod run name (default: LABEL-rp)")
     parser.add_argument("--gpu", action="append", default=None)
     parser.add_argument("--max-hours", type=float, default=6)
+    parser.add_argument("--accumulate", type=int, default=0, help="set --accumulate (Llama on a 24 GB 4090: 4)")
     parser.add_argument("--allow-dirty-source", action="store_true")
     parser.add_argument("--continue", dest="resume", action="store_true",
                         help="copy the Modal run's latest checkpoint into the RunPod run, which then resumes from it")
@@ -141,7 +147,7 @@ def main():
     launch = json.loads((ROOT / "runs/minimal" / args.label / "launch.json").read_text())
     head = check_code(launch, args.allow_dirty_source)
     image_sha = find_image(head)
-    command, vol_paths = translate(launch["command"], args.steps, launch["command"][2].lower())
+    command, vol_paths = translate(launch["command"], args.steps, launch["command"][2].lower(), args.accumulate)
     print(f"image: ghcr.io/rrenaud/rewarding-doubt:{image_sha[:8]}")
     print("data:")
     for p in vol_paths:
