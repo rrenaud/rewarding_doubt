@@ -96,14 +96,19 @@ def find_image(head):
     raise SystemExit("no image built from the current image-relevant code; push a commit that triggers the docker workflow")
 
 
-def copy_to_runpod(modal_path, dry_run, dest_rel=None):
+def copy_to_runpod(modal_path, dry_run, dest_rel=None, replace=False):
     """Copy /vol/<rel> (file or directory) from the Modal volume to /workspace/<dest_rel> (default: the same <rel>)
-    unless already there."""
+    unless already there; with `replace`, whatever is there is deleted first (a checkpoint changes as its run goes on)."""
     from runpod_sync import client, objects
     rel = modal_path[len("/vol/"):].rstrip("/")
     dest_rel = dest_rel or rel
     s3 = client()
-    if any(True for _ in objects(s3, dest_rel)):
+    existing = list(objects(s3, dest_rel))
+    if existing and replace and not dry_run:
+        for key in existing:
+            s3.delete_object(Bucket=VOLUME_ID, Key=key if isinstance(key, str) else key["Key"])
+        print(f"  /workspace/{dest_rel}: deleted {len(existing)} existing files to replace them")
+    elif existing and not replace:
         print(f"  {modal_path}: already on the RunPod volume at /workspace/{dest_rel}")
         return
     print(f"  {modal_path}: copying to /workspace/{dest_rel}{' (dry run)' if dry_run else ''}", flush=True)
@@ -174,7 +179,7 @@ def main():
         copy_to_runpod(p, args.dry_run)
     name = args.name or f"{args.label}-rp"
     if args.resume:  # the trainer resumes from OUT_DIR/checkpoint when it exists (same command, larger --steps)
-        copy_to_runpod(f"/vol/outputs/{launch['modal_run']}/{args.label}/checkpoint", args.dry_run, dest_rel=f"runs/{name}/checkpoint")
+        copy_to_runpod(f"/vol/outputs/{launch['modal_run']}/{args.label}/checkpoint", args.dry_run, dest_rel=f"runs/{name}/checkpoint", replace=True)
     for gpus, accumulate in tiers(launch["command"], args.gpu, args.accumulate):
         command, _ = translate(launch["command"], args.steps, accumulate)
         post = "python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON" if "--save-adapter-every" in command else ""
