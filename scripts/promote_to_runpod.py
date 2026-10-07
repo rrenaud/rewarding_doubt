@@ -17,6 +17,9 @@ holds the command, the git commit and whether its code was committed. Steps:
 5. Launch: runpod_launch.py with the image pinned to that commit, GPUs by model (Llama: 48 GB cards; Qwen: a 4090
    first), and eval_snapshots.py as the post command when the run saves adapters. The promotion is recorded in
    runs/runpod/NAME/promoted_from.json.
+
+--continue also copies the Modal run's latest checkpoint into the RunPod run, so with a larger --steps it carries on
+from where Modal stopped (optimizer, data position and controller included) instead of starting over.
 """
 import argparse
 import json
@@ -83,15 +86,17 @@ def find_image(head):
     raise SystemExit("no image built from the current image-relevant code; push a commit that triggers the docker workflow")
 
 
-def copy_to_runpod(modal_path, dry_run):
-    """Copy /vol/<rel> (file or directory) from the Modal volume to /workspace/<rel> unless already there."""
+def copy_to_runpod(modal_path, dry_run, dest_rel=None):
+    """Copy /vol/<rel> (file or directory) from the Modal volume to /workspace/<dest_rel> (default: the same <rel>)
+    unless already there."""
     from runpod_sync import client, objects
     rel = modal_path[len("/vol/"):].rstrip("/")
+    dest_rel = dest_rel or rel
     s3 = client()
-    if any(True for _ in objects(s3, rel)):
-        print(f"  {modal_path}: already on the RunPod volume")
+    if any(True for _ in objects(s3, dest_rel)):
+        print(f"  {modal_path}: already on the RunPod volume at /workspace/{dest_rel}")
         return
-    print(f"  {modal_path}: copying to /workspace/{rel}{' (dry run)' if dry_run else ''}", flush=True)
+    print(f"  {modal_path}: copying to /workspace/{dest_rel}{' (dry run)' if dry_run else ''}", flush=True)
     if dry_run:
         return
     with tempfile.TemporaryDirectory() as tmp:
@@ -99,7 +104,7 @@ def copy_to_runpod(modal_path, dry_run):
         local = Path(tmp) / Path(rel).name
         files = [local] if local.is_file() else [p for p in local.rglob("*") if p.is_file()]
         for f in files:
-            key = rel if f == local else f"{rel}/{f.relative_to(local)}"
+            key = dest_rel if f == local else f"{dest_rel}/{f.relative_to(local)}"
             s3.upload_file(str(f), VOLUME_ID, key)
 
 
@@ -129,6 +134,8 @@ def main():
     parser.add_argument("--gpu", action="append", default=None)
     parser.add_argument("--max-hours", type=float, default=6)
     parser.add_argument("--allow-dirty-source", action="store_true")
+    parser.add_argument("--continue", dest="resume", action="store_true",
+                        help="copy the Modal run's latest checkpoint into the RunPod run, which then resumes from it")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     launch = json.loads((ROOT / "runs/minimal" / args.label / "launch.json").read_text())
@@ -143,6 +150,8 @@ def main():
     gpus = args.gpu or (GPUS_48GB if "llama" in model else ["NVIDIA GeForce RTX 4090", *GPUS_48GB])
     post = "python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON" if "--save-adapter-every" in command else ""
     name = args.name or f"{args.label}-rp"
+    if args.resume:  # the trainer resumes from OUT_DIR/checkpoint when it exists (same command, larger --steps)
+        copy_to_runpod(f"/vol/outputs/{launch['modal_run']}/{args.label}/checkpoint", args.dry_run, dest_rel=f"runs/{name}/checkpoint")
     launcher = ["python3", str(ROOT / "scripts/runpod_launch.py"), name, "--expt", name.split("-")[0], "--max-hours", str(args.max_hours),
                 "--image", f"ghcr.io/rrenaud/rewarding-doubt:{image_sha}", "--train-cmd", "python " + " ".join(command)]
     for g in gpus:
