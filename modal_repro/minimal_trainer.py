@@ -625,6 +625,14 @@ def train(args):
     biases = [p for k in ("attn_bias", "residual_bias", "stock") for p in trained[k]]
     groups = [g for g in (dict(params=trained["lora"], lr=args.lr), dict(params=biases, lr=args.bias_lr or args.lr)) if g["params"]]
     optimizer = torch.optim.Adam(groups, lr=args.lr)
+    base_lrs = [g["lr"] for g in optimizer.param_groups]
+
+    def set_lr(step):
+        """--lr-schedule cosine: each group's rate decays from its base to 0 over the run (from the step number, so a
+        resumed run continues the schedule)."""
+        factor = 1.0 if args.lr_schedule == "constant" else 0.5 * (1 + math.cos(math.pi * (step - 1) / args.steps))
+        for g, lr in zip(optimizer.param_groups, base_lrs):
+            g["lr"] = lr * factor
     kl_ctl = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon) if args.adaptive_kl else None
     beta = args.kl_coef
     answer_w, kl_ema = args.answer_kl, None
@@ -661,6 +669,7 @@ def train(args):
     if state is None:
         log = open(metrics_path, "w")
         curve, batches, start, elapsed = {0: dev_metrics(0)}, [], 1, 0.0
+        average, n_averaged = None, 0
         print(json.dumps(dict(step=0, **curve[0])), flush=True)
     else:
         with torch.no_grad():
@@ -672,6 +681,9 @@ def train(args):
         rng.setstate(state["rng_local"])
         curve, batches, start, elapsed = state["curve"], state["batches"], state["step"] + 1, state["seconds"]
         beta, answer_w, kl_ema = state["beta"], state["answer_w"], state.get("kl_ema")
+        average, n_averaged = state.get("average"), state.get("n_averaged", 0)
+        if average is not None:
+            average = {n: v.to(named[n].device) for n, v in average.items()}
         if kl_ctl is not None:
             kl_ctl.value = beta
         phase_seconds.update(state["phase_seconds"])
@@ -691,7 +703,8 @@ def train(args):
         save_checkpoint(checkpoint_dir, dict(
             step=step, seconds=time.time() - t0, params={n: p.detach().cpu().clone() for n, p in named.items()},
             optimizer=optimizer.state_dict(), rng=rng_state(), rng_local=rng.getstate(), batches=batches, curve=curve,
-            beta=beta, answer_w=answer_w, kl_ema=kl_ema, phase_seconds=dict(phase_seconds)))
+            beta=beta, answer_w=answer_w, kl_ema=kl_ema, phase_seconds=dict(phase_seconds),
+            average=None if average is None else {n: v.cpu() for n, v in average.items()}, n_averaged=n_averaged))
         announce_saved(checkpoint_dir)
 
     def lap(phase=None):
@@ -704,6 +717,7 @@ def train(args):
             phase_seconds[phase] += now - last[0]
         last[0] = now
     for step in range(start, args.steps + 1):
+        set_lr(step)
         if not batches:
             batches = epoch_batches([len(r["ids"]) for r in train_rows], args.batchsize, args.bucket_window, rng)
         batch = [train_rows[i] for i in batches.pop()]
@@ -767,9 +781,17 @@ def train(args):
             answer_w = min(args.answer_kl_max, max(args.answer_kl_min, answer_w * math.exp(args.answer_kl_rate * max(-1.0, min(1.0, error)))))
         record = dict(step=step, answer_w=answer_w, answer_kl_ema=kl_ema, **online, expected_reward=statistics.fmean(s[0] for s in stats), kl=statistics.fmean(s[1] for s in stats),
                       mean_confidence=statistics.fmean(s[2] for s in stats), answer_kl=statistics.fmean(s[3] for s in stats),
-                      beta=beta, seconds=time.time() - t0,
+                      beta=beta, lr=optimizer.param_groups[0]["lr"], seconds=time.time() - t0,
                       **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
         log.write(json.dumps(record) + "\n")
+        if args.weight_avg_start and step >= args.weight_avg_start:  # running mean of the trained tensors, in fp32
+            n_averaged += 1
+            with torch.no_grad():
+                if average is None:
+                    average = {n: p.detach().float().clone() for n, p in named.items()}
+                else:
+                    for n, p in named.items():
+                        average[n] += (p.detach().float() - average[n]) / n_averaged
         if step % args.eval_every == 0 or step == args.steps:
             began = time.time()
             curve[step] = dev_metrics(step)
@@ -790,6 +812,19 @@ def train(args):
         if stopping:
             print(f"stopping after step {step}: {stopping[0]}", flush=True)
             sys.exit(143)
+    if average is not None:  # the averaged weights, evaluated once at the end (and saved as an adapter when adapters are)
+        with torch.no_grad():
+            final = {n: p.detach().clone() for n, p in named.items()}
+            for n, p in named.items():
+                p.copy_(average[n].to(p.dtype))
+            sync_stock(lm, "weights")
+            curve["avg"] = dict(dev_metrics(args.regen_every or 1), from_step=args.weight_avg_start, n_averaged=n_averaged)
+            print(json.dumps(dict(event="weight_avg", **curve["avg"])), flush=True)
+            if args.save_adapter_every:
+                save_adapter(lm, tok, os.path.join(args.out_dir, "adapter-avg"))
+            for n, p in named.items():
+                p.copy_(final[n])
+            sync_stock(lm, "weights")
     json.dump({str(k): v for k, v in curve.items()}, open(os.path.join(args.out_dir, "curve.json"), "w"), indent=1)
     seconds = time.time() - t0
     print(json.dumps(dict(event="done", time=utc(), steps=args.steps, questions=args.steps * args.batchsize,
@@ -839,6 +874,10 @@ def main():
     t.add_argument("--lr", type=float, default=3e-4)
     t.add_argument("--dump-examples", action="store_true",
                    help="at the end, write examples.jsonl: per-example losses under the fitted and the base model (train and dev)")
+    t.add_argument("--lr-schedule", choices=["constant", "cosine"], default="constant",
+                   help="cosine: every learning rate decays to 0 over --steps")
+    t.add_argument("--weight-avg-start", type=int, default=0,
+                   help="average the trained tensors from this step on; the average is evaluated (and saved) at the end")
     t.add_argument("--bias-lr", type=float, default=0, help="learning rate of bias vectors and stock parameters (default: --lr)")
     t.add_argument("--kl-coef", type=float, default=0.05)
     t.add_argument("--adaptive-kl", action="store_true", help="the released controller: target 6, horizon 10000")
