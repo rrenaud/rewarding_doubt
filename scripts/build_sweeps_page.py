@@ -74,6 +74,20 @@ def xy(x, y):
             out[axis] = v
     return out
 
+KL_SPLIT = 1.2  # sweep 18: answer KL (nats per answer) dividing the mostly stable region from the unstable one
+
+
+def drift(keep):
+    """Sweep 18's per-seed points (answer KL, regenerated accuracy), split by adapter type, filtered by keep(point)."""
+    out = []
+    for label, small, color in (("small adapters (biases, norm gains, o-LoRA)", True, P), ("LoRA on all projections", False, E)):
+        data = [dict(x=max(q["kl"], 1e-3), y=q["acc"], label=f"{q['name']}, seed {q['seed']}")
+                for q in SEEDS["18/points"] if q["small"] == small and keep(q)]
+        if data:
+            out.append(dict(label=label, color=color, data=data))
+    return out
+
+
 CHARTS = {
     "01": [
         dict(type="scatter", title="Round 1: every scored configuration after 128 steps (one seed each)", xlabel="learning rate",
@@ -148,14 +162,14 @@ CHARTS = {
            dict(type="line", title="Weight floor against answer KL at step 1,000", xlabel="floor on the answer-KL weight", ylabel="answer KL (nats per answer)", xlog=True,
                 datasets=[line([.001, .1, .3, 1, 3], [R(f"17/1.5/{f}/kl") for f in ("0.001", "0.1", "0.3", "1", "3")], "target 1.5", E),
                           line([.001, .1, .3, 1, 3], [R(f"17/2/{f}/kl") for f in ("0.001", "0.1", "0.3", "1", "3")], "target 2", P)])],
-    "18": [dict(type="scatter", title="Llama: answer drift against regenerated accuracy, every 500-step arm, each seed", xlabel="answer KL at step 500 (nats per answer)",
-                ylabel="regenerated dev accuracy", xlog=True, datasets=[
-                    dict(label="small adapters (biases, norm gains, o-LoRA)", color=P,
-                         data=[dict(x=max(q["kl"], 1e-3), y=q["acc"], label=f"{q['name']}, seed {q['seed']}") for q in SEEDS["18/points"] if q["small"]]),
-                    dict(label="LoRA on all projections", color=E,
-                         data=[dict(x=max(q["kl"], 1e-3), y=q["acc"], label=f"{q['name']}, seed {q['seed']}") for q in SEEDS["18/points"] if not q["small"]]),
-                    flat("base model 0.669", 1e-3, 30, .669, G)],
-                note="One point per seed (2 per arm). LoRA stays near the base accuracy up to about 1 nat; small adapters fall off from a few tenths.")],
+    "18": [dict(type="scatter", title=f"Llama drift, stable region: answer KL below {KL_SPLIT} nats (each seed)",
+                xlabel="answer KL at step 500 (nats per answer)", ylabel="regenerated dev accuracy", xlog=True,
+                datasets=drift(lambda q: q["kl"] < KL_SPLIT) + [flat("base model 0.669", 1e-3, KL_SPLIT, .669, G)],
+                note="One point per seed. LoRA stays within about 3 points of the base model (0.640–0.673); small adapters lose more per nat, down to 0.598 (−7 points) near 1 nat."),
+           dict(type="scatter", title=f"Llama drift, unstable region: answer KL of {KL_SPLIT} nats and above (each seed)",
+                xlabel="answer KL at step 500 (nats per answer)", ylabel="regenerated dev accuracy", xlog=True,
+                datasets=drift(lambda q: q["kl"] >= KL_SPLIT) + [flat("base model 0.669", KL_SPLIT, 40, .669, G)],
+                note="One point per seed. Only small adapters reach this region, and no run landed between 1.2 and about 4 nats; accuracy falls from about 0.55 at 4–5 nats to near 0 at 35.")],
     "20": [dict(type="bar", title="o_proj-only LoRA, dev Brier at step 500", ylabel="Brier (lower is better)", note=SEED_NOTE, **bars(
         ["16–31, 3e-4", "16–31, 1e-3", "16–31, 3e-3", "all, 1e-3", "all, 1e-3, W 0"],
         [("Brier", [llama("llama-lorao-lr3e-4-w1"), llama("llama-lorao16-lr1e-3-w1"), llama("llama-lorao16-lr3e-3-w1"),
