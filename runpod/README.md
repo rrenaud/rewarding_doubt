@@ -97,3 +97,13 @@ Memory (32 questions per update): LoRA on layers 16–31 peaks at 34.6 GB, all-l
 brings all-layer LoRA to 33 GB, `--accumulate 4` to 25 GB. So: a 48 GB card (A6000, L40S, A40) for either with
 `--accumulate 2` for all layers; a 24 GB 4090 needs `--accumulate 4` and is about 2.5x slower per step. The first
 pod downloads the 16-bit model (~16 GB) into `/workspace/hf`; later pods reuse it.
+
+### Promoting a Modal run
+
+`minimal_train` writes `runs/minimal/<label>/launch.json` (command, Modal run, git commit, whether code was
+uncommitted). `scripts/promote_to_runpod.py <label>` reruns it on RunPod: it requires committed, pushed code, picks
+the newest image with no image-relevant changes since, copies the `/vol/...` inputs to the RunPod volume, and
+launches with GPUs chosen by model and the adapter evaluation as the post command. `--steps N` to train longer,
+`--continue` to start from the Modal run's latest checkpoint, `--dry-run` to see the plan. Llama runs need a
+48 GB card; when EU-RO-1 has none the launch fails with "no instances currently available" (retry later, or pass
+`--gpu "NVIDIA GeForce RTX 4090"` with an `--accumulate` that fits 24 GB).
