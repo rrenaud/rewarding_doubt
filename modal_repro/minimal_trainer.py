@@ -22,7 +22,16 @@ batched full forward against one row at a time; in bf16 both comparisons differ 
 rows (`diagnose`), so bf16 scoring carries that much noise whichever way it is computed.
 
 ref: the cache's reference levels came from the 4-bit Unsloth model, which differs from bf16 by up to 10 nats;
-this recomputes them with the bf16 model (no adapters) and saves a copy of the cache with them.
+this recomputes them with the bf16 model (no adapters) and saves a copy of the cache with them. The model is
+the cache's ("model"), which `ref --model` replaces: the trained model and its reference are always the same.
+A pre-quantized bitsandbytes checkpoint (e.g. unsloth/llama-3-8b-Instruct-bnb-4bit, the paper's) loads in
+4-bit with bf16 compute, LoRA on top as in QLoRA; build its cache with `ref --model` and then `answer-ref`.
+
+Two KL penalties, weighted separately: the loss of each row is
+    -(J - beta * confidence_KL) + W * answer_KL
+confidence_KL is KL(policy || reference) over the 11 confidence levels (beta: --confidence-kl, default 0.05 as
+in the released code, or the released adaptive controller with --adaptive-confidence-kl); answer_KL is over the
+vocabulary at the answer tokens (W: --answer-kl).
 
 Answer drift: the adapters act at every position, so they can move the answers too, while the objective
 trains only the confidence. The same forward pass gives the log-softmax at each answer token, and the
@@ -190,9 +199,18 @@ def adapters_off(lm):
         sync_stock(lm, "weights")
 
 
+def quantized(model_name):
+    """True for a pre-quantized bitsandbytes checkpoint (its config carries a quantization_config)."""
+    from transformers import AutoConfig
+    return getattr(AutoConfig.from_pretrained(model_name), "quantization_config", None) is not None
+
+
 def load(model_name, device="cuda", attention_bias=False):
-    """bf16, SDPA. attention_bias=True (Llama) adds zero-initialized q/k/v/o projection biases the checkpoint
-    lacks, so o_proj's can be trained (--o-bias); they are checked to start at zero."""
+    """bf16 (or a pre-quantized 4-bit checkpoint with bf16 compute), SDPA. attention_bias=True (Llama) adds
+    zero-initialized q/k/v/o projection biases the checkpoint lacks, so o_proj's can be trained (--o-bias); they
+    are checked to start at zero."""
+    if attention_bias and quantized(model_name):
+        raise SystemExit(f"{model_name} is quantized: --o-bias would add biases outside its 4-bit weights")
     extra = dict(attention_bias=True) if attention_bias else {}
     lm = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16, attn_implementation="sdpa",
                                               device_map={"": device}, **extra)
@@ -486,8 +504,8 @@ def make_ref(args):
         diff = (torch.stack(new) - old).abs()
         print(json.dumps(dict(split=split, rows=len(rows), seconds=round(time.time() - t0, 1),
                               vs_4bit_ref_mean_abs=float(diff.mean()), vs_4bit_ref_max_abs=float(diff.max()))), flush=True)
-    print(json.dumps(dict(untrained_bf16_dev=dev_metrics_from_levels([r["ref"] for r in dev], [r["f1"] for r in dev]))), flush=True)
-    cache.update(ref_model=f"{cache['model']} bf16 (minimal_trainer.py ref)", ref_created=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
+    print(json.dumps(dict(untrained_dev=dev_metrics_from_levels([r["ref"] for r in dev], [r["f1"] for r in dev]))), flush=True)
+    cache.update(ref_model=f"{cache['model']} {'4-bit, bf16 compute' if quantized(cache['model']) else 'bf16'} (minimal_trainer.py ref)", ref_created=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
     torch.save(cache, args.out)
 
 
@@ -633,8 +651,9 @@ def train(args):
         factor = 1.0 if args.lr_schedule == "constant" else 0.5 * (1 + math.cos(math.pi * (step - 1) / args.steps))
         for g, lr in zip(optimizer.param_groups, base_lrs):
             g["lr"] = lr * factor
-    kl_ctl = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon) if args.adaptive_kl else None
-    beta = args.kl_coef
+    kl_ctl = (AdaptiveKLController(args.confidence_kl, args.confidence_kl_target, args.confidence_kl_horizon)
+              if args.adaptive_confidence_kl else None)
+    beta = args.confidence_kl
     answer_w, kl_ema = args.answer_kl, None
     if answer_w and args.answer_ref == "topk" and not args.online and "answer_ref_idx" not in train_rows[0]:
         raise SystemExit("--answer-ref topk needs a cache from `minimal_trainer.py answer-ref`")
@@ -779,7 +798,7 @@ def train(args):
             kl_ema = statistics.fmean(s[3] for s in stats) if kl_ema is None else 0.9 * kl_ema + 0.1 * statistics.fmean(s[3] for s in stats)
             error = kl_ema / args.answer_kl_target - 1
             answer_w = min(args.answer_kl_max, max(args.answer_kl_min, answer_w * math.exp(args.answer_kl_rate * max(-1.0, min(1.0, error)))))
-        record = dict(step=step, answer_w=answer_w, answer_kl_ema=kl_ema, **online, expected_reward=statistics.fmean(s[0] for s in stats), kl=statistics.fmean(s[1] for s in stats),
+        record = dict(step=step, answer_w=answer_w, answer_kl_ema=kl_ema, **online, expected_reward=statistics.fmean(s[0] for s in stats), confidence_kl=statistics.fmean(s[1] for s in stats),
                       mean_confidence=statistics.fmean(s[2] for s in stats), answer_kl=statistics.fmean(s[3] for s in stats),
                       beta=beta, lr=optimizer.param_groups[0]["lr"], seconds=time.time() - t0,
                       **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
@@ -853,7 +872,8 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     r = sub.add_parser("ref")
     r.add_argument("cache"); r.add_argument("out")
-    r.add_argument("--model", default="", help="the bf16 model to use from here on (recorded in the cache), if not the cache's")
+    r.add_argument("--model", default="", help="the model to use from here on (recorded in the cache), if not the cache's: bf16, or a pre-quantized "
+                                                         "4-bit checkpoint (e.g. unsloth/llama-3-8b-Instruct-bnb-4bit)")
     d = sub.add_parser("diagnose")
     d.add_argument("cache")
     d.add_argument("--rows", type=int, default=64)
@@ -879,10 +899,12 @@ def main():
     t.add_argument("--weight-avg-start", type=int, default=0,
                    help="average the trained tensors from this step on; the average is evaluated (and saved) at the end")
     t.add_argument("--bias-lr", type=float, default=0, help="learning rate of bias vectors and stock parameters (default: --lr)")
-    t.add_argument("--kl-coef", type=float, default=0.05)
-    t.add_argument("--adaptive-kl", action="store_true", help="the released controller: target 6, horizon 10000")
-    t.add_argument("--kl-target", type=float, default=6.0)
-    t.add_argument("--kl-horizon", type=float, default=10000.0)
+    t.add_argument("--confidence-kl", type=float, default=0.05,
+                   help="beta: weight of KL(policy || reference) over the 11 confidence levels (released default 0.05)")
+    t.add_argument("--adaptive-confidence-kl", action="store_true",
+                   help="adapt beta with the released controller (target 6, horizon 10000), starting from --confidence-kl")
+    t.add_argument("--confidence-kl-target", type=float, default=6.0)
+    t.add_argument("--confidence-kl-horizon", type=float, default=10000.0)
     t.add_argument("--grading", choices=["em", "f1"], default="em", help="training label (released default: exact match)")
     t.add_argument("--eval-every", type=int, default=50)
     t.add_argument("--seed", type=int, default=1)

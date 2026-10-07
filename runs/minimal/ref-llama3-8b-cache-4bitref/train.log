@@ -1,0 +1,5 @@
+=== attempt 2026-10-07T19:42:25Z on NVIDIA L40S ===
+Unused kwargs: ['_load_in_4bit', '_load_in_8bit', 'quant_method']. These kwargs are not used in <class 'transformers.utils.quantization_config.BitsAndBytesConfig'>.
+{"split": "train", "rows": 8000, "seconds": 60.8, "vs_4bit_ref_mean_abs": 0.07758457213640213, "vs_4bit_ref_max_abs": 1.0950965881347656}
+{"split": "dev", "rows": 508, "seconds": 3.6, "vs_4bit_ref_mean_abs": 0.07554131746292114, "vs_4bit_ref_max_abs": 1.1189804077148438}
+{"untrained_bf16_dev": {"ece_expected": 0.33282244205474854, "auroc_expected": 0.7165012304490725, "brier_expected": 0.329668999092215, "ece_sampled": 0.3391733169555664, "auroc_sampled": 0.6139610550481444, "brier_sampled": 0.33635826771653543, "accuracy": 0.6240157480314961, "level_mass": 0.9999949719879949, "n": 508}}
