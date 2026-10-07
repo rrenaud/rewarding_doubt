@@ -3,6 +3,9 @@
 **When / where:** Oct 7, 2026. Minimal trainer, rank-4 LoRA on layers 16–31, W = 1, offline on the 8,000-question
 cache, 2,000 steps (8 passes over the data), 2 seeds, RunPod (`runs/runpod/llama-r4-2k-*`), per-example dumps.
 
+**Compute (estimated):** 6 runs, 3.2 GPU-hours if run one after another, about $3 (RunPod). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Online runs got worse past step 1,000 and oscillated between checkpoints. Hypothesis: a constant learning rate tuned on

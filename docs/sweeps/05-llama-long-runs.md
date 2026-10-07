@@ -3,6 +3,9 @@
 **When / where:** Oct 2–3, 2026. Our `exact_llama.py` and the released PPO (`subset.py`), full TriviaQA training set,
 4,000 steps, RTX 4090s on RunPod (`runs/runpod/long-*`, `long2-*`, `long3-*`). Curves: [`docs/long_runs.html`](../long_runs.html).
 
+**Compute (estimated):** 12 runs, 32.6 GPU-hours if run one after another, about $24 (RunPod). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Do the search's short-horizon winners ([01](01-llama-hparam-search.md)) hold over a long run, and does exact keep

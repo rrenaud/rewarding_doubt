@@ -5,6 +5,8 @@ question, the inputs (what was swept and what was held fixed), the results, what
 Numbers are copied from the run logs and the documents they cite; "dev" is the 512-question selection split unless
 a report says otherwise.
 
+**Compute.** About $237 and 147 GPU-hours in all, estimated by `scripts/sweep_costs.py` from the runs' logged training time, the GPUs' prices, and stated allowances for loading and provisioning; each report says what it includes.
+
 **Rating scales.**
 - **Motivation:** ★★★ a specific hypothesis or decision with the test or rule fixed in advance; ★★ a reasonable
   question run as exploration; ★ convenience or curiosity, or a design too loose to answer its question.
@@ -13,34 +15,34 @@ a report says otherwise.
 
 ## Index
 
-| # | sweep | model, trainer | swept | motivation | knowledge | one-line result |
-|---|---|---|---|---|---|---|
-| [01](01-llama-hparam-search.md) | Hyperparameter search, exact vs PPO | Llama-3-8B, released pipeline | lr, updates per batch, hinge, clip, vf | ★★★ | high | Exact beats PPO on test (AUROC 0.839 vs 0.757); found the Brier loophole that rewards broken answers |
-| [02](02-brier-mix-reward.md) | Brier mixed into the reward | Llama, released | mix m | ★★ | low | The small-scale pick (m = 0.5) lost at full scale; log score stays |
-| [03](03-frozen-answers-lr.md) | Frozen answers and their lr | Llama, released | answer mode, lr | ★★★ | medium | Frozen answers never break but cost AUROC (0.797 vs 0.839); exact's lr plateau confirmed |
-| [04](04-qwen-kl-grid.md) | KL settings grid | Qwen-2.5-3B, released + patch | KL mode × objective | ★★★ | high | PPO is not KL-limited; exact ahead at every setting; adaptive KL hurts very long runs |
-| [05](05-llama-long-runs.md) | 4,000-step runs | Llama, own trainers | lr, regularizer | ★★ | medium | The 128-step-tuned lr (4e-5) diverged; 1e-5 stable; exact keeps its lead |
-| [06](06-thinking-check.md) | Thinking before the confidence | Llama | arm, β | ★★ | low | No gain from a trained check; β irrelevant at this scale |
-| [07](07-fast-schedule.md) | Fast-loop schedule | Qwen, fast loop | batch, lr, KL mode, bucketing | ★★★ | high | One update per 32 questions at a ~10× higher lr matches the released schedule in 5 min instead of 48 |
-| [08](08-fast-optimizers.md) | Optimizers | Qwen, fast loop | Adam, Muon, Scaled AdamW, PoLoRA × lr | ★★ | medium | Nothing beats Adam at a matched lr; earlier "wins" were lr confounds; Adam's best lr 3e-4 |
-| [09](09-fast-adapter-ablation.md) | Which LoRA adapters | Qwen, fast loop | projections, layer ranges | ★★ | high | One residual-writing projection or half the layers suffices; placement beats size |
-| [10](10-fast-minimal-adapters.md) | Bias-vector adapters | Qwen, fast loop | adapter type, lr, layers | ★★ | medium | A vector per layer nearly matches LoRA on the proxy, but at rates that wreck answers |
-| [11](11-answer-kl-weight.md) | Answer-KL penalty weight | Qwen, fast loop + minimal | W | ★★★ | high | Unpenalized adapters destroy the answers; a small penalty is nearly free |
-| [12](12-offline-search-topk.md) | Offline search, top-k reference | Qwen, minimal | adapter × lr × W/target | ★★★ | medium | LoRA + W = 1 best offline; adaptive target wrong for LoRA |
-| [13](13-online-trials.md) | Online trials | Qwen, minimal | adapter, penalty | ★★★ | high | Drift compounds online without the penalty; offline ranking flipped online |
-| [14](14-stock-params.md) | Stock parameters (`v_proj` bias, norm gains) | Qwen, minimal | adapter, lr, mode | ★★ | medium | Hook-free `v_proj` bias ≈ hooked bias online; ~1 nat is not universally safe |
-| [15](15-runpod-3k-targets.md) | 3,000-step online targets | Qwen, minimal | answer-KL target | ★★ | medium | Unbounded controller blew up at targets 0.5–1; bounded it |
-| [16](16-recovery.md) | Recovering drifted answers | Qwen, minimal | lr × W | ★★ | medium | W ≥ 1 restores answers in 50 steps; nearly free at lr 3e-3 |
-| [17](17-weight-floor.md) | Floor on the adaptive weight | Qwen, minimal | target × floor | ★★★ | medium–high | Floor 0.1 is the knee; the controller reduces to a fixed weight |
-| [18](18-llama-small-adapters.md) | Small adapters on Llama | Llama, minimal | adapter, lr, penalty | ★★ | high | Llama loses accuracy from 0.1 nats with small adapters; Qwen's rates wreck it |
-| [19](19-llama-full-lora-lr.md) | Full LoRA on Llama | Llama, minimal | lr/schedule × W | ★★★ | high | Learner not buggy; full LoRA + W = 1 holds accuracy to ~0.8 nats |
-| [20](20-llama-oproj-lora.md) | `o_proj`-only LoRA | Llama, minimal | layers × lr × W | ★ | low–medium | Safe only in the late half at ≤ 1e-3, and worse than full LoRA |
-| [21](21-llama-late-layers.md) | Late-layer LoRA depth | Llama, minimal | first trained layer | ★★ | high | Layers 16–31 ≥ full LoRA at a fifth of the drift, fits 48 GB |
-| [22](22-llama-paper-comparison.md) | Paper comparison | Llama, minimal online, released eval | layers, steps, rank | ★★★ | high | Full validation: AUROC 0.877 (paper 0.859), ECE 0.031 (paper 0.023); longer got worse |
-| [23](23-llama-lora-rank.md) | LoRA rank | Llama, minimal | rank 1–8 | ★★ | medium–high | Rank 4 = rank 8 calibration with ~8× less drift |
-| [24](24-llama-r4-residual-bias.md) | Residual biases on rank-4 LoRA | Llama, minimal | bias type × bias lr | ★★ | medium | No extra capacity (worse training fit); capacity not the bottleneck |
-| [25](25-llama-lr-schedule-2k.md) | lr schedule and averaging, 2,000 steps | Llama, minimal | constant/cosine, lr, averaging | ★★★ | high | Not an lr noise floor: overfitting to 8,000 repeated questions |
-| [26](26-llama-cosine-gate.md) | Cosine gate, 1–2 epochs | Llama, minimal | cosine peak lr × length | ★★★ | medium | Gate failed: cosine underfits short runs; full-split runs use a constant lr |
+| # | sweep | model, trainer | swept | motivation | knowledge | compute (est.) | one-line result |
+|---|---|---|---|---|---|---|---|
+| [01](01-llama-hparam-search.md) | Hyperparameter search, exact vs PPO | Llama-3-8B, released pipeline | lr, updates per batch, hinge, clip, vf | ★★★ | high | $47 (86 runs, 20.3 h) | Exact beats PPO on test (AUROC 0.839 vs 0.757); found the Brier loophole that rewards broken answers |
+| [02](02-brier-mix-reward.md) | Brier mixed into the reward | Llama, released | mix m | ★★ | low | $13 (26 runs, 5.7 h) | The small-scale pick (m = 0.5) lost at full scale; log score stays |
+| [03](03-frozen-answers-lr.md) | Frozen answers and their lr | Llama, released | answer mode, lr | ★★★ | medium | $17 (22 runs, 7.6 h) | Frozen answers never break but cost AUROC (0.797 vs 0.839); exact's lr plateau confirmed |
+| [04](04-qwen-kl-grid.md) | KL settings grid | Qwen-2.5-3B, released + patch | KL mode × objective | ★★★ | high | $14 (6 runs, 19.6 h) | PPO is not KL-limited; exact ahead at every setting; adaptive KL hurts very long runs |
+| [05](05-llama-long-runs.md) | 4,000-step runs | Llama, own trainers | lr, regularizer | ★★ | medium | $24 (12 runs, 32.6 h) | The 128-step-tuned lr (4e-5) diverged; 1e-5 stable; exact keeps its lead |
+| [06](06-thinking-check.md) | Thinking before the confidence | Llama | arm, β | ★★ | low | $13 (18 runs, 5.6 h) | No gain from a trained check; β irrelevant at this scale |
+| [07](07-fast-schedule.md) | Fast-loop schedule | Qwen, fast loop | batch, lr, KL mode, bucketing | ★★★ | high | $6 (8 runs, 2.5 h) | One update per 32 questions at a ~10× higher lr matches the released schedule in 5 min instead of 48 |
+| [08](08-fast-optimizers.md) | Optimizers | Qwen, fast loop | Adam, Muon, Scaled AdamW, PoLoRA × lr | ★★ | medium | $7 (25 runs, 3.1 h) | Nothing beats Adam at a matched lr; earlier "wins" were lr confounds; Adam's best lr 3e-4 |
+| [09](09-fast-adapter-ablation.md) | Which LoRA adapters | Qwen, fast loop | projections, layer ranges | ★★ | high | $9 (33 runs, 3.8 h) | One residual-writing projection or half the layers suffices; placement beats size |
+| [10](10-fast-minimal-adapters.md) | Bias-vector adapters | Qwen, fast loop | adapter type, lr, layers | ★★ | medium | $5 (26 runs, 2.3 h) | A vector per layer nearly matches LoRA on the proxy, but at rates that wreck answers |
+| [11](11-answer-kl-weight.md) | Answer-KL penalty weight | Qwen, fast loop + minimal | W | ★★★ | high | $8 (24 runs, 3.3 h) | Unpenalized adapters destroy the answers; a small penalty is nearly free |
+| [12](12-offline-search-topk.md) | Offline search, top-k reference | Qwen, minimal | adapter × lr × W/target | ★★★ | medium | $9 (44 runs, 4.1 h) | LoRA + W = 1 best offline; adaptive target wrong for LoRA |
+| [13](13-online-trials.md) | Online trials | Qwen, minimal | adapter, penalty | ★★★ | high | $7 (10 runs, 3.1 h) | Drift compounds online without the penalty; offline ranking flipped online |
+| [14](14-stock-params.md) | Stock parameters (`v_proj` bias, norm gains) | Qwen, minimal | adapter, lr, mode | ★★ | medium | $5 (18 runs, 2.1 h) | Hook-free `v_proj` bias ≈ hooked bias online; ~1 nat is not universally safe |
+| [15](15-runpod-3k-targets.md) | 3,000-step online targets | Qwen, minimal | answer-KL target | ★★ | medium | $3 (5 runs, 3.7 h) | Unbounded controller blew up at targets 0.5–1; bounded it |
+| [16](16-recovery.md) | Recovering drifted answers | Qwen, minimal | lr × W | ★★ | medium | $3 (16 runs, 1.4 h) | W ≥ 1 restores answers in 50 steps; nearly free at lr 3e-3 |
+| [17](17-weight-floor.md) | Floor on the adaptive weight | Qwen, minimal | target × floor | ★★★ | medium–high | $7 (23 runs, 3.5 h) | Floor 0.1 is the knee; the controller reduces to a fixed weight |
+| [18](18-llama-small-adapters.md) | Small adapters on Llama | Llama, minimal | adapter, lr, penalty | ★★ | high | $7 (26 runs, 3.1 h) | Llama loses accuracy from 0.1 nats with small adapters; Qwen's rates wreck it |
+| [19](19-llama-full-lora-lr.md) | Full LoRA on Llama | Llama, minimal | lr/schedule × W | ★★★ | high | $3 (6 runs, 1.2 h) | Learner not buggy; full LoRA + W = 1 holds accuracy to ~0.8 nats |
+| [20](20-llama-oproj-lora.md) | `o_proj`-only LoRA | Llama, minimal | layers × lr × W | ★ | low–medium | $4 (12 runs, 1.9 h) | Safe only in the late half at ≤ 1e-3, and worse than full LoRA |
+| [21](21-llama-late-layers.md) | Late-layer LoRA depth | Llama, minimal | first trained layer | ★★ | high | $2 (8 runs, 1.0 h) | Layers 16–31 ≥ full LoRA at a fifth of the drift, fits 48 GB |
+| [22](22-llama-paper-comparison.md) | Paper comparison | Llama, minimal online, released eval | layers, steps, rank | ★★★ | high | $16 (4 runs, 7.4 h) | Full validation: AUROC 0.877 (paper 0.859), ECE 0.031 (paper 0.023); longer got worse |
+| [23](23-llama-lora-rank.md) | LoRA rank | Llama, minimal | rank 1–8 | ★★ | medium–high | $1 (6 runs, 1.4 h) | Rank 4 = rank 8 calibration with ~8× less drift |
+| [24](24-llama-r4-residual-bias.md) | Residual biases on rank-4 LoRA | Llama, minimal | bias type × bias lr | ★★ | medium | $2 (10 runs, 2.2 h) | No extra capacity (worse training fit); capacity not the bottleneck |
+| [25](25-llama-lr-schedule-2k.md) | lr schedule and averaging, 2,000 steps | Llama, minimal | constant/cosine, lr, averaging | ★★★ | high | $3 (6 runs, 3.2 h) | Not an lr noise floor: overfitting to 8,000 repeated questions |
+| [26](26-llama-cosine-gate.md) | Cosine gate, 1–2 epochs | Llama, minimal | cosine peak lr × length | ★★★ | medium | $1 (8 runs, 1.5 h) | Gate failed: cosine underfits short runs; full-split runs use a constant lr |
 
 Not covered here (comparisons of methods rather than hyperparameters): the Tinker-phase smoke, pilot, hinge and
 paper-PPO runs (`docs/objectives.md`), the objective comparisons in `docs/computation_guide.html`, and the

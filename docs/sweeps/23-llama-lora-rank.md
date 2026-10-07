@@ -3,6 +3,9 @@
 **When / where:** Oct 7, 2026. Minimal trainer, LoRA on layers 16–31, lr 3e-4, W = 1, alpha = rank (scale 1), offline,
 500 steps, 2 seeds; ranks 1–4 on RunPod 4090s (`runs/runpod/llama-lorafull16-r*`), rank 8 from [21](21-llama-late-layers.md).
 
+**Compute (estimated):** 6 runs, 1.4 GPU-hours if run one after another, about $1 (RunPod); includes the later per-example dump reruns. See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Is rank 8 needed? A smaller adapter might drift less with the same calibration.

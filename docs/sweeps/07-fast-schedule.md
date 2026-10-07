@@ -3,6 +3,9 @@
 **When / where:** Oct 5–6, 2026. `modal_repro/fast_loop.py` on cached base-model answers, one L40S per run;
 [`docs/fast_loop_log.md`](../fast_loop_log.md) sections 1, 3, 4; configs in `runs/fast/`.
 
+**Compute (estimated):** 8 runs, 2.5 GPU-hours if run one after another, about $6 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 The released schedule (8 questions per batch, 4 passes in minibatches of 4, lr 1e-5) took 48 minutes for 1,000 steps

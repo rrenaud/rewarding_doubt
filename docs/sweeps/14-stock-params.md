@@ -3,6 +3,9 @@
 **When / where:** Oct 6 (evening), 2026. Minimal trainer, adaptive 1-nat answer-KL target, 300 steps, 2 seeds;
 [`docs/minimal_trainer.md`](../minimal_trainer.md) "Stock parameters" (`runs/minimal/stock-*`).
 
+**Compute (estimated):** 18 runs, 2.1 GPU-hours if run one after another, about $5 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 The attention-output bias needs a forward hook (and a patched decoding loop in Unsloth). Qwen's `v_proj` bias has the

@@ -3,6 +3,9 @@
 **When / where:** Oct 6 (night), 2026. Minimal trainer, all-layer rank-8 LoRA, offline, 500 steps, 2 seeds
 (`runs/minimal/llama-lorafull-*`, `llama_lorafull_configs.json`).
 
+**Compute (estimated):** 6 runs, 1.2 GPU-hours if run one after another, about $3 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 After [18](18-llama-small-adapters.md): is our learner buggy on Llama, or is drift adapter-dependent? Run the paper's

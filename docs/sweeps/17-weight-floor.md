@@ -4,6 +4,9 @@
 (`runs/minimal/floor-*`), then online 300 steps (2 seeds) and 3,000 steps on RunPod (one seed);
 [`docs/minimal_trainer.md`](../minimal_trainer.md) "A floor on the adaptive weight".
 
+**Compute (estimated):** 23 runs, 3.5 GPU-hours if run one after another, about $7 (Modal L40S + RunPod). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 In the 3,000-step `v_proj` run the adaptive weight sank to ~0.001 and the answers drifted past the knee (about 2 nats

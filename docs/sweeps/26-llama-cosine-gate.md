@@ -5,6 +5,9 @@ cache, 2 seeds, RunPod (`runs/runpod/llama-r4-ep*-cos*`). Constant-rate baseline
 ([23](23-llama-lora-rank.md), [25](25-llama-lr-schedule-2k.md)): a constant-rate run's first N steps do not depend on
 its planned length.
 
+**Compute (estimated):** 8 runs, 1.5 GPU-hours if run one after another, about $1 (RunPod). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Before spending on full-split runs with cosine decay, check at small scale whether cosine helps when the data is not

@@ -4,6 +4,9 @@
 with the adapter off, so training only shapes the confidence. Runs:
 `runs/hparam-search-20261002T044831Z/{frozen_compare,frozen_lr}`; amendment in `PROTOCOL.md`.
 
+**Compute (estimated):** 22 runs, 7.6 GPU-hours if run one after another, about $17 (Modal L40S); estimated: 22 runs at the final round's mean run time (their logs stayed on the volume). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 On-policy finals occasionally damaged their answers (one exact seed in five collapsed). Does freezing the answers

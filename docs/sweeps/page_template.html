@@ -46,6 +46,7 @@ th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--lin
 th { font-weight: 600; color: var(--muted); font-size: 12px; letter-spacing: .02em; border-bottom-color: var(--fg); }
 tbody tr:hover { background: var(--surface); }
 table.index td.num { font: 500 13px var(--mono); }
+table.index td.cost { white-space: nowrap; font-variant-numeric: tabular-nums; }
 table.index .sub { color: var(--faint); font-size: 12px; }
 .stars { color: var(--star); letter-spacing: 1px; white-space: nowrap; }
 .stars .dim { color: var(--line); }
@@ -92,7 +93,7 @@ html { scroll-behavior: smooth; }
     <section class="hero" id="index">
       <p class="eyebrow">Rewarding Doubt · October 1–7, 2026</p>
       <h1>Hyperparameter sweeps, rated</h1>
-      <p class="lede">26 sweeps that trained Qwen-2.5-3B and Llama-3-8B to state a calibrated confidence, each with its inputs, results and lessons, rated by how well it was motivated and by what it taught.</p>
+      <p class="lede">26 sweeps that trained Qwen-2.5-3B and Llama-3-8B to state a calibrated confidence, each with its inputs, results and lessons, rated by how well it was motivated and by what it taught. Together they used {{TOTAL}} (estimated; each report shows its own).</p>
       {{INTRO}}
     </section>
     <section class="block">
@@ -110,18 +111,26 @@ html { scroll-behavior: smooth; }
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-error-bars@4.4.5/build/index.umd.min.js"></script>
 <script>
 const SPECS = {{CHARTS}};
 const charts = {};
 function token(name) { return getComputedStyle(document.documentElement).getPropertyValue("--" + name).trim(); }
-function fmt(v) { const sci = x => Number(Number(x).toPrecision(3)).toExponential(); return Math.abs(v) >= 1000 ? sci(v) : (Math.abs(v) < 0.01 && v !== 0 ? sci(v) : +Number(v).toFixed(4)); }
+function fmt(v) { const sci = x => Number(Number(x).toPrecision(3)).toExponential(); return Math.abs(v) >= 1e5 ? sci(v) : Math.abs(v) >= 1000 ? Number(v).toLocaleString("en-US") : (Math.abs(v) < 0.01 && v !== 0 ? sci(v) : +Number(v).toFixed(4)); }
 // Log axes: label only 1, 2 and 5 times a power of ten (Chart.js places a tick at every minor step).
 function logTick(v) {
   const m = v / Math.pow(10, Math.floor(Math.log10(v) + 1e-9));
   return [1, 2, 5].some(k => Math.abs(m - k) < 1e-6) ? fmt(v) : "";
 }
+let registered = false;
+function hasRange(d) { return d.data.some(p => p && typeof p === "object" && (p.yMin !== undefined || p.xMin !== undefined)); }
 function render() {
   if (!window.Chart) return;
+  if (!registered && window.ChartErrorBars) {
+    const EB = window.ChartErrorBars;
+    Chart.register(EB.BarWithErrorBarsController, EB.BarWithErrorBar, EB.LineWithErrorBarsController, EB.ScatterWithErrorBarsController, EB.PointWithErrorBar);
+    registered = true;
+  }
   const fg = token("fg"), muted = token("muted"), grid = token("grid"), surface = token("surface");
   Chart.defaults.font.family = token("sans");
   Chart.defaults.color = muted;
@@ -130,6 +139,7 @@ function render() {
     if (!canvas) continue;
     if (charts[id]) charts[id].destroy();
     const isBar = spec.type === "bar";
+    const ranged = registered && spec.datasets.some(hasRange);  // seed ranges: draw whiskers with the error-bar chart types
     const datasets = spec.datasets.map(d => {
       const c = token(d.color);
       const base = { label: d.label, data: d.data, borderColor: c, backgroundColor: isBar ? c : (d.hollow ? "transparent" : c),
@@ -137,20 +147,25 @@ function render() {
                      borderWidth: isBar ? 0 : 2, pointRadius: spec.type === "scatter" ? 5 : (d.data.length === 1 ? 6 : 3.5),
                      pointHoverRadius: 7, borderDash: d.dashed ? [6, 4] : [], spanGaps: true };
       if (isBar) Object.assign(base, { borderRadius: 3, maxBarThickness: 46 });
-      if (d.dashed) Object.assign(base, { pointRadius: 0, borderWidth: 1.5 });
+      if (ranged) Object.assign(base, { errorBarColor: isBar ? fg : c, errorBarWhiskerColor: isBar ? fg : c, errorBarLineWidth: 1.5,
+                                        errorBarWhiskerLineWidth: 1.5, errorBarWhiskerSize: 7,
+                                        data: isBar ? d.data.map(v => (v === null || typeof v === "object") ? v : { y: v }) : d.data });
+      if (d.connect) Object.assign(base, { showLine: true, borderWidth: 1.5 });
+      if (d.dashed) Object.assign(base, { pointRadius: 0, pointHoverRadius: 0, pointStyle: false, borderWidth: 1.5, showLine: true });  // reference lines, in scatter charts too
       return base;
     });
     const scaleBase = { grid: { color: grid }, ticks: { color: muted, callback: function(v) { return fmt(this.getLabelForValue ? (isBar ? this.getLabelForValue(v) : v) : v); } },
                         title: { display: true, color: muted, font: { size: 12 } } };
     const x = isBar ? { grid: { display: false }, ticks: { color: muted } }
                     : Object.assign({}, scaleBase, { type: spec.xlog ? "logarithmic" : "linear", title: Object.assign({}, scaleBase.title, { text: spec.xlabel || "" }),
-                                     ticks: { color: muted, maxRotation: 0, autoSkip: true, callback: v => spec.xlog ? logTick(v) : fmt(v) } });
+                                     ticks: { color: muted, maxRotation: 0, autoSkip: true, callback: v => spec.xlog && !spec.xticks ? logTick(v) : fmt(v) } });
     const y = Object.assign({}, scaleBase, { type: spec.ylog ? "logarithmic" : "linear", title: Object.assign({}, scaleBase.title, { text: spec.ylabel || "" }),
                             ticks: { color: muted, callback: v => spec.ylog ? logTick(v) : fmt(v) } });
     if (spec.ymin !== undefined) y.min = spec.ymin;
+    if (spec.xticks) x.afterBuildTicks = axis => { axis.ticks = spec.xticks.map(value => ({ value })); };  // ticks exactly at the data's x values
     if (isBar && spec.ymin === undefined) y.beginAtZero = true;
     charts[id] = new Chart(canvas, {
-      type: spec.type === "scatter" ? "scatter" : (isBar ? "bar" : "line"),
+      type: (spec.type === "scatter" ? "scatter" : (isBar ? "bar" : "line")) + (ranged ? "WithErrorBars" : ""),
       data: { labels: spec.labels, datasets },
       options: {
         responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: isBar ? "index" : "nearest", intersect: !isBar },
@@ -159,7 +174,10 @@ function render() {
           legend: { position: "bottom", labels: { color: muted, boxWidth: 12, boxHeight: 12, usePointStyle: true } },
           tooltip: { callbacks: { label: ctx => {
             const r = ctx.raw;
-            if (r && typeof r === "object") return `${ctx.dataset.label}${r.label ? " — " + r.label : ""}: (${fmt(r.x)}, ${fmt(r.y)})`;
+            const range = (lo, hi) => lo !== undefined && lo !== null ? ` [seeds ${fmt(lo)}–${fmt(hi)}]` : "";
+            if (r && typeof r === "object" && r.x !== undefined)
+              return `${ctx.dataset.label}${r.label ? " — " + r.label : ""}: (${fmt(r.x)}${range(r.xMin, r.xMax)}, ${fmt(r.y)}${range(r.yMin, r.yMax)})`;
+            if (r && typeof r === "object") return `${ctx.dataset.label}: ${fmt(r.y)}${range(r.yMin, r.yMax)}`;
             return `${ctx.dataset.label}: ${r === null ? "not run" : fmt(r)}`;
           } } }
         },

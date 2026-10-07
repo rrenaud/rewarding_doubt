@@ -4,6 +4,9 @@
 [`docs/thinking_experiment.md`](../thinking_experiment.md). Not a hyperparameter sweep proper: an arm comparison with
 one KL-weight variation.
 
+**Compute (estimated):** 18 runs, 5.6 GPU-hours if run one after another, about $13 (Modal L40S); recorded spend. See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 If the model writes a short "check" before stating its confidence, does the confidence get better?

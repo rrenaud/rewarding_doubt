@@ -4,6 +4,9 @@
 adapters saved every 250 steps; Modal L40S, continued on RunPod A100s. Released evaluation (`subset.py evaluate`) on
 the 512 dev questions and the full validation set; `runs/minimal/llama-paper-release-full-metrics.json`.
 
+**Compute (estimated):** 4 runs, 7.4 GPU-hours if run one after another, about $16 (Modal L40S + RunPod); released evaluations estimated: 9 dev runs at 5 min, 4 full-set runs at 45 min. See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Do our best settings beat the paper's Llama numbers (ECE 0.0226, AUROC 0.859) under the paper's own evaluation?

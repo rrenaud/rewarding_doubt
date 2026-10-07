@@ -3,6 +3,9 @@
 **When / where:** Oct 6 (evening), 2026. Minimal trainer online, layers 18–35, lr 1e-2, one seed, RTX 4090s
 (`runs/runpod/online-*`); [`docs/minimal_trainer.md`](../minimal_trainer.md) "3,000-step online runs".
 
+**Compute (estimated):** 5 runs, 3.7 GPU-hours if run one after another, about $3 (RunPod). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 The 300-step winners ([13](13-online-trials.md), [14](14-stock-params.md)) at 10× the horizon: which answer-KL target

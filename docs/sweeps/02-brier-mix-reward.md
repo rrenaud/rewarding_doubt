@@ -3,6 +3,9 @@
 **When / where:** Oct 2, 2026. Follow-up to [01](01-llama-hparam-search.md), same pipeline and tuned exact + hinge config.
 Runs: `runs/hparam-search-20261002T044831Z/{brier_sweep,brier_sweep2,brier_full}`, choice in `brier_choice.json`.
 
+**Compute (estimated):** 26 runs, 5.7 GPU-hours if run one after another, about $13 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Selection is by Brier, but the reward is a clipped log score. Would rewarding (1 − m)·log score + m·Brier

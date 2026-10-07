@@ -1,0 +1,184 @@
+{
+ "01": {
+  "runs": 86,
+  "hours": 20.33,
+  "usd": 46.75,
+  "where": "Modal L40S",
+  "note": "training from per-step clocks; evaluation estimated at 3 min per snapshot"
+ },
+ "02": {
+  "runs": 26,
+  "hours": 5.66,
+  "usd": 13.02,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "03": {
+  "runs": 22,
+  "hours": 7.59,
+  "usd": 17.46,
+  "where": "Modal L40S",
+  "note": "estimated: 22 runs at the final round's mean run time (their logs stayed on the volume)"
+ },
+ "04": {
+  "runs": 6,
+  "hours": 19.58,
+  "usd": 14.49,
+  "where": "RunPod",
+  "note": "the 3,000-step comparison and seed check run elsewhere are not included"
+ },
+ "05": {
+  "runs": 12,
+  "hours": 32.59,
+  "usd": 24.12,
+  "where": "RunPod",
+  "note": ""
+ },
+ "06": {
+  "runs": 18,
+  "hours": 5.57,
+  "usd": 12.8,
+  "where": "Modal L40S",
+  "note": "recorded spend"
+ },
+ "07": {
+  "runs": 8,
+  "hours": 2.52,
+  "usd": 5.8,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "08": {
+  "runs": 25,
+  "hours": 3.12,
+  "usd": 7.18,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "09": {
+  "runs": 33,
+  "hours": 3.77,
+  "usd": 8.67,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "10": {
+  "runs": 26,
+  "hours": 2.31,
+  "usd": 5.32,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "11": {
+  "runs": 24,
+  "hours": 3.3,
+  "usd": 7.6,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "12": {
+  "runs": 44,
+  "hours": 4.12,
+  "usd": 9.48,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "13": {
+  "runs": 10,
+  "hours": 3.11,
+  "usd": 7.16,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "14": {
+  "runs": 18,
+  "hours": 2.08,
+  "usd": 4.78,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "15": {
+  "runs": 5,
+  "hours": 3.7,
+  "usd": 2.74,
+  "where": "RunPod",
+  "note": ""
+ },
+ "16": {
+  "runs": 16,
+  "hours": 1.45,
+  "usd": 3.34,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "17": {
+  "runs": 23,
+  "hours": 3.55,
+  "usd": 6.81,
+  "where": "Modal L40S + RunPod",
+  "note": ""
+ },
+ "18": {
+  "runs": 26,
+  "hours": 3.09,
+  "usd": 7.12,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "19": {
+  "runs": 6,
+  "hours": 1.16,
+  "usd": 2.66,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "20": {
+  "runs": 12,
+  "hours": 1.87,
+  "usd": 4.3,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "21": {
+  "runs": 8,
+  "hours": 1.03,
+  "usd": 2.37,
+  "where": "Modal L40S",
+  "note": ""
+ },
+ "22": {
+  "runs": 4,
+  "hours": 7.4,
+  "usd": 15.5,
+  "where": "Modal L40S + RunPod",
+  "note": "released evaluations estimated: 9 dev runs at 5 min, 4 full-set runs at 45 min"
+ },
+ "23": {
+  "runs": 6,
+  "hours": 1.4,
+  "usd": 1.04,
+  "where": "RunPod",
+  "note": "includes the later per-example dump reruns"
+ },
+ "24": {
+  "runs": 10,
+  "hours": 2.19,
+  "usd": 2.5,
+  "where": "RunPod",
+  "note": "includes 8 runs that crashed at start on 5090s and their reruns"
+ },
+ "25": {
+  "runs": 6,
+  "hours": 3.21,
+  "usd": 2.77,
+  "where": "RunPod",
+  "note": ""
+ },
+ "26": {
+  "runs": 8,
+  "hours": 1.54,
+  "usd": 1.14,
+  "where": "RunPod",
+  "note": ""
+ }
+}

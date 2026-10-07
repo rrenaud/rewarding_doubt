@@ -3,6 +3,9 @@
 **When / where:** Oct 6, 2026. Fast loop, default schedule (Adam 3e-4, 300 steps), 2 seeds per arm (baseline 3);
 [`docs/fast_loop_log.md`](../fast_loop_log.md) sections 6–8.
 
+**Compute (estimated):** 33 runs, 3.8 GPU-hours if run one after another, about $9 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Rank-8 LoRA on all 7 projections and 36 layers (15M parameters) may be far more than calibration needs. Which parts

@@ -4,6 +4,9 @@
 3,000 steps, one RTX 4090 per run on RunPod (`runs/runpod/klgrid-*`). Write-up:
 [`patches/PR_DESCRIPTION.md`](../../patches/PR_DESCRIPTION.md), commit 472cf22.
 
+**Compute (estimated):** 6 runs, 19.6 GPU-hours if run one after another, about $14 (RunPod); the 3,000-step comparison and seed check run elsewhere are not included. See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 The obvious objection to "exact beats PPO": maybe PPO is held back by its KL constraint. Loosen it and see.

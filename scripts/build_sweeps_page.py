@@ -16,139 +16,199 @@ ROOT = Path(__file__).resolve().parents[1]
 SWEEPS = ROOT / "docs" / "sweeps"
 GITHUB = "https://github.com/rrenaud/rewarding_doubt/blob/main/"
 DATA = json.loads((SWEEPS / "page_data.json").read_text())
+COSTS = json.loads((SWEEPS / "costs.json").read_text())  # scripts/sweep_costs.py
 
-E, P, R, G, B = "exact", "ppo", "paper", "faint", "blue"  # color tokens: teal, orange, purple, grey, blue
+
+
+r1 = DATA["round1"]
+SEEDS = DATA["seeds"]
+BANDS = DATA["lr_schedule_bands"]
+
+
+def R(key, index=None):
+    """Mean over seeds with the seed range: {y, yMin, yMax} (error bars on the page); a plain number for one seed."""
+    v = SEEDS[key] if isinstance(key, str) else key
+    if index is not None:
+        v = [x[index] for x in v]
+    if len(v) == 1:
+        return v[0]
+    return dict(y=round(sum(v) / len(v), 5), yMin=min(v), yMax=max(v))
+
+
+def pts(xs, ys):
+    """Points for line and scatter charts; ys are numbers, R() dicts or None."""
+    out = []
+    for x, y in zip(xs, ys):
+        if y is None:
+            continue
+        out.append(dict(x=x, **y) if isinstance(y, dict) else dict(x=x, y=y))
+    return out
 
 
 def line(x, y, label, color, dashed=False):
-    return dict(label=label, color=color, dashed=dashed, data=[dict(x=a, y=b) for a, b in zip(x, y) if b is not None])
+    return dict(label=label, color=color, dashed=dashed, data=pts(x, y))
 
 
-def flat(label, x0, x1, y, color=R):
-    return line([x0, x1], [y, y], label, color, dashed=True)
+def flat(label, x0, x1, y, color="paper"):
+    return dict(label=label, color=color, dashed=True, data=[dict(x=x0, y=y), dict(x=x1, y=y)])
 
 
 def bars(labels, series):
     return dict(labels=labels, datasets=[dict(label=n, color=c, data=v) for n, v, c in series])
 
 
-r1 = DATA["round1"]
-curves = DATA["lr_schedule_curves"]
-llama_points = [  # (label, answer KL, regenerated accuracy, small adapter?) at step 500, from reports 18-23
-    ("o_proj bias 3e-3", 4.9, .534, 1), ("o_proj bias 1e-2", 10.9, .418, 1), ("hooked bias 1e-2", 17.7, .403, 1),
-    ("norm gains 3e-3", .24, .651, 1), ("o_proj bias 3e-4, unpenalized", .93, .610, 1),
-    ("o_proj bias 1e-3, unpenalized", 19.5, .262, 1), ("norm gains 3e-3, unpenalized", .51, .639, 1),
-    ("norm gains 1e-2, unpenalized", 16.2, .295, 1), ("o-LoRA 16-31 3e-4", .007, .674, 1), ("o-LoRA 16-31 1e-3", .17, .664, 1),
-    ("full LoRA, W=1", .78, .661, 0), ("full LoRA, released schedule", .94, .646, 0), ("LoRA 8-31", .49, .649, 0),
-    ("LoRA 16-31", .15, .659, 0), ("LoRA 24-31", .045, .661, 0), ("LoRA 16-31 rank 1", .005, .667, 0),
-    ("LoRA 16-31 rank 2", .006, .664, 0), ("LoRA 16-31 rank 4", .024, .668, 0),
-]
+E, P, PAPER, G, B = "exact", "ppo", "paper", "faint", "blue"  # colour tokens: teal, orange, purple, grey, blue
+fast = lambda arm: R(f"fast/{arm}")
+llama = lambda arm, m="brier": R(f"llama/{arm}/{m}")
+SEED_NOTE = "Points are means over seeds; whiskers span the lowest to highest seed."
+BASE11 = 0.426  # regenerated dev accuracy of the bf16 Qwen base model
+
+
+def xy(x, y):
+    """A 2-D point from two R() values (numbers or {y, yMin, yMax}), with whiskers on both axes."""
+    out = {}
+    for axis, v in (("x", x), ("y", y)):
+        if isinstance(v, dict):
+            out.update({axis: v["y"], f"{axis}Min": v["yMin"], f"{axis}Max": v["yMax"]})
+        else:
+            out[axis] = v
+    return out
+
 CHARTS = {
     "01": [
-        dict(type="scatter", title="Round 1: every scored configuration after 128 steps", xlabel="learning rate", ylabel="dev Brier (lower is better)",
-             xlog=True, datasets=[
+        dict(type="scatter", title="Round 1: every scored configuration after 128 steps (one seed each)", xlabel="learning rate",
+             ylabel="dev Brier (lower is better)", xlog=True, datasets=[
                  dict(label=f"{arm} {'eligible' if el else 'ineligible'}", color=E if arm == "exact" else P, hollow=not el,
-                      data=[dict(x=p["lr"], y=p["brier"], label=f"lr {p['lr']:.2g}, accuracy {p['accuracy']:.2f}")
-                            for p in r1 if p["arm"] == arm and p["eligible"] == el])
+                      data=[dict(x=q["lr"], y=q["brier"], label=f"lr {q['lr']:.2g}, accuracy {q['accuracy']:.2f}")
+                            for q in r1 if q["arm"] == arm and q["eligible"] == el])
                  for arm in ("exact", "ppo") for el in (True, False)],
              note="Hollow points damaged the answers or the format; several of them have the best Brier, which is the loophole the eligibility rule closed."),
-        dict(type="bar", title="Final round, test set", ylabel="value", **bars(["ECE (lower is better)", "AUROC (higher is better)"], [
-            ("exact + hinge (3 seeds)", [.052, .839], E), ("PPO + hinge (3 seeds)", [.128, .757], P), ("PPO + hinge, F1 labels (5 seeds)", [.114, .721], G)])),
+        dict(type="bar", title="Final round, test set", ylabel="value", note=SEED_NOTE, **bars(["ECE (lower is better)", "AUROC (higher is better)"], [
+            ("exact + hinge (3 seeds)", [R("01/exact/ece"), R("01/exact/auroc")], E),
+            ("PPO + hinge (3 seeds)", [R("01/ppo/ece"), R("01/ppo/auroc")], P),
+            ("PPO + hinge, F1 labels (5 seeds)", [R("01/ppo_f1/ece"), R("01/ppo_f1/auroc")], G)])),
     ],
-    "02": [dict(type="line", title="Reward mix m against dev Brier (mean over seeds)", xlabel="m (share of Brier in the reward)", ylabel="dev Brier",
-                datasets=[line([0, .25, .3, .4, .5, .6, .75, 1], [.164, .175, .173, .174, .162, .163, .241, .202], "512 questions, 128 steps", E),
-                          line([0, .5], [.156, .169], "full scale, test (3 seeds)", P)])],
-    "03": [dict(type="line", title="Learning rate with frozen answers (dev, mean of 2–5 seeds)", xlabel="learning rate", ylabel="dev Brier", xlog=True,
-                datasets=[line([2e-5, 4e-5, 8e-5, 1.6e-4, 3.2e-4], [.171, .169, .171, .246, .250], "exact + hinge", E),
-                          line([2.27e-5, 4.5e-5, 9e-5], [.205, .195, .174], "PPO + hinge", P)],
-                note="Exact is flat from 2e-5 to 8e-5 and collapses above; PPO's tuned rate (2.27e-5) is too low once answers are frozen.")],
-    "04": [dict(type="bar", title="Dev ECE by KL setting (mean of steps 1,000–3,000)", ylabel="ECE (lower is better)", **bars(
+    "02": [dict(type="line", title="Reward mix m against dev Brier", xlabel="m (share of Brier in the reward)", ylabel="dev Brier", note=SEED_NOTE,
+                datasets=[line([0, .25, .3, .4, .5, .6, .75, 1], [R(f"02/dev/{m}") for m in ("0.00", "0.25", "0.30", "0.40", "0.50", "0.60", "0.75", "1.00")],
+                               "512 questions, 128 steps (2–4 seeds)", E),
+                          line([0, .5], [R("02/test/0.00"), R("02/test/0.50")], "full scale, test (3 seeds)", P)])],
+    "03": [dict(type="line", title="Learning rate with frozen answers (dev Brier)", xlabel="learning rate", ylabel="dev Brier", xlog=True,
+                datasets=[line([2e-5, 4e-5, 8e-5, 1.6e-4, 3.2e-4], [R("03/exact/2.0e-05"), R("03/exact/tuned"), R("03/exact/8.0e-05"), R("03/exact/1.6e-04"),
+                                                                   R("03/exact/3.2e-04")], "exact + hinge", E),
+                          line([2.27e-5, 4.5e-5, 9e-5], [R("03/ppo/tuned"), R("03/ppo/4.5e-05"), R("03/ppo/9.0e-05")], "PPO + hinge", P)],
+                note="2 seeds per rate, 5 at the tuned rate; whiskers span the seeds. Exact is flat from 2e-5 to 8e-5 and collapses above; "
+                     "PPO's tuned rate (2.27e-5) is too low once answers are frozen.")],
+    "04": [dict(type="bar", title="Dev ECE by KL setting (mean of steps 1,000–3,000, one seed each)", ylabel="ECE (lower is better)", **bars(
         ["adaptive, target 6", "adaptive, target 20", "fixed 0.05", "none"], [("PPO", [.106, .128, .162, .114], P), ("exact", [.035, .051, .055, .071], E)]))],
-    "06": [dict(type="bar", title="Dev AUROC by arm", ylabel="AUROC (higher is better)", ymin=.75, **bars(
-        ["no check", "filler", "frozen check", "trained check, β 0.05", "trained check, β 0.005"], [("AUROC", [.783, .782, .823, .792, .815], E)]))],
-    "07": [dict(type="line", title="One update per batch of 32: learning rate against dev Brier (300 steps)", xlabel="learning rate", ylabel="dev Brier",
-                xlog=True, datasets=[line([1e-5, 3e-5, 1e-4], [.183, .155, .117], "batch 32, 5.4 min", E),
-                                     flat("released schedule, 1,000 steps, 48 min", 1e-5, 1e-4, .133)])],
+    "06": [dict(type="bar", title="Dev AUROC by arm (mean over 2–4 seeds)", ylabel="AUROC (higher is better)", ymin=.75, **bars(
+        ["no check", "filler", "frozen check", "trained check, β 0.05", "trained check, β 0.005"], [("AUROC", [.783, .782, .823, .792, .815], E)]),
+        note="Per-seed AUROC was not kept; the report gives standard errors of 0.008–0.012 for the 4-seed arms.")],
+    "07": [dict(type="line", title="One update per batch of 32: learning rate against dev Brier (300 steps, one seed)", xlabel="learning rate",
+                ylabel="dev Brier", xlog=True, datasets=[line([1e-5, 3e-5, 1e-4], [.183, .155, .117], "batch 32, 5.4 min", E),
+                                                         flat("released schedule, 1,000 steps, 48 min", 1e-5, 1e-4, .133)])],
     "08": [dict(type="line", title="Dev Brier at step 300 by optimizer and learning rate", xlabel="learning rate", ylabel="dev Brier (collapse ≈ 0.31)",
                 xlog=True, datasets=[
-                    line([1e-4, 3e-4, 1e-3], [.122, .120, .202], "Adam (3 seeds at 3e-4 and 1e-3)", E),
+                    line([1e-4, 3e-4, 1e-3], [.122, R("08/seeds-adam-lr3e-4"), R("08/seeds-adam-lr1e-3")], "Adam", E),
                     line([3e-5, 1e-4, 3e-4, 1e-3], [.153, .117, .314, .326], "Muon", P),
-                    line([3e-5, 1e-4, 3e-4, 1e-3], [.163, .142, .139, .208], "Scaled AdamW", G),
-                    line([3e-3, 1e-2, 3e-2], [.124, .135, .123], "PoLoRA", B)],
-                note="Each optimizer is best near its own rate; at matched rates none beats Adam. PoLoRA's rates are on a different scale.")],
+                    line([3e-5, 1e-4, 3e-4, 1e-3], [.163, .142, R("08/seeds-scaled-adamw-lr3e-4"), R("08/seeds-scaled-adamw-lr1e-3")], "Scaled AdamW", G),
+                    line([3e-3, 1e-2, 3e-2], [R("08/seeds-polora-lr3e-3"), .135, .123], "PoLoRA", B)],
+                note="Whiskers: 3 seeds (Adam at 3e-4 and 1e-3, Scaled AdamW at 3e-4 and 1e-3, PoLoRA at 3e-3); other points are one seed. "
+                     "At matched rates none beats Adam. PoLoRA's rates are on a different scale.")],
     "09": [dict(type="scatter", title="Trainable parameters against dev Brier at step 300", xlabel="trainable parameters", ylabel="dev Brier", xlog=True, datasets=[
-        dict(label="projections, all layers", color=E, data=[dict(x=a, y=b, label=l) for l, a, b in [
-            ("all 7", 15.0e6, .120), ("gate, up, down", 11.3e6, .113), ("q, k, v, o", 3.7e6, .122), ("o, down", 4.9e6, .118), ("q, v", 1.8e6, .120),
-            ("gate", 3.8e6, .117), ("up", 3.8e6, .118), ("down", 3.8e6, .121), ("o", 1.2e6, .115), ("q", 1.2e6, .129), ("v", .7e6, .129), ("k", .7e6, .145)]]),
-        dict(label="all 7, layer range", color=P, data=[dict(x=a, y=b, label=l) for l, a, b in [
-            ("layers 0–17", 7.5e6, .117), ("layers 18–35", 7.5e6, .117), ("layers 27–35", 3.7e6, .152), ("layers 32–35", 1.7e6, .233)]])],
-        note="Size barely matters within the projections; the last layers alone fail at any size.")],
+        dict(label="projections, all layers", color=E, data=[dict(x=a, label=l, **fast(arm)) for l, a, arm in [
+            ("all 7", 15.0e6, "baseline"), ("gate, up, down", 11.3e6, "ablate-mlp"), ("q, k, v, o", 3.7e6, "ablate-attn"), ("o, down", 4.9e6, "ablate-o-down"),
+            ("q, v", 1.8e6, "ablate-qv"), ("gate", 3.8e6, "ablate-gate"), ("up", 3.8e6, "ablate-up"), ("down", 3.8e6, "ablate-down"), ("o", 1.2e6, "ablate-o"),
+            ("q", 1.2e6, "ablate-q"), ("v", .7e6, "ablate-v"), ("k", .7e6, "ablate-k")]]),
+        dict(label="all 7, layer range", color=P, data=[dict(x=a, label=l, **fast(arm)) for l, a, arm in [
+            ("layers 0–17", 7.5e6, "ablate-layers0-17"), ("layers 18–35", 7.5e6, "ablate-layers18-35"), ("layers 27–35", 3.7e6, "ablate-layers27-35"),
+            ("layers 32–35", 1.7e6, "ablate-layers32-35")]])],
+        note="2 seeds per arm (3 for all 7); whiskers span the seeds. Size barely matters within the projections; the last layers alone fail at any size.")],
     "10": [dict(type="scatter", title="Bias-vector and small adapters: parameters against dev Brier", xlabel="trainable parameters", ylabel="dev Brier", xlog=True, datasets=[
-        dict(label="layers 18–35 or all", color=E, data=[dict(x=a, y=b, label=l) for l, a, b in [
-            ("o LoRA 18–35", 590e3, .118), ("gate biases 3e-3", 396e3, .114), ("attention bias 1e-2", 36.9e3, .114), ("MLP bias 1e-2", 36.9e3, .130),
-            ("attention + MLP 1e-2", 73.7e3, .128), ("all-layer LoRA", 15e6, .120)]]),
-        dict(label="layers 27–35", color=P, data=[dict(x=a, y=b, label=l) for l, a, b in [
-            ("o LoRA 27–35", 295e3, .166), ("MLP bias", 18.4e3, .203), ("attention bias", 18.4e3, .169), ("attention + MLP", 36.9e3, .182)]])])],
-    "11": [dict(type="bar", title="Regenerated dev accuracy at step 300 (base 0.426)", ylabel="accuracy", ymin=.2, **bars(
-        ["W = 0", "W = 0.1", "W = 1", "W = 10"], [("attention bias", [.217, .423, .439, .430], E), ("all-layer LoRA", [.404, None, .439, None], P)])),
-           dict(type="bar", title="Dev Brier at step 300", ylabel="Brier (lower is better)", ymin=.1, **bars(
-               ["W = 0", "W = 0.1", "W = 1", "W = 10"], [("attention bias", [.114, .115, .128, .156], E), ("all-layer LoRA", [.112, None, .112, None], P)]))],
-    "16": [dict(type="line", title="Recovery at lr 1e-2: penalty weight against accuracy and Brier", xlabel="answer-KL weight W", ylabel="value", xlog=True,
-                datasets=[line([.3, 1, 3, 10, 30], [.412, .433, .435, .440, .445], "regenerated accuracy", E),
-                          flat("base accuracy 0.426", .3, 30, .426, G)])],
+        dict(label="layers 18–35 or all", color=E, data=[dict(x=a, label=l, **fast(arm)) for l, a, arm in [
+            ("o LoRA 18–35", 590e3, "ablate-o-layers18-35"), ("gate biases 3e-3", 396e3, "gatebias-lr3e-3"), ("attention bias 1e-2", 36.9e3, "attnbias18-35"),
+            ("MLP bias 1e-2", 36.9e3, "resbias18-35-lr1e-2"), ("attention + MLP 1e-2", 73.7e3, "attnmlpbias18-35"), ("all-layer LoRA", 15e6, "baseline")]]),
+        dict(label="layers 27–35", color=P, data=[dict(x=a, label=l, **fast(arm)) for l, a, arm in [
+            ("o LoRA 27–35", 295e3, "ablate-o-layers27-35"), ("MLP bias", 18.4e3, "resbias27-35-lr1e-2"), ("attention bias", 18.4e3, "attnbias27-35"),
+            ("attention + MLP", 36.9e3, "attnmlpbias27-35")]])], note=SEED_NOTE + " 2 seeds per arm.")],
+    "11": [dict(type="scatter", title="Answer-KL weight: accuracy lost against dev Brier (step 300)",
+                xlabel="accuracy drop from the base model (0.426 regenerated; right is worse)", ylabel="dev Brier (lower is better)",
+                datasets=[dict(label=name, color=col, connect=True, data=[
+                    dict(label=f"{name}, W = {w}", **xy(R([BASE11 - a for a in SEEDS[f"11/{arm}-b{w}/regen"]]), R(f"11/{arm}-b{w}/brier")))
+                    for w in ws]) for name, arm, ws, col in (("attention bias", "akl-attnbias", ("0", "0.1", "1", "10"), E),
+                                                             ("all-layer LoRA", "akl-lora", ("0", "1"), P))] + [
+                    dict(label="no accuracy lost", color=G, dashed=True, data=[dict(x=0, y=.105), dict(x=0, y=.165)])],
+                note=SEED_NOTE + " 2 seeds, whiskers in both directions. Lines join each adapter's weights in order "
+                     "(W = 0, 0.1, 1, 10): the unpenalized attention bias has a good Brier but loses about 21 points of accuracy.")],
+    "16": [dict(type="line", title="Recovery at lr 1e-2: penalty weight against regenerated accuracy (step 300)", xlabel="answer-KL weight W", ylabel="accuracy",
+                xlog=True, datasets=[line([.3, 1, 3, 10, 30], [R(f"16/{w}") for w in ("0.3", "1", "3", "10", "30")], "regenerated accuracy", E),
+                                     flat("base accuracy 0.426", .3, 30, .426, G)], note=SEED_NOTE + " 2 seeds.")],
     "17": [dict(type="line", title="Weight floor against dev Brier (steps 500–1,000)", xlabel="floor on the answer-KL weight", ylabel="Brier", xlog=True,
-                datasets=[line([.001, .1, .3, 1, 3], [.113, .118, .120, .133, .144], "target 1.5", E),
-                          line([.001, .1, .3, 1, 3], [.113, .114, .123, .131, .144], "target 2", P)]),
+                datasets=[line([.001, .1, .3, 1, 3], [R(f"17/1.5/{f}/brier") for f in ("0.001", "0.1", "0.3", "1", "3")], "target 1.5", E),
+                          line([.001, .1, .3, 1, 3], [R(f"17/2/{f}/brier") for f in ("0.001", "0.1", "0.3", "1", "3")], "target 2", P)], note=SEED_NOTE + " 2 seeds."),
            dict(type="line", title="Weight floor against answer KL at step 1,000", xlabel="floor on the answer-KL weight", ylabel="answer KL (nats per answer)", xlog=True,
-                datasets=[line([.001, .1, .3, 1, 3], [1.68, 1.05, .65, .33, .20], "target 1.5", E),
-                          line([.001, .1, .3, 1, 3], [2.26, 1.08, .61, .34, .22], "target 2", P)])],
-    "18": [dict(type="scatter", title="Llama: answer drift against regenerated accuracy, every 500-step arm", xlabel="answer KL at step 500 (nats per answer)",
+                datasets=[line([.001, .1, .3, 1, 3], [R(f"17/1.5/{f}/kl") for f in ("0.001", "0.1", "0.3", "1", "3")], "target 1.5", E),
+                          line([.001, .1, .3, 1, 3], [R(f"17/2/{f}/kl") for f in ("0.001", "0.1", "0.3", "1", "3")], "target 2", P)])],
+    "18": [dict(type="scatter", title="Llama: answer drift against regenerated accuracy, every 500-step arm, each seed", xlabel="answer KL at step 500 (nats per answer)",
                 ylabel="regenerated dev accuracy", xlog=True, datasets=[
-                    dict(label="small adapters (biases, norm gains, o-LoRA)", color=P, data=[dict(x=k, y=a, label=l) for l, k, a, s in llama_points if s]),
-                    dict(label="LoRA on all projections", color=E, data=[dict(x=k, y=a, label=l) for l, k, a, s in llama_points if not s]),
-                    flat("base model 0.669", .004, 25, .669, G)],
-                note="LoRA stays near the base accuracy up to about 1 nat; small adapters fall off from a few tenths.")],
-    "20": [dict(type="bar", title="o_proj-only LoRA, step 500", ylabel="dev Brier (lower is better)", **bars(
-        ["16–31, 3e-4", "16–31, 1e-3", "16–31, 3e-3", "all, 1e-3", "all, 1e-3, W 0"], [("Brier", [.149, .141, .289, .321, .208], E)]))],
-    "21": [dict(type="bar", title="Depth of LoRA: dev Brier at step 500", ylabel="Brier (lower is better)", ymin=.1, **bars(
-        ["layers 0–31", "8–31", "16–31", "24–31"], [("Brier", [.136, .134, .128, .138], E)])),
-           dict(type="bar", title="Depth of LoRA: answer KL at step 500", ylabel="answer KL (nats)", **bars(
-               ["layers 0–31", "8–31", "16–31", "24–31"], [("answer KL", [.78, .49, .15, .05], P)]))],
-    "22": [dict(type="line", title="Released evaluation on dev: ECE by checkpoint", xlabel="training step", ylabel="ECE (lower is better)", datasets=[
+                    dict(label="small adapters (biases, norm gains, o-LoRA)", color=P,
+                         data=[dict(x=max(q["kl"], 1e-3), y=q["acc"], label=f"{q['name']}, seed {q['seed']}") for q in SEEDS["18/points"] if q["small"]]),
+                    dict(label="LoRA on all projections", color=E,
+                         data=[dict(x=max(q["kl"], 1e-3), y=q["acc"], label=f"{q['name']}, seed {q['seed']}") for q in SEEDS["18/points"] if not q["small"]]),
+                    flat("base model 0.669", 1e-3, 30, .669, G)],
+                note="One point per seed (2 per arm). LoRA stays near the base accuracy up to about 1 nat; small adapters fall off from a few tenths.")],
+    "20": [dict(type="bar", title="o_proj-only LoRA, dev Brier at step 500", ylabel="Brier (lower is better)", note=SEED_NOTE, **bars(
+        ["16–31, 3e-4", "16–31, 1e-3", "16–31, 3e-3", "all, 1e-3", "all, 1e-3, W 0"],
+        [("Brier", [llama("llama-lorao-lr3e-4-w1"), llama("llama-lorao16-lr1e-3-w1"), llama("llama-lorao16-lr3e-3-w1"),
+                    llama("llama-loraoall-lr1e-3-w1"), llama("llama-loraoall-lr1e-3-w0")], E)]))],
+    "21": [dict(type="bar", title="Depth of LoRA: dev Brier at step 500", ylabel="Brier (lower is better)", ymin=.1, note=SEED_NOTE, **bars(
+        ["layers 0–31", "8–31", "16–31", "24–31"],
+        [("Brier", [llama(f"llama-lorafull{d}lr3e-4-w1") for d in ("-", "8-", "16-", "24-")], E)])),
+           dict(type="bar", title="Depth of LoRA: answer KL at step 500", ylabel="answer KL (nats)", note=SEED_NOTE, **bars(
+               ["layers 0–31", "8–31", "16–31", "24–31"],
+               [("answer KL", [llama(f"llama-lorafull{d}lr3e-4-w1", "kl") for d in ("-", "8-", "16-", "24-")], P)]))],
+    "22": [dict(type="line", title="Released evaluation on dev: ECE by checkpoint (one seed per run)", xlabel="training step", ylabel="ECE (lower is better)", datasets=[
         line([250, 500, 750, 1000, 1250, 1500, 1750, 2000], [.0925, .0656, .0571, .0309, .0481, .0677, .0705, .0838], "late-half rank 8 (continued past 1,000)", E),
         line([250, 500, 750, 1000], [.0681, .0689, .0475, .0637], "all-layer rank 8", P),
         line([250, 500, 750, 1000, 1250, 1500, 1750, 2000], [.0604, .1008, .0477, .0410, .0770, .0594, .0809, .0821], "late-half rank 4", B),
-        flat("paper (full set) 0.0226", 250, 2000, .0226)]),
-           dict(type="line", title="Released evaluation on dev: AUROC by checkpoint", xlabel="training step", ylabel="AUROC (higher is better)", datasets=[
+        flat("paper (full set) 0.0226", 250, 2000, .0226, PAPER)]),
+           dict(type="line", title="Released evaluation on dev: AUROC by checkpoint (one seed per run)", xlabel="training step", ylabel="AUROC (higher is better)", datasets=[
                line([250, 500, 750, 1000, 1250, 1500, 1750, 2000], [.788, .858, .845, .862, .849, .828, .811, .836], "late-half rank 8 (continued past 1,000)", E),
                line([250, 500, 750, 1000], [.837, .866, .831, .827], "all-layer rank 8", P),
                line([250, 500, 750, 1000, 1250, 1500, 1750, 2000], [.815, .823, .827, .841, .792, .835, .801, .826], "late-half rank 4", B),
-               flat("paper (full set) 0.859", 250, 2000, .859)]),
+               flat("paper (full set) 0.859", 250, 2000, .859, PAPER)]),
            dict(type="bar", title="Full validation set (11,313 questions)", ylabel="value", **bars(["ECE (lower is better)", "AUROC (higher is better)"], [
-               ("untrained Llama-3-8B", [.303, .625], G), ("paper", [.0226, .859], R), ("ours: late-half, step 1,000", [.031, .877], E),
+               ("untrained Llama-3-8B", [.303, .625], G), ("paper", [.0226, .859], PAPER), ("ours: late-half, step 1,000", [.031, .877], E),
                ("ours: all-layer, step 500", [.063, .867], P)]))],
-    "23": [dict(type="line", title="LoRA rank: dev Brier and AUROC at step 500 (mean of 2 seeds)", xlabel="rank", ylabel="value", xlog=True, datasets=[
-        line([1, 2, 4, 8], [.1335, .1295, .1275, .1285], "Brier (lower is better)", E)], note="AUROC: 0.881, 0.887, 0.892, 0.889."),
-           dict(type="line", title="LoRA rank: answer KL at step 500", xlabel="rank", ylabel="answer KL (nats)", xlog=True, ylog=True, datasets=[
-               line([1, 2, 4, 8], [.005, .006, .023, .155], "answer KL", P)])],
-    "24": [dict(type="bar", title="Training-set Brier at the end (fit to the training data; lower is better)", ylabel="train Brier", ymin=.12, **bars(
+    "23": [dict(type="line", title="LoRA rank: dev Brier at step 500", xlabel="rank", xticks=[1, 2, 4, 8], ylabel="Brier (lower is better)", xlog=True, datasets=[
+        line([1, 2, 4, 8], [R(f"23/r{r}/brier") for r in (1, 2, 4, 8)], "Brier", E)], note=SEED_NOTE + " 2 seeds. AUROC: 0.881, 0.887, 0.892, 0.889."),
+           dict(type="line", title="LoRA rank: answer KL at step 500", xlabel="rank", xticks=[1, 2, 4, 8], ylabel="answer KL (nats)", xlog=True, ylog=True, datasets=[
+               line([1, 2, 4, 8], [R(f"23/r{r}/kl") for r in (1, 2, 4, 8)], "answer KL", P)], note=SEED_NOTE)],
+    "24": [dict(type="bar", title="Training-set Brier at the end (fit to the training data; lower is better)", ylabel="train Brier", ymin=.12, note=SEED_NOTE, **bars(
         ["rank 4 alone", "+ MLP 3e-5", "+ MLP 1e-4", "+ MLP 3e-4", "+ attn+MLP 3e-5", "+ attn+MLP 1e-4"],
-        [("train Brier", [.139, .147, .148, .159, .148, .140], E)]))],
-    "25": [dict(type="line", title="Dev Brier over 2,000 steps on 8,000 repeated questions (mean of 2 seeds)", xlabel="training step", ylabel="dev Brier",
-                datasets=[line(c["steps"][1:], c["brier"][1:], arm, col) for (arm, c), col in zip(curves.items(), (E, B, P))] + [
-                    line([2000], [.130], "weights averaged, constant 3e-4", E), line([2000], [.127], "weights averaged, constant 1e-4", B)],
-                note="Single points at step 2,000 are the averaged weights (steps 1,000–2,000)."),
-           dict(type="bar", title="Overfitting: training vs dev Brier at the end (exact-match labels)", ylabel="Brier", **bars(
+        [("train Brier", [R(f"24/{k}") for k in ("rank 4 alone", "+ MLP 3e-5", "+ MLP 1e-4", "+ MLP 3e-4", "+ attn+MLP 3e-5", "+ attn+MLP 1e-4")], E)]))],
+    "25": [dict(type="line", title="Dev Brier over 2,000 steps on 8,000 repeated questions", xlabel="training step", ylabel="dev Brier",
+                datasets=[line(b["steps"][1:], [R(v) for v in b["brier"][1:]], arm, col) for (arm, b), col in zip(BANDS.items(), (E, B, P))] + [
+                    line([2000], [R("25/avg/constant 3e-4")], "weights averaged, constant 3e-4", E),
+                    line([2000], [R("25/avg/constant 1e-4")], "weights averaged, constant 1e-4", B)],
+                note=SEED_NOTE + " 2 seeds. Single points at step 2,000 are the averaged weights (steps 1,000–2,000)."),
+           dict(type="bar", title="Overfitting: training vs dev Brier at the end (exact-match labels)", ylabel="Brier", note=SEED_NOTE, **bars(
                ["500 steps, constant 3e-4", "2,000, constant 3e-4", "2,000, constant 1e-4", "2,000, cosine 3e-4"],
-               [("training set", [.139, .052, .048, .030], E), ("dev", [.149, .172, .168, .175], P)]))],
-    "26": [dict(type="bar", title="Cosine vs constant: dev AUROC", ylabel="AUROC (higher is better)", ymin=.8, **bars(
+               [("training set", [R(f"25/traindev/{k}", 0) for k in ("500 steps", "constant 3e-4", "constant 1e-4", "cosine 3e-4")], E),
+                ("dev", [R(f"25/traindev/{k}", 1) for k in ("500 steps", "constant 3e-4", "constant 1e-4", "cosine 3e-4")], P)]))],
+    "26": [dict(type="bar", title="Cosine vs constant: dev AUROC", ylabel="AUROC (higher is better)", ymin=.8, note=SEED_NOTE, **bars(
         ["1 epoch, 3e-4", "1 epoch, 1e-4", "2 epochs, 3e-4", "2 epochs, 1e-4"],
-        [("cosine", [.837, .819, .883, .854], P), ("constant", [.874, .839, .891, .874], E)])),
+        [("cosine", [R(f"26/cos/{e}/{lr}/auroc") for e, lr in ((1, "3e-4"), (1, "1e-4"), (2, "3e-4"), (2, "1e-4"))], P),
+         ("constant", [R(f"26/const/{e}/{lr}/auroc") for e, lr in ((1, "3e-4"), (1, "1e-4"), (2, "3e-4"), (2, "1e-4"))], E)])),
            dict(type="bar", title="Cosine vs constant: dev Brier", ylabel="Brier (lower is better)", ymin=.1, **bars(
                ["1 epoch, 3e-4", "1 epoch, 1e-4", "2 epochs, 3e-4", "2 epochs, 1e-4"],
-               [("cosine", [.154, .165, .131, .144], P), ("constant", [.141, .160, .129, .141], E)]),
-               note="Constant 1e-4 at 1 epoch is the mean of steps 200 and 300 (its runs were evaluated every 100 steps).")],
+               [("cosine", [R(f"26/cos/{e}/{lr}/brier") for e, lr in ((1, "3e-4"), (1, "1e-4"), (2, "3e-4"), (2, "1e-4"))], P),
+                ("constant", [R(f"26/const/{e}/{lr}/brier") for e, lr in ((1, "3e-4"), (1, "1e-4"), (2, "3e-4"), (2, "1e-4"))], E)]),
+               note=SEED_NOTE + " Constant 3e-4: the rank sweep's runs; constant 1e-4 at 1 epoch: the mean of steps 200 and 300 of the "
+                    "2,000-step runs (evaluated every 100 steps).")],
 }
+
+
+
 
 
 def inline(text):
@@ -254,7 +314,7 @@ def main():
     after = "Not covered here" + after
     one_liners = {}
     for row in index_table.splitlines():
-        m = re.match(r"\| \[(\d\d)\]\([^)]+\) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| [^|]+ \| [^|]+ \| (.+) \|$", row)
+        m = re.match(r"\| \[(\d\d)\]\([^)]+\) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| [^|]+ \| [^|]+ \| [^|]+ \| (.+) \|$", row)
         if m:
             one_liners[m.group(1)] = dict(model=m.group(3).strip(), swept=m.group(4).strip(), result=m.group(5).strip())
     intro_html = markdown(intro.split("\n", 1)[1])  # drop the Markdown title
@@ -264,9 +324,11 @@ def main():
         rows.append(f"<tr><td class='num'><a href='#s{num}'>{num}</a></td><td><a href='#s{num}'>{inline(title)}</a>"
                     f"<div class='sub'>{inline(o.get('model', ''))} · {inline(o.get('swept', ''))}</div></td>"
                     f"<td class='stars'>{'★' * stars}<span class='dim'>{'★' * (3 - stars)}</span></td>"
-                    f"<td><span class='know k-{know.replace('–', '-')}'>{html.escape(know)}</span></td><td>{inline(o.get('result', ''))}</td></tr>")
+                    f"<td><span class='know k-{know.replace('–', '-')}'>{html.escape(know)}</span></td>"
+                    f"<td class='cost'>${COSTS[num]['usd']:.0f}<div class='sub'>{COSTS[num]['runs']} runs · {COSTS[num]['hours']:.1f} h</div></td>"
+                    f"<td>{inline(o.get('result', ''))}</td></tr>")
     index_html = ("<div class='table'><table class='index'><thead><tr><th>#</th><th>sweep</th><th>motivation</th><th>knowledge</th>"
-                  "<th>result</th></tr></thead><tbody>" + "".join(rows) + "</tbody></table></div>")
+                  "<th>compute (est.)</th><th>result</th></tr></thead><tbody>" + "".join(rows) + "</tbody></table></div>")
     grid = ["<div class='matrix' role='table' aria-label='Sweeps by motivation and knowledge'>",
             "<div class='mh' role='columnheader'></div>" + "".join(f"<div class='mh' role='columnheader'>{'★' * s}</div>" for s in (1, 2, 3))]
     for k in KNOWLEDGE_ORDER:
@@ -279,7 +341,8 @@ def main():
     page = (SWEEPS / "page_template.html").read_text()
     page = (page.replace("{{INTRO}}", intro_html).replace("{{MATRIX}}", "".join(grid)).replace("{{INDEX}}", index_html)
             .replace("{{AFTER}}", markdown(after)).replace("{{SWEEPS}}", "\n".join(s[4] for s in sweeps)).replace("{{TOC}}", toc)
-            .replace("{{CHARTS}}", json.dumps(CHART_SPECS)))
+            .replace("{{CHARTS}}", json.dumps(CHART_SPECS))
+            .replace("{{TOTAL}}", f"about ${sum(c['usd'] for c in COSTS.values()):.0f} and {sum(c['hours'] for c in COSTS.values()):.0f} GPU-hours"))
     (SWEEPS / "index.html").write_text(page)
     print(f"{len(sweeps)} sweeps, {len(CHART_SPECS)} charts -> docs/sweeps/index.html ({len(page) // 1024} KB)")
 

@@ -4,6 +4,9 @@
 [`docs/fast_loop_log.md`](../fast_loop_log.md) section 10, [`docs/minimal_trainer.md`](../minimal_trainer.md)
 "Answer drift" (`runs/minimal/akl-*`).
 
+**Compute (estimated):** 24 runs, 3.3 GPU-hours if run one after another, about $8 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 A 3,000-step attention-bias run in the released pipeline fell to 0.315 dev accuracy: adapters trained only on the

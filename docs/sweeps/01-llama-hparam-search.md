@@ -4,6 +4,9 @@
 per run on Modal. Protocol fixed before any result: [`runs/hparam-search-20261002T044831Z/PROTOCOL.md`](../../runs/hparam-search-20261002T044831Z/PROTOCOL.md);
 interactive page: `runs/hparam-search-20261002T044831Z/hparam_search.html`.
 
+**Compute (estimated):** 86 runs, 20.3 GPU-hours if run one after another, about $47 (Modal L40S); training from per-step clocks; evaluation estimated at 3 min per snapshot. See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Compare the exact objective with PPO fairly: each arm tuned with the same budget, one selection rule, a dev split

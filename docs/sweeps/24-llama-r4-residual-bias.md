@@ -4,6 +4,9 @@
 to the residual stream after each MLP (and attention) in layers 16–31 with their own learning rate (`--bias-lr`);
 offline, 500 steps, 2 seeds, RunPod (`runs/runpod/llama-lora16r4-*`), per-example dumps.
 
+**Compute (estimated):** 10 runs, 2.2 GPU-hours if run one after another, about $2 (RunPod); includes 8 runs that crashed at start on 5090s and their reruns. See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 User hypothesis: simple learned residual additions might add modelling power that LoRA lacks.

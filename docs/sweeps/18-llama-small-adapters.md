@@ -4,6 +4,9 @@
 layers 16–31, 2 seeds (`runs/minimal/llama-*`, configs `llama_configs.json`, `llama_drift_configs.json`); KL vs
 accuracy plot `docs/answer_kl_vs_accuracy_llama.png`.
 
+**Compute (estimated):** 26 runs, 3.1 GPU-hours if run one after another, about $7 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Port Qwen's best small adapters ([14](14-stock-params.md), [17](17-weight-floor.md)) to Llama at Qwen's learning

@@ -4,6 +4,9 @@
 steps, 2 seeds (`runs/minimal/llama-lorafull{8,16,24}-*`, `llama_latelora_configs.json`). Learning curves:
 `docs/learning_curves.html`.
 
+**Compute (estimated):** 8 runs, 1.0 GPU-hours if run one after another, about $2 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Full LoRA on Llama needs 53 GB per step (or gradient accumulation). Training only later layers stops the backward

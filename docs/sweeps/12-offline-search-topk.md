@@ -4,6 +4,9 @@
 300 steps, 2 seeds; [`docs/minimal_trainer.md`](../minimal_trainer.md) "Search with the cached top-k reference"
 (`runs/minimal/hs-*`, 22 arms).
 
+**Compute (estimated):** 44 runs, 4.1 GPU-hours if run one after another, about $9 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 With drift measurable ([11](11-answer-kl-weight.md)), find the best calibration among configurations that keep the

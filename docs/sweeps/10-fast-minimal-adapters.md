@@ -2,6 +2,9 @@
 
 **When / where:** Oct 6, 2026. Fast loop, default schedule, 2 seeds; [`docs/fast_loop_log.md`](../fast_loop_log.md) section 9.
 
+**Compute (estimated):** 26 runs, 2.3 GPU-hours if run one after another, about $5 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Following [09](09-fast-adapter-ablation.md): can calibration be learned with no low-rank matrices at all, just a

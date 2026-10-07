@@ -3,6 +3,9 @@
 **When / where:** Oct 6, 2026. Fast loop, all-layer rank-8 LoRA, batch 32, one pass, bucketed, fixed KL 0.05, 300
 steps; [`docs/fast_loop_log.md`](../fast_loop_log.md) section 5; configs `runs/fast/{muon,lora_optim,seed_sweep}_configs.json`.
 
+**Compute (estimated):** 25 runs, 3.1 GPU-hours if run one after another, about $7 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 User-driven: is there a better optimizer for LoRA than Adam? Literature suggested factor-aware methods (PoLoRA,

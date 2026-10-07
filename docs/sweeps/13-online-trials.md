@@ -4,6 +4,9 @@
 on, with a live reference; 300 steps, 2 seeds; [`docs/minimal_trainer.md`](../minimal_trainer.md) "Online trials"
 (`runs/minimal/on-*`).
 
+**Compute (estimated):** 10 runs, 3.1 GPU-hours if run one after another, about $7 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 Offline training uses the base model's answers forever. Online, the policy trains on its own (drifted) answers, so

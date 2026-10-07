@@ -3,6 +3,9 @@
 **When / where:** Oct 6 (night), 2026. Minimal trainer, offline, 500 steps, 2 seeds (`runs/minimal/llama-lorao*`,
 `llama_lorao_configs.json`).
 
+**Compute (estimated):** 12 runs, 1.9 GPU-hours if run one after another, about $4 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 On Qwen, `o` alone matched all seven projections ([09](09-fast-adapter-ablation.md)). Is a cheap `o`-only LoRA

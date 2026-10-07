@@ -4,6 +4,9 @@
 accuracy 0.418 vs base 0.426), offline, fixed answer-KL weight, 300 steps, 2 seeds;
 [`docs/minimal_trainer.md`](../minimal_trainer.md) "Recovering" (`runs/minimal/recover-*`).
 
+**Compute (estimated):** 16 runs, 1.4 GPU-hours if run one after another, about $3 (Modal L40S). See `scripts/sweep_costs.py`.
+
+
 ## Question and motivation
 
 How much penalty does it take to undo drift after the fact, and does it cost the calibration?
