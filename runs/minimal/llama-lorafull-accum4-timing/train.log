@@ -1,0 +1,12 @@
+=== attempt 2026-10-07T05:28:16Z on NVIDIA L40S ===
+
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:08,  2.79s/it]
+Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.75s/it]
+Loading checkpoint shards:  75%|███████▌  | 3/4 [00:08<00:02,  2.70s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  1.96s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  2.24s/it]
+{"lora_modules": ["q", "k", "v", "o", "gate", "up", "down"], "lora_layers": [0, 31], "attn_bias": "none", "residual_bias": "none", "v_bias": "none", "norm_gain": "none", "o_bias": "none", "model": "unsloth/llama-3-8b-Instruct", "n_layers": 32, "trainable_params": 20971520, "shared_prefix": true}
+{"step": 0, "ece_expected": 0.3235341012477875, "auroc_expected": 0.7388309908005352, "brier_expected": 0.3202819874571456, "ece_sampled": 0.3344489336013794, "auroc_sampled": 0.6414190628767734, "brier_sampled": 0.33068897637795275, "accuracy": 0.6240157480314961, "level_mass": 0.9999912546868992, "n": 508, "answer_kl": 0.0, "answer_kl_token": 0.0, "answer_kl_topk": 0.0}
+{"step": 40, "minutes": 1.1, "beta": 0.05, "peak_gb": 24.7, "ece_expected": 0.16323795914649963, "auroc_expected": 0.851966241101954, "brier_expected": 0.2025528634571629, "ece_sampled": 0.13897784054279327, "auroc_sampled": 0.7542074751845673, "brier_sampled": 0.20480314960629922, "accuracy": 0.6240157480314961, "level_mass": 0.9999964977554479, "n": 508, "answer_kl": 0.19463332731126906, "answer_kl_token": 0.027014680402766306, "answer_kl_topk": 0.10918802040491594}
+RD_SAVED /vol/outputs/minimal-20261007T051844Z/llama-lorafull-accum4-timing/status.json

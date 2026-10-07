@@ -271,6 +271,29 @@ target-2 run without a floor:
 The floor kept the answer KL below the knee and the answers at base over the last third, for 0.004 Brier and 0.007
 AUROC. The weight never left the floor (at most 0.102): in practice a fixed weight of 0.1. One seed each.
 
+## Llama-3-8B (Oct 6, night)
+
+The trainer finds answer starts from the chat template and stops at the tokenizer's end-of-turn tokens, so it
+runs Llama-3-8B (data: `llama3-8b-cache*.pt`, answers from the pre-quantized 4-bit model, trained and scored in
+bf16; untrained dev Brier 0.321, ECE 0.324, AUROC 0.737, accuracy 0.624). `--o-bias` loads it with
+`attention_bias=True` and trains `o_proj`'s (zero-initialized) bias, the attention-output bias as an ordinary
+weight. Offline, 500 steps, 2 seeds (`runs/minimal/llama-*`):
+
+- **Small adapters cost accuracy per nat.** At Qwen's learning rates the `o_proj` and hooked biases wreck the
+  answers within 100 steps; unpenalized drift runs show Llama losing accuracy from the first tenths of a nat
+  (about −2 points at 0.1–0.3 nats, −4 at 0.5–1, −7 at 1–2), with no flat region as on Qwen. The base model's
+  regenerated accuracy over 8 sampling seeds is 0.668 ± 0.007, so this is not seed noise
+  (`docs/answer_kl_vs_accuracy_llama.png`).
+- **Full LoRA does not** (rank 8, all projections and layers, 21M parameters): at lr 3e-4 with answer-KL weight 1
+  it stays within ±2 points up to 0.8 nats, Brier 0.136, AUROC 0.879; the paper's schedule (lr 1e-5) holds to
+  about 1.2 nats. Same trainer and evaluation, so the curve depends on the adapter, not a learner bug.
+- **LoRA on `o_proj` only** is safe in layers 16–31 up to lr 1e-3 (Brier 0.146, AUROC 0.866, KL 0.17); lr 3e-3, or
+  all 32 layers at 1e-3, destroy the answers even with the penalty.
+
+**Gradient accumulation** (`--accumulate K`: each minibatch in K parts, gradients summed, one step; tested equal
+to one pass) brings full LoRA on Llama from 53 GB to 33 GB (K=2, 0.59 s per step on an L40S, as fast as an H100
+without it) or 25 GB (K=4, 1.45 s per step).
+
 ## Differences from the fast loop, and what is not done
 
 - bf16 weights instead of 4-bit; fp32 LoRA weights where the fast loop's were bf16 (TRL casts them).

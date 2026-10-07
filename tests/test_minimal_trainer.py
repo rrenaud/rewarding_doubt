@@ -179,3 +179,21 @@ def test_stock_params_train_through_masters_and_switch_off():
     scored(lm, data)[0].sum().backward()  # gradients reach the bf16/fp32 weights, then the masters
     mt.sync_stock(lm, "grads")
     assert all(m.grad is not None and float(m.grad.abs().sum()) > 0 for m in masters.values())
+
+
+def test_accumulated_gradients_match_one_pass():
+    lm, params = trained_model(torch.float32)
+    data = rows()
+
+    def row_losses(part):
+        levels, answers = scored(lm, part)
+        return levels.logsumexp(-1) + torch.stack([a.exp().max(-1).values.sum() for a in answers])
+
+    grads = []
+    for pieces in (1, 2, 3, 6):
+        for p in params:
+            p.grad = None
+        mt.accumulate_backward(data, pieces, row_losses)
+        grads.append(torch.cat([p.grad.flatten() for p in params]))
+    for g in grads[1:]:
+        assert torch.allclose(g, grads[0], rtol=1e-4, atol=1e-6)

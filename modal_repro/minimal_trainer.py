@@ -508,6 +508,15 @@ def make_answer_ref(args):
     torch.save(cache, args.out)
 
 
+def accumulate_backward(rows, pieces, row_losses):
+    """Backward of the mean of row_losses(rows) over `rows`, computed in `pieces` consecutive parts: each part's
+    losses are summed and divided by len(rows), so the accumulated gradient equals one pass over all rows while
+    the peak activation memory is that of one part (the shared prefix is recomputed per part)."""
+    size = -(-len(rows) // max(1, pieces))
+    for s in range(0, len(rows), size):
+        (row_losses(rows[s:s + size]).sum() / len(rows)).backward()
+
+
 def epoch_batches(lengths, batchsize, window, rng):
     """One epoch of batches (every row once, ragged tail dropped). With window > 0, length bucketing:
     the shuffled epoch is cut into windows of `window` batches, each window is sorted by length before
@@ -642,31 +651,36 @@ def train(args):
             rng.shuffle(idx)
             for mb in range(0, len(idx), args.minibatch):
                 chunk = [batch[i] for i in idx[mb:mb + args.minibatch]]
-                lap()
-                queries, starts = [r["ids"] for r in chunk], [r["answer_start"] for r in chunk]
-                scored, answers = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)
-                if not answer_w:
-                    kls = torch.zeros(len(chunk), device=scored.device)
-                elif args.online:  # the reference pass ran with the generation (online_rows)
-                    kls = answer_kl(answers, [r["answer_ref_live"] for r in chunk])
-                elif args.answer_ref == "topk":
-                    kls = topk_answer_kl(answers, chunk)
-                else:
-                    with torch.no_grad(), adapters_off(lm):
-                        reference = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)[1]
-                    kls = answer_kl(answers, reference)
-                lap("forward")
-                losses = []
-                for r, lv, a_kl in zip(chunk, scored, kls):
-                    J, kl = baseline_matched_objective(lv.double(), float(r[args.grading]), "discrete-exact", "released",
-                                                       -30.0, ref_logq=r["ref"].to(lv.device).double())
-                    losses.append(-(J - beta * kl) + answer_w * a_kl)
-                    if p == 0:
-                        stats.append((J.item(), kl.item(), float((lv.double().softmax(-1) * torch.arange(11, device=lv.device)).sum()),
-                                      float(a_kl)))
-                lap("loss")
+
+                def row_losses(rows):
+                    """Per-row loss tensor [len(rows)] for one forward pass over `rows`."""
+                    lap("backward")  # with --accumulate, the time since the last mark is the previous part's backward
+                    queries, starts = [r["ids"] for r in rows], [r["answer_start"] for r in rows]
+                    scored, answers = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)
+                    if not answer_w:
+                        kls = torch.zeros(len(rows), device=scored.device)
+                    elif args.online:  # the reference pass ran with the generation (online_rows)
+                        kls = answer_kl(answers, [r["answer_ref_live"] for r in rows])
+                    elif args.answer_ref == "topk":
+                        kls = topk_answer_kl(answers, rows)
+                    else:
+                        with torch.no_grad(), adapters_off(lm):
+                            reference = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)[1]
+                        kls = answer_kl(answers, reference)
+                    lap("forward")
+                    losses = []
+                    for r, lv, a_kl in zip(rows, scored, kls):
+                        J, kl = baseline_matched_objective(lv.double(), float(r[args.grading]), "discrete-exact", "released",
+                                                           -30.0, ref_logq=r["ref"].to(lv.device).double())
+                        losses.append(-(J - beta * kl) + answer_w * a_kl)
+                        if p == 0:
+                            stats.append((J.item(), kl.item(), float((lv.double().softmax(-1) * torch.arange(11, device=lv.device)).sum()),
+                                          float(a_kl)))
+                    lap("loss")
+                    return torch.stack(losses)
+
                 optimizer.zero_grad()
-                torch.stack(losses).mean().backward()
+                accumulate_backward(chunk, args.accumulate, row_losses)
                 sync_stock(lm, "grads")
                 lap("backward")
                 optimizer.step()
@@ -729,6 +743,8 @@ def main():
     t.add_argument("--batchsize", type=int, default=32)
     t.add_argument("--passes", type=int, default=1)
     t.add_argument("--minibatch", type=int, default=32)
+    t.add_argument("--accumulate", type=int, default=1,
+                   help="split each minibatch into this many parts and accumulate their gradients: same update, lower peak memory")
     t.add_argument("--lr", type=float, default=3e-4)
     t.add_argument("--kl-coef", type=float, default=0.05)
     t.add_argument("--adaptive-kl", action="store_true", help="the released controller: target 6, horizon 10000")

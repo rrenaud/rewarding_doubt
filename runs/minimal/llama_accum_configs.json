@@ -1,0 +1,36 @@
+{
+ "llama-lorafull-accum2-timing": [
+  "--steps",
+  "40",
+  "--eval-every",
+  "40",
+  "--gt",
+  "/vol/fast/llama3-8b-gt.json",
+  "--lr",
+  "3e-4",
+  "--answer-kl",
+  "1",
+  "--time-steps",
+  "--seed",
+  "1",
+  "--accumulate",
+  "2"
+ ],
+ "llama-lorafull-accum4-timing": [
+  "--steps",
+  "40",
+  "--eval-every",
+  "40",
+  "--gt",
+  "/vol/fast/llama3-8b-gt.json",
+  "--lr",
+  "3e-4",
+  "--answer-kl",
+  "1",
+  "--time-steps",
+  "--seed",
+  "1",
+  "--accumulate",
+  "4"
+ ]
+}
