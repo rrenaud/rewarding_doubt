@@ -121,8 +121,9 @@ def build_cache(args):
                               accuracy_em=statistics.fmean(r["em"] for r in rows), seconds=round(time.time() - t0))), flush=True)
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     torch.save(cache, args.out)
+    dev = cache["splits"].get("dev")  # absent in shards other than 0 (--shard)
     print(json.dumps(dict(saved=args.out, base_dev=dev_metrics_from_levels(
-        [r["ref"] for r in cache["splits"]["dev"]], [r["f1"] for r in cache["splits"]["dev"]]))), flush=True)
+        [r["ref"] for r in dev], [r["f1"] for r in dev]) if dev else None)), flush=True)
 
 
 def dev_metrics_from_levels(levels, labels, temperature=0.6, seed=0):
