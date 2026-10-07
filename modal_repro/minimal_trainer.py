@@ -580,7 +580,11 @@ def train(args):
         r["answer_start"] = answer_start(r["ids"], header)
     gt_candidates = json.load(open(args.gt)) if args.regen_every or args.online else None
     # Adam as in the released code (TRL 0.8.6 PPOTrainer: torch.optim.Adam, default betas, no weight decay).
-    optimizer = torch.optim.Adam(params, lr=args.lr)
+    # --bias-lr: bias vectors and stock parameters get their own rate (on Llama they drift the answers at rates that
+    # suit LoRA); everything else uses --lr.
+    biases = [p for k in ("attn_bias", "residual_bias", "stock") for p in trained[k]]
+    groups = [g for g in (dict(params=trained["lora"], lr=args.lr), dict(params=biases, lr=args.bias_lr or args.lr)) if g["params"]]
+    optimizer = torch.optim.Adam(groups, lr=args.lr)
     kl_ctl = AdaptiveKLController(args.kl_coef, args.kl_target, args.kl_horizon) if args.adaptive_kl else None
     beta = args.kl_coef
     answer_w, kl_ema = args.answer_kl, None
@@ -783,6 +787,7 @@ def main():
     t.add_argument("--accumulate", type=int, default=1,
                    help="split each minibatch into this many parts and accumulate their gradients: same update, lower peak memory")
     t.add_argument("--lr", type=float, default=3e-4)
+    t.add_argument("--bias-lr", type=float, default=0, help="learning rate of bias vectors and stock parameters (default: --lr)")
     t.add_argument("--kl-coef", type=float, default=0.05)
     t.add_argument("--adaptive-kl", action="store_true", help="the released controller: target 6, horizon 10000")
     t.add_argument("--kl-target", type=float, default=6.0)
