@@ -15,7 +15,7 @@ holds the command, the git commit and whether its code was committed. Steps:
 4. Command: --steps replaced if given; --checkpoint-every 100 added if absent (pods can be preempted).
 5. Launch: runpod_launch.py with the image pinned to that commit and eval_snapshots.py as the post command when the
    run saves adapters, trying GPU tiers in order until one has stock, each with the --accumulate that fits it
-   (Llama: 48 GB cards, A100 80GB, 5090, 4090; see LLAMA_TIERS). --gpu (with --accumulate) replaces the tiers. The promotion is recorded in
+   (Llama: 48 GB cards, A100 80GB, 4090; see LLAMA_TIERS). --gpu (with --accumulate) replaces the tiers. The promotion is recorded in
    runs/runpod/NAME/promoted_from.json.
 
 --continue also copies the Modal run's latest checkpoint into the RunPod run, so with a larger --steps it carries on
@@ -39,10 +39,11 @@ GPUS_48GB = ["NVIDIA RTX A6000", "NVIDIA L40S", "NVIDIA A40", "NVIDIA RTX 6000 A
 GPUS_80GB = ["NVIDIA A100 80GB PCIe", "NVIDIA A100-SXM4-80GB"]
 # Llama-3-8B tiers, tried in order until RunPod has stock: (GPU types, --accumulate). Accumulation splits the same
 # 32-question update into K backward passes: identical updates, less memory, slower. Measured peaks: LoRA on layers
-# 16-31 34.6 GB at 1, 18.0 at 4 (2 interpolates to ~25); all-layer LoRA 53 GB at 1, 33 at 2, 25 at 4 (8 untested).
+# 16-31 34.6 GB at 1, 18.0 at 4; all-layer LoRA 53 GB at 1, 33 at 2, 25 at 4 (8 untested). No 5090s: Blackwell
+# (sm_120) needs a newer CUDA build than the image's PyTorch ("no kernel image is available for execution").
 LLAMA_TIERS = {
-    "late": [(GPUS_48GB, 1), (GPUS_80GB, 1), (["NVIDIA GeForce RTX 5090"], 2), (["NVIDIA GeForce RTX 4090"], 4)],
-    "all": [(GPUS_48GB, 2), (GPUS_80GB, 1), (["NVIDIA GeForce RTX 5090"], 4), (["NVIDIA GeForce RTX 4090"], 8)],
+    "late": [(GPUS_48GB, 1), (GPUS_80GB, 1), (["NVIDIA GeForce RTX 4090"], 4)],
+    "all": [(GPUS_48GB, 2), (GPUS_80GB, 1), (["NVIDIA GeForce RTX 4090"], 8)],
 }
 QWEN_TIERS = [(["NVIDIA GeForce RTX 4090", *GPUS_48GB], None)]  # Qwen-2.5-3B fits a 4090 as is
 
@@ -167,6 +168,7 @@ def main():
     parser.add_argument("--allow-dirty-source", action="store_true")
     parser.add_argument("--continue", dest="resume", action="store_true",
                         help="copy the Modal run's latest checkpoint into the RunPod run, which then resumes from it")
+    parser.add_argument("--examples", action="store_true", help="add --dump-examples: per-example losses at the end of training")
     parser.add_argument("--dump", action="store_true",
                         help="rerun a finished RunPod run in place with --dump-examples: it resumes from its final checkpoint and "
                              "only writes examples.jsonl (per-example losses, fitted vs base)")
@@ -185,7 +187,7 @@ def main():
         copy_to_runpod(f"/vol/outputs/{launch['modal_run']}/{args.label}/checkpoint", args.dry_run, dest_rel=f"runs/{name}/checkpoint", replace=True)
     for gpus, accumulate in tiers(launch["command"], args.gpu, args.accumulate):
         command, _ = translate(launch["command"], args.steps, accumulate)
-        if args.dump:
+        if args.dump or args.examples:
             command.append("--dump-examples")
         post = "python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON" if "--save-adapter-every" in command and not args.dump else ""
         launcher = ["python3", str(ROOT / "scripts/runpod_launch.py"), name, "--expt", name.split("-")[0], "--max-hours",

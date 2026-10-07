@@ -106,6 +106,7 @@ the newest image with no image-relevant changes since, copies the `/vol/...` inp
 launches with GPUs chosen by model and the adapter evaluation as the post command. `--steps N` to train longer,
 `--continue` to start from the Modal run's latest checkpoint, `--dry-run` to see the plan. GPUs are tried in tiers until one has stock in EU-RO-1, each
 with the `--accumulate` that fits it (same updates, less memory, slower). Llama late-half LoRA: 48 GB cards (1), A100
-80GB (1), 5090 (2), 4090 (4); all-layer LoRA: 48 GB (2), A100 80GB (1), 5090 (4), 4090 (8). `--gpu` with
+80GB (1), 4090 (4); all-layer LoRA: 48 GB (2), A100 80GB (1), 4090 (8). No 5090s: the image's PyTorch has no
+Blackwell kernels. `--gpu` with
 `--accumulate` replaces the tiers. Stock (07 Oct 2026): EU-RO-1 had the most 4090s of any datacenter, plus 5090s and
 A100s; 48 GB cards were mostly in datacenters without network volumes, so moving the volume would not help.
