@@ -279,8 +279,12 @@ def subset_loader(ids_by_split, system_prompt=None):
         # util/DataHelper.load_prepared_dataset, with one added filter step.
         descriptor = DataHelper.get_dataset_descriptor(dataset)
         data = load_dataset(**descriptor.huggingface_config, split=split)
-        if ids_by_split[split] != "all":  # "all": the whole split, e.g. the full training set
-            keep = set(ids_by_split[split])
+        spec = ids_by_split[split]
+        if isinstance(spec, dict):  # {"exclude": [ids]}: the whole split except these (e.g. a dev subset)
+            dropped = set(spec["exclude"])
+            data = data.filter(lambda x: x["question_id"] not in dropped)
+        elif spec != "all":  # "all": the whole split, e.g. the full training set
+            keep = set(spec)
             data = data.filter(lambda x: x["question_id"] in keep)
             if len(data) != len(keep):
                 raise ValueError(f"{split}: found {len(data)} of {len(keep)} requested questions")

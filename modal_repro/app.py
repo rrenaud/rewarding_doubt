@@ -725,15 +725,17 @@ def hparam_round(search_dir: str, round: str, score_test: bool = False, gpu: str
     print(f"Round {round} done: {out}")
 
 
-@app.function(volumes={VOL: volume}, timeout=HOUR)
-def evaluate_test(ids_by_split: dict, model_dir: str, frozen: bool = False) -> dict:
-    """The released evaluation on the test questions, writing to eval_test*.json beside the checkpoint;
-    with `frozen`, frozen_eval.py (base-model answers, adapted confidence) to eval_test_frozen*.json."""
+@app.function(volumes={VOL: volume}, timeout=4 * HOUR)
+def evaluate_test(ids_by_split: dict, model_dir: str, frozen: bool = False, out_dir: str = "", name: str = "test") -> dict:
+    """The released evaluation on the test questions, writing to eval_<name>*.json beside the checkpoint (or in
+    out_dir, e.g. for a hub model name); with `frozen`, frozen_eval.py (base-model answers, adapted confidence)
+    to eval_<name>_frozen*.json."""
     import subprocess
 
     volume.reload()
     Path("/tmp/ids.json").write_text(json.dumps(ids_by_split))
-    out_json = f"{model_dir}/eval_test{'_frozen' if frozen else ''}.json"
+    Path(out_dir or model_dir).mkdir(parents=True, exist_ok=True)
+    out_json = f"{out_dir or model_dir}/eval_{name}{'_frozen' if frozen else ''}.json"
     if Path(out_json.replace(".json", "_metrics.json")).exists():  # already evaluated (e.g. before a restart)
         return dict(model_dir=model_dir, metrics=json.loads(Path(out_json.replace(".json", "_metrics.json")).read_text()))
     command = ["frozen_eval.py", "/tmp/ids.json", model_dir, out_json] if frozen else ["subset.py", "evaluate", "/tmp/ids.json", model_dir, out_json]
@@ -742,6 +744,27 @@ def evaluate_test(ids_by_split: dict, model_dir: str, frozen: bool = False) -> d
     if proc.returncode:
         return dict(model_dir=model_dir, error=proc.stdout[-3000:] + proc.stderr[-3000:])
     return dict(model_dir=model_dir, metrics=json.loads(Path(out_json.replace(".json", "_metrics.json")).read_text()))
+
+
+@app.local_entrypoint()
+def release_eval(dirs: str, split: str = "dev", gpu: str = "L40S"):
+    """The released evaluation (subset.py evaluate: the model writes answer and confidence, F1 > 0.5, torchmetrics
+    ECE) of each comma-separated model dir (adapter dirs on the volume, or a hub name for the untrained model), in
+    parallel. split: dev (the 512 dev questions), heldout (the validation split without them), full (all of it,
+    the paper's test set). Results to eval_<split>_metrics.json beside each adapter (hub models: /vol/release-eval/)."""
+    root = Path(__file__).resolve().parents[1]
+    dev = json.loads((root / "runs/hparam-search-20261002T044831Z/dev_ids.json").read_text())
+    ids = {"dev": {"validation": dev}, "heldout": {"validation": {"exclude": dev}}, "full": {"validation": "all"}}[split]
+    jobs = []
+    for d in dirs.split(","):
+        out = "" if d.startswith(VOL) else f"{VOL}/release-eval/{d.replace('/', '__')}"
+        jobs.append((ids, d, False, out, split))
+    for r in evaluate_test.with_options(gpu=gpu).starmap(jobs, return_exceptions=True, order_outputs=False):
+        if isinstance(r, Exception) or "error" in r:
+            print("FAILED", repr(r)[:500] if isinstance(r, Exception) else r["error"][-1500:]); continue
+        m = r["metrics"]
+        print("RESULT", json.dumps(dict(model=r["model_dir"], split=split, **{k: round(v, 4) if isinstance(v, float) else v
+                                                                            for k, v in m.items() if k != "model"})), flush=True)
 
 
 @app.local_entrypoint()

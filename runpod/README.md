@@ -77,3 +77,23 @@ Memory: all-layer LoRA peaks at about 33 GB over a run, so it needs a 48 GB GPU
 (`--gpu "NVIDIA RTX A6000" --gpu "NVIDIA L40S"`); attention biases and LoRA on fewer layers fit a 24 GB 4090.
 Tested on Modal (`minimal_restart_check`): stopped at step 12 of 20, the same command resumed at step 12
 and finished with every step logged once.
+
+### Llama-3-8B with the minimal trainer
+
+Data on the volume: `/workspace/fast/llama3-8b-cache-bf16ref-top64.pt` and `/workspace/fast/llama3-8b-gt.json` (from the
+Modal volume, as above). With `--save-adapter-every N` the trainer writes `adapter-step<N>/` PEFT adapters, and
+`eval_snapshots.py` as the post command scores each with the released evaluation on the 512 dev questions (the
+launcher's validation IDs), into `OUT_DIR/curve.json`. Online, F1 labels, late-half LoRA:
+
+```bash
+python scripts/runpod_launch.py llama-lora16-f1-s1 --max-hours 4 --gpu "NVIDIA RTX A6000" --gpu "NVIDIA L40S" --gpu "NVIDIA A40" \
+  --train-cmd "python minimal_trainer.py train /workspace/fast/llama3-8b-cache-bf16ref-top64.pt OUT_DIR --online \
+    --gt /workspace/fast/llama3-8b-gt.json --grading f1 --lora-layers 16-31 --lr 3e-4 --answer-kl 1 --steps 1000 \
+    --eval-every 50 --regen-every 250 --save-adapter-every 250 --checkpoint-every 100" \
+  --post-cmd "python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON"
+```
+
+Memory (32 questions per update): LoRA on layers 16–31 peaks at 34.6 GB, all-layer LoRA at 53 GB; `--accumulate 2`
+brings all-layer LoRA to 33 GB, `--accumulate 4` to 25 GB. So: a 48 GB card (A6000, L40S, A40) for either with
+`--accumulate 2` for all layers; a 24 GB 4090 needs `--accumulate 4` and is about 2.5x slower per step. The first
+pod downloads the 16-bit model (~16 GB) into `/workspace/hf`; later pods reuse it.

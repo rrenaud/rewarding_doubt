@@ -2,7 +2,7 @@
 
     python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON [--frozen-answers]   # from SingleAnswerSetting/
 
-Each snapshot-step<N>/ gets the released evaluation (subset.py evaluate: eval_dev.json and
+Each snapshot-step<N>/ (TRL trainers) or adapter-step<N>/ (minimal_trainer.py --save-adapter-every) gets the released evaluation (subset.py evaluate: eval_dev.json and
 eval_dev_metrics.json, skipped if already there; with --frozen-answers frozen_eval.py instead,
 for adapters trained with frozen answers; so a rerun only does what is missing). The
 curve goes to OUT_DIR/curve.json ({step: metrics}) and, when W&B is configured, to the run's
@@ -20,7 +20,8 @@ def main(out_dir, ids, *flags):
     evaluator = "frozen_eval.py" if "--frozen-answers" in flags else None
     out = Path(out_dir)
     curve = {}
-    for snapshot in sorted(out.glob("snapshot-step*"), key=lambda p: int(p.name.split("step")[1])):
+    snapshots = [*out.glob("snapshot-step*"), *out.glob("adapter-step*")]
+    for snapshot in sorted(snapshots, key=lambda p: int(p.name.split("step")[1])):
         step = int(snapshot.name.split("step")[1])
         metrics_path = snapshot / "eval_dev_metrics.json"
         if not metrics_path.exists():

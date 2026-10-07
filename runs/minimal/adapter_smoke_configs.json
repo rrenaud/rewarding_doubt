@@ -1,0 +1,1 @@
+{"llama-adapter-smoke": ["--steps", "10", "--eval-every", "10", "--lora-layers", "16-31", "--lr", "3e-4", "--answer-kl", "1", "--grading", "f1", "--save-adapter-every", "10"]}

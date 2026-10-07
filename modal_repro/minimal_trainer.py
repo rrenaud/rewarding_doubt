@@ -209,9 +209,12 @@ def add_lora(lm, modules, layers):
     from peft import LoraConfig, get_peft_model
     if not modules or not layers:
         return []
-    config = LoraConfig(r=8, lora_alpha=8, lora_dropout=0.0, bias="none", target_modules=[f"{m}_proj" for m in modules],
+    # task_type: loaded back for evaluation, the adapter must become a PeftModelForCausalLM (Unsloth requires it)
+    config = LoraConfig(r=8, lora_alpha=8, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=[f"{m}_proj" for m in modules],
                         layers_to_transform=list(layers), layers_pattern="layers")
-    get_peft_model(lm, config)  # injects the adapters into lm's modules in place
+    # get_peft_model injects the adapters into lm's modules in place. Its wrapper is kept for save_pretrained, in __dict__:
+    # assigning a Module attribute would register the wrapper (which contains lm) as a submodule of lm, a cycle.
+    lm.__dict__["peft_wrapper"] = get_peft_model(lm, config)
     return [p for n, p in lm.named_parameters() if "lora_" in n]
 
 
@@ -517,6 +520,15 @@ def accumulate_backward(rows, pieces, row_losses):
         (row_losses(rows[s:s + size]).sum() / len(rows)).backward()
 
 
+def save_adapter(lm, tokenizer, directory):
+    """The LoRA adapter as a standard PEFT directory (plus the tokenizer), loadable on the 16-bit base model by the
+    released evaluation (subset.py evaluate). LoRA only: train() refuses --save-adapter-every for runs that also
+    train biases or stock parameters, which an adapter cannot carry."""
+    lm.peft_wrapper.save_pretrained(directory)
+    tokenizer.save_pretrained(directory)
+    announce_saved(directory)
+
+
 def epoch_batches(lengths, batchsize, window, rng):
     """One epoch of batches (every row once, ragged tail dropped). With window > 0, length bucketing:
     the shuffled epoch is cut into windows of `window` batches, each window is sorted by length before
@@ -546,6 +558,8 @@ def train(args):
     trained = dict(lora=add_lora(lm, modules, lora_layers), attn_bias=add_output_biases(lm, attn_layers, "self_attn"),
                    residual_bias=add_output_biases(lm, mlp_layers, "mlp"), stock=list(stock.values()))
     params = [p for group in trained.values() for p in group]
+    if args.save_adapter_every and (not trained["lora"] or trained["attn_bias"] or trained["residual_bias"] or trained["stock"]):
+        raise SystemExit("--save-adapter-every saves a LoRA adapter: the run must train LoRA and nothing else")
     print(json.dumps(dict(lora_modules=modules, lora_layers=[lora_layers.start, lora_layers.stop - 1] if modules else None,
                           attn_bias=args.attn_bias, residual_bias=args.residual_bias, v_bias=args.v_bias, norm_gain=args.norm_gain,
                           o_bias=args.o_bias, model=cache["model"], n_layers=n_layers,
@@ -708,6 +722,8 @@ def train(args):
             log.flush()
         if step == args.stop_after:  # testing: behave as if preempted here
             stopping.append("--stop-after")
+        if args.save_adapter_every and (step % args.save_adapter_every == 0 or step == args.steps):
+            save_adapter(lm, tok, os.path.join(args.out_dir, f"adapter-step{step:05d}"))
         if args.checkpoint_every and (step % args.checkpoint_every == 0 or stopping):
             log.flush()
             save(step)
@@ -780,6 +796,7 @@ def main():
     t.add_argument("--online", action="store_true",
                    help="train on answers the policy generates for each batch (graded with --gt) instead of the cached ones")
     t.add_argument("--time-steps", action="store_true", help="log cumulative seconds per update phase (adds GPU syncs)")
+    t.add_argument("--save-adapter-every", type=int, default=0, help="save the LoRA as a PEFT adapter every N steps and at the end")
     t.add_argument("--save", action="store_true", help="save the trained parameters to OUT_DIR/trained.pt")
     t.add_argument("--checkpoint-every", type=int, default=0,
                    help="resumable checkpoint every N steps and on SIGTERM (exit 143); rerunning the same command resumes")
