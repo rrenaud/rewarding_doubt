@@ -191,12 +191,14 @@ CHARTS = {
                line([250, 500, 750, 1000, 1250, 1500, 1750, 2000], [.815, .823, .827, .841, .792, .835, .801, .826], "late-half rank 4", B),
                flat("paper (full set) 0.859", 250, 2000, .859, PAPER)]),
            dict(type="bar", title="Full validation set (11,313 questions): ECE", ylabel="ECE (lower is better)", **bars(
-               ["untrained Llama-3-8B", "paper", "ours: late-half, step 1,000", "ours: all-layer, step 500"],
-               [("ECE", [.303, .0226, .031, .063], E)]), colors=[G, PAPER, E, P]),
+               ["paper", "ours: late-half, step 1,000", "ours: all-layer, step 500"],
+               [("ECE", [.0226, .031, .063], E)]), colors=[PAPER, E, P],
+               note="The untrained model's ECE is 0.303 (left out so the trained models can be compared)."),
            dict(type="bar", title="Full validation set (11,313 questions): AUROC", ylabel="AUROC (higher is better)", ymin=.5, **bars(
-               ["untrained Llama-3-8B", "paper", "ours: late-half, step 1,000", "ours: all-layer, step 500"],
-               [("AUROC", [.625, .859, .877, .867], E)]), colors=[G, PAPER, E, P],
-               note="The axis starts at 0.5, the AUROC of a confidence that carries no information. One seed per run; the paper reports one number per method.")],
+               ["paper", "ours: late-half, step 1,000", "ours: all-layer, step 500"],
+               [("AUROC", [.859, .877, .867], E)]), colors=[PAPER, E, P],
+               note="The axis starts at 0.5, the AUROC of a confidence that carries no information. The untrained model scores 0.625. "
+                    "One seed per run; the paper reports one number per method.")],
     "23": [dict(type="line", title="LoRA rank: dev Brier at step 500", xlabel="rank", xticks=[1, 2, 4, 8], ylabel="Brier (lower is better)", xlog=True, datasets=[
         line([1, 2, 4, 8], [R(f"23/r{r}/brier") for r in (1, 2, 4, 8)], "Brier", E)], note=SEED_NOTE + " 2 seeds. AUROC: 0.881, 0.887, 0.892, 0.889."),
            dict(type="line", title="LoRA rank: answer KL at step 500", xlabel="rank", xticks=[1, 2, 4, 8], ylabel="answer KL (nats)", xlog=True, ylog=True, datasets=[
