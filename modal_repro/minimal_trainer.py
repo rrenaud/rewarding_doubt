@@ -36,6 +36,7 @@ plus one bucket for the rest, which is never more than the exact KL. --answer-kl
 each step, within [--answer-kl-min, --answer-kl-max], to hold a moving average of the batch answer KL near T.
 """
 import argparse
+import datetime
 import collections
 import contextlib
 import json
@@ -55,6 +56,12 @@ from rewarding_doubt.checkpoint import (announce_saved, load_checkpoint, rng_sta
                                         truncate_jsonl, write_status)
 from rewarding_doubt.core import baseline_matched_objective
 from rewarding_doubt.paper_ppo import AdaptiveKLController, evaluation_metrics, is_correct_exact, is_correct_f1
+
+PROCESS_START = time.time()  # for the cost accounting: model and data loading is the time from here to the first step
+
+
+def utc(t=None):
+    return datetime.datetime.fromtimestamp(time.time() if t is None else t, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 LORA_MODULES = ("q", "k", "v", "o", "gate", "up", "down")
 # The released util.ResponseHandling.parse_answer_confidence, applied to the decoded answer + ": 0".
@@ -628,6 +635,10 @@ def train(args):
         log = open(metrics_path, "a")
         print(f"resumed from {checkpoint_dir} at step {state['step']}", flush=True)
     t0 = time.time() - elapsed
+    # Wall-clock events for the cost accounting (scripts/run_costs.py): loading ends here; per-step seconds exclude
+    # dev evaluation (phase dev_eval) and checkpoint/adapter saving (phase save), which are logged separately.
+    print(json.dumps(dict(event="train_start", time=utc(), process_start=utc(PROCESS_START),
+                          load_seconds=round(time.time() - PROCESS_START, 1), start_step=start)), flush=True)
     last = [time.time()]
     stopping = []  # SIGTERM (a preempted pod or container): checkpoint after the current step and exit 143
     signal.signal(signal.SIGTERM, lambda signum, frame: stopping.append("SIGTERM"))
@@ -716,21 +727,31 @@ def train(args):
                       **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
         log.write(json.dumps(record) + "\n")
         if step % args.eval_every == 0 or step == args.steps:
+            began = time.time()
             curve[step] = dev_metrics(step)
-            print(json.dumps(dict(step=step, minutes=round((time.time() - t0) / 60, 1), beta=round(beta, 4),
+            phase_seconds["dev_eval"] += time.time() - began
+            print(json.dumps(dict(step=step, minutes=round((time.time() - t0) / 60, 1), time=utc(), beta=round(beta, 4),
+                                  eval_seconds=round(phase_seconds["dev_eval"], 1), save_seconds=round(phase_seconds["save"], 1),
                                   peak_gb=round(torch.cuda.max_memory_allocated() / 2**30, 1), **curve[step])), flush=True)
             log.flush()
         if step == args.stop_after:  # testing: behave as if preempted here
             stopping.append("--stop-after")
+        began = time.time()
         if args.save_adapter_every and (step % args.save_adapter_every == 0 or step == args.steps):
             save_adapter(lm, tok, os.path.join(args.out_dir, f"adapter-step{step:05d}"))
         if args.checkpoint_every and (step % args.checkpoint_every == 0 or stopping):
             log.flush()
             save(step)
+        phase_seconds["save"] += time.time() - began
         if stopping:
             print(f"stopping after step {step}: {stopping[0]}", flush=True)
             sys.exit(143)
     json.dump({str(k): v for k, v in curve.items()}, open(os.path.join(args.out_dir, "curve.json"), "w"), indent=1)
+    seconds = time.time() - t0
+    print(json.dumps(dict(event="done", time=utc(), steps=args.steps, questions=args.steps * args.batchsize,
+                          seconds=round(seconds, 1), eval_seconds=round(phase_seconds["dev_eval"], 1),
+                          save_seconds=round(phase_seconds["save"], 1),
+                          train_seconds=round(seconds - phase_seconds["dev_eval"] - phase_seconds["save"], 1))), flush=True)
     write_status(args.out_dir, "completed", step=args.steps)
     if args.save:
         torch.save(dict(args=vars(args), lora={n: p.detach().cpu() for n, p in lm.named_parameters() if "lora_" in n},

@@ -22,6 +22,7 @@ holds the command, the git commit and whether its code was committed. Steps:
 from where Modal stopped (optimizer, data position and controller included) instead of starting over.
 """
 import argparse
+import datetime
 import json
 import subprocess
 import sys
@@ -186,6 +187,7 @@ def main():
         if args.dry_run:
             launcher.append("--dry-run")
         print(f"trying {', '.join(g.replace('NVIDIA ', '') for g in gpus)} with --accumulate {accumulate or 'as in the run'}", flush=True)
+        launched_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         result = subprocess.run(launcher, capture_output=True, text=True)
         out = result.stdout.strip()
         if "no instances currently available" in out + result.stderr:
@@ -202,8 +204,12 @@ def main():
         if not args.dry_run:
             record = ROOT / "runs/runpod" / name
             record.mkdir(parents=True, exist_ok=True)
-            (record / "promoted_from.json").write_text(json.dumps(dict(launch, image_sha=image_sha, runpod_command=command,
-                                                                       gpus=gpus, post_cmd=post), indent=1) + "\n")
+            # pod_created and cost_per_hr feed scripts/run_costs.py (billing runs from creation to termination);
+            # only these pod fields are kept: the pod's env holds keys
+            (record / "promoted_from.json").write_text(json.dumps(dict(
+                launch, image_sha=image_sha, runpod_command=command, gpus=gpus, post_cmd=post, pod_id=pod.get("id"),
+                cost_per_hr=pod.get("costPerHr"), gpu_type=(pod.get("machine") or {}).get("gpuTypeId"),
+                pod_created=launched_at), indent=1) + "\n")
         return
     raise SystemExit("no GPU tier has stock in the volume's datacenter; retry later")
 
