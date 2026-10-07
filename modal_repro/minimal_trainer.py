@@ -202,15 +202,15 @@ def load(model_name, device="cuda", attention_bias=False):
     return lm, tok
 
 
-def add_lora(lm, modules, layers):
-    """Rank-8 LoRA (alpha 8, no dropout, no bias) on `modules` in decoder `layers`; adapters elsewhere would
+def add_lora(lm, modules, layers, rank=8):
+    """Rank-`rank` LoRA (alpha = rank, so scale 1; no dropout, no bias) on `modules` in decoder `layers`; adapters elsewhere would
     be frozen at B = 0 and change nothing, so they are not created. PEFT keeps adapter weights in fp32
     (the fast loop's were bf16: TRL's peft_module_casting_to_bf16)."""
     from peft import LoraConfig, get_peft_model
     if not modules or not layers:
         return []
     # task_type: loaded back for evaluation, the adapter must become a PeftModelForCausalLM (Unsloth requires it)
-    config = LoraConfig(r=8, lora_alpha=8, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=[f"{m}_proj" for m in modules],
+    config = LoraConfig(r=rank, lora_alpha=rank, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=[f"{m}_proj" for m in modules],
                         layers_to_transform=list(layers), layers_pattern="layers")
     # get_peft_model injects the adapters into lm's modules in place. Its wrapper is kept for save_pretrained, in __dict__:
     # assigning a Module attribute would register the wrapper (which contains lm) as a submodule of lm, a cycle.
@@ -555,7 +555,7 @@ def train(args):
     stock = dict(add_stock_params(lm, v_layers, ["self_attn.v_proj.bias"]),
                  **add_stock_params(lm, norm_layers, ["input_layernorm.weight", "post_attention_layernorm.weight"]),
                  **add_stock_params(lm, o_layers, ["self_attn.o_proj.bias"]))
-    trained = dict(lora=add_lora(lm, modules, lora_layers), attn_bias=add_output_biases(lm, attn_layers, "self_attn"),
+    trained = dict(lora=add_lora(lm, modules, lora_layers, args.lora_rank), attn_bias=add_output_biases(lm, attn_layers, "self_attn"),
                    residual_bias=add_output_biases(lm, mlp_layers, "mlp"), stock=list(stock.values()))
     params = [p for group in trained.values() for p in group]
     if args.save_adapter_every and (not trained["lora"] or trained["attn_bias"] or trained["residual_bias"] or trained["stock"]):
@@ -770,6 +770,7 @@ def main():
     t.add_argument("--eval-every", type=int, default=50)
     t.add_argument("--seed", type=int, default=1)
     t.add_argument("--lora-modules", default=",".join(LORA_MODULES), help='projections with LoRA adapters, or "none"')
+    t.add_argument("--lora-rank", type=int, default=8, help="LoRA rank (alpha equals it, so the scale stays 1)")
     t.add_argument("--lora-layers", default="all", help='"all" or an inclusive range of decoder layers, e.g. "18-35"')
     t.add_argument("--attn-bias", default="none", help='"none", "all" or a layer range: train a vector added to each attention output')
     t.add_argument("--v-bias", default="none",
