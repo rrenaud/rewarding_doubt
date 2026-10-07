@@ -147,6 +147,7 @@ function render() {
                      borderWidth: isBar ? 0 : 2, pointRadius: spec.type === "scatter" ? 5 : (d.data.length === 1 ? 6 : 3.5),
                      pointHoverRadius: 7, borderDash: d.dashed ? [6, 4] : [], spanGaps: true };
       if (isBar) Object.assign(base, { borderRadius: 3, maxBarThickness: 46 });
+      if (isBar && spec.colors) base.backgroundColor = spec.colors.map(token);  // one colour per bar (one series, several models)
       if (ranged) Object.assign(base, { errorBarColor: isBar ? fg : c, errorBarWhiskerColor: isBar ? fg : c, errorBarLineWidth: 1.5,
                                         errorBarWhiskerLineWidth: 1.5, errorBarWhiskerSize: 7,
                                         data: isBar ? d.data.map(v => (v === null || typeof v === "object") ? v : { y: v }) : d.data });
@@ -171,7 +172,7 @@ function render() {
         responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: isBar ? "index" : "nearest", intersect: !isBar },
         plugins: {
           title: { display: true, text: spec.title, color: fg, font: { size: 13.5, weight: "600" }, align: "start", padding: { bottom: 8 } },
-          legend: { position: "bottom", labels: { color: muted, boxWidth: 12, boxHeight: 12, usePointStyle: true } },
+          legend: { display: !spec.colors, position: "bottom", labels: { color: muted, boxWidth: 12, boxHeight: 12, usePointStyle: true } },
           tooltip: { callbacks: { label: ctx => {
             const r = ctx.raw;
             const range = (lo, hi) => lo !== undefined && lo !== null ? ` [seeds ${fmt(lo)}–${fmt(hi)}]` : "";
