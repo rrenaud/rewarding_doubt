@@ -120,12 +120,29 @@ def score_rows(lm, levels, queries, answer_starts, pad, shared_prefix=True):
     return levels.from_logp(lm.lm_head(hidden[rows, pos]).float().log_softmax(-1)), list(answers)
 
 
-def answer_start(ids, tokenizer):
-    """Index of a cached row's first answer token: right after the last "<|im_start|>assistant\\n" (rows are
-    the chat prompt, which ends with that header, then the generated answer)."""
-    start = len(ids) - 1 - ids[::-1].index(tokenizer.convert_tokens_to_ids("<|im_start|>")) + 3
-    assert tokenizer.decode(ids[start - 3:start]) == "<|im_start|>assistant\n", tokenizer.decode(ids[start - 3:start])
-    return start
+def assistant_header(tokenizer):
+    """The tokens the chat template puts before an assistant turn's text (its generation prompt): Qwen's
+    "<|im_start|>assistant\\n", Llama-3's "<|start_header_id|>assistant<|end_header_id|>\\n\\n"."""
+    turn = [{"role": "user", "content": "x"}]
+    with_prompt = tokenizer.apply_chat_template(turn, add_generation_prompt=True, tokenize=False)
+    without = tokenizer.apply_chat_template(turn, add_generation_prompt=False, tokenize=False)
+    assert with_prompt.startswith(without) and len(with_prompt) > len(without), "the generation prompt is not a suffix"
+    return tokenizer.encode(with_prompt[len(without):], add_special_tokens=False)
+
+
+def answer_start(ids, header):
+    """Index of a cached row's first answer token: right after the last assistant header (rows are the chat
+    prompt, which ends with that header, then the generated answer)."""
+    for start in range(len(ids) - len(header), -1, -1):
+        if ids[start:start + len(header)] == header:
+            return start + len(header)
+    raise ValueError("no assistant header in the row")
+
+
+def end_of_turn_tokens(tokenizer):
+    """Every end-of-turn token the vocabulary has (Qwen's <|im_end|>, Llama-3's <|eot_id|>) plus EOS."""
+    found = {tokenizer.convert_tokens_to_ids(t) for t in ("<|im_end|>", "<|eot_id|>", "<|end_of_text|>")}
+    return sorted({t for t in found if t is not None and t != tokenizer.unk_token_id} | {tokenizer.eos_token_id})
 
 
 def answer_kl(policy, reference):
@@ -166,9 +183,20 @@ def adapters_off(lm):
         sync_stock(lm, "weights")
 
 
-def load(model_name, device="cuda"):
+def load(model_name, device="cuda", attention_bias=False):
+    """bf16, SDPA. attention_bias=True (Llama) adds zero-initialized q/k/v/o projection biases the checkpoint
+    lacks, so o_proj's can be trained (--o-bias); they are checked to start at zero."""
+    extra = dict(attention_bias=True) if attention_bias else {}
     lm = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16, attn_implementation="sdpa",
-                                              device_map={"": device})
+                                              device_map={"": device}, **extra)
+    if attention_bias:
+        biases = [m.self_attn.o_proj.bias for m in lm.model.layers]
+        if any(b is None for b in biases):
+            raise SystemExit(f"{model_name} has no o_proj bias even with attention_bias=True (e.g. Qwen-2: use --v-bias)")
+        with torch.no_grad():  # newly created weights: make sure they are zero, as _init_weights should leave them
+            for m in lm.model.layers:
+                for proj in ("q_proj", "k_proj", "v_proj", "o_proj"):
+                    getattr(m.self_attn, proj).bias.zero_()
     lm.requires_grad_(False)
     tok = AutoTokenizer.from_pretrained(model_name)
     return lm, tok
@@ -306,7 +334,7 @@ def generate_answers(lm, tokenizer, prompts, seed):
     mask = (torch.arange(width, device=ids.device)[None, :] >= torch.tensor([width - len(p) for p in prompts], device=ids.device)[:, None]).long()
     torch.manual_seed(seed)
     out = lm.generate(input_ids=ids, attention_mask=mask, max_new_tokens=96, do_sample=True, temperature=0.6, top_p=0.9,
-                      eos_token_id=[pad, tokenizer.convert_tokens_to_ids("<|im_end|>"), confidence], pad_token_id=pad)
+                      eos_token_id=sorted(set(end_of_turn_tokens(tokenizer)) | {pad, confidence}), pad_token_id=pad)
     answers = []
     for row in out[:, width:].tolist():
         while row and row[-1] == pad:
@@ -434,6 +462,8 @@ def memory(args):
 
 def make_ref(args):
     cache = torch.load(args.cache, weights_only=False)
+    if args.model:  # e.g. a cache built with a pre-quantized 4-bit model, scored and trained on its 16-bit original
+        cache["generated_by"], cache["model"] = cache["model"], args.model
     lm, tok = load(cache["model"])
     levels = Levels(tok)
     dev = cache["splits"]["dev"]
@@ -457,12 +487,13 @@ def make_answer_ref(args):
     cache = torch.load(args.cache, weights_only=False)
     lm, tok = load(cache["model"])
     levels, pad = Levels(tok), tok.eos_token_id
+    header = assistant_header(tok)
     for split, rows in cache["splits"].items():
         t0, covered = time.time(), []
         for s in range(0, len(rows), 32):
             part = rows[s:s + 32]
             for r in part:
-                r["answer_start"] = answer_start(r["ids"], tok)
+                r["answer_start"] = answer_start(r["ids"], header)
             with torch.no_grad():
                 answers = score_rows(lm, levels, [r["ids"] for r in part], [r["answer_start"] for r in part], pad)[1]
             for r, a in zip(part, answers):
@@ -492,28 +523,31 @@ def epoch_batches(lengths, batchsize, window, rng):
 
 def train(args):
     cache = torch.load(args.cache, weights_only=False)
-    lm, tok = load(cache["model"])
+    lm, tok = load(cache["model"], attention_bias=args.o_bias != "none")
     pad = tok.eos_token_id
     n_layers = lm.config.num_hidden_layers
     modules = [] if args.lora_modules == "none" else args.lora_modules.split(",")
     assert set(modules) <= set(LORA_MODULES), modules
     torch.manual_seed(args.seed)
     lora_layers, attn_layers, mlp_layers = (layer_range(s, n_layers) for s in (args.lora_layers, args.attn_bias, args.residual_bias))
-    v_layers, norm_layers = layer_range(args.v_bias, n_layers), layer_range(args.norm_gain, n_layers)
+    v_layers, norm_layers, o_layers = (layer_range(s, n_layers) for s in (args.v_bias, args.norm_gain, args.o_bias))
     stock = dict(add_stock_params(lm, v_layers, ["self_attn.v_proj.bias"]),
-                 **add_stock_params(lm, norm_layers, ["input_layernorm.weight", "post_attention_layernorm.weight"]))
+                 **add_stock_params(lm, norm_layers, ["input_layernorm.weight", "post_attention_layernorm.weight"]),
+                 **add_stock_params(lm, o_layers, ["self_attn.o_proj.bias"]))
     trained = dict(lora=add_lora(lm, modules, lora_layers), attn_bias=add_output_biases(lm, attn_layers, "self_attn"),
                    residual_bias=add_output_biases(lm, mlp_layers, "mlp"), stock=list(stock.values()))
     params = [p for group in trained.values() for p in group]
     print(json.dumps(dict(lora_modules=modules, lora_layers=[lora_layers.start, lora_layers.stop - 1] if modules else None,
                           attn_bias=args.attn_bias, residual_bias=args.residual_bias, v_bias=args.v_bias, norm_gain=args.norm_gain,
+                          o_bias=args.o_bias, model=cache["model"], n_layers=n_layers,
                           trainable_params=sum(p.numel() for p in params),
                           shared_prefix=not args.no_shared_prefix)), flush=True)
     levels = Levels(tok)
     rng = random.Random(args.seed)
     train_rows, dev_rows = cache["splits"]["train"], cache["splits"]["dev"]
+    header = assistant_header(tok)
     for r in train_rows + dev_rows:
-        r["answer_start"] = answer_start(r["ids"], tok)
+        r["answer_start"] = answer_start(r["ids"], header)
     gt_candidates = json.load(open(args.gt)) if args.regen_every or args.online else None
     # Adam as in the released code (TRL 0.8.6 PPOTrainer: torch.optim.Adam, default betas, no weight decay).
     optimizer = torch.optim.Adam(params, lr=args.lr)
@@ -679,6 +713,7 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     r = sub.add_parser("ref")
     r.add_argument("cache"); r.add_argument("out")
+    r.add_argument("--model", default="", help="the bf16 model to use from here on (recorded in the cache), if not the cache's")
     d = sub.add_parser("diagnose")
     d.add_argument("cache")
     d.add_argument("--rows", type=int, default=64)
@@ -708,6 +743,9 @@ def main():
     t.add_argument("--v-bias", default="none",
                    help='"none", "all" or a layer range: train the model\'s own v_proj biases; with attention weights summing to 1,'
                         ' a change in them adds a constant vector to the attention output (in the span of o_proj)')
+    t.add_argument("--o-bias", default="none",
+                   help='"none", "all" or a layer range: train o_proj biases, i.e. a vector added to the attention output; the model '
+                        'is loaded with attention_bias=True, which adds them (zero) to Llama; Qwen-2 cannot have them')
     t.add_argument("--norm-gain", default="none", help='"none", "all" or a layer range: train the RMSNorm weights before attention and MLP')
     t.add_argument("--residual-bias", default="none", help='"none", "all" or a layer range: train a vector added to each MLP output')
     t.add_argument("--bucket-window", type=int, default=64, help="batches per length-sorting window; 0 = random batches")

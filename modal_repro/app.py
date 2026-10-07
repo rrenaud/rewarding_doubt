@@ -1097,13 +1097,16 @@ FAST_CACHE = f"{VOL}/fast/qwen25-3b-cache.pt"
 
 
 @app.local_entrypoint()
-def fast_cache(n_train: int = 8000, gpu: str = "L40S"):
+def fast_cache(n_train: int = 8000, gpu: str = "L40S", model: str = "unsloth/Qwen2.5-3B-Instruct", out: str = FAST_CACHE):
     """Build the fast loop's rollout cache (fast_loop.py cache): base-model answers for n_train random
-    training questions and the 512 dev questions, graded, with reference level log-probs."""
+    training questions and the 512 dev questions, graded, with reference level log-probs. Llama-3-8B:
+    --model unsloth/llama-3-8b-Instruct-bnb-4bit --out /vol/fast/llama3-8b-cache.pt (LLAMA_CACHE); the 16-bit
+    repo is killed for host memory while Unsloth quantizes it on load. minimal_ref --model then switches to bf16."""
     root = Path(__file__).resolve().parents[1]
     ids = {"train": "all", "validation": json.loads((root / "runs/hparam-search-20261002T044831Z/dev_ids.json").read_text())}
-    r = train_with_snapshots.with_options(gpu=gpu).remote(ids, "cache", ["fast_loop.py", "cache", "IDS_JSON", FAST_CACHE,
-                                                                          "--n-train", str(n_train)], "fast-cache")
+    r = train_with_snapshots.with_options(gpu=gpu).remote(ids, "cache", ["fast_loop.py", "cache", "IDS_JSON", out,
+                                                                          "--n-train", str(n_train), "--model", model],
+                                                          "fast-cache-" + Path(out).stem)
     print("exit", r["exit_code"]); print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
 
 
@@ -1278,14 +1281,17 @@ def fast_eval(dirs: str, gpu: str = "L40S"):
 
 MINIMAL_CACHE = f"{VOL}/fast/qwen25-3b-cache-bf16ref.pt"
 TOPK_CACHE = f"{VOL}/fast/qwen25-3b-cache-bf16ref-top64.pt"  # MINIMAL_CACHE + answer reference top-64 (answer-ref)
+LLAMA_CACHE = f"{VOL}/fast/llama3-8b-cache.pt"  # fast_cache --model unsloth/llama-3-8b-Instruct
+LLAMA_TOPK_CACHE = f"{VOL}/fast/llama3-8b-cache-bf16ref-top64.pt"  # minimal_ref, then minimal_answer_ref, of LLAMA_CACHE
+LLAMA_GT = f"{VOL}/fast/llama3-8b-gt.json"
 GT = f"{VOL}/fast/gt.json"  # {question_id: gt_candidates} of every cached row (fast_loop.py gt)
 
 
 @app.local_entrypoint()
-def fast_gt():
+def fast_gt(cache: str = FAST_CACHE, out: str = GT):
     """fast_loop.py gt: the cached rows' gold answers (train and dev) for minimal_trainer.py --gt."""
     # a GPU only because fast_loop.py imports Unsloth, which needs one at import
-    r = train_with_snapshots.with_options(gpu="T4").remote({}, "gt", ["fast_loop.py", "gt", FAST_CACHE, GT], "fast-gt")
+    r = train_with_snapshots.with_options(gpu="T4").remote({}, "gt", ["fast_loop.py", "gt", cache, out], "fast-gt-" + Path(out).stem)
     print("exit", r["exit_code"]); print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
 
 
@@ -1313,24 +1319,26 @@ def minimal_tests():
 
 
 @app.local_entrypoint()
-def minimal_ref(gpu: str = "L40S"):
+def minimal_ref(gpu: str = "L40S", source: str = FAST_CACHE, out: str = MINIMAL_CACHE, model: str = ""):
     """minimal_trainer.py ref: the fast cache with reference levels recomputed by the bf16 model, the
     untrained bf16 dev metrics, and the shared-prefix check against a full forward; log to runs/minimal/ref/."""
     run = "minimal-ref-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "ref", ["minimal_trainer.py", "ref", FAST_CACHE, MINIMAL_CACHE], run)
+    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "ref", ["minimal_trainer.py", "ref", source, out,
+                                                                   *(["--model", model] if model else [])], run)
     print("exit", r["exit_code"], r["gpu"])
-    out = Path(__file__).resolve().parents[1] / "runs" / "minimal" / "ref"
+    log_dir = "ref" if out == MINIMAL_CACHE else "ref-" + Path(out).stem
+    out = Path(__file__).resolve().parents[1] / "runs" / "minimal" / log_dir
     out.mkdir(parents=True, exist_ok=True)
     (out / "train.log").write_text(r["log"])
     print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
 
 
 @app.local_entrypoint()
-def minimal_answer_ref(gpu: str = "L40S", k: int = 64):
+def minimal_answer_ref(gpu: str = "L40S", k: int = 64, source: str = MINIMAL_CACHE, out: str = TOPK_CACHE):
     """minimal_trainer.py answer-ref: TOPK_CACHE, the bf16 cache plus the reference's top-k log-probs at every
     cached answer token (for --answer-kl without a reference pass)."""
-    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "answer-ref", ["minimal_trainer.py", "answer-ref", MINIMAL_CACHE,
-                                                                             TOPK_CACHE, "--k", str(k)], "minimal-answer-ref")
+    r = train_with_snapshots.with_options(gpu=gpu).remote({}, "answer-ref", ["minimal_trainer.py", "answer-ref", source,
+                                                                             out, "--k", str(k)], "minimal-answer-ref-" + Path(out).stem)
     print("exit", r["exit_code"], r["gpu"]); print("\n".join(l for l in r["log"].splitlines() if l.startswith("{") or "Error" in l))
 
 
