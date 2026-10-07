@@ -57,9 +57,11 @@ main { max-width:1400px; margin:0 auto; padding:20px 16px 40px; }
 h1 { font-size:21px; margin:0 0 4px; } p { color:var(--muted); margin:0 0 12px; }
 .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(520px, 1fr)); gap:14px; }
 .panel { border:1px solid var(--line); border-radius:6px; height:430px; }
+#hovered { position:sticky; top:0; z-index:5; min-height:24px; padding:4px 0 8px; background:var(--bg); font-weight:600; }
 </style></head><body><main>
 <h1>Learning curves</h1>
 <p>__SUBTITLE__</p>
+<div id="hovered">&nbsp;</div>
 <div class="grid">
 <div id="brier" class="panel"></div><div id="auroc" class="panel"></div>
 <div id="dacc" class="panel"></div><div id="kl" class="panel"></div>
@@ -80,7 +82,8 @@ function layout(title, ytitle, extra) {
 }
 function lines(key, xkey) {
   return names.filter(n => data[n][key].length).map(n => ({x: data[n][xkey || "steps"], y: data[n][key], name: `${n} (${data[n].seeds})`,
-    legendgroup: n, mode: "lines+markers", marker: {size: 4}, line: {color: color[n], width: 1.6}}));
+    legendgroup: n, mode: "lines+markers", marker: {size: 4}, line: {color: color[n], width: 1.6},
+    hovertemplate: "<b>" + n + "</b><br>step %{x}<br>%{y:.3f}<extra></extra>"}));
 }
 const cfg = {responsive: true, displaylogo: false};
 Plotly.newPlot("brier", lines("brier"), layout("Brier (expected confidence, cached dev answers) ↓", "Brier"), cfg);
@@ -91,10 +94,29 @@ Plotly.newPlot("kl", lines("kl"), layout("Answer KL to the base model (nats per 
 Plotly.newPlot("scatter", names.filter(n => data[n].points.length).map(n => ({
     x: data[n].points.map(p => Math.max(p.kl, 1e-3)), y: data[n].points.map(p => p.dacc), text: data[n].points.map(p => `step ${p.step}`),
     name: n, legendgroup: n, mode: "markers", marker: {size: 7, color: color[n], opacity: 0.75},
-    hovertemplate: "%{text}<br>KL %{x:.2f}<br>Δacc %{y:+.3f}<extra>" + n + "</extra>"})),
+    hovertemplate: "<b>" + n + "</b><br>%{text}<br>KL %{x:.2f}<br>Δacc %{y:+.3f}<extra></extra>"})),
   layout("Answer KL against accuracy change, every evaluation (each seed)", "Δ accuracy",
     {xaxis: {type: "log", title: "answer KL (nats per answer)", gridcolor: grid},
      shapes: [{type: "rect", xref: "paper", x0: 0, x1: 1, y0: -0.02, y1: 0.02, fillcolor: "#999", opacity: 0.15, line: {width: 0}}]}), cfg);
+// Hovering a line or point highlights that arm in every panel (thicker, others faded) and names it above the plots.
+const panels = ["brier", "auroc", "dacc", "kl", "scatter"].map(id => document.getElementById(id));
+const label = document.getElementById("hovered");
+let current = null;
+function highlight(group) {
+  if (group === current) return;
+  current = group;
+  for (const el of panels) {
+    const idx = el.data.map((_, i) => i);
+    Plotly.restyle(el, {opacity: el.data.map(t => group === null || t.legendgroup === group ? 1 : 0.12)}, idx);
+    if (el.id !== "scatter")
+      Plotly.restyle(el, {"line.width": el.data.map(t => t.legendgroup === group ? 3.6 : 1.6)}, idx);
+  }
+  label.innerHTML = group === null ? "&nbsp;" : `<span style="color:${color[group]}">■</span> ${group} (${data[group].seeds} seeds)`;
+}
+for (const el of panels) {
+  el.on("plotly_hover", e => highlight(e.points[0].data.legendgroup));
+  el.on("plotly_unhover", () => highlight(null));
+}
 </script>
 </main></body></html>"""
     subtitle = (f"{len(data)} arms from {', '.join(patterns)}; each line is the mean over seeds (count in the legend). "
