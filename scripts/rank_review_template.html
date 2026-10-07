@@ -1,0 +1,225 @@
+<title>Rank 4 or Rank 8?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an evidence memo. Verdict first, then each piece of evidence as a ruled entry with its chart and its weight. */
+:root {
+  --bg: #f4f6f7; --surface: #ffffff; --fg: #18222b; --muted: #56636e; --faint: #8b97a1; --line: #d7dde2; --grid: #e8ecef;
+  --r4: #0b7a83; --r8: #c25a12; --r2: #2f5f9e; --r1: #8b97a1; --weak: #b5840a; --strong: #0b7a83;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cond: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11171c; --surface: #172028; --fg: #e6ecf0; --muted: #a3b0ba; --faint: #73818c; --line: #2c3842; --grid: #222c35;
+  --r4: #3fb7c0; --r8: #ee8a45; --r2: #7aa7e6; --r1: #73818c; --weak: #e3b341; --strong: #3fb7c0; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11171c; --surface: #172028; --fg: #e6ecf0; --muted: #a3b0ba; --faint: #73818c; --line: #2c3842; --grid: #222c35;
+  --r4: #3fb7c0; --r8: #ee8a45; --r2: #7aa7e6; --r1: #73818c; --weak: #e3b341; --strong: #3fb7c0; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; }
+h1 { font: 600 34px/1.15 var(--cond); margin: 0 0 6px; letter-spacing: -.01em; text-wrap: balance; }
+h2 { font: 600 21px/1.25 var(--cond); margin: 0 0 6px; text-wrap: balance; }
+p, li { max-width: 70ch; }
+.eyebrow { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); margin: 0 0 4px; }
+.lede { color: var(--muted); font-size: 16px; margin: 0 0 18px; }
+.verdict { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--r4); border-radius: 6px; padding: 14px 18px; margin: 0 0 8px; }
+.verdict p { margin: 6px 0; }
+.verdict strong { color: var(--fg); }
+section.ev { border-top: 2px solid var(--fg); margin-top: 40px; padding-top: 12px; }
+.weight { display: inline-block; font: 500 12px var(--sans); padding: 1px 9px; border-radius: 999px; border: 1px solid currentColor; margin-left: 6px; vertical-align: 3px; }
+.w-strong { color: var(--strong); } .w-weak { color: var(--weak); }
+.meta { color: var(--muted); font-size: 13.5px; margin: 0 0 10px; }
+.table { overflow-x: auto; margin: 10px 0 14px; }
+table { border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; min-width: 100%; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 12px; border-bottom-color: var(--fg); }
+td.r4 { color: var(--r4); font-weight: 600; } td.r8 { color: var(--r8); font-weight: 600; }
+figure { margin: 12px 0 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 12px 8px; }
+.box { position: relative; height: 290px; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.pair figure { margin: 0; }
+figcaption { color: var(--muted); font-size: 12.5px; margin-top: 6px; }
+ul.tight { padding-left: 20px; margin: 6px 0 12px; } ul.tight li { margin: 4px 0; }
+code { font: 13px var(--mono); background: var(--grid); padding: 1px 4px; border-radius: 3px; }
+@media (max-width: 600px) { h1 { font-size: 28px; } .box { height: 250px; } }
+</style>
+
+<main>
+  <p class="eyebrow">Rewarding Doubt · Llama-3-8B · LoRA on layers 16–31</p>
+  <h1>Rank 4 or rank 8?</h1>
+  <p class="lede">Every run we have that compares LoRA ranks with everything else equal, what each shows, and how much weight it can bear.</p>
+
+  <div class="verdict">
+    <p><strong>Verdict: rank 4 is the better default, but the evidence is thin.</strong></p>
+    <p>Offline (2 seeds), rank 4 calibrates as well as rank 8 while moving the answers 6–7× less, and it keeps their accuracy where rank 8 loses about a point.
+       Online (1 seed each), rank 8 had higher AUROC on the paper's evaluation at 6 of 8 checkpoints with ECE split evenly, and drifted about 5× more.
+       No comparison has more than 2 seeds, the learning rate was never retuned per rank, and none was run on the 4-bit model or scored on the full validation set.</p>
+  </div>
+
+  <section class="ev">
+    <h2>1. Offline rank sweep <span class="weight w-strong">2 seeds · strongest evidence</span></h2>
+    <p class="meta">bf16 Llama-3-8B, cached base-model answers (8,000 questions), lr 3e-4, answer-KL weight 1, alpha = rank (scale 1), 500 steps. Dev metrics: the trainer's expected-confidence proxy on 508 dev answers.</p>
+    <div class="table"><table>
+      <thead><tr><th>rank</th><th>dev Brier (seeds)</th><th>dev AUROC (seeds)</th><th>answer KL (nats)</th><th>regenerated accuracy, start → end</th></tr></thead>
+      <tbody id="offline-table"></tbody>
+    </table></div>
+    <figure><div class="box"><canvas id="c-off-curve" role="img" aria-label="Dev Brier over 500 steps by rank"></canvas></div>
+      <figcaption>Mean of 2 seeds; whiskers span the seeds. Ranks 2, 4 and 8 are indistinguishable from step 300 on; rank 1 trails slightly.</figcaption></figure>
+    <div class="pair">
+      <figure><div class="box"><canvas id="c-off-scatter" role="img" aria-label="Answer KL against dev Brier per seed"></canvas></div>
+        <figcaption>Each seed at step 500. Same calibration, very different drift: rank 8 sits far right.</figcaption></figure>
+      <figure><div class="box"><canvas id="c-off-acc" role="img" aria-label="Regenerated accuracy at step 500 by rank"></canvas></div>
+        <figcaption>Each seed at step 500; dashed line: the base model (0.667–0.669). Both rank-8 seeds lose a point.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="ev">
+    <h2>2. Online runs, rank 8 vs rank 4 <span class="weight w-weak">1 seed each · suggestive</span></h2>
+    <p class="meta">Same settings except rank: online (the model answers its training questions), F1 labels, lr 3e-4, answer-KL weight 1, 2,000 steps on the 8,000-question cache. Rank 8 ran its first 1,000 steps on a Modal L40S and the rest on a RunPod A100; rank 4 ran on an A100 throughout.</p>
+    <div class="pair">
+      <figure><div class="box"><canvas id="c-on-brier" role="img" aria-label="Online dev Brier over training"></canvas></div>
+        <figcaption>Trainer's dev Brier. Rank 8 is ahead around steps 500–1,000; both worsen after 1,000 (the data repeats).</figcaption></figure>
+      <figure><div class="box"><canvas id="c-on-kl" role="img" aria-label="Online answer KL over training"></canvas></div>
+        <figcaption>Answer KL (log scale). Rank 8 drifts about 5× more by step 1,000 (0.55 vs 0.11 nats).</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="ev">
+    <h2>3. The paper's evaluation of those online checkpoints <span class="weight w-weak">1 seed each · 512 questions</span></h2>
+    <p class="meta">Released evaluation (the model writes answer and confidence; F1 &gt; 0.5; sampled confidence) on the 512 dev questions, every saved adapter. ECE on 512 questions resolves only to about ±0.03.</p>
+    <div class="pair">
+      <figure><div class="box"><canvas id="c-rel-ece" role="img" aria-label="Released-evaluation ECE by checkpoint"></canvas></div>
+        <figcaption>ECE. Rank 8 is lower at 4 of 8 checkpoints, a tie; its best (0.031 at step 1,000) is our headline adapter.</figcaption></figure>
+      <figure><div class="box"><canvas id="c-rel-auroc" role="img" aria-label="Released-evaluation AUROC by checkpoint"></canvas></div>
+        <figcaption>AUROC. Rank 8 is higher at 6 of 8 checkpoints; mean over steps 1,000–2,000: 0.837 vs 0.819.</figcaption></figure>
+    </div>
+    <p class="meta">Accuracy in the same evaluations: rank 8 averages 65.5% over the eight checkpoints, rank 4 66.1%.</p>
+  </section>
+
+  <section class="ev">
+    <h2>What weakens the comparison</h2>
+    <ul class="tight">
+      <li><strong>Seeds.</strong> Two per rank offline, one online. Seed-to-seed differences in dev Brier (up to 0.007) are as large as the rank differences.</li>
+      <li><strong>Learning rate.</strong> Every rank used 3e-4 with alpha = rank, so each direction gets the same step size. A lower rank might want a higher rate; that was never tested.</li>
+      <li><strong>Hardware and accumulation.</strong> Offline, rank 8 ran on a Modal L40S without gradient accumulation and ranks 1–4 on RunPod 4090s with 4-way accumulation. The math is the same, but kernels are nondeterministic, and the base model's regenerated accuracy already differs slightly between the two (0.669 vs 0.667).</li>
+      <li><strong>Model and protocol.</strong> All of it is bf16. Our new baseline is the 4-bit model, scored in 4-bit, where neither rank has been run. The online pair was also never scored on the full validation set.</li>
+      <li><strong>Selection.</strong> The headline rank-8 checkpoint (step 1,000) was chosen by dev ECE, which flatters it against rank 4's unselected curve.</li>
+    </ul>
+  </section>
+
+  <section class="ev">
+    <h2>What would settle it</h2>
+    <p>On the 4-bit model: rank 4 vs rank 8, 3 seeds each, online with F1 labels, 1,000 steps, adapters every 250 steps, scored with the paper's evaluation in 4-bit on the dev questions, and the best checkpoint of each seed on the full validation set.
+       Roughly $5 of RunPod training and $12 of Modal evaluation. Report AUROC, ECE and accuracy per seed, with the spread.</p>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-error-bars@4.4.5/build/index.umd.min.js"></script>
+<script>
+const D = __DATA__;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue("--" + n).trim();
+const fmt = v => Math.abs(v) < 0.01 && v !== 0 ? Number(Number(v).toPrecision(2)).toExponential() : +Number(v).toFixed(3);
+const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+const rankColor = { "1": "r1", "2": "r2", "4": "r4", "8": "r8" };
+const charts = {};
+let registered = false;
+
+function table() {
+  const rows = ["1", "2", "4", "8"].map(r => {
+    const o = D.offline[r], last = o.steps.length - 1;
+    const seeds = k => o[k][last].map(fmt).join(", ");
+    const cls = r === "4" ? "r4" : r === "8" ? "r8" : "";
+    return `<tr><td class="${cls}">rank ${r}</td><td>${fmt(mean(o.brier[last]))} (${seeds("brier")})</td><td>${fmt(mean(o.auroc[last]))} (${seeds("auroc")})</td>` +
+           `<td>${fmt(mean(o.akl[last]))}</td><td>${fmt(mean(o.regen0))} → ${o.regen.map(fmt).join(", ")}</td></tr>`;
+  });
+  document.getElementById("offline-table").innerHTML = rows.join("");
+}
+
+function base(title, xlabel, ylabel, extra) {
+  const muted = css("muted"), grid = css("grid"), fg = css("fg");
+  return Object.assign({
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { title: { display: true, text: title, color: fg, font: { size: 13.5, weight: "600" }, align: "start" },
+               legend: { position: "bottom", labels: { color: muted, usePointStyle: true, boxWidth: 10, filter: i => !!i.text } },
+               tooltip: { callbacks: { label: c => {
+                 const r = c.raw; if (r && typeof r === "object") {
+                   const rng = r.yMin !== undefined ? ` [seeds ${fmt(r.yMin)}–${fmt(r.yMax)}]` : "";
+                   return `${c.dataset.label}${r.label ? " — " + r.label : ""}: ${r.x !== undefined ? fmt(r.x) + ", " : ""}${fmt(r.y)}${rng}`; }
+                 return `${c.dataset.label}: ${fmt(r)}`; } } } },
+    scales: { x: { title: { display: true, text: xlabel, color: muted }, grid: { color: grid }, ticks: { color: muted } },
+              y: { title: { display: true, text: ylabel, color: muted }, grid: { color: grid }, ticks: { color: muted, callback: v => fmt(v) } } }
+  }, extra || {});
+}
+
+function make(id, type, datasets, options) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), { type, data: { datasets }, options });
+}
+
+function ds(label, color, data, extra) {
+  const c = css(color);
+  return Object.assign({ label, data, borderColor: c, backgroundColor: c, pointBackgroundColor: c, borderWidth: 2, pointRadius: 3.5,
+                         errorBarColor: c, errorBarWhiskerColor: c, errorBarLineWidth: 1.5, errorBarWhiskerSize: 6 }, extra || {});
+}
+const refLine = (label, x0, x1, y) => ({ label, data: [{ x: x0, y }, { x: x1, y }], borderColor: css("faint"), borderDash: [6, 4],
+                                        borderWidth: 1.5, pointRadius: 0, pointStyle: false, showLine: true });
+
+function render() {
+  if (!window.Chart) return;
+  if (!registered && window.ChartErrorBars) {
+    const E = window.ChartErrorBars;
+    Chart.register(E.LineWithErrorBarsController, E.ScatterWithErrorBarsController, E.PointWithErrorBar);
+    registered = true;
+  }
+  Chart.defaults.font.family = css("sans");
+  const lineType = registered ? "lineWithErrorBars" : "line";
+  // 1a: offline curves
+  make("c-off-curve", lineType, ["1", "2", "4", "8"].map(r => {
+    const o = D.offline[r];
+    return ds(`rank ${r}`, rankColor[r], o.steps.slice(1).map((s, i) => {
+      const v = o.brier[i + 1]; return { x: s, y: mean(v), yMin: Math.min(...v), yMax: Math.max(...v) }; }));
+  }), base("Offline: dev Brier over training", "training step", "dev Brier (lower is better)", { scales: Object.assign(base("", "", "").scales,
+       { x: { type: "linear", title: { display: true, text: "training step", color: css("muted") }, grid: { color: css("grid") }, ticks: { color: css("muted") } } }) }));
+  // 1b: KL vs Brier per seed
+  const sc = base("Offline, step 500: drift against calibration", "answer KL (nats, log scale)", "dev Brier (lower is better)");
+  sc.scales.x.type = "logarithmic";
+  make("c-off-scatter", "scatter", ["1", "2", "4", "8"].map(r => {
+    const o = D.offline[r], last = o.steps.length - 1;
+    return ds(`rank ${r}`, rankColor[r], o.akl[last].map((k, i) => ({ x: k, y: o.brier[last][i], label: `seed ${i + 1}` })), { pointRadius: 6 });
+  }), sc);
+  // 1c: regenerated accuracy per seed
+  const acc = base("Offline, step 500: regenerated dev accuracy", "rank", "accuracy");
+  acc.scales.x.type = "logarithmic"; acc.scales.x.min = 0.8; acc.scales.x.max = 10;
+  acc.scales.x.afterBuildTicks = a => { a.ticks = [1, 2, 4, 8].map(value => ({ value })); };
+  acc.scales.x.ticks.callback = v => v;
+  make("c-off-acc", "scatter", [...["1", "2", "4", "8"].map(r => ds(`rank ${r}`, rankColor[r],
+      D.offline[r].regen.map((a, i) => ({ x: +r * (i ? 1.06 : 0.94), y: a, label: `seed ${i + 1}` })), { pointRadius: 6 })),
+    refLine("base model", 0.8, 10, mean(D.offline["4"].regen0))], acc);
+  // 2: online
+  const onKeys = ["rank 8", "rank 4"], onColor = { "rank 8": "r8", "rank 4": "r4" };
+  const onl = (key, title, ylabel, log) => {
+    const o = base(title, "training step", ylabel);
+    o.scales.x.type = "linear"; if (log) o.scales.y.type = "logarithmic";
+    return o;
+  };
+  make("c-on-brier", "line", onKeys.map(k => ds(k, onColor[k], D.online[k].steps.slice(1).map((s, i) => ({ x: s, y: D.online[k].brier[i + 1] })), { pointRadius: 2 })),
+       onl("brier", "Online: dev Brier (trainer)", "dev Brier"));
+  make("c-on-kl", "line", onKeys.map(k => ds(k, onColor[k], D.online[k].steps.slice(1).map((s, i) => ({ x: s, y: Math.max(D.online[k].akl[i + 1], 1e-3) })), { pointRadius: 2 })),
+       onl("kl", "Online: answer KL", "answer KL (nats)", true));
+  // 3: released evaluation
+  const rel = (key, title, ylabel, ref) => {
+    const o = base(title, "training step", ylabel); o.scales.x.type = "linear";
+    make(`c-rel-${key}`, "line", [...onKeys.map(k => ds(k, onColor[k], D.released[k].steps.map((s, i) => ({ x: s, y: D.released[k][key][i] })))),
+                                   refLine(ref[0], 250, 2000, ref[1])], o);
+  };
+  rel("ece", "Released evaluation (dev): ECE", "ECE (lower is better)", ["paper (full set) 0.0226", 0.0226]);
+  rel("auroc", "Released evaluation (dev): AUROC", "AUROC (higher is better)", ["paper (full set) 0.859", 0.859]);
+}
+table();
+render();
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
