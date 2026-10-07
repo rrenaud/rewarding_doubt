@@ -74,6 +74,8 @@ def xy(x, y):
             out[axis] = v
     return out
 
+ACCEPTED = 0.649  # sweep 18: base accuracy 0.669 minus 2 points, the eligibility rule of the search (sweep 01)
+ACCEPTED_LABEL = "accepted accuracy loss: −2 points (0.649)"
 KL_SPLIT = 1.2  # sweep 18: answer KL (nats per answer) dividing the mostly stable region from the unstable one
 
 
@@ -164,11 +166,13 @@ CHARTS = {
                           line([.001, .1, .3, 1, 3], [R(f"17/2/{f}/kl") for f in ("0.001", "0.1", "0.3", "1", "3")], "target 2", P)])],
     "18": [dict(type="scatter", title=f"Llama drift, stable region: answer KL below {KL_SPLIT} nats (each seed)",
                 xlabel="answer KL at step 500 (nats per answer)", ylabel="regenerated dev accuracy", xlog=True,
-                datasets=drift(lambda q: q["kl"] < KL_SPLIT) + [flat("base model 0.669", 1e-3, KL_SPLIT, .669, G)],
-                note="One point per seed. LoRA stays within about 3 points of the base model (0.640–0.673); small adapters lose more per nat, down to 0.598 (−7 points) near 1 nat."),
+                datasets=drift(lambda q: q["kl"] < KL_SPLIT) + [flat("base model 0.669", 1e-3, KL_SPLIT, .669, G),
+                                                                  flat(ACCEPTED_LABEL, 1e-3, KL_SPLIT, ACCEPTED, PAPER)],
+                note="One point per seed. LoRA stays within about 3 points of the base model (0.640–0.673); small adapters lose more per nat, down to 0.598 (−7 points) near 1 nat. The purple line is the most accuracy loss we accept (2 points, the search's eligibility rule): all but three LoRA seeds sit above it (the released schedule's two, and one of LoRA 8–31), and every small-adapter seed past 0.3 nats falls below."),
            dict(type="scatter", title=f"Llama drift, unstable region: answer KL of {KL_SPLIT} nats and above (each seed)",
                 xlabel="answer KL at step 500 (nats per answer)", ylabel="regenerated dev accuracy", xlog=True,
-                datasets=drift(lambda q: q["kl"] >= KL_SPLIT) + [flat("base model 0.669", KL_SPLIT, 40, .669, G)],
+                datasets=drift(lambda q: q["kl"] >= KL_SPLIT) + [flat("base model 0.669", KL_SPLIT, 40, .669, G),
+                                                                   flat(ACCEPTED_LABEL, KL_SPLIT, 40, ACCEPTED, PAPER)],
                 note="One point per seed. Only small adapters reach this region, and no run landed between 1.2 and about 4 nats; accuracy falls from about 0.55 at 4–5 nats to near 0 at 35.")],
     "20": [dict(type="bar", title="o_proj-only LoRA, dev Brier at step 500", ylabel="Brier (lower is better)", note=SEED_NOTE, **bars(
         ["16–31, 3e-4", "16–31, 1e-3", "16–31, 3e-3", "all, 1e-3", "all, 1e-3, W 0"],
