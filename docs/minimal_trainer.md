@@ -256,8 +256,20 @@ floor. Stock `v_proj` bias 18–35, lr 1e-2, offline, 1,000 steps, 2 seeds; rege
 - From a floor of 0.1 up, the weight sits on the floor (the controller wants less), so the target stops
   mattering and the floor sets the trade-off.
 - Floor 0.1 keeps accuracy at base (0.427–0.430) with the KL near 1 nat, below the knee, for about 0.003 Brier;
-  higher floors buy a little accuracy for up to 0.03 Brier. One training phase, no polish step. Offline; an online
-  check and a 3,000-step run are next.
+  higher floors buy a little accuracy for up to 0.03 Brier. One training phase, no polish step.
+
+**Online, target 1.5 and floor 0.1.** 300 steps on Modal, 2 seeds (`runs/minimal/online-vbias-t1.5-min0.1-*`): accuracy
+0.422–0.442 (base 0.426), answer KL 0.5–0.8, weight at the floor throughout; Brier 0.119 / 0.135 at step 300, still
+improving. 3,000 steps on RunPod (`runs/runpod/online-vbias-t1.5-min0.1-s1`; base accuracy 0.440 there), against the
+target-2 run without a floor:
+
+| run | Brier, steps 1k–3k | ECE | AUROC | answer KL | regenerated accuracy @500 / 1k / 1.5k / 2k / 2.5k / 3k |
+|---|---|---|---|---|---|
+| target 2, no floor | 0.108 | 0.044 | 0.919 | 2.54 | 0.424 / 0.426 / 0.404 / 0.410 / 0.428 / 0.426 |
+| target 1.5, floor 0.1 | 0.112 | 0.045 | 0.912 | 1.39 | 0.414 / 0.432 / 0.414 / 0.440 / 0.444 / 0.440 |
+
+The floor kept the answer KL below the knee and the answers at base over the last third, for 0.004 Brier and 0.007
+AUROC. The weight never left the floor (at most 0.102): in practice a fixed weight of 0.1. One seed each.
 
 ## Differences from the fast loop, and what is not done
 

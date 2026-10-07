@@ -1,0 +1,5 @@
+2026-10-07T01:34:02Z attempt start (image 88e222cdd98999aee04c2931012917801e680a21): python minimal_trainer.py train /workspace/fast/qwen25-3b-cache-bf16ref-top64.pt /workspace/runs/online-vbias-t1.5-min0.1-s1 --online --gt /workspace/fast/gt.json --lora-modules none --v-bias 18-35 --lr 1e-2 --answer-kl 0.1 --answer-kl-target 1.5 --answer-kl-min 0.1 --seed 1 --steps 3000 --eval-every 100 --regen-every 500 --checkpoint-every 100
+2026-10-07T02:24:04Z trainer exited with code 0
+2026-10-07T02:24:04Z outcome: completed
+selfstop: terminate pod ofg35kcleugj1m: HTTP 204
+2026-10-07T02:24:05Z pod terminate requested
