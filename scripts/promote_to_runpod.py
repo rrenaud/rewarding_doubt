@@ -12,10 +12,10 @@ holds the command, the git commit and whether its code was committed. Steps:
    files the image contains (the workflow's paths); waits for one in progress at HEAD.
 3. Data: every /vol/... argument (caches, gold answers, --init checkpoints) is copied from the Modal volume to the
    RunPod volume unless already there, and rewritten to /workspace/....
-4. Command: --steps replaced if given; --checkpoint-every 100 added if absent (pods can be preempted); for Llama,
-   all-layer LoRA without --accumulate gets --accumulate 2 (53 GB otherwise).
-5. Launch: runpod_launch.py with the image pinned to that commit, GPUs by model (Llama: 48 GB cards; Qwen: a 4090
-   first), and eval_snapshots.py as the post command when the run saves adapters. The promotion is recorded in
+4. Command: --steps replaced if given; --checkpoint-every 100 added if absent (pods can be preempted).
+5. Launch: runpod_launch.py with the image pinned to that commit and eval_snapshots.py as the post command when the
+   run saves adapters, trying GPU tiers in order until one has stock, each with the --accumulate that fits it
+   (Llama: 48 GB cards, A100 80GB, 5090, 4090; see LLAMA_TIERS). --gpu (with --accumulate) replaces the tiers. The promotion is recorded in
    runs/runpod/NAME/promoted_from.json.
 
 --continue also copies the Modal run's latest checkpoint into the RunPod run, so with a larger --steps it carries on
@@ -35,6 +35,15 @@ from runpod_launch import VOLUME_ID  # noqa: E402
 CODE_PATHS = ["modal_repro", "src", "runpod", "patches"]
 MODAL_VOLUME = "rewarding-doubt-repro"
 GPUS_48GB = ["NVIDIA RTX A6000", "NVIDIA L40S", "NVIDIA A40", "NVIDIA RTX 6000 Ada Generation", "NVIDIA L40"]
+GPUS_80GB = ["NVIDIA A100 80GB PCIe", "NVIDIA A100-SXM4-80GB"]
+# Llama-3-8B tiers, tried in order until RunPod has stock: (GPU types, --accumulate). Accumulation splits the same
+# 32-question update into K backward passes: identical updates, less memory, slower. Measured peaks: LoRA on layers
+# 16-31 34.6 GB at 1, 18.0 at 4 (2 interpolates to ~25); all-layer LoRA 53 GB at 1, 33 at 2, 25 at 4 (8 untested).
+LLAMA_TIERS = {
+    "late": [(GPUS_48GB, 1), (GPUS_80GB, 1), (["NVIDIA GeForce RTX 5090"], 2), (["NVIDIA GeForce RTX 4090"], 4)],
+    "all": [(GPUS_48GB, 2), (GPUS_80GB, 1), (["NVIDIA GeForce RTX 5090"], 4), (["NVIDIA GeForce RTX 4090"], 8)],
+}
+QWEN_TIERS = [(["NVIDIA GeForce RTX 4090", *GPUS_48GB], None)]  # Qwen-2.5-3B fits a 4090 as is
 
 
 def git(*args):
@@ -108,24 +117,34 @@ def copy_to_runpod(modal_path, dry_run, dest_rel=None):
             s3.upload_file(str(f), VOLUME_ID, key)
 
 
-def translate(command, steps, model, accumulate=0):
+def all_layer_lora(args):
+    trains_lora = "--lora-modules" not in args or args[args.index("--lora-modules") + 1] != "none"
+    return trains_lora and ("--lora-layers" not in args or args[args.index("--lora-layers") + 1] == "all")
+
+
+def tiers(command, gpus, accumulate):
+    """[(GPU types, --accumulate or None to keep the command's)] to try in order."""
+    if gpus:
+        return [(gpus, accumulate or None)]
+    if "llama" not in command[2].lower():
+        return [(g, accumulate or a) for g, a in QWEN_TIERS]
+    return LLAMA_TIERS["all" if all_layer_lora(command) else "late"]
+
+
+def translate(command, steps, accumulate=None):
     """The RunPod train command: /vol paths rewritten, --steps / --checkpoint-every / --accumulate set."""
     args = list(command)
     if steps and "--steps" in args:
         args[args.index("--steps") + 1] = str(steps)
     elif steps:
         args += ["--steps", str(steps)]
-    if accumulate:  # e.g. to fit a 24 GB card
+    if accumulate:
         if "--accumulate" in args:
             args[args.index("--accumulate") + 1] = str(accumulate)
         else:
             args += ["--accumulate", str(accumulate)]
     if "--checkpoint-every" not in args:
         args += ["--checkpoint-every", "100"]
-    lora_all = "--lora-modules" not in args or args[args.index("--lora-modules") + 1] != "none"
-    lora_all = lora_all and ("--lora-layers" not in args or args[args.index("--lora-layers") + 1] == "all")
-    if "llama" in model and lora_all and "--accumulate" not in args:
-        args += ["--accumulate", "2"]  # all-layer LoRA on Llama-3-8B: 53 GB at 32 questions per update, 33 GB with 2
     vol_paths = [a for a in args if a.startswith("/vol/")]
     args = [a.replace("/vol/", "/workspace/", 1) if a.startswith("/vol/") else a for a in args]
     return args, vol_paths
@@ -138,7 +157,7 @@ def main():
     parser.add_argument("--name", default="", help="RunPod run name (default: LABEL-rp)")
     parser.add_argument("--gpu", action="append", default=None)
     parser.add_argument("--max-hours", type=float, default=6)
-    parser.add_argument("--accumulate", type=int, default=0, help="set --accumulate (Llama on a 24 GB 4090: 4)")
+    parser.add_argument("--accumulate", type=int, default=0, help="with --gpu: set --accumulate for those GPUs")
     parser.add_argument("--allow-dirty-source", action="store_true")
     parser.add_argument("--continue", dest="resume", action="store_true",
                         help="copy the Modal run's latest checkpoint into the RunPod run, which then resumes from it")
@@ -147,40 +166,46 @@ def main():
     launch = json.loads((ROOT / "runs/minimal" / args.label / "launch.json").read_text())
     head = check_code(launch, args.allow_dirty_source)
     image_sha = find_image(head)
-    command, vol_paths = translate(launch["command"], args.steps, launch["command"][2].lower(), args.accumulate)
+    _, vol_paths = translate(launch["command"], args.steps)
     print(f"image: ghcr.io/rrenaud/rewarding-doubt:{image_sha[:8]}")
     print("data:")
     for p in vol_paths:
         copy_to_runpod(p, args.dry_run)
-    model = launch["command"][2].lower()
-    gpus = args.gpu or (GPUS_48GB if "llama" in model else ["NVIDIA GeForce RTX 4090", *GPUS_48GB])
-    post = "python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON" if "--save-adapter-every" in command else ""
     name = args.name or f"{args.label}-rp"
     if args.resume:  # the trainer resumes from OUT_DIR/checkpoint when it exists (same command, larger --steps)
         copy_to_runpod(f"/vol/outputs/{launch['modal_run']}/{args.label}/checkpoint", args.dry_run, dest_rel=f"runs/{name}/checkpoint")
-    launcher = ["python3", str(ROOT / "scripts/runpod_launch.py"), name, "--expt", name.split("-")[0], "--max-hours", str(args.max_hours),
-                "--image", f"ghcr.io/rrenaud/rewarding-doubt:{image_sha}", "--train-cmd", "python " + " ".join(command)]
-    for g in gpus:
-        launcher += ["--gpu", g]
-    if post:
-        launcher += ["--post-cmd", post]
-    if args.dry_run:
-        launcher.append("--dry-run")
-    print("train command:", "python " + " ".join(command))
-    result = subprocess.run(launcher, capture_output=True, text=True)
-    out = result.stdout.strip()
-    try:
-        pod = json.loads(out)
+    for gpus, accumulate in tiers(launch["command"], args.gpu, args.accumulate):
+        command, _ = translate(launch["command"], args.steps, accumulate)
+        post = "python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON" if "--save-adapter-every" in command else ""
+        launcher = ["python3", str(ROOT / "scripts/runpod_launch.py"), name, "--expt", name.split("-")[0], "--max-hours",
+                    str(args.max_hours), "--image", f"ghcr.io/rrenaud/rewarding-doubt:{image_sha}", "--train-cmd", "python " + " ".join(command)]
+        for g in gpus:
+            launcher += ["--gpu", g]
+        if post:
+            launcher += ["--post-cmd", post]
+        if args.dry_run:
+            launcher.append("--dry-run")
+        print(f"trying {', '.join(g.replace('NVIDIA ', '') for g in gpus)} with --accumulate {accumulate or 'as in the run'}", flush=True)
+        result = subprocess.run(launcher, capture_output=True, text=True)
+        out = result.stdout.strip()
+        if "no instances currently available" in out + result.stderr:
+            print("  none available", flush=True)
+            continue
+        try:
+            pod = json.loads(out)
+        except json.JSONDecodeError:
+            print(out[-1500:], result.stderr[-1500:])
+            raise SystemExit("launch failed")
+        print("train command:", "python " + " ".join(command))
         print(json.dumps({k: pod.get(k) for k in ("id", "name", "costPerHr", "desiredStatus")} if not args.dry_run else
                          {k: pod.get(k) for k in ("name", "imageName", "gpuTypeIds")}, indent=1))
-    except json.JSONDecodeError:
-        print(out[-1500:], result.stderr[-1500:])
-        raise SystemExit("launch failed")
-    if not args.dry_run:
-        record = ROOT / "runs/runpod" / name
-        record.mkdir(parents=True, exist_ok=True)
-        (record / "promoted_from.json").write_text(json.dumps(dict(launch, image_sha=image_sha, runpod_command=command,
-                                                                   gpus=gpus, post_cmd=post), indent=1) + "\n")
+        if not args.dry_run:
+            record = ROOT / "runs/runpod" / name
+            record.mkdir(parents=True, exist_ok=True)
+            (record / "promoted_from.json").write_text(json.dumps(dict(launch, image_sha=image_sha, runpod_command=command,
+                                                                       gpus=gpus, post_cmd=post), indent=1) + "\n")
+        return
+    raise SystemExit("no GPU tier has stock in the volume's datacenter; retry later")
 
 
 if __name__ == "__main__":
