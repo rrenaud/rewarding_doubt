@@ -1,4 +1,6 @@
-"""Build docs/sweeps/index.html, one web page with every sweep report from docs/sweeps/*.md plus charts.
+"""Build docs/sweeps/index.html, one web page with every sweep report from docs/sweeps/*.md plus charts
+(served by GitHub Pages at https://rrenaud.github.io/rewarding_doubt/sweeps/; docs/sweeps/artifact.html is the same page
+as a fragment for the claude.ai artifact).
 
     python scripts/build_sweeps_page.py
 
@@ -368,8 +370,16 @@ def main():
             .replace("{{AFTER}}", markdown(after)).replace("{{SWEEPS}}", "\n".join(s[4] for s in sweeps)).replace("{{TOC}}", toc)
             .replace("{{CHARTS}}", json.dumps(CHART_SPECS))
             .replace("{{TOTAL}}", f"about ${sum(c['usd'] for c in COSTS.values()):.0f} and {sum(c['hours'] for c in COSTS.values()):.0f} GPU-hours"))
-    (SWEEPS / "index.html").write_text(page)
-    print(f"{len(sweeps)} sweeps, {len(CHART_SPECS)} charts -> docs/sweeps/index.html ({len(page) // 1024} KB)")
+    # The claude.ai artifact gets the page as a fragment (the publisher adds the document skeleton); GitHub Pages serves a
+    # full document (docs/sweeps/index.html, https://rrenaud.github.io/rewarding_doubt/sweeps/).
+    (SWEEPS / "artifact.html").write_text(page)
+    head, body = page.split("</style>", 1)
+    standalone = ("<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
+                  "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\n"
+                  + head + "</style>\n</head>\n<body>\n" + body + "\n</body>\n</html>\n")
+    (SWEEPS / "index.html").write_text(standalone)
+    print(f"{len(sweeps)} sweeps, {len(CHART_SPECS)} charts -> docs/sweeps/index.html (GitHub Pages) and docs/sweeps/artifact.html "
+          f"({len(standalone) // 1024} KB)")
 
 
 if __name__ == "__main__":
