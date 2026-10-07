@@ -114,7 +114,12 @@ html { scroll-behavior: smooth; }
 const SPECS = {{CHARTS}};
 const charts = {};
 function token(name) { return getComputedStyle(document.documentElement).getPropertyValue("--" + name).trim(); }
-function fmt(v) { return Math.abs(v) >= 1000 ? Number(v).toExponential(1) : (Math.abs(v) < 0.01 && v !== 0 ? Number(v).toExponential(1) : +Number(v).toFixed(4)); }
+function fmt(v) { const sci = x => Number(Number(x).toPrecision(3)).toExponential(); return Math.abs(v) >= 1000 ? sci(v) : (Math.abs(v) < 0.01 && v !== 0 ? sci(v) : +Number(v).toFixed(4)); }
+// Log axes: label only 1, 2 and 5 times a power of ten (Chart.js places a tick at every minor step).
+function logTick(v) {
+  const m = v / Math.pow(10, Math.floor(Math.log10(v) + 1e-9));
+  return [1, 2, 5].some(k => Math.abs(m - k) < 1e-6) ? fmt(v) : "";
+}
 function render() {
   if (!window.Chart) return;
   const fg = token("fg"), muted = token("muted"), grid = token("grid"), surface = token("surface");
@@ -138,9 +143,10 @@ function render() {
     const scaleBase = { grid: { color: grid }, ticks: { color: muted, callback: function(v) { return fmt(this.getLabelForValue ? (isBar ? this.getLabelForValue(v) : v) : v); } },
                         title: { display: true, color: muted, font: { size: 12 } } };
     const x = isBar ? { grid: { display: false }, ticks: { color: muted } }
-                    : Object.assign({}, scaleBase, { type: spec.xlog ? "logarithmic" : "linear", title: Object.assign({}, scaleBase.title, { text: spec.xlabel || "" }) });
+                    : Object.assign({}, scaleBase, { type: spec.xlog ? "logarithmic" : "linear", title: Object.assign({}, scaleBase.title, { text: spec.xlabel || "" }),
+                                     ticks: { color: muted, maxRotation: 0, autoSkip: true, callback: v => spec.xlog ? logTick(v) : fmt(v) } });
     const y = Object.assign({}, scaleBase, { type: spec.ylog ? "logarithmic" : "linear", title: Object.assign({}, scaleBase.title, { text: spec.ylabel || "" }),
-                            ticks: { color: muted, callback: v => fmt(v) } });
+                            ticks: { color: muted, callback: v => spec.ylog ? logTick(v) : fmt(v) } });
     if (spec.ymin !== undefined) y.min = spec.ymin;
     if (isBar && spec.ymin === undefined) y.beginAtZero = true;
     charts[id] = new Chart(canvas, {
