@@ -636,7 +636,19 @@ def main():
         original_loader = InferenceDatasetSplit.load_model_tokenizer
 
         def keep_model(*load_args, **load_kwargs):
-            model, tokenizer = original_loader(*load_args, **load_kwargs)
+            if os.environ.get("RD_EVAL_4BIT") == "1":
+                # The released loader passes load_in_4bit=False, so Unsloth swaps a -bnb-4bit name for the 16-bit weights
+                # (adapters trained on the 4-bit model are evaluated on the 16-bit base). RD_EVAL_4BIT=1 keeps 4-bit:
+                # off the paper's protocol, for measuring the 4-bit model itself.
+                from unsloth import FastLanguageModel
+                plain = FastLanguageModel.from_pretrained
+                FastLanguageModel.from_pretrained = lambda *a, **k: plain(*a, **{**k, "load_in_4bit": True})
+                try:
+                    model, tokenizer = original_loader(*load_args, **load_kwargs)
+                finally:
+                    FastLanguageModel.from_pretrained = plain
+            else:
+                model, tokenizer = original_loader(*load_args, **load_kwargs)
             from rewarding_doubt import attn_bias
             loaded["attn_bias_layers"] = attn_bias.load(model, sys.argv[3])
             original_generate = model.generate

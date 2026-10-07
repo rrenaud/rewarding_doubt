@@ -727,10 +727,12 @@ def hparam_round(search_dir: str, round: str, score_test: bool = False, gpu: str
 
 
 @app.function(volumes={VOL: volume}, timeout=4 * HOUR)
-def evaluate_test(ids_by_split: dict, model_dir: str, frozen: bool = False, out_dir: str = "", name: str = "test") -> dict:
+def evaluate_test(ids_by_split: dict, model_dir: str, frozen: bool = False, out_dir: str = "", name: str = "test",
+                  four_bit: bool = False) -> dict:
     """The released evaluation on the test questions, writing to eval_<name>*.json beside the checkpoint (or in
     out_dir, e.g. for a hub model name); with `frozen`, frozen_eval.py (base-model answers, adapted confidence)
-    to eval_<name>_frozen*.json."""
+    to eval_<name>_frozen*.json. four_bit: keep a 4-bit base in 4-bit (subset.py RD_EVAL_4BIT; off the paper's protocol)."""
+    import os
     import subprocess
 
     volume.reload()
@@ -740,7 +742,8 @@ def evaluate_test(ids_by_split: dict, model_dir: str, frozen: bool = False, out_
     if Path(out_json.replace(".json", "_metrics.json")).exists():  # already evaluated (e.g. before a restart)
         return dict(model_dir=model_dir, metrics=json.loads(Path(out_json.replace(".json", "_metrics.json")).read_text()))
     command = ["frozen_eval.py", "/tmp/ids.json", model_dir, out_json] if frozen else ["subset.py", "evaluate", "/tmp/ids.json", model_dir, out_json]
-    proc = subprocess.run(["python", *command], cwd=CODE, capture_output=True, text=True)
+    env = dict(os.environ, RD_EVAL_4BIT="1") if four_bit else None  # subset.py: keep the base model in 4-bit
+    proc = subprocess.run(["python", *command], cwd=CODE, capture_output=True, text=True, env=env)
     volume.commit()
     if proc.returncode:
         return dict(model_dir=model_dir, error=proc.stdout[-3000:] + proc.stderr[-3000:])
@@ -748,18 +751,20 @@ def evaluate_test(ids_by_split: dict, model_dir: str, frozen: bool = False, out_
 
 
 @app.local_entrypoint()
-def release_eval(dirs: str, split: str = "dev", gpu: str = "L40S"):
+def release_eval(dirs: str, split: str = "dev", gpu: str = "L40S", four_bit: bool = False):
     """The released evaluation (subset.py evaluate: the model writes answer and confidence, F1 > 0.5, torchmetrics
     ECE) of each comma-separated model dir (adapter dirs on the volume, or a hub name for the untrained model), in
     parallel. split: dev (the 512 dev questions), heldout (the validation split without them), full (all of it,
-    the paper's test set). Results to eval_<split>_metrics.json beside each adapter (hub models: /vol/release-eval/)."""
+    the paper's test set). Results to eval_<split>_metrics.json beside each adapter (hub models: /vol/release-eval/).
+    The released loader evaluates in 16-bit even for a -bnb-4bit model or an adapter trained on one; --four-bit keeps
+    the 4-bit weights instead (results eval_<split>-4bit_*), to measure the 4-bit model itself."""
     root = Path(__file__).resolve().parents[1]
     dev = json.loads((root / "runs/hparam-search-20261002T044831Z/dev_ids.json").read_text())
     ids = {"dev": {"validation": dev}, "heldout": {"validation": {"exclude": dev}}, "full": {"validation": "all"}}[split]
     jobs = []
     for d in dirs.split(","):
         out = "" if d.startswith(VOL) else f"{VOL}/release-eval/{d.replace('/', '__')}"
-        jobs.append((ids, d, False, out, split))
+        jobs.append((ids, d, False, out, split + ("-4bit" if four_bit else ""), four_bit))
     for r in evaluate_test.with_options(gpu=gpu).starmap(jobs, return_exceptions=True, order_outputs=False):
         if isinstance(r, Exception) or "error" in r:
             print("FAILED", repr(r)[:500] if isinstance(r, Exception) else r["error"][-1500:]); continue
@@ -1367,9 +1372,14 @@ def fast_eval(dirs: str, gpu: str = "L40S"):
 
 MINIMAL_CACHE = f"{VOL}/fast/qwen25-3b-cache-bf16ref.pt"
 TOPK_CACHE = f"{VOL}/fast/qwen25-3b-cache-bf16ref-top64.pt"  # MINIMAL_CACHE + answer reference top-64 (answer-ref)
-LLAMA_CACHE = f"{VOL}/fast/llama3-8b-cache.pt"  # fast_cache --model unsloth/llama-3-8b-Instruct
-LLAMA_TOPK_CACHE = f"{VOL}/fast/llama3-8b-cache-bf16ref-top64.pt"  # minimal_ref, then minimal_answer_ref, of LLAMA_CACHE
+LLAMA_CACHE = f"{VOL}/fast/llama3-8b-cache.pt"  # fast_cache --model unsloth/llama-3-8b-Instruct-bnb-4bit (8,000 questions)
+# The Llama baseline is the paper's model, Unsloth's pre-quantized 4-bit Llama-3-8B (answers and references both from
+# it): minimal_ref --model unsloth/llama-3-8b-Instruct-bnb-4bit, then minimal_answer_ref. The bf16-reference caches
+# (llama3-8b-*-bf16ref-top64.pt) are the earlier bf16 baseline.
+LLAMA_TOPK_CACHE = f"{VOL}/fast/llama3-8b-cache-4bitref-top64.pt"
+LLAMA_FULL_TOPK_CACHE = f"{VOL}/fast/llama3-8b-full-4bitref-top64.pt"  # full_cache (87,334 training questions), 4-bit references
 LLAMA_GT = f"{VOL}/fast/llama3-8b-gt.json"
+LLAMA_FULL_GT = f"{VOL}/fast/llama3-8b-full-gt.json"
 GT = f"{VOL}/fast/gt.json"  # {question_id: gt_candidates} of every cached row (fast_loop.py gt)
 
 

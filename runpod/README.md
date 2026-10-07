@@ -80,14 +80,16 @@ and finished with every step logged once.
 
 ### Llama-3-8B with the minimal trainer
 
-Data on the volume: `/workspace/fast/llama3-8b-cache-bf16ref-top64.pt` and `/workspace/fast/llama3-8b-gt.json` (from the
+The Llama baseline is the 4-bit model (`unsloth/llama-3-8b-Instruct-bnb-4bit`), with caches whose references come from it:
+`llama3-8b-cache-4bitref-top64.pt` (8,000 questions) and `llama3-8b-full-4bitref-top64.pt` (87,334); the bf16-reference caches
+(`*-bf16ref-top64.pt`) are the earlier bf16 baseline. Data on the volume: `/workspace/fast/llama3-8b-cache-bf16ref-top64.pt` and `/workspace/fast/llama3-8b-gt.json` (from the
 Modal volume, as above). With `--save-adapter-every N` the trainer writes `adapter-step<N>/` PEFT adapters, and
 `eval_snapshots.py` as the post command scores each with the released evaluation on the 512 dev questions (the
 launcher's validation IDs), into `OUT_DIR/curve.json`. Online, F1 labels, late-half LoRA:
 
 ```bash
 python scripts/runpod_launch.py llama-lora16-f1-s1 --max-hours 4 --gpu "NVIDIA RTX A6000" --gpu "NVIDIA L40S" --gpu "NVIDIA A40" \
-  --train-cmd "python minimal_trainer.py train /workspace/fast/llama3-8b-cache-bf16ref-top64.pt OUT_DIR --online \
+  --train-cmd "python minimal_trainer.py train /workspace/fast/llama3-8b-cache-4bitref-top64.pt OUT_DIR --online \
     --gt /workspace/fast/llama3-8b-gt.json --grading f1 --lora-layers 16-31 --lr 3e-4 --answer-kl 1 --steps 1000 \
     --eval-every 50 --regen-every 250 --save-adapter-every 250 --checkpoint-every 100" \
   --post-cmd "python /opt/runpod/eval_snapshots.py OUT_DIR IDS_JSON"
