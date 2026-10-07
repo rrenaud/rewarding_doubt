@@ -172,7 +172,7 @@ function render() {
         responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: isBar ? "index" : "nearest", intersect: !isBar },
         plugins: {
           title: { display: true, text: spec.title, color: fg, font: { size: 13.5, weight: "600" }, align: "start", padding: { bottom: 8 } },
-          legend: { display: !spec.colors, position: "bottom", labels: { color: muted, boxWidth: 12, boxHeight: 12, usePointStyle: true } },
+          legend: { display: !spec.colors, position: "bottom", labels: { color: muted, boxWidth: 12, boxHeight: 12, usePointStyle: true, filter: item => !!item.text } },  // unlabelled helper lines stay out
           tooltip: { callbacks: { label: ctx => {
             const r = ctx.raw;
             const range = (lo, hi) => lo !== undefined && lo !== null ? ` [seeds ${fmt(lo)}–${fmt(hi)}]` : "";

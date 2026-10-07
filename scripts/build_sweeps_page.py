@@ -215,16 +215,17 @@ CHARTS = {
                ["500 steps, constant 3e-4", "2,000, constant 3e-4", "2,000, constant 1e-4", "2,000, cosine 3e-4"],
                [("training set", [R(f"25/traindev/{k}", 0) for k in ("500 steps", "constant 3e-4", "constant 1e-4", "cosine 3e-4")], E),
                 ("dev", [R(f"25/traindev/{k}", 1) for k in ("500 steps", "constant 3e-4", "constant 1e-4", "cosine 3e-4")], P)]))],
-    "26": [dict(type="bar", title="Cosine vs constant: dev AUROC", ylabel="AUROC (higher is better)", ymin=.8, note=SEED_NOTE, **bars(
-        ["1 epoch, 3e-4", "1 epoch, 1e-4", "2 epochs, 3e-4", "2 epochs, 1e-4"],
-        [("cosine", [R(f"26/cos/{e}/{lr}/auroc") for e, lr in ((1, "3e-4"), (1, "1e-4"), (2, "3e-4"), (2, "1e-4"))], P),
-         ("constant", [R(f"26/const/{e}/{lr}/auroc") for e, lr in ((1, "3e-4"), (1, "1e-4"), (2, "3e-4"), (2, "1e-4"))], E)])),
-           dict(type="bar", title="Cosine vs constant: dev Brier", ylabel="Brier (lower is better)", ymin=.1, **bars(
-               ["1 epoch, 3e-4", "1 epoch, 1e-4", "2 epochs, 3e-4", "2 epochs, 1e-4"],
-               [("cosine", [R(f"26/cos/{e}/{lr}/brier") for e, lr in ((1, "3e-4"), (1, "1e-4"), (2, "3e-4"), (2, "1e-4"))], P),
-                ("constant", [R(f"26/const/{e}/{lr}/brier") for e, lr in ((1, "3e-4"), (1, "1e-4"), (2, "3e-4"), (2, "1e-4"))], E)]),
-               note=SEED_NOTE + " Constant 3e-4: the rank sweep's runs; constant 1e-4 at 1 epoch: the mean of steps 200 and 300 of the "
-                    "2,000-step runs (evaluated every 100 steps).")],
+    "26": [dict(type="scatter", title="Cosine vs constant: dev Brier against AUROC (top left is best)",
+                xlabel="dev Brier (lower is better)", ylabel="dev AUROC (higher is better)",
+                datasets=[dict(label=name, color=col, data=[
+                    dict(label=f"{name}, {e} epoch{'s' if e == 2 else ''}, peak lr {lr}", **xy(R(f"26/{kind}/{e}/{lr}/brier"), R(f"26/{kind}/{e}/{lr}/auroc")))
+                    for e, lr in ((1, "3e-4"), (1, "1e-4"), (2, "3e-4"), (2, "1e-4"))]) for name, kind, col in (("cosine", "cos", P), ("constant", "const", E))]
+                + [dict(label="same setting" if i == 0 else "", color=G, dashed=True, data=[
+                    dict(x=R(f"26/{kind}/{e}/{lr}/brier")["y"], y=R(f"26/{kind}/{e}/{lr}/auroc")["y"]) for kind in ("cos", "const")])
+                   for i, (e, lr) in enumerate(((1, "3e-4"), (1, "1e-4"), (2, "3e-4"), (2, "1e-4")))],
+                note=SEED_NOTE + " 2 seeds, whiskers in both directions; hover a point for its setting. Dashed lines join cosine and constant at "
+                     "the same epochs and peak rate: every pair moves down and right with cosine (worse on both). Two constant points coincide at Brier 0.141, AUROC 0.874 (1 epoch at 3e-4, 2 epochs at 1e-4). Constant 3e-4: the rank "
+                     "sweep's runs; constant 1e-4 at 1 epoch: the mean of steps 200 and 300 of the 2,000-step runs (evaluated every 100 steps).")],
 }
 
 
