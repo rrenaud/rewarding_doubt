@@ -33,6 +33,10 @@ confidence_KL is KL(policy || reference) over the 11 confidence levels (beta: --
 in the released code, or the released adaptive controller with --adaptive-confidence-kl); answer_KL is over the
 vocabulary at the answer tokens (W: --answer-kl).
 
+unselected_mass (each step's batch mean in metrics.jsonl, the dev mean at each evaluation, per example in
+--dump-examples): 1 - sum_k q(k)^2 over the 11 normalized levels, the expected mass one sampled confidence leaves out.
+As q grows peaky it falls toward 0, and the exact expectation gains less over sampling.
+
 Answer drift: the adapters act at every position, so they can move the answers too, while the objective
 trains only the confidence. The same forward pass gives the log-softmax at each answer token, and the
 reference is the model with adapters off (adapters_off): dev metrics report KL(policy || reference) over the
@@ -301,20 +305,28 @@ def layer_range(spec, n_layers):
     return range(lo, hi + 1)
 
 
+def unselected_mass(q):
+    """Expected confidence mass a single sample leaves out: E_k~q[1 - q(k)] = 1 - sum_k q(k)^2, over the 11 levels
+    (normalized). 0 when q is one-hot (sampling loses nothing against the exact expectation), 10/11 when uniform."""
+    return float(1 - (q * q).sum())
+
+
 def dev_metrics_from_levels(levels, labels, temperature=0.6, seed=0):
     """Metrics of the expected and of a T=0.6-sampled confidence, from per-answer level log-probs (fast_loop's)."""
     gen = torch.Generator().manual_seed(seed)
-    expected, sampled, masses = [], [], []
+    expected, sampled, masses, unselected = [], [], [], []
     for lv, y in zip(levels, labels):
         lv = lv.double()
         q = lv.softmax(-1)
         masses.append(float(lv.logsumexp(-1).exp()))
+        unselected.append(unselected_mass(q))
         expected.append(dict(confidence=float((q * torch.arange(11, dtype=q.dtype)).sum()), correct=y))
         k = int(torch.multinomial((lv / temperature).softmax(-1), 1, generator=gen))
         sampled.append(dict(confidence=k, correct=y))
     out = {f"{k}_expected": v for k, v in evaluation_metrics(expected).items() if k in ("ece", "auroc", "brier")}
     out.update({f"{k}_sampled": v for k, v in evaluation_metrics(sampled).items() if k in ("ece", "auroc", "brier")})
-    out.update(accuracy=statistics.fmean(labels), level_mass=statistics.fmean(masses), n=len(labels))
+    out.update(accuracy=statistics.fmean(labels), level_mass=statistics.fmean(masses), unselected_mass=statistics.fmean(unselected),
+               n=len(labels))
     return out
 
 
@@ -585,6 +597,7 @@ def dump_examples(lm, tokenizer, levels, rows, pad, grading, beta, answer_w, pat
                     probs = lv.double().softmax(-1)
                     conf = float((probs * torch.arange(11, device=lv.device)).sum()) / 10
                     out[tag] = dict(J=J.item(), conf_kl=kl.item(), expected_conf=conf, brier=(conf - label) ** 2,
+                                    unselected_mass=unselected_mass(probs),
                                     probs=[round(x, 4) for x in probs.tolist()])
                 out["fitted"]["answer_kl"], out["base"]["answer_kl"] = a_kl, 0.0
                 out["fitted"]["loss"] = -(out["fitted"]["J"] - beta * out["fitted"]["conf_kl"]) + answer_w * a_kl
@@ -776,8 +789,9 @@ def train(args):
                                                            -30.0, ref_logq=r["ref"].to(lv.device).double())
                         losses.append(-(J - beta * kl) + answer_w * a_kl)
                         if p == 0:
-                            stats.append((J.item(), kl.item(), float((lv.double().softmax(-1) * torch.arange(11, device=lv.device)).sum()),
-                                          float(a_kl)))
+                            q = lv.double().softmax(-1)
+                            stats.append((J.item(), kl.item(), float((q * torch.arange(11, device=lv.device)).sum()),
+                                          float(a_kl), unselected_mass(q)))
                     lap("loss")
                     return torch.stack(losses)
 
@@ -800,6 +814,7 @@ def train(args):
             answer_w = min(args.answer_kl_max, max(args.answer_kl_min, answer_w * math.exp(args.answer_kl_rate * max(-1.0, min(1.0, error)))))
         record = dict(step=step, answer_w=answer_w, answer_kl_ema=kl_ema, **online, expected_reward=statistics.fmean(s[0] for s in stats), confidence_kl=statistics.fmean(s[1] for s in stats),
                       mean_confidence=statistics.fmean(s[2] for s in stats), answer_kl=statistics.fmean(s[3] for s in stats),
+                      unselected_mass=statistics.fmean(s[4] for s in stats),
                       beta=beta, lr=optimizer.param_groups[0]["lr"], seconds=time.time() - t0,
                       **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
         log.write(json.dumps(record) + "\n")

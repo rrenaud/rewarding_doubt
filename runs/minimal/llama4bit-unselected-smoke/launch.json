@@ -1,0 +1,30 @@
+{
+ "label": "llama4bit-unselected-smoke",
+ "modal_run": "minimal-20261007T212312Z",
+ "command": [
+  "minimal_trainer.py",
+  "train",
+  "/vol/fast/llama3-8b-cache-4bitref-top64.pt",
+  "OUT_DIR",
+  "--steps",
+  "200",
+  "--eval-every",
+  "25",
+  "--lora-layers",
+  "16-31",
+  "--lora-rank",
+  "4",
+  "--lr",
+  "3e-4",
+  "--answer-kl",
+  "1",
+  "--gt",
+  "/vol/fast/llama3-8b-gt.json",
+  "--seed",
+  "1"
+ ],
+ "gpu": "L40S",
+ "launched": "2026-10-07T21:23:12Z",
+ "git_sha": "0174a56d54e0793ca2ecb938437fbcdea022cb2c",
+ "git_dirty": true
+}

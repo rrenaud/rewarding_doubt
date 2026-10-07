@@ -197,3 +197,14 @@ def test_accumulated_gradients_match_one_pass():
         grads.append(torch.cat([p.grad.flatten() for p in params]))
     for g in grads[1:]:
         assert torch.allclose(g, grads[0], rtol=1e-4, atol=1e-6)
+
+
+def test_unselected_mass():
+    """1 - sum q^2: nothing left out by a sample of a one-hot distribution, 10/11 of a uniform one, half of a 50/50 split."""
+    one_hot = torch.zeros(11, dtype=torch.float64)
+    one_hot[7] = 1
+    assert mt.unselected_mass(one_hot) == pytest.approx(0)
+    assert mt.unselected_mass(torch.full((11,), 1 / 11, dtype=torch.float64)) == pytest.approx(10 / 11)
+    half = torch.zeros(11, dtype=torch.float64)
+    half[3] = half[9] = 0.5
+    assert mt.unselected_mass(half) == pytest.approx(0.5)

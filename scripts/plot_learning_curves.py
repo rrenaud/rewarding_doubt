@@ -4,7 +4,8 @@
 
 Per arm (a run name without its -s<seed> suffix), the mean over seeds at each evaluation step of: Brier and AUROC of
 the expected confidence on the cached dev answers, the change in regenerated dev accuracy from the run's step 0,
-and the answer KL to the base model; plus a scatter of answer KL against that accuracy change for every evaluation.
+the answer KL to the base model, and the unselected confidence mass (1 - sum q^2: what one sampled confidence leaves
+out; logged by runs since 2026-10-07); plus a scatter of answer KL against that accuracy change for every evaluation.
 Plotly (from a CDN) draws them: hover for values, click a legend entry to hide or show an arm.
 """
 import collections
@@ -36,6 +37,7 @@ def arms(patterns):
             seeds=len(cs), steps=steps,
             brier=[mean("brier_expected", s) for s in steps], auroc=[mean("auroc_expected", s) for s in steps],
             kl=[mean("answer_kl", s) for s in steps],
+            unselected=[mean("unselected_mass", s) if all("unselected_mass" in c[s] for c in cs) else None for s in steps],
             regen_steps=regen_steps, dacc=[mean("regen_accuracy", s) - base for s in regen_steps] if base is not None else [],
             points=[dict(kl=c[s]["answer_kl"], dacc=c[s]["regen_accuracy"] - c[0]["regen_accuracy"], step=s)
                     for c in cs for s in steps if s > 0 and "regen_accuracy" in c[s] and "regen_accuracy" in c.get(0, {})])
@@ -65,6 +67,7 @@ h1 { font-size:21px; margin:0 0 4px; } p { color:var(--muted); margin:0 0 12px; 
 <div class="grid">
 <div id="brier" class="panel"></div><div id="auroc" class="panel"></div>
 <div id="dacc" class="panel"></div><div id="kl" class="panel"></div>
+<div id="unselected" class="panel"></div>
 <div id="scatter" class="panel" style="grid-column:1/-1"></div>
 </div>
 <script>
@@ -90,6 +93,8 @@ Plotly.newPlot("brier", lines("brier"), layout("Brier (expected confidence, cach
 Plotly.newPlot("auroc", lines("auroc"), layout("AUROC ↑", "AUROC"), cfg);
 Plotly.newPlot("dacc", lines("dacc", "regen_steps"), layout("Regenerated dev accuracy − step 0", "Δ accuracy",
   {shapes: [{type: "rect", xref: "paper", x0: 0, x1: 1, y0: -0.02, y1: 0.02, fillcolor: "#999", opacity: 0.15, line: {width: 0}}]}), cfg);
+Plotly.newPlot("unselected", lines("unselected").filter(t => t.y.some(v => v !== null)),
+  layout("Unselected confidence mass, 1 − Σ q² (dev; runs since it was logged)", "unselected mass", {yaxis: {range: [0, 0.92], title: "unselected mass", gridcolor: grid}}), cfg);
 Plotly.newPlot("kl", lines("kl"), layout("Answer KL to the base model (nats per answer)", "answer KL", {yaxis: {type: "log", title: "answer KL", gridcolor: grid}}), cfg);
 Plotly.newPlot("scatter", names.filter(n => data[n].points.length).map(n => ({
     x: data[n].points.map(p => Math.max(p.kl, 1e-3)), y: data[n].points.map(p => p.dacc), text: data[n].points.map(p => `step ${p.step}`),
@@ -99,7 +104,7 @@ Plotly.newPlot("scatter", names.filter(n => data[n].points.length).map(n => ({
     {xaxis: {type: "log", title: "answer KL (nats per answer)", gridcolor: grid},
      shapes: [{type: "rect", xref: "paper", x0: 0, x1: 1, y0: -0.02, y1: 0.02, fillcolor: "#999", opacity: 0.15, line: {width: 0}}]}), cfg);
 // Hovering a line or point highlights that arm in every panel (thicker, others faded) and names it above the plots.
-const panels = ["brier", "auroc", "dacc", "kl", "scatter"].map(id => document.getElementById(id));
+const panels = ["brier", "auroc", "dacc", "kl", "unselected", "scatter"].map(id => document.getElementById(id));
 const label = document.getElementById("hovered");
 let current = null;
 function highlight(group) {
