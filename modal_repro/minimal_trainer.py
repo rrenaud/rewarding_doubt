@@ -67,7 +67,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache
 
 from rewarding_doubt.checkpoint import (announce_saved, load_checkpoint, rng_state, save_checkpoint, set_rng_state,
                                         truncate_jsonl, write_status)
-from rewarding_doubt.core import baseline_matched_objective
+from rewarding_doubt.core import LEVELS, baseline_matched_objective, reward
 from rewarding_doubt.paper_ppo import AdaptiveKLController, evaluation_metrics, is_correct_exact, is_correct_f1
 
 PROCESS_START = time.time()  # for the cost accounting: model and data loading is the time from here to the first step
@@ -114,7 +114,8 @@ class Levels:
 
 def score_rows(lm, levels, queries, answer_starts, pad, shared_prefix=True):
     """One forward pass over each query + the levels' tokens, with logits only at the positions read:
-    (levels [B, 11] log q, answers [B][T_b, V]). answers[b] is the log-softmax at the positions predicting
+    (levels [B, 11] log q, answers [B][T_b, V], states [B, H]). states is the final hidden state at the position
+    predicting the confidence (the value head's input, --value-head). answers[b] is the log-softmax at the positions predicting
     query b's tokens from answer_starts[b] on, through the final " Confidence" (empty when it is len(query)).
     With shared_prefix, the queries' common prefix runs once and its key/value cache is expanded over the
     batch; otherwise one full forward."""
@@ -137,7 +138,7 @@ def score_rows(lm, levels, queries, answer_starts, pad, shared_prefix=True):
     flat_rows = torch.tensor([b for b, span in enumerate(spans) for _ in span], device=device, dtype=torch.long)
     flat_pos = torch.tensor([t for span in spans for t in span], device=device, dtype=torch.long)
     answers = lm.lm_head(hidden[flat_rows, flat_pos]).float().log_softmax(-1).split([len(span) for span in spans])
-    return levels.from_logp(lm.lm_head(hidden[rows, pos]).float().log_softmax(-1)), list(answers)
+    return levels.from_logp(lm.lm_head(hidden[rows, pos]).float().log_softmax(-1)), list(answers), hidden[rows[:, 0], pos[:, 0]]
 
 
 def assistant_header(tokenizer):
@@ -305,6 +306,25 @@ def layer_range(spec, n_layers):
     return range(lo, hi + 1)
 
 
+def sample_outcome(lv, ref_lv, label, beta, generator, invalid_reward=-30.0):
+    """--objective sampled: the paper's PPO signal for one answer, from its 11 unnormalized level log-probs lv.
+
+    Samples one outcome at temperature 1 from the 12 the exact objective sums over (the 11 levels, and
+    "invalid" with the leftover mass 1 - M), and returns (log p(outcome) with grad, its reward, the sampled KL
+    estimate). The reward, as PPO's: R(outcome) - beta * (log p - log p_ref)(outcome); its score-function
+    gradient (reward - baseline) * grad log p is unbiased for the gradient of J - beta * KL, the exact objective."""
+    lv = lv.double()
+    mass = lv.exp().sum().clamp(max=1 - 1e-6)
+    logp = torch.cat([lv, torch.log1p(-mass).unsqueeze(0)])
+    ref = ref_lv.to(lv.device).double()
+    ref_logp = torch.cat([ref, torch.log1p(-ref.exp().sum().clamp(max=1 - 1e-6)).unsqueeze(0)])
+    k = int(torch.multinomial(logp.detach().exp().cpu().float(), 1, generator=generator))
+    rewards = reward(lv.new_tensor(LEVELS), label, "released")
+    r = float(rewards[k]) if k < 11 else invalid_reward
+    kl_hat = float(logp[k] - ref_logp[k])
+    return logp[k], r - beta * kl_hat, kl_hat
+
+
 def unselected_mass(q):
     """Expected confidence mass a single sample leaves out: E_k~q[1 - q(k)] = 1 - sum_k q(k)^2, over the 11 levels
     (normalized). 0 when q is one-hot (sampling loses nothing against the exact expectation), 10/11 when uniform."""
@@ -349,7 +369,7 @@ def score_dev(lm, levels, rows, pad, chunk=32):
     for s in range(0, len(rows), chunk):
         part = rows[s:s + chunk]
         queries, starts = [r["ids"] for r in part], [r["answer_start"] for r in part]
-        lv, answers = score_rows(lm, levels, queries, starts, pad)
+        lv, answers, _ = score_rows(lm, levels, queries, starts, pad)
         with adapters_off(lm):
             reference = score_rows(lm, levels, queries, starts, pad)[1]
         lvs += list(lv.float().cpu())
@@ -416,7 +436,7 @@ def online_rows(lm, tokenizer, levels, batch, gt_candidates, seed, pad):
                  online_answer_tokens=statistics.fmean(len(r["ids"]) - r["answer_start"] for r in rows) if rows else 0.0)
     if rows:
         with adapters_off(lm):
-            ref_levels, ref_answers = score_rows(lm, levels, [r["ids"] for r in rows], [r["answer_start"] for r in rows], pad)
+            ref_levels, ref_answers, _ = score_rows(lm, levels, [r["ids"] for r in rows], [r["answer_start"] for r in rows], pad)
         for r, lv, a in zip(rows, ref_levels, ref_answers):
             r["ref"], r["answer_ref_live"] = lv.float(), a
     return rows, stats
@@ -584,9 +604,9 @@ def dump_examples(lm, tokenizer, levels, rows, pad, grading, beta, answer_w, pat
         for s in range(0, len(rows), chunk):
             part = rows[s:s + chunk]
             queries, starts = [r["ids"] for r in part], [r["answer_start"] for r in part]
-            fitted, answers = score_rows(lm, levels, queries, starts, pad)
+            fitted, answers, _ = score_rows(lm, levels, queries, starts, pad)
             with adapters_off(lm):
-                base, reference = score_rows(lm, levels, queries, starts, pad)
+                base, reference, _ = score_rows(lm, levels, queries, starts, pad)
             kls = answer_kl(answers, reference).tolist()
             for r, lf, lb, a_kl in zip(part, fitted, base, kls):
                 label, out = float(r[grading]), dict(split=split, qid=r.get("qid"), label=int(r[grading]), answer=r.get("answer"),
@@ -655,6 +675,12 @@ def train(args):
     # suit LoRA); everything else uses --lr.
     biases = [p for k in ("attn_bias", "residual_bias", "stock") for p in trained[k]]
     groups = [g for g in (dict(params=trained["lora"], lr=args.lr), dict(params=biases, lr=args.bias_lr or args.lr)) if g["params"]]
+    value_head = None
+    if args.value_head:  # PPO's value head (TRL's ValueHead: one linear layer on the last hidden state), in fp32
+        if args.objective != "sampled":
+            raise SystemExit("--value-head is the baseline of --objective sampled")
+        value_head = torch.nn.Linear(lm.config.hidden_size, 1).to(lm.lm_head.weight.device, torch.float32)
+        groups.append(dict(params=list(value_head.parameters()), lr=args.lr))
     optimizer = torch.optim.Adam(groups, lr=args.lr)
     base_lrs = [g["lr"] for g in optimizer.param_groups]
 
@@ -683,6 +709,8 @@ def train(args):
     named.update({f"attn_bias.{i}": p for i, p in zip(attn_layers, trained["attn_bias"])})
     named.update({f"residual_bias.{i}": p for i, p in zip(mlp_layers, trained["residual_bias"])})
     named.update({f"stock.{k}": m for k, m in stock.items()})
+    if value_head is not None:
+        named.update({f"value_head.{k}": v for k, v in value_head.named_parameters()})
     if args.init:  # start from another run's trained tensors (a checkpoint's state.pt or its directory); fresh optimizer
         source = torch.load(os.path.join(args.init, "state.pt") if os.path.isdir(args.init) else args.init,
                             map_location="cpu", weights_only=False)["params"]
@@ -760,7 +788,8 @@ def train(args):
             lap("generate")
             if not batch:
                 continue
-        stats = []
+        stats, sampled_stats = [], []
+        sample_gen = torch.Generator().manual_seed(args.seed * 1_000_003 + step)  # --objective sampled: reproducible draws
         for p in range(args.passes):
             idx = list(range(len(batch)))
             rng.shuffle(idx)
@@ -771,7 +800,7 @@ def train(args):
                     """Per-row loss tensor [len(rows)] for one forward pass over `rows`."""
                     lap("backward")  # with --accumulate, the time since the last mark is the previous part's backward
                     queries, starts = [r["ids"] for r in rows], [r["answer_start"] for r in rows]
-                    scored, answers = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)
+                    scored, answers, states = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)
                     if not answer_w:
                         kls = torch.zeros(len(rows), device=scored.device)
                     elif args.online:  # the reference pass ran with the generation (online_rows)
@@ -783,15 +812,37 @@ def train(args):
                             reference = score_rows(lm, levels, queries, starts, pad, shared_prefix=not args.no_shared_prefix)[1]
                         kls = answer_kl(answers, reference)
                     lap("forward")
-                    losses = []
+                    losses, sampled = [], []
+                    values = value_head(states.float()).squeeze(-1) if value_head is not None else None
                     for r, lv, a_kl in zip(rows, scored, kls):
                         J, kl = baseline_matched_objective(lv.double(), float(r[args.grading]), "discrete-exact", "released",
                                                            -30.0, ref_logq=r["ref"].to(lv.device).double())
-                        losses.append(-(J - beta * kl) + answer_w * a_kl)
+                        if args.objective == "sampled":  # PPO's signal: one sampled confidence; loss below, after the baseline
+                            sampled.append(sample_outcome(lv, r["ref"], float(r[args.grading]), beta, sample_gen))
+                            losses.append(answer_w * a_kl)
+                        else:
+                            losses.append(-(J - beta * kl) + answer_w * a_kl)
                         if p == 0:
                             q = lv.double().softmax(-1)
                             stats.append((J.item(), kl.item(), float((q * torch.arange(11, device=lv.device)).sum()),
                                           float(a_kl), unselected_mass(q)))
+                    if sampled:
+                        rewards = torch.tensor([x[1] for x in sampled], device=scored.device, dtype=torch.float64)
+                        if values is not None:  # PPO's baseline: the value head's prediction, trained toward the reward
+                            advantages = rewards - values.detach().double()
+                        else:  # leave-one-out: the mean reward of the other rows
+                            others = (rewards.sum() - rewards) / max(len(rewards) - 1, 1)
+                            advantages = rewards - others if len(rewards) > 1 else rewards
+                        raw = advantages
+                        if not args.no_whiten and len(rewards) > 1:  # TRL whitens advantages over the batch
+                            advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+                        for i, (logp_k, rew, kl_hat) in enumerate(sampled):
+                            losses[i] = losses[i] - advantages[i] * logp_k
+                            if values is not None:
+                                losses[i] = losses[i] + args.vf_coef * 0.5 * (values[i].double() - rewards[i]) ** 2
+                            if p == 0:
+                                sampled_stats.append((rew, kl_hat, float(raw[i].abs()),
+                                                      float((values[i] - rewards[i]) ** 2) if values is not None else float("nan")))
                     lap("loss")
                     return torch.stack(losses)
 
@@ -815,6 +866,10 @@ def train(args):
         record = dict(step=step, answer_w=answer_w, answer_kl_ema=kl_ema, **online, expected_reward=statistics.fmean(s[0] for s in stats), confidence_kl=statistics.fmean(s[1] for s in stats),
                       mean_confidence=statistics.fmean(s[2] for s in stats), answer_kl=statistics.fmean(s[3] for s in stats),
                       unselected_mass=statistics.fmean(s[4] for s in stats),
+                      **(dict(sampled_reward=statistics.fmean(x[0] for x in sampled_stats),
+                              sampled_kl=statistics.fmean(x[1] for x in sampled_stats),
+                              advantage_abs=statistics.fmean(x[2] for x in sampled_stats),
+                              value_error=statistics.fmean(x[3] for x in sampled_stats)) if sampled_stats else {}),
                       beta=beta, lr=optimizer.param_groups[0]["lr"], seconds=time.time() - t0,
                       **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
         log.write(json.dumps(record) + "\n")
@@ -914,6 +969,14 @@ def main():
     t.add_argument("--weight-avg-start", type=int, default=0,
                    help="average the trained tensors from this step on; the average is evaluated (and saved) at the end")
     t.add_argument("--bias-lr", type=float, default=0, help="learning rate of bias vectors and stock parameters (default: --lr)")
+    t.add_argument("--objective", choices=["exact", "sampled"], default="exact",
+                   help="exact: the expected reward over the 11 levels; sampled: one sampled confidence per answer, "
+                        "reward minus beta x the sampled KL, leave-one-out baseline (PPO's signal, one update per batch)")
+    t.add_argument("--value-head", action="store_true",
+                   help="--objective sampled: PPO's value head (a linear layer on the hidden state at the confidence position) "
+                        "as the baseline, trained with --vf-coef x 1/2 (value - reward)^2 through the shared model")
+    t.add_argument("--vf-coef", type=float, default=0.1, help="value loss weight (TRL's default)")
+    t.add_argument("--no-whiten", action="store_true", help="--objective sampled: do not whiten advantages (TRL whitens them)")
     t.add_argument("--confidence-kl", type=float, default=0.05,
                    help="beta: weight of KL(policy || reference) over the 11 confidence levels (released default 0.05)")
     t.add_argument("--adaptive-confidence-kl", action="store_true",

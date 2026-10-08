@@ -85,9 +85,9 @@ def test_adapters_off_is_the_base_model():
     data = rows()
     with torch.no_grad():
         with mt.adapters_off(lm):
-            off_levels, off_answers = scored(lm, data)
-        on_levels, on_answers = scored(lm, data)
-        base_levels, base_answers = scored(base, data)
+            off_levels, off_answers, _ = scored(lm, data)
+        on_levels, on_answers, _ = scored(lm, data)
+        base_levels, base_answers, _ = scored(base, data)
     assert float((off_levels - base_levels).abs().max()) < 1e-5
     assert max(float((a - b).abs().max()) for a, b in zip(off_answers, base_answers)) < 1e-5
     assert float((on_levels - base_levels).abs().max()) > 1e-3  # the adapters matter when on
@@ -186,7 +186,7 @@ def test_accumulated_gradients_match_one_pass():
     data = rows()
 
     def row_losses(part):
-        levels, answers = scored(lm, part)
+        levels, answers, _ = scored(lm, part)
         return levels.logsumexp(-1) + torch.stack([a.exp().max(-1).values.sum() for a in answers])
 
     grads = []
@@ -208,3 +208,33 @@ def test_unselected_mass():
     half = torch.zeros(11, dtype=torch.float64)
     half[3] = half[9] = 0.5
     assert mt.unselected_mass(half) == pytest.approx(0.5)
+
+
+def test_sampled_objective_is_unbiased():
+    """The score-function gradient of sample_outcome, averaged over many draws, matches the exact objective's gradient
+    d(J - beta KL)/d(level log-probs) (with an invalid bucket: the 11 levels hold 90% of the mass)."""
+    from rewarding_doubt.core import baseline_matched_objective
+    torch.manual_seed(0)
+    logits = torch.randn(12, dtype=torch.float64)
+    base = (logits.log_softmax(-1)[:11]).detach()
+    ref = (torch.randn(12, dtype=torch.float64).log_softmax(-1)[:11])
+    beta, label = 0.05, 1.0
+    lv = base.clone().requires_grad_(True)
+    J, kl = baseline_matched_objective(lv, label, "discrete-exact", "released", -30.0, ref_logq=ref)
+    exact = torch.autograd.grad(J - beta * kl, lv)[0]
+    lv = base.clone().requires_grad_(True)
+    gen = torch.Generator().manual_seed(1)
+    n, total = 40000, 0
+    for _ in range(n):
+        logp_k, rew, _ = mt.sample_outcome(lv, ref, label, beta, gen)
+        total = total + rew * logp_k
+    sampled = torch.autograd.grad(total / n, lv)[0]
+    assert torch.allclose(sampled, exact, atol=0.05 * exact.abs().max()), (sampled, exact)
+
+
+def test_score_rows_returns_confidence_states():
+    """The third output is the final hidden state at the position predicting the confidence, one per row."""
+    lm = tiny_qwen(torch.float32)
+    data = rows()
+    states = scored(lm, data)[2]
+    assert states.shape == (len(data), lm.config.hidden_size)
