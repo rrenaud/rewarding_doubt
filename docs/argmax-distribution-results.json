@@ -1,0 +1,744 @@
+{
+  "checkpoints": {
+    "runs/hinge-20261001T023959Z/discrete-exact-s1-eval/predictions.jsonl": {
+      "n": 474,
+      "mean_top_probability": 0.8819085356735579,
+      "median_top_probability": 0.9525479069316412,
+      "fraction_top_below_half": 0.016877637130801686,
+      "mean_discarded_mass": 0.11809146432644216,
+      "mean_entropy_mnat": 283.5646721894729,
+      "mean_effective_labels": 1.3799999541751296,
+      "mean_abs_argmax_mean_gap_pp": 1.1575446609576256,
+      "mean_distribution_sd_pp": 2.488375840228608,
+      "mean_expected_displacement_pp": 1.2473921578234601,
+      "mean_valid_mass": 0.9999987038753168,
+      "mean_unconditional_top_probability": 0.8819080698149024,
+      "argmax_minus_fractional_nll_mnat": 3.633808081304478,
+      "paired_bootstrap_95_mnat": [
+        -2.0310234816016073,
+        10.633692972029266
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 8,
+          "mean_abs_gap_pp": 5.009123249099934,
+          "nll_difference_mnat": -18.128596860407356,
+          "ci95_mnat": [
+            -80.27807470843108,
+            37.30927986806985
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 85,
+          "mean_abs_gap_pp": 3.741145399076827,
+          "nll_difference_mnat": -2.6960462012016646,
+          "ci95_mnat": [
+            -21.093532406493537,
+            15.868527762599497
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 381,
+          "mean_abs_gap_pp": 0.5002777542771255,
+          "nll_difference_mnat": 5.502933681164626,
+          "ci95_mnat": [
+            0.30876088252697814,
+            13.140333219812263
+          ]
+        }
+      ]
+    },
+    "runs/hinge-20261001T023959Z/fractional-s1-eval/predictions.jsonl": {
+      "n": 474,
+      "mean_top_probability": 0.5840819970263953,
+      "median_top_probability": 0.5380879470710374,
+      "fraction_top_below_half": 0.4050632911392405,
+      "mean_discarded_mass": 0.41591800297360454,
+      "mean_entropy_mnat": 1000.7992535126626,
+      "mean_effective_labels": 2.986562288984718,
+      "mean_abs_argmax_mean_gap_pp": 3.360565424091365,
+      "mean_distribution_sd_pp": 7.591248881708461,
+      "mean_expected_displacement_pp": 5.450044158011165,
+      "mean_valid_mass": 0.9999160922986797,
+      "mean_unconditional_top_probability": 0.5840417627793298,
+      "argmax_minus_fractional_nll_mnat": 15.907798524506156,
+      "paired_bootstrap_95_mnat": [
+        4.924195063131065,
+        27.3654303169495
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 192,
+          "mean_abs_gap_pp": 5.326183807591291,
+          "nll_difference_mnat": 28.922769195109804,
+          "ci95_mnat": [
+            6.023524802232173,
+            53.54653175233442
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 176,
+          "mean_abs_gap_pp": 2.708932520129347,
+          "nll_difference_mnat": 9.079440506040804,
+          "ci95_mnat": [
+            -5.086893127940889,
+            24.817816276289008
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 106,
+          "mean_abs_gap_pp": 0.8821565699906971,
+          "nll_difference_mnat": 3.6711630763363448,
+          "ci95_mnat": [
+            -2.6377506927116476,
+            11.013659604166854
+          ]
+        }
+      ]
+    },
+    "runs/paper-ppo-20261001T051018Z/base-eval/predictions.jsonl": {
+      "n": 474,
+      "mean_top_probability": 0.9264911508881197,
+      "median_top_probability": 0.9980636549680271,
+      "fraction_top_below_half": 0.02109704641350211,
+      "mean_discarded_mass": 0.07350884911188023,
+      "mean_entropy_mnat": 194.82912328093505,
+      "mean_effective_labels": 1.294235979053186,
+      "mean_abs_argmax_mean_gap_pp": 1.073242026504263,
+      "mean_distribution_sd_pp": 2.4263244622150415,
+      "mean_expected_displacement_pp": 1.251184343070965,
+      "mean_valid_mass": 1.0000247187646536,
+      "mean_unconditional_top_probability": 0.9265007747904714,
+      "argmax_minus_fractional_nll_mnat": 342.39390122875983,
+      "paired_bootstrap_95_mnat": [
+        258.0808853225646,
+        433.06177055563217
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 10,
+          "mean_abs_gap_pp": 13.568053241962922,
+          "nll_difference_mnat": 1237.6960883229374,
+          "ci95_mnat": [
+            175.14197122629187,
+            2413.6412967177707
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 48,
+          "mean_abs_gap_pp": 4.796442099571316,
+          "nll_difference_mnat": 1374.9611775930173,
+          "ci95_mnat": [
+            846.4298765215673,
+            1905.482607938243
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 416,
+          "mean_abs_gap_pp": 0.3432859792403082,
+          "nll_difference_mnat": 201.7298359969662,
+          "ci95_mnat": [
+            143.03407794036013,
+            265.6877866437468
+          ]
+        }
+      ]
+    },
+    "runs/pilot-20261001T002945Z/base-eval/predictions.jsonl": {
+      "n": 474,
+      "mean_top_probability": 0.9416563865060429,
+      "median_top_probability": 0.9999805538760826,
+      "fraction_top_below_half": 0.035864978902953586,
+      "mean_discarded_mass": 0.05834361349395719,
+      "mean_entropy_mnat": 147.2122487195429,
+      "mean_effective_labels": 1.2322154246090298,
+      "mean_abs_argmax_mean_gap_pp": 0.7488004003377927,
+      "mean_distribution_sd_pp": 1.636822748267688,
+      "mean_expected_displacement_pp": 0.9098198673404707,
+      "mean_valid_mass": 0.9958394644080759,
+      "mean_unconditional_top_probability": 0.9382457191625951,
+      "argmax_minus_fractional_nll_mnat": 357.21377366719076,
+      "paired_bootstrap_95_mnat": [
+        271.76713935160956,
+        454.3485991280674
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 17,
+          "mean_abs_gap_pp": 7.822833072610347,
+          "nll_difference_mnat": 1032.7884853679545,
+          "ci95_mnat": [
+            169.5514062886349,
+            2098.0400567778306
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 33,
+          "mean_abs_gap_pp": 4.183643465955391,
+          "nll_difference_mnat": 1818.7015750995538,
+          "ci95_mnat": [
+            1122.085982781968,
+            2474.038906147661
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 424,
+          "mean_abs_gap_pp": 0.19783724799341965,
+          "nll_difference_mnat": 216.37918039789605,
+          "ci95_mnat": [
+            153.13728463062648,
+            285.2072943823453
+          ]
+        }
+      ]
+    },
+    "runs/pilot-20261001T002945Z/discrete-exact-s1-eval/predictions.jsonl": {
+      "n": 474,
+      "mean_top_probability": 0.8870460829328499,
+      "median_top_probability": 0.9663585021350386,
+      "fraction_top_below_half": 0.02531645569620253,
+      "mean_discarded_mass": 0.11295391706715001,
+      "mean_entropy_mnat": 264.03038938390813,
+      "mean_effective_labels": 1.357545776687821,
+      "mean_abs_argmax_mean_gap_pp": 1.0496981852436233,
+      "mean_distribution_sd_pp": 2.262475390170326,
+      "mean_expected_displacement_pp": 1.1521229343234598,
+      "mean_valid_mass": 0.9989377599524439,
+      "mean_unconditional_top_probability": 0.8860173453841296,
+      "argmax_minus_fractional_nll_mnat": 2.76585204473849,
+      "paired_bootstrap_95_mnat": [
+        -3.240952777729271,
+        9.766888306753462
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 12,
+          "mean_abs_gap_pp": 4.770514098472427,
+          "nll_difference_mnat": 5.263942871898976,
+          "ci95_mnat": [
+            -47.00137989826126,
+            63.29013675408557
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 75,
+          "mean_abs_gap_pp": 3.462108157610021,
+          "nll_difference_mnat": -9.36993467805791,
+          "ci95_mnat": [
+            -34.847782945370206,
+            15.949059529349826
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 387,
+          "mean_abs_gap_pp": 0.46680273592521127,
+          "nll_difference_mnat": 5.040288515756073,
+          "ci95_mnat": [
+            0.04103487982915933,
+            12.289864133510118
+          ]
+        }
+      ]
+    },
+    "runs/pilot-20261001T002945Z/discrete-ppo-s1-eval/predictions.jsonl": {
+      "n": 474,
+      "mean_top_probability": 0.9289252492565482,
+      "median_top_probability": 0.9998993685865426,
+      "fraction_top_below_half": 0.03164556962025317,
+      "mean_discarded_mass": 0.07107475074345183,
+      "mean_entropy_mnat": 179.41114498328102,
+      "mean_effective_labels": 1.282663163356608,
+      "mean_abs_argmax_mean_gap_pp": 0.8526408571812808,
+      "mean_distribution_sd_pp": 1.8764417338432864,
+      "mean_expected_displacement_pp": 1.0452726940883077,
+      "mean_valid_mass": 0.9963236034195223,
+      "mean_unconditional_top_probability": 0.9259252539535748,
+      "argmax_minus_fractional_nll_mnat": 372.33676338765076,
+      "paired_bootstrap_95_mnat": [
+        281.41862238039784,
+        471.3133001367459
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 15,
+          "mean_abs_gap_pp": 7.850467728046789,
+          "nll_difference_mnat": 2017.8978492247677,
+          "ci95_mnat": [
+            791.6374272913565,
+            3251.4282210562073
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 47,
+          "mean_abs_gap_pp": 4.168831956161653,
+          "nll_difference_mnat": 1187.9790613589162,
+          "ci95_mnat": [
+            667.0872547709195,
+            1770.4381822087717
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 412,
+          "mean_abs_gap_pp": 0.21956225350395048,
+          "nll_difference_mnat": 219.37898597938315,
+          "ci95_mnat": [
+            158.03142269124726,
+            287.9409107825168
+          ]
+        }
+      ]
+    },
+    "runs/pilot-20261001T002945Z/fractional-s1-eval/predictions.jsonl": {
+      "n": 474,
+      "mean_top_probability": 0.6891280826985131,
+      "median_top_probability": 0.6955873982148087,
+      "fraction_top_below_half": 0.24261603375527427,
+      "mean_discarded_mass": 0.31087191730148694,
+      "mean_entropy_mnat": 777.9620951586693,
+      "mean_effective_labels": 2.467262715570127,
+      "mean_abs_argmax_mean_gap_pp": 3.207078081981385,
+      "mean_distribution_sd_pp": 6.299911850241142,
+      "mean_expected_displacement_pp": 4.390338157405449,
+      "mean_valid_mass": 0.02581709919208792,
+      "mean_unconditional_top_probability": 0.019871487397016614,
+      "argmax_minus_fractional_nll_mnat": 25.671794414962946,
+      "paired_bootstrap_95_mnat": [
+        12.517859253441294,
+        40.14084012332139
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 115,
+          "mean_abs_gap_pp": 7.0434001398230475,
+          "nll_difference_mnat": 70.04786565392033,
+          "ci95_mnat": [
+            25.21028957356512,
+            120.26666311613728
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 154,
+          "mean_abs_gap_pp": 3.557277740521219,
+          "nll_difference_mnat": 21.307665248957388,
+          "ci95_mnat": [
+            2.080724162660629,
+            41.14556808722211
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 205,
+          "mean_abs_gap_pp": 0.7919181597036983,
+          "nll_difference_mnat": 4.05631977635201,
+          "ci95_mnat": [
+            -1.0077267864535377,
+            9.32819659649005
+          ]
+        }
+      ]
+    },
+    "runs/smoke-20260930T222803Z/base-eval/predictions.jsonl": {
+      "n": 115,
+      "mean_top_probability": 0.9405508201838566,
+      "median_top_probability": 0.9997326749991886,
+      "fraction_top_below_half": 0.043478260869565216,
+      "mean_discarded_mass": 0.05944917981614344,
+      "mean_entropy_mnat": 155.93101944432965,
+      "mean_effective_labels": 1.2480611164537603,
+      "mean_abs_argmax_mean_gap_pp": 0.7665052266381732,
+      "mean_distribution_sd_pp": 1.7448729328954793,
+      "mean_expected_displacement_pp": 0.8907398420694829,
+      "mean_valid_mass": 0.9954242489210983,
+      "mean_unconditional_top_probability": 0.9374599526788882,
+      "argmax_minus_fractional_nll_mnat": 431.74293796364856,
+      "paired_bootstrap_95_mnat": [
+        247.50023568360228,
+        636.9089614349622
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 5,
+          "mean_abs_gap_pp": 5.5578167639639675,
+          "nll_difference_mnat": 950.7995560291645,
+          "ci95_mnat": [
+            -171.48520491351118,
+            2828.151444432508
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 5,
+          "mean_abs_gap_pp": 5.304297694924041,
+          "nll_difference_mnat": 1507.836821072493,
+          "ci95_mnat": [
+            7.202706745019578,
+            3019.6347987045906
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 105,
+          "mean_abs_gap_pp": 0.3222621787519036,
+          "nll_difference_mnat": 355.7833902886791,
+          "ci95_mnat": [
+            194.11223512305708,
+            547.9521064597824
+          ]
+        }
+      ]
+    },
+    "runs/smoke-20260930T222803Z/discrete-exact-eval/predictions.jsonl": {
+      "n": 115,
+      "mean_top_probability": 0.8745152168536686,
+      "median_top_probability": 0.9889311251812559,
+      "fraction_top_below_half": 0.043478260869565216,
+      "mean_discarded_mass": 0.1254847831463314,
+      "mean_entropy_mnat": 301.28826205807746,
+      "mean_effective_labels": 1.4719374101327267,
+      "mean_abs_argmax_mean_gap_pp": 1.272580707730403,
+      "mean_distribution_sd_pp": 2.6090174636370222,
+      "mean_expected_displacement_pp": 1.5445861015762254,
+      "mean_valid_mass": 0.9932090905105401,
+      "mean_unconditional_top_probability": 0.8697179880184972,
+      "argmax_minus_fractional_nll_mnat": 563.9148062225554,
+      "paired_bootstrap_95_mnat": [
+        349.03004746199014,
+        810.7018858760486
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 5,
+          "mean_abs_gap_pp": 8.552499408791656,
+          "nll_difference_mnat": 2582.5321020475103,
+          "ci95_mnat": [
+            538.4792172671855,
+            4587.846248113271
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 26,
+          "mean_abs_gap_pp": 3.1684241608555728,
+          "nll_difference_mnat": 956.7629894451395,
+          "ci95_mnat": [
+            381.5067149293864,
+            1620.2020285982283
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 84,
+          "mean_abs_gap_pp": 0.2524435257475375,
+          "nll_difference_mnat": 322.16314856884156,
+          "ci95_mnat": [
+            164.98813667735038,
+            498.3607599086298
+          ]
+        }
+      ]
+    },
+    "runs/smoke-20260930T222803Z/discrete-ppo-eval/predictions.jsonl": {
+      "n": 115,
+      "mean_top_probability": 0.9321854481919257,
+      "median_top_probability": 0.99956532691041,
+      "fraction_top_below_half": 0.05217391304347826,
+      "mean_discarded_mass": 0.06781455180807425,
+      "mean_entropy_mnat": 173.21920052020673,
+      "mean_effective_labels": 1.2736246550616739,
+      "mean_abs_argmax_mean_gap_pp": 0.7929540125277196,
+      "mean_distribution_sd_pp": 1.7972835455955838,
+      "mean_expected_displacement_pp": 0.9347218334743729,
+      "mean_valid_mass": 0.9957711597368696,
+      "mean_unconditional_top_probability": 0.9293453494021853,
+      "argmax_minus_fractional_nll_mnat": 430.52337462725524,
+      "paired_bootstrap_95_mnat": [
+        247.85526856426804,
+        641.9884004985994
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 6,
+          "mean_abs_gap_pp": 4.43842777923036,
+          "nll_difference_mnat": -123.6786142922105,
+          "ci95_mnat": [
+            -335.1032599298017,
+            113.23066764364592
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 8,
+          "mean_abs_gap_pp": 4.952530242111893,
+          "nll_difference_mnat": 2382.953571162269,
+          "ci95_mnat": [
+            997.2344824522627,
+            3428.636749720216
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 101,
+          "mean_abs_gap_pp": 0.2469198299842618,
+          "nll_difference_mnat": 308.79832869890555,
+          "ci95_mnat": [
+            153.61699661318067,
+            484.81891163297644
+          ]
+        }
+      ]
+    },
+    "runs/smoke-20260930T222803Z/fractional-eval/predictions.jsonl": {
+      "n": 115,
+      "mean_top_probability": 0.8700199338423354,
+      "median_top_probability": 0.9872663613750168,
+      "fraction_top_below_half": 0.06086956521739131,
+      "mean_discarded_mass": 0.12998006615766464,
+      "mean_entropy_mnat": 316.2430083750818,
+      "mean_effective_labels": 1.5031044354964995,
+      "mean_abs_argmax_mean_gap_pp": 1.2841959342408187,
+      "mean_distribution_sd_pp": 2.762612490436916,
+      "mean_expected_displacement_pp": 1.6159492033257803,
+      "mean_valid_mass": 0.9933025924730341,
+      "mean_unconditional_top_probability": 0.8651906334712554,
+      "argmax_minus_fractional_nll_mnat": 568.9256288121545,
+      "paired_bootstrap_95_mnat": [
+        361.5924038091548,
+        815.4082416062133
+      ],
+      "strata": [
+        {
+          "top_probability_range": [
+            0,
+            0.5
+          ],
+          "n": 7,
+          "mean_abs_gap_pp": 6.353753320418318,
+          "nll_difference_mnat": 1153.1777316566045,
+          "ci95_mnat": [
+            -294.8154895778049,
+            3174.4861367806857
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.5,
+            0.75
+          ],
+          "n": 24,
+          "mean_abs_gap_pp": 3.2754912410758474,
+          "nll_difference_mnat": 1047.310137000879,
+          "ci95_mnat": [
+            420.1447268778377,
+            1742.5412026415033
+          ]
+        },
+        {
+          "top_probability_range": [
+            0.75,
+            1
+          ],
+          "n": 84,
+          "mean_abs_gap_pp": 0.29279130248744767,
+          "nll_difference_mnat": 383.55666552119567,
+          "ci95_mnat": [
+            213.64836874010058,
+            583.5877177874974
+          ]
+        }
+      ]
+    }
+  },
+  "selected_examples": [
+    {
+      "selection": "Lowest top-label probability",
+      "id": "tc_1924",
+      "correct": true,
+      "top_probability": 0.1828123065482476,
+      "valid_mass": 0.9998997737453592,
+      "entropy_mnat": 1991.704849994657,
+      "stddev_pp": 18.79015737386388,
+      "argmax": 0.5,
+      "fractional": 0.49058630176210816,
+      "abs_gap_pp": 0.9413698237891843,
+      "nll_difference_mnat": -19.006888385679645,
+      "probabilities": [
+        0.00039987918175586563,
+        0.015005754434718853,
+        0.08635826882966151,
+        0.18280685909244515,
+        0.14237234804227333,
+        0.1828123065482476,
+        0.14237930606324745,
+        0.16134169839650978,
+        0.07621086841733404,
+        0.010312559092415144,
+        1.5190139116754737e-07
+      ]
+    },
+    {
+      "selection": "Largest argmax-to-mean shift",
+      "id": "tc_1029",
+      "correct": false,
+      "top_probability": 0.19967176829099292,
+      "valid_mass": 0.9998269389347026,
+      "entropy_mnat": 1865.7944406230233,
+      "stddev_pp": 16.868795512423088,
+      "argmax": 0.7,
+      "fractional": 0.5141634350803286,
+      "abs_gap_pp": 18.583656491967137,
+      "nll_difference_mnat": 482.08980651390186,
+      "probabilities": [
+        1.1637476484530834e-05,
+        0.00284719147064218,
+        0.03061928510232191,
+        0.17618588098605542,
+        0.1761859019839227,
+        0.1996593214581529,
+        0.13722364562550432,
+        0.19967176829099292,
+        0.07345189032520692,
+        0.004143416255417293,
+        6.102529908504893e-08
+      ]
+    },
+    {
+      "selection": "Median-entropy example",
+      "id": "tc_543",
+      "correct": true,
+      "top_probability": 0.6190712174350665,
+      "valid_mass": 0.9999606988331621,
+      "entropy_mnat": 1034.2132752139744,
+      "stddev_pp": 7.5465425823325205,
+      "argmax": 0.8,
+      "fractional": 0.7629658844913426,
+      "abs_gap_pp": 3.703411550865743,
+      "nll_difference_mnat": -47.398409714233225,
+      "probabilities": [
+        4.5409028832583054e-07,
+        5.204648394375178e-05,
+        0.0002352198282823012,
+        0.0010542969507647672,
+        0.0017385892439216062,
+        0.011337986792022171,
+        0.05758123744017301,
+        0.2580672318806713,
+        0.6190712174350665,
+        0.05081580885010505,
+        4.591100476113837e-05
+      ]
+    }
+  ]
+}

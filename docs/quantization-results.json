@@ -1,0 +1,86 @@
+{
+  "capacity_nats": 2.3978952727983707,
+  "capacity_bits": 3.4594316186372973,
+  "eps": 0.001,
+  "optimal_grid_boundaries": [
+    0.022159326060837703,
+    0.1452443543242726,
+    0.24774074125343362,
+    0.3488892098472241,
+    0.44966028678679143,
+    0.5503397132132085,
+    0.6511107901527758,
+    0.7522592587465666,
+    0.8547556456757274,
+    0.9778406739391622
+  ],
+  "worst_oracle_grid_excess_nll": 0.04772167478513768,
+  "worst_at_p": 0.022159326060837703,
+  "uniform_prior_mean_oracle_grid_excess_nll": 0.004881373028246171,
+  "examples": [
+    {
+      "p": 0.61,
+      "optimal_grid_q": 0.6,
+      "excess_nll": 0.00020892907636538283
+    },
+    {
+      "p": 0.64,
+      "optimal_grid_q": 0.6,
+      "excess_nll": 0.003374867891228095
+    },
+    {
+      "p": 0.65,
+      "optimal_grid_q": 0.6,
+      "excess_nll": 0.005291772569215647
+    },
+    {
+      "p": 0.69,
+      "optimal_grid_q": 0.7,
+      "excess_nll": 0.00023661623317849934
+    }
+  ],
+  "evaluations": {
+    "runs/hinge-20261001T023959Z/fractional-s1-eval/predictions.jsonl": {
+      "n": 474,
+      "fractional_nll": 0.5116019483815454,
+      "plugin_grid_regret_not_a_true_bound": 0.0027407263204532856,
+      "argmax": {
+        "nll": 0.5275097469060523,
+        "nll_minus_fractional": 0.01590779852450615,
+        "paired_bootstrap_95_percent": [
+          0.004937684775422145,
+          0.027413258728166443
+        ]
+      },
+      "grid_projection": {
+        "nll": 0.5145496620018154,
+        "nll_minus_fractional": 0.002947713620269229,
+        "paired_bootstrap_95_percent": [
+          -0.0032793333665506524,
+          0.009247489260807252
+        ]
+      }
+    },
+    "runs/hinge-20261001T023959Z/discrete-exact-s1-eval/predictions.jsonl": {
+      "n": 474,
+      "fractional_nll": 0.5376167387476372,
+      "plugin_grid_regret_not_a_true_bound": 0.0009794970939344368,
+      "argmax": {
+        "nll": 0.5412505468289432,
+        "nll_minus_fractional": 0.0036338080813044906,
+        "paired_bootstrap_95_percent": [
+          -0.0020704011561399364,
+          0.010670065426393876
+        ]
+      },
+      "grid_projection": {
+        "nll": 0.5415662353525591,
+        "nll_minus_fractional": 0.003949496604920272,
+        "paired_bootstrap_95_percent": [
+          -0.0016411965454944226,
+          0.01055954515524462
+        ]
+      }
+    }
+  }
+}

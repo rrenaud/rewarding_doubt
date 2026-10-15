@@ -1,0 +1,18 @@
+[
+  {
+    "distribution": "Uniform(0, 1)",
+    "mean_oracle_grid_regret_nats": 0.004881373067682668
+  },
+  {
+    "distribution": "Beta(5, 5)",
+    "mean_oracle_grid_regret_nats": 0.0018804228055753231
+  },
+  {
+    "distribution": "Beta(1/2, 1/2)",
+    "mean_oracle_grid_regret_nats": 0.007341442613309764
+  },
+  {
+    "distribution": "0.5 Beta(5, 30) + 0.5 Beta(30, 5)",
+    "mean_oracle_grid_regret_nats": 0.003978952260671199
+  }
+]

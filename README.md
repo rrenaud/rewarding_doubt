@@ -1,5 +1,12 @@
 # Rewarding Doubt with Tinker
 
+See [confidence quantization and its NLL cost](docs/confidence-quantization.md)
+for the eleven-label information bound, fractional-readout analysis, and offline results.
+The [illustrated HTML version](docs/confidence-quantization.html) embeds all four
+figures for offline reading and printing.
+The [empirical argmax analysis](docs/argmax-distribution.html) measures top-label
+probability, distribution spread, and held-out NLL differences from saved outputs.
+
 An executable **single-answer adaptation**, plus an experiment that retains the
 confidence distribution instead of decoding one integer. A live 128/128 smoke test
 completed all three ten-update training arms and checkpoint evaluations using
