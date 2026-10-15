@@ -31,8 +31,7 @@
   "16-31"
  ],
  "gpu": "L40S",
- "launched": "2026-10-07T06:26:14Z",
- "git_sha": "8bb7105",
- "git_dirty": true,
- "note": "written after the fact: launched before launch records existed, with adapter export not yet committed (02e0061)"
+ "launched": "2026-10-07T07:12:39Z",
+ "git_sha": "a35db4a78ad2cbda959732a0047dba5d912ce850",
+ "git_dirty": false
 }

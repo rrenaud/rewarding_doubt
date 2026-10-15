@@ -1,0 +1,42 @@
+{
+ "expt": "adhoc",
+ "run": "exact-B",
+ "trainer": "exact",
+ "args": {
+  "ids": "/vol/outputs/resume-test-20261003T041657Z/exact-B/ids.json",
+  "out_dir": "/vol/outputs/resume-test-20261003T041657Z/exact-B",
+  "mode": "discrete-exact",
+  "reward": "paper",
+  "reward_mix": 0.0,
+  "format_weight": 1.01,
+  "format_threshold": 0.95,
+  "lr": 4.01e-05,
+  "batchsize": 8,
+  "epochs": 2,
+  "max_steps": 0,
+  "passes": 2,
+  "minibatch": 4,
+  "save_every": 0,
+  "regularization": "hinge",
+  "invalid_reward": -3.0,
+  "kl_coef": 0.05,
+  "kl_target": 6.0,
+  "kl_horizon": 10000.0,
+  "value_head": false,
+  "forward_batch": 0,
+  "grad_ckpt": "off",
+  "vf_coef": 0.1,
+  "scoring": "single",
+  "seed": 1,
+  "checkpoint_every": 3,
+  "stop_on": "nonfinite",
+  "no_resume": false,
+  "stop_after": 0,
+  "n_common": 2
+ },
+ "image_git_sha": null,
+ "started": "2026-10-03T04:18:26Z",
+ "resumed_at_steps": [
+  3
+ ]
+}

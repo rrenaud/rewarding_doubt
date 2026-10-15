@@ -1,0 +1,11 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.392 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+unsloth/llama-3-8b-Instruct-bnb-4bit does not have a padding token! Will use pad_token = <|reserved_special_token_250|>.
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+{"n": 64, "wrong_format_rate": 0.0, "ece": 0.29062503576278687, "accuracy": 0.703125, "auroc": 0.5304093567251462, "brier": 0.29125, "ece_unsampled": 0.27789410948753357, "auroc_unsampled": 0.7087719298245614, "brier_unsampled": 0.27637552847407354, "protocol": "frozen-answers"}

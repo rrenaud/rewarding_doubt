@@ -1,0 +1,18 @@
+=== attempt 2026-10-07T02:56:54Z on NVIDIA L40S ===
+
+Downloading shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Downloading shards:  25%|██▌       | 1/4 [00:21<01:04, 21.67s/it]
+Downloading shards:  50%|█████     | 2/4 [00:44<00:44, 22.19s/it]
+Downloading shards:  75%|███████▌  | 3/4 [01:04<00:21, 21.48s/it]
+Downloading shards: 100%|██████████| 4/4 [01:11<00:00, 15.55s/it]
+Downloading shards: 100%|██████████| 4/4 [01:11<00:00, 17.83s/it]
+
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|██▌       | 1/4 [00:01<00:03,  1.32s/it]
+Loading checkpoint shards:  50%|█████     | 2/4 [00:02<00:02,  1.12s/it]
+Loading checkpoint shards:  75%|███████▌  | 3/4 [00:03<00:01,  1.04s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:03<00:00,  1.25it/s]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:03<00:00,  1.09it/s]
+{"split": "train", "rows": 8000, "seconds": 53.8, "vs_4bit_ref_mean_abs": 1.2058794498443604, "vs_4bit_ref_max_abs": 17.439964294433594}
+{"split": "dev", "rows": 508, "seconds": 3.2, "vs_4bit_ref_mean_abs": 1.220294713973999, "vs_4bit_ref_max_abs": 11.471355438232422}
+{"untrained_bf16_dev": {"ece_expected": 0.3236805498600006, "auroc_expected": 0.7373940905412324, "brier_expected": 0.3205437553615072, "ece_sampled": 0.33425211906433105, "auroc_sampled": 0.6439377673542868, "brier_sampled": 0.3303149606299213, "accuracy": 0.6240157480314961, "level_mass": 0.9999911014985956, "n": 508}}

@@ -1,0 +1,22 @@
+{
+ "expt": "adhoc",
+ "run": "ppo-B",
+ "trainer": "ppo",
+ "args": {
+  "model_dir": "unsloth/llama-3-8b-Instruct-bnb-4bit",
+  "tokenizer_dir": "unsloth/llama-3-8b-Instruct-bnb-4bit",
+  "out_dir": "/vol/outputs/resume-test-20261003T041657Z/ppo-B",
+  "lr": 2.27e-05,
+  "epochs": 2,
+  "batchsize": 8,
+  "log_with": "tensorboard",
+  "dataset": "triviaqa",
+  "is_unsloth": true,
+  "wrapper_options": "--seed 1 --fast --no-kl --grading f1 --hinge 0.39 --hinge-threshold 0.9 --ppo ppo_epochs=2 --checkpoint-every 3"
+ },
+ "image_git_sha": null,
+ "started": "2026-10-03T04:17:24Z",
+ "resumed_at_steps": [
+  3
+ ]
+}

@@ -1,0 +1,6 @@
+2026-10-04T17:55:48Z attempt start (image 8d32c44f530a305aebdfc5d48bc06a0c0bbb0e47): python subset.py train /workspace/runs/qwen-exactfast-fixedkl-s1/ids.json --seed 1 --save-every 500 --checkpoint-every 200 --max-steps 3000 --ppo adap_kl_ctrl=0 -- --out_dir /workspace/runs/qwen-exactfast-fixedkl-s1 --dataset triviaqa --is_unsloth --model_dir unsloth/Qwen2.5-3B-Instruct --tokenizer_dir unsloth/Qwen2.5-3B-Instruct --epochs 2 --lr 1e-05 --batchsize 8 --log_with tensorboard --objective exact_fast
+2026-10-04T19:39:50Z trainer exited with code 0
+2026-10-04T19:39:50Z post: python /opt/runpod/eval_snapshots.py /workspace/runs/qwen-exactfast-fixedkl-s1 /workspace/runs/qwen-exactfast-fixedkl-s1/ids.json
+2026-10-04T19:44:15Z outcome: completed
+selfstop: terminate pod otcria353xc47t: HTTP 204
+2026-10-04T19:44:16Z pod terminate requested

@@ -1,0 +1,33 @@
+=== attempt 2026-10-07T09:14:27Z on NVIDIA L40S ===
+
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|██▌       | 1/4 [00:03<00:09,  3.07s/it]
+Loading checkpoint shards:  50%|█████     | 2/4 [00:06<00:06,  3.06s/it]
+Loading checkpoint shards:  75%|███████▌  | 3/4 [00:09<00:03,  3.09s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:10<00:00,  2.23s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:10<00:00,  2.54s/it]
+{"lora_modules": ["q", "k", "v", "o", "gate", "up", "down"], "lora_layers": [16, 31], "attn_bias": "none", "residual_bias": "16-31", "v_bias": "none", "norm_gain": "none", "o_bias": "none", "model": "unsloth/llama-3-8b-Instruct", "n_layers": 32, "trainable_params": 5308416, "shared_prefix": true}
+{"step": 0, "ece_expected": 0.3235341012477875, "auroc_expected": 0.7388309908005352, "brier_expected": 0.3202819874571456, "ece_sampled": 0.3344489336013794, "auroc_sampled": 0.6414190628767734, "brier_sampled": 0.33068897637795275, "accuracy": 0.6240157480314961, "level_mass": 0.9999912546868992, "n": 508, "answer_kl": 0.0, "answer_kl_token": 0.0, "answer_kl_topk": 0.0}
+{"event": "train_start", "time": "2026-10-07T09:15:02Z", "process_start": "2026-10-07T09:14:38Z", "load_seconds": 23.9, "start_step": 1}
+RD_SAVED /vol/outputs/minimal-20261007T091414Z/llama-dump-smoke/checkpoint
+{"step": 10, "minutes": 0.2, "time": "2026-10-07T09:15:14Z", "beta": 0.05, "eval_seconds": 7.4, "save_seconds": 0.5, "peak_gb": 24.9, "ece_expected": 0.1477707326412201, "auroc_expected": 0.7803524534659025, "brier_expected": 0.21299531602319233, "ece_sampled": 0.11358189582824707, "auroc_sampled": 0.6806282722513088, "brier_sampled": 0.2142716535433071, "accuracy": 0.6240157480314961, "level_mass": 0.9999967712064116, "n": 508, "answer_kl": 0.02512069896716356, "answer_kl_token": 0.00348669810801068, "answer_kl_topk": 0.024842422160534807}
+RD_SAVED /vol/outputs/minimal-20261007T091414Z/llama-dump-smoke/checkpoint
+per-example losses -> /vol/outputs/minimal-20261007T091414Z/llama-dump-smoke/examples.jsonl
+RD_SAVED /vol/outputs/minimal-20261007T091414Z/llama-dump-smoke
+{"event": "done", "time": "2026-10-07T09:17:43Z", "steps": 10, "questions": 320, "seconds": 161.4, "eval_seconds": 7.4, "save_seconds": 1.1, "train_seconds": 152.9}
+RD_SAVED /vol/outputs/minimal-20261007T091414Z/llama-dump-smoke/status.json
+=== attempt 2026-10-07T09:18:45Z on NVIDIA L40S ===
+
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:08,  2.97s/it]
+Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.91s/it]
+Loading checkpoint shards:  75%|███████▌  | 3/4 [00:08<00:02,  2.85s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.05s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.36s/it]
+{"lora_modules": ["q", "k", "v", "o", "gate", "up", "down"], "lora_layers": [16, 31], "attn_bias": "none", "residual_bias": "16-31", "v_bias": "none", "norm_gain": "none", "o_bias": "none", "model": "unsloth/llama-3-8b-Instruct", "n_layers": 32, "trainable_params": 5308416, "shared_prefix": true}
+resumed from /vol/outputs/minimal-20261007T091414Z/llama-dump-smoke/checkpoint at step 10
+{"event": "train_start", "time": "2026-10-07T09:19:05Z", "process_start": "2026-10-07T09:18:52Z", "load_seconds": 12.9, "start_step": 11}
+{"event": "done", "time": "2026-10-07T09:19:05Z", "steps": 10, "questions": 320, "seconds": 11.8, "eval_seconds": 7.4, "save_seconds": 0.5, "train_seconds": 3.9}
+per-example losses -> /vol/outputs/minimal-20261007T091414Z/llama-dump-smoke/examples.jsonl
+RD_SAVED /vol/outputs/minimal-20261007T091414Z/llama-dump-smoke
+RD_SAVED /vol/outputs/minimal-20261007T091414Z/llama-dump-smoke/status.json

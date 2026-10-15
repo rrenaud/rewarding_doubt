@@ -1,0 +1,1 @@
+{"llama-sched-smoke": ["--steps", "12", "--eval-every", "6", "--regen-every", "12", "--gt", "/vol/fast/llama3-8b-gt.json", "--lora-layers", "16-31", "--lora-rank", "4", "--answer-kl", "1", "--lr-schedule", "cosine", "--weight-avg-start", "7", "--checkpoint-every", "4"]}

@@ -1,0 +1,33 @@
+{
+ "label": "llama-dump-smoke",
+ "modal_run": "minimal-20261007T091414Z",
+ "command": [
+  "minimal_trainer.py",
+  "train",
+  "/vol/fast/llama3-8b-cache-bf16ref-top64.pt",
+  "OUT_DIR",
+  "--steps",
+  "10",
+  "--eval-every",
+  "10",
+  "--gt",
+  "/vol/fast/llama3-8b-gt.json",
+  "--lora-layers",
+  "16-31",
+  "--lora-rank",
+  "4",
+  "--residual-bias",
+  "16-31",
+  "--bias-lr",
+  "1e-4",
+  "--answer-kl",
+  "1",
+  "--checkpoint-every",
+  "5",
+  "--dump-examples"
+ ],
+ "gpu": "L40S",
+ "launched": "2026-10-07T09:18:32Z",
+ "git_sha": "733cd0c83b60aba257b036c0d46cbcac77a51be6",
+ "git_dirty": true
+}

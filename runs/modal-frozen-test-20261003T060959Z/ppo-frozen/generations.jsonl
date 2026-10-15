@@ -1,0 +1,96 @@
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 1, "question_id": "tc_100", "confidence": 10, "answer": "Kansas", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 1, "question_id": "tc_68", "confidence": 10, "answer": "Colorado", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 1, "question_id": "tc_131", "confidence": 10, "answer": "C", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 1, "question_id": "tc_22", "confidence": 10, "answer": "Dance", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 1, "question_id": "tc_54", "confidence": 10, "answer": "Chicago, Illinois, USA", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 1, "question_id": "tc_24", "confidence": 10, "answer": "Glider", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 1, "question_id": "tc_130", "confidence": 10, "answer": "38th parallel", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 1, "question_id": "tc_78", "confidence": 9, "answer": "France", "correct": false, "reward": 3.3342991948388354}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 2, "question_id": "tc_72", "confidence": 10, "answer": "Lee Marvin", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 2, "question_id": "tc_102", "confidence": 10, "answer": "8,905,000", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 2, "question_id": "tc_41", "confidence": 10, "answer": "Dance", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 2, "question_id": "tc_60", "confidence": 10, "answer": "The Odd Couple", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 2, "question_id": "tc_43", "confidence": 10, "answer": "Bo Donaldson and the Heywoods", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 2, "question_id": "tc_9", "confidence": 10, "answer": "London", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 2, "question_id": "tc_86", "confidence": 8, "answer": "Gigi", "correct": true, "reward": 11.856643627827342}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 2, "question_id": "tc_36", "confidence": 9, "answer": "Scorpio", "correct": false, "reward": 3.3342991948388354}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 3, "question_id": "tc_65", "confidence": 10, "answer": "Mahogany", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 3, "question_id": "tc_31", "confidence": 10, "answer": "AL", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 3, "question_id": "tc_47", "confidence": 10, "answer": "Stanley Kubrick", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 3, "question_id": "tc_94", "confidence": 10, "answer": "18th", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 3, "question_id": "tc_124", "confidence": 10, "answer": "Alistair Cooke", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 3, "question_id": "tc_11", "confidence": 10, "answer": "Norway", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 3, "question_id": "tc_132", "confidence": 10, "answer": "Stop the World - I Want to Get Off", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 3, "question_id": "tc_58", "confidence": 10, "answer": "George Eastman", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 4, "question_id": "tc_30", "confidence": 10, "answer": "Melanie Brown", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 4, "question_id": "tc_90", "confidence": 7, "answer": "The Great Train Robbery", "correct": false, "reward": 6.5160292257433685}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 4, "question_id": "tc_135", "confidence": 8, "answer": "The Washington Times-Herald", "correct": true, "reward": 11.856643627827342}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 4, "question_id": "tc_81", "confidence": 10, "answer": "Bad", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 4, "question_id": "tc_138", "confidence": 10, "answer": "Henry James", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 4, "question_id": "tc_57", "confidence": 10, "answer": "1940s", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 4, "question_id": "tc_104", "confidence": 9, "answer": "Live and Let Die", "correct": false, "reward": 3.3342991948388354}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 4, "question_id": "tc_98", "confidence": 10, "answer": "Fire Tiger", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 5, "question_id": "tc_108", "confidence": 10, "answer": "Calvin Klein", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 5, "question_id": "tc_110", "confidence": 10, "answer": "Lusitania", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 5, "question_id": "tc_15", "confidence": 6, "answer": "United States", "correct": false, "reward": 7.34919548349784}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 5, "question_id": "tc_127", "confidence": 10, "answer": "Snorkel, a dog", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 5, "question_id": "tc_99", "confidence": 10, "answer": "Austria", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 5, "question_id": "tc_77", "confidence": 10, "answer": "Thursday", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 5, "question_id": "tc_28", "confidence": 10, "answer": "Robert Ballard", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 5, "question_id": "tc_25", "confidence": 9, "answer": "University of Heidelberg", "correct": false, "reward": 3.3342991948388354}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 6, "question_id": "tc_101", "confidence": 10, "answer": "General Hospital", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 6, "question_id": "tc_91", "confidence": 9, "answer": "Shirley MacLaine", "correct": false, "reward": 3.3342991948388354}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 6, "question_id": "tc_84", "confidence": 8, "answer": "Nevis", "correct": false, "reward": 5.341747339168338}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 6, "question_id": "tc_21", "confidence": 10, "answer": "Joan Rivers", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 6, "question_id": "tc_63", "confidence": 10, "answer": "Vevey, Switzerland", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 6, "question_id": "tc_23", "confidence": 8, "answer": "Hungary", "correct": false, "reward": 5.341747339168338}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 6, "question_id": "tc_82", "confidence": 10, "answer": "Inchon", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 6, "question_id": "tc_112", "confidence": 10, "answer": "Ian Fleming", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 7, "question_id": "tc_38", "confidence": 8, "answer": "Maeve Binchy", "correct": true, "reward": 11.856643627827342}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 7, "question_id": "tc_26", "confidence": 10, "answer": "Prince Edward", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 7, "question_id": "tc_1", "confidence": 10, "answer": "Upton Sinclair", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 7, "question_id": "tc_10", "confidence": 10, "answer": "Chicago Bears", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 7, "question_id": "tc_48", "confidence": 10, "answer": "Sakurajima", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 7, "question_id": "tc_19", "confidence": 10, "answer": "Johnny Cash", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 7, "question_id": "tc_70", "confidence": 10, "answer": "Sophie's Choice", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 7, "question_id": "tc_96", "confidence": 10, "answer": "Teapot Dome scandal", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 8, "question_id": "tc_3", "confidence": 10, "answer": "Heptonstall, West Riding of Yorkshire", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 8, "question_id": "tc_27", "confidence": 10, "answer": "1914", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 8, "question_id": "tc_85", "confidence": 10, "answer": "1940s", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 8, "question_id": "tc_109", "confidence": 10, "answer": "Davy Jones", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 8, "question_id": "tc_136", "confidence": 10, "answer": "T", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 8, "question_id": "tc_120", "confidence": 10, "answer": "Nevada", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 8, "question_id": "tc_17", "confidence": 10, "answer": "William Golding", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 8, "question_id": "tc_67", "confidence": 10, "answer": "6", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 9, "question_id": "tc_45", "confidence": 10, "answer": "Federico Fellini", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 9, "question_id": "tc_55", "confidence": 10, "answer": "Gerald Ford", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 9, "question_id": "tc_111", "confidence": 10, "answer": "1950s", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 9, "question_id": "tc_134", "confidence": 10, "answer": "Blackmail", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 9, "question_id": "tc_80", "confidence": 10, "answer": "\"Batdance\"", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 9, "question_id": "tc_16", "confidence": 10, "answer": "Walter", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 9, "question_id": "tc_5", "confidence": 10, "answer": "1936", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 9, "question_id": "tc_39", "confidence": 8, "answer": "Fiji", "correct": true, "reward": 11.856643627827342}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 10, "question_id": "tc_117", "confidence": 10, "answer": "Edgar Winter Group", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 10, "question_id": "tc_32", "confidence": 10, "answer": "Jock Ewing, the father of J.R. and Bobby Ewing, died of a heart attack in Dallas", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 10, "question_id": "tc_8", "confidence": 10, "answer": "Portugal", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 10, "question_id": "tc_113", "confidence": 9, "answer": "Hotels", "correct": false, "reward": 3.3342991948388354}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 10, "question_id": "tc_97", "confidence": 10, "answer": "Hook", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 10, "question_id": "tc_44", "confidence": 10, "answer": "Insulin", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 10, "question_id": "tc_46", "confidence": 10, "answer": "Costa Rica", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 10, "question_id": "tc_103", "confidence": 8, "answer": "Art Deco pottery", "correct": true, "reward": 11.856643627827342}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 11, "question_id": "tc_87", "confidence": 10, "answer": "Hong Kong", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 11, "question_id": "tc_114", "confidence": 10, "answer": "United States", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 11, "question_id": "tc_123", "confidence": 10, "answer": "Korean War", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 11, "question_id": "tc_50", "confidence": 10, "answer": "Boxing", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 11, "question_id": "tc_61", "confidence": 10, "answer": "Sony", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 11, "question_id": "tc_139", "confidence": 10, "answer": "USS Nautilus", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 11, "question_id": "tc_53", "confidence": 10, "answer": "Lake Washington Ship Canal", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 11, "question_id": "tc_107", "confidence": 10, "answer": "1965", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 12, "question_id": "tc_52", "confidence": 10, "answer": "Amelia Earhart", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 12, "question_id": "tc_128", "confidence": 10, "answer": "REO Speedwagon", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 12, "question_id": "tc_66", "confidence": 10, "answer": "Dragon", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 12, "question_id": "tc_125", "confidence": 10, "answer": "Viacom", "correct": false, "reward": -10.002897584516507}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 12, "question_id": "tc_115", "confidence": 10, "answer": "That's the way it is", "correct": true, "reward": 12.5}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 12, "question_id": "tc_18", "confidence": 8, "answer": "The electric starter", "correct": false, "reward": 5.341747339168338}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 12, "question_id": "tc_88", "confidence": 8, "answer": "Dalmatian", "correct": false, "reward": 5.341747339168338}
+{"expt": "adhoc", "run": "ppo-frozen", "trainer": "ppo", "step": 12, "question_id": "tc_126", "confidence": 10, "answer": "Radium", "correct": true, "reward": 12.5}

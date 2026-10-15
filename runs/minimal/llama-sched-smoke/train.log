@@ -1,0 +1,31 @@
+=== attempt 2026-10-07T10:03:32Z on NVIDIA L40S ===
+
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:07,  2.61s/it]
+Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.55s/it]
+Loading checkpoint shards:  75%|███████▌  | 3/4 [00:07<00:02,  2.42s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  1.73s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  2.02s/it]
+{"lora_modules": ["q", "k", "v", "o", "gate", "up", "down"], "lora_layers": [16, 31], "attn_bias": "none", "residual_bias": "none", "v_bias": "none", "norm_gain": "none", "o_bias": "none", "model": "unsloth/llama-3-8b-Instruct", "n_layers": 32, "trainable_params": 5242880, "shared_prefix": true}
+{"step": 0, "ece_expected": 0.3235341012477875, "auroc_expected": 0.7388309908005352, "brier_expected": 0.3202819874571456, "ece_sampled": 0.3344489336013794, "auroc_sampled": 0.6414190628767734, "brier_sampled": 0.33068897637795275, "accuracy": 0.6240157480314961, "level_mass": 0.9999912546868992, "n": 508, "answer_kl": 0.0, "answer_kl_token": 0.0, "answer_kl_topk": 0.0, "regen_accuracy": 0.6692913385826772, "regen_malformed": 0.0}
+{"event": "train_start", "time": "2026-10-07T10:04:19Z", "process_start": "2026-10-07T10:03:38Z", "load_seconds": 41.1, "start_step": 1}
+RD_SAVED /vol/outputs/minimal-20261007T100321Z/llama-sched-smoke/checkpoint
+{"step": 6, "minutes": 0.2, "time": "2026-10-07T10:04:29Z", "beta": 0.05, "eval_seconds": 7.4, "save_seconds": 0.3, "peak_gb": 24.9, "ece_expected": 0.1378002017736435, "auroc_expected": 0.7699473136571588, "brier_expected": 0.21716108157447794, "ece_sampled": 0.10531561076641083, "auroc_sampled": 0.6807438849158506, "brier_sampled": 0.21655511811023623, "accuracy": 0.6240157480314961, "level_mass": 0.999998341114444, "n": 508, "answer_kl": 0.004473293603144273, "answer_kl_token": 0.0006208833744254892, "answer_kl_topk": 0.004428536787519542}
+RD_SAVED /vol/outputs/minimal-20261007T100321Z/llama-sched-smoke/checkpoint
+stopping after step 8: --stop-after
+=== attempt 2026-10-07T10:06:54Z on NVIDIA L40S ===
+
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:08,  2.80s/it]
+Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.77s/it]
+Loading checkpoint shards:  75%|███████▌  | 3/4 [00:08<00:02,  2.70s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  1.95s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  2.24s/it]
+{"lora_modules": ["q", "k", "v", "o", "gate", "up", "down"], "lora_layers": [16, 31], "attn_bias": "none", "residual_bias": "none", "v_bias": "none", "norm_gain": "none", "o_bias": "none", "model": "unsloth/llama-3-8b-Instruct", "n_layers": 32, "trainable_params": 5242880, "shared_prefix": true}
+resumed from /vol/outputs/minimal-20261007T100321Z/llama-sched-smoke/checkpoint at step 8
+{"event": "train_start", "time": "2026-10-07T10:07:16Z", "process_start": "2026-10-07T10:07:03Z", "load_seconds": 13.0, "start_step": 9}
+{"step": 12, "minutes": 0.7, "time": "2026-10-07T10:07:48Z", "beta": 0.05, "eval_seconds": 37.3, "save_seconds": 0.3, "peak_gb": 22.0, "ece_expected": 0.14200015366077423, "auroc_expected": 0.7834079310287876, "brier_expected": 0.21746359343716004, "ece_sampled": 0.10531570762395859, "auroc_sampled": 0.6825028490263761, "brier_sampled": 0.21679133858267716, "accuracy": 0.6240157480314961, "level_mass": 0.9999977659597643, "n": 508, "answer_kl": 0.006621261204077547, "answer_kl_token": 0.0009190165824238782, "answer_kl_topk": 0.006565507781804734, "regen_accuracy": 0.6712598425196851, "regen_malformed": 0.0}
+RD_SAVED /vol/outputs/minimal-20261007T100321Z/llama-sched-smoke/checkpoint
+{"event": "weight_avg", "ece_expected": 0.15487150847911835, "auroc_expected": 0.7795596809090459, "brier_expected": 0.21764259439337139, "ece_sampled": 0.1104336604475975, "auroc_sampled": 0.6869126463738913, "brier_sampled": 0.2162795275590551, "accuracy": 0.6240157480314961, "level_mass": 0.9999978105457155, "n": 508, "answer_kl": 0.006057752138692093, "answer_kl_token": 0.0008408027558621812, "answer_kl_topk": 0.006003814817289683, "regen_accuracy": 0.6692913385826772, "regen_malformed": 0.0, "from_step": 7, "n_averaged": 6}
+{"event": "done", "time": "2026-10-07T10:08:18Z", "steps": 12, "questions": 384, "seconds": 71.8, "eval_seconds": 37.3, "save_seconds": 0.8, "train_seconds": 33.7}
+RD_SAVED /vol/outputs/minimal-20261007T100321Z/llama-sched-smoke/status.json

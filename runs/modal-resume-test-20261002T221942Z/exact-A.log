@@ -1,0 +1,123 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+==((====))==  Unsloth 2025.1.5: Fast Llama patching. Transformers: 4.48.0.
+   \\   /|    GPU: NVIDIA L40S. Max memory: 44.392 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.9. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth 2025.1.5 patched 32 layers with 32 QKV layers, 32 O layers and 32 MLP layers.
+
+Filter:   0%|          | 0/87622 [00:00<?, ? examples/s]
+Filter:   1%|          | 1000/87622 [00:00<01:07, 1276.45 examples/s]
+Filter:   2%|▏         | 2000/87622 [00:01<00:47, 1790.53 examples/s]
+Filter:   3%|▎         | 3000/87622 [00:01<00:40, 2092.21 examples/s]
+Filter:   5%|▍         | 4000/87622 [00:01<00:36, 2322.77 examples/s]
+Filter:   6%|▌         | 5000/87622 [00:02<00:31, 2589.65 examples/s]
+Filter:   7%|▋         | 6000/87622 [00:02<00:28, 2814.68 examples/s]
+Filter:   8%|▊         | 7000/87622 [00:02<00:27, 2948.40 examples/s]
+Filter:   9%|▉         | 8000/87622 [00:03<00:26, 3051.62 examples/s]
+Filter:  10%|█         | 9000/87622 [00:03<00:24, 3167.10 examples/s]
+Filter:  11%|█▏        | 10000/87622 [00:03<00:24, 3192.84 examples/s]
+Filter:  13%|█▎        | 11000/87622 [00:04<00:23, 3254.22 examples/s]
+Filter:  14%|█▎        | 12000/87622 [00:04<00:23, 3243.09 examples/s]
+Filter:  15%|█▍        | 13000/87622 [00:04<00:23, 3243.04 examples/s]
+Filter:  16%|█▌        | 14000/87622 [00:04<00:22, 3230.49 examples/s]
+Filter:  17%|█▋        | 15000/87622 [00:05<00:22, 3249.38 examples/s]
+Filter:  18%|█▊        | 16000/87622 [00:05<00:21, 3299.34 examples/s]
+Filter:  19%|█▉        | 17000/87622 [00:05<00:21, 3299.40 examples/s]
+Filter:  21%|██        | 18000/87622 [00:06<00:25, 2695.61 examples/s]
+Filter:  22%|██▏       | 19000/87622 [00:06<00:24, 2835.25 examples/s]
+Filter:  23%|██▎       | 20000/87622 [00:07<00:32, 2104.28 examples/s]
+Filter:  24%|██▍       | 21000/87622 [00:07<00:31, 2104.41 examples/s]
+Filter:  25%|██▌       | 22000/87622 [00:08<00:30, 2167.53 examples/s]
+Filter:  26%|██▌       | 23000/87622 [00:08<00:28, 2273.08 examples/s]
+Filter:  27%|██▋       | 24000/87622 [00:09<00:27, 2311.00 examples/s]
+Filter:  29%|██▊       | 25000/87622 [00:09<00:26, 2394.85 examples/s]
+Filter:  30%|██▉       | 26000/87622 [00:09<00:25, 2457.50 examples/s]
+Filter:  31%|███       | 27000/87622 [00:10<00:23, 2539.57 examples/s]
+Filter:  32%|███▏      | 28000/87622 [00:10<00:22, 2643.10 examples/s]
+Filter:  33%|███▎      | 29000/87622 [00:10<00:21, 2759.94 examples/s]
+Filter:  34%|███▍      | 30000/87622 [00:11<00:22, 2553.36 examples/s]
+Filter:  35%|███▌      | 31000/87622 [00:11<00:22, 2551.79 examples/s]
+Filter:  37%|███▋      | 32000/87622 [00:12<00:22, 2439.04 examples/s]
+Filter:  38%|███▊      | 33000/87622 [00:12<00:22, 2471.09 examples/s]
+Filter:  39%|███▉      | 34000/87622 [00:13<00:25, 2088.33 examples/s]
+Filter:  40%|███▉      | 35000/87622 [00:13<00:22, 2293.67 examples/s]
+Filter:  41%|████      | 36000/87622 [00:14<00:21, 2353.07 examples/s]
+Filter:  42%|████▏     | 37000/87622 [00:14<00:20, 2422.43 examples/s]
+Filter:  43%|████▎     | 38000/87622 [00:14<00:19, 2494.91 examples/s]
+Filter:  45%|████▍     | 39000/87622 [00:15<00:18, 2638.99 examples/s]
+Filter:  46%|████▌     | 40000/87622 [00:15<00:17, 2754.59 examples/s]
+Filter:  47%|████▋     | 41000/87622 [00:15<00:16, 2912.25 examples/s]
+Filter:  48%|████▊     | 42000/87622 [00:16<00:14, 3050.67 examples/s]
+Filter:  49%|████▉     | 43000/87622 [00:16<00:14, 3166.97 examples/s]
+Filter:  50%|█████     | 44000/87622 [00:16<00:13, 3215.07 examples/s]
+Filter:  51%|█████▏    | 45000/87622 [00:16<00:13, 3152.36 examples/s]
+Filter:  52%|█████▏    | 46000/87622 [00:17<00:13, 3161.28 examples/s]
+Filter:  54%|█████▎    | 47000/87622 [00:17<00:12, 3148.34 examples/s]
+Filter:  55%|█████▍    | 48000/87622 [00:17<00:12, 3161.80 examples/s]
+Filter:  56%|█████▌    | 49000/87622 [00:18<00:12, 3208.94 examples/s]
+Filter:  57%|█████▋    | 50000/87622 [00:18<00:14, 2584.84 examples/s]
+Filter:  58%|█████▊    | 51000/87622 [00:19<00:13, 2746.91 examples/s]
+Filter:  59%|█████▉    | 52000/87622 [00:19<00:12, 2905.13 examples/s]
+Filter:  60%|██████    | 53000/87622 [00:19<00:11, 3003.87 examples/s]
+Filter:  62%|██████▏   | 54000/87622 [00:20<00:10, 3069.76 examples/s]
+Filter:  63%|██████▎   | 55000/87622 [00:20<00:10, 3108.21 examples/s]
+Filter:  64%|██████▍   | 56000/87622 [00:20<00:10, 3035.64 examples/s]
+Filter:  65%|██████▌   | 57000/87622 [00:20<00:09, 3094.83 examples/s]
+Filter:  66%|██████▌   | 58000/87622 [00:21<00:09, 3095.06 examples/s]
+Filter:  67%|██████▋   | 59000/87622 [00:21<00:09, 3090.68 examples/s]
+Filter:  68%|██████▊   | 60000/87622 [00:21<00:08, 3118.79 examples/s]
+Filter:  70%|██████▉   | 61000/87622 [00:22<00:08, 3102.32 examples/s]
+Filter:  71%|███████   | 62000/87622 [00:22<00:08, 3098.23 examples/s]
+Filter:  72%|███████▏  | 63000/87622 [00:22<00:07, 3141.30 examples/s]
+Filter:  73%|███████▎  | 64000/87622 [00:23<00:07, 3133.34 examples/s]
+Filter:  74%|███████▍  | 65000/87622 [00:23<00:07, 2970.83 examples/s]
+Filter:  75%|███████▌  | 66000/87622 [00:24<00:08, 2551.91 examples/s]
+Filter:  76%|███████▋  | 67000/87622 [00:24<00:07, 2673.68 examples/s]
+Filter:  78%|███████▊  | 68000/87622 [00:24<00:07, 2790.93 examples/s]
+Filter:  79%|███████▊  | 69000/87622 [00:25<00:07, 2372.25 examples/s]
+Filter:  80%|███████▉  | 70000/87622 [00:25<00:06, 2608.19 examples/s]
+Filter:  81%|████████  | 71000/87622 [00:25<00:06, 2710.64 examples/s]
+Filter:  82%|████████▏ | 72000/87622 [00:26<00:05, 2824.76 examples/s]
+Filter:  83%|████████▎ | 73000/87622 [00:26<00:04, 2977.12 examples/s]
+Filter:  84%|████████▍ | 74000/87622 [00:26<00:04, 3035.38 examples/s]
+Filter:  86%|████████▌ | 75000/87622 [00:27<00:04, 3098.17 examples/s]
+Filter:  87%|████████▋ | 76000/87622 [00:27<00:03, 3054.62 examples/s]
+Filter:  88%|████████▊ | 77000/87622 [00:27<00:03, 3056.01 examples/s]
+Filter:  89%|████████▉ | 78000/87622 [00:28<00:03, 3169.31 examples/s]
+Filter:  90%|█████████ | 79000/87622 [00:28<00:02, 3401.93 examples/s]
+Filter:  91%|█████████▏| 80000/87622 [00:28<00:02, 3586.23 examples/s]
+Filter:  92%|█████████▏| 81000/87622 [00:28<00:01, 3695.37 examples/s]
+Filter:  94%|█████████▎| 82000/87622 [00:29<00:01, 3799.67 examples/s]
+Filter:  95%|█████████▍| 83000/87622 [00:29<00:01, 3858.56 examples/s]
+Filter:  96%|█████████▌| 84000/87622 [00:29<00:00, 3821.04 examples/s]
+Filter:  97%|█████████▋| 85000/87622 [00:30<00:00, 3334.03 examples/s]
+Filter:  98%|█████████▊| 86000/87622 [00:30<00:00, 2569.83 examples/s]
+Filter:  99%|█████████▉| 87000/87622 [00:31<00:00, 2562.18 examples/s]
+Filter: 100%|██████████| 87622/87622 [00:31<00:00, 2645.29 examples/s]
+Filter: 100%|██████████| 87622/87622 [00:31<00:00, 2804.68 examples/s]
+
+Map:   0%|          | 0/32 [00:00<?, ? examples/s]
+Map: 100%|██████████| 32/32 [00:00<00:00, 1334.11 examples/s]
+
+Map:   0%|          | 0/32 [00:00<?, ? examples/s]
+Map: 100%|██████████| 32/32 [00:00<00:00, 1476.79 examples/s]
+{"step": 1, "epoch": 0, "batch_hash": 1959506215, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 4, "seconds": 5.892469644546509, "time": 1790979655.2107978, "loss": -0.5475236290703165, "confidence": 0.9475223976805025, "mass": 0.999996563835742, "hinge_active": 0.0, "stop_prob": 0.9998211190104485, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 2, "epoch": 0, "batch_hash": 4207269886, "rows": 8, "skipped": 0, "answer_accuracy": 0.5, "updates": 4, "seconds": 7.909344911575317, "time": 1790979663.1214285, "loss": 1.4081165090393248, "confidence": 0.8695133044116892, "mass": 0.87499618320203, "hinge_active": 0.125, "stop_prob": 0.9994488443647113, "sampled_number_rate": 0.875, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 3, "epoch": 0, "batch_hash": 1194984897, "rows": 8, "skipped": 0, "answer_accuracy": 0.625, "updates": 4, "seconds": 2.726686477661133, "time": 1790979665.8491778, "loss": -0.7904110583270608, "confidence": 0.7850577048467495, "mass": 0.9999985586385269, "hinge_active": 0.0, "stop_prob": 0.9997101426124573, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+checkpoint at step 3 (0.7 s)
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 4, "epoch": 0, "batch_hash": 3384713000, "rows": 8, "skipped": 0, "answer_accuracy": 0.875, "updates": 4, "seconds": 2.259307384490967, "time": 1790979668.841856, "loss": -0.8667117272150185, "confidence": 0.7200600483965814, "mass": 0.9999987278789877, "hinge_active": 0.0, "stop_prob": 0.9987511709332466, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 5, "epoch": 1, "batch_hash": 18377858, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "updates": 4, "seconds": 8.00840950012207, "time": 1790979677.2726986, "loss": 0.05049462945230408, "confidence": 0.7063665387512865, "mass": 0.8750989894393651, "hinge_active": 0.125, "stop_prob": 0.9953318153108869, "sampled_number_rate": 0.875, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 6, "epoch": 1, "batch_hash": 72136726, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "updates": 4, "seconds": 2.685307741165161, "time": 1790979679.9594731, "loss": -0.8004646246145326, "confidence": 0.5867684615272325, "mass": 0.9999944781272555, "hinge_active": 0.0, "stop_prob": 0.9936203807592392, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+checkpoint at step 6 (0.6 s)
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 7, "epoch": 1, "batch_hash": 1691307575, "rows": 8, "skipped": 0, "answer_accuracy": 0.75, "updates": 4, "seconds": 2.240093946456909, "time": 1790979682.7857852, "loss": -0.8385933267086242, "confidence": 0.6456948246986177, "mass": 0.99999831126495, "hinge_active": 0.0, "stop_prob": 0.9976084679365158, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
+{"step": 8, "epoch": 1, "batch_hash": 2585676213, "rows": 8, "skipped": 0, "answer_accuracy": 0.375, "updates": 4, "seconds": 2.3123981952667236, "time": 1790979685.099307, "loss": -0.7796465183510761, "confidence": 0.6245680907586136, "mass": 0.9999979074990912, "hinge_active": 0.0, "stop_prob": 0.9966980740427971, "sampled_number_rate": 1.0, "kl": 0.0, "kl_coef": 0.05, "value_loss": 0.0}

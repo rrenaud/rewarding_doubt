@@ -1,0 +1,12 @@
+{
+ "n": 64,
+ "wrong_format_rate": 0.0,
+ "ece": 0.3140625059604645,
+ "accuracy": 0.6875,
+ "auroc": 0.5130681818181818,
+ "brier": 0.31015625,
+ "ece_unsampled": 0.2943005859851837,
+ "auroc_unsampled": 0.7215909090909091,
+ "brier_unsampled": 0.29287852868085007,
+ "protocol": "frozen-answers"
+}

@@ -1,0 +1,96 @@
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 1, "question_id": "tc_94", "correct": null, "confidence": null, "answer": "Answer: 18", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 1, "question_id": "tc_46", "correct": null, "confidence": null, "answer": "Answer: Costa Rica", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 1, "question_id": "tc_18", "correct": null, "confidence": null, "answer": "Answer: The electric", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 1, "question_id": "tc_80", "correct": null, "confidence": null, "answer": "Answer: When D", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 1, "question_id": "tc_9", "correct": null, "confidence": null, "answer": "Answer: Manchester,", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 1, "question_id": "tc_50", "correct": null, "confidence": null, "answer": "Answer: Boxing,", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 1, "question_id": "tc_25", "correct": null, "confidence": null, "answer": "Answer: University of", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 1, "question_id": "tc_17", "correct": null, "confidence": null, "answer": "Answer: William Gold", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 2, "question_id": "tc_114", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 2, "question_id": "tc_81", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 2, "question_id": "tc_86", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 2, "question_id": "tc_67", "correct": null, "confidence": null, "answer": "Answer: 6", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 2, "question_id": "tc_136", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 2, "question_id": "tc_70", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 2, "question_id": "tc_38", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 2, "question_id": "tc_98", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 3, "question_id": "tc_82", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 3, "question_id": "tc_107", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 3, "question_id": "tc_30", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 3, "question_id": "tc_139", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 3, "question_id": "tc_66", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 3, "question_id": "tc_10", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 3, "question_id": "tc_99", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 3, "question_id": "tc_110", "correct": null, "confidence": null, "answer": "Answer: Lus", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 4, "question_id": "tc_54", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 4, "question_id": "tc_36", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 4, "question_id": "tc_68", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 4, "question_id": "tc_134", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 4, "question_id": "tc_120", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 4, "question_id": "tc_57", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 4, "question_id": "tc_112", "correct": null, "confidence": null, "answer": "Answer: John Le", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 4, "question_id": "tc_39", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 5, "question_id": "tc_55", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 5, "question_id": "tc_90", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 5, "question_id": "tc_63", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 5, "question_id": "tc_28", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 5, "question_id": "tc_125", "correct": null, "confidence": null, "answer": "Answer: Viacom", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 5, "question_id": "tc_58", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 5, "question_id": "tc_100", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 5, "question_id": "tc_135", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 6, "question_id": "tc_31", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 6, "question_id": "tc_15", "correct": null, "confidence": null, "answer": "system\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 6, "question_id": "tc_78", "correct": null, "confidence": null, "answer": "Answer: Colombia,", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 6, "question_id": "tc_109", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 6, "question_id": "tc_19", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 6, "question_id": "tc_11", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 6, "question_id": "tc_61", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 6, "question_id": "tc_88", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 7, "question_id": "tc_126", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 7, "question_id": "tc_102", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 7, "question_id": "tc_27", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 7, "question_id": "tc_111", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 7, "question_id": "tc_128", "correct": null, "confidence": null, "answer": "Answer: REO", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 7, "question_id": "tc_117", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 7, "question_id": "tc_65", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 7, "question_id": "tc_115", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 8, "question_id": "tc_32", "correct": null, "confidence": null, "answer": "system\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 8, "question_id": "tc_23", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 8, "question_id": "tc_53", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 8, "question_id": "tc_47", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 8, "question_id": "tc_130", "correct": null, "confidence": null, "answer": "Answer: 38", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 8, "question_id": "tc_132", "correct": null, "confidence": null, "answer": "system\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 8, "question_id": "tc_101", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 8, "question_id": "tc_44", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 9, "question_id": "tc_104", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 9, "question_id": "tc_84", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 9, "question_id": "tc_43", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 9, "question_id": "tc_127", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 9, "question_id": "tc_3", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 9, "question_id": "tc_103", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 9, "question_id": "tc_138", "correct": null, "confidence": null, "answer": "Answer: Henry James", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 9, "question_id": "tc_5", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 10, "question_id": "tc_123", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 10, "question_id": "tc_60", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 10, "question_id": "tc_22", "correct": null, "confidence": null, "answer": "", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 10, "question_id": "tc_45", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 10, "question_id": "tc_52", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 10, "question_id": "tc_131", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 10, "question_id": "tc_1", "correct": null, "confidence": null, "answer": "Answer: Upton", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 10, "question_id": "tc_113", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 11, "question_id": "tc_85", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 11, "question_id": "tc_77", "correct": null, "confidence": null, "answer": "", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 11, "question_id": "tc_8", "correct": null, "confidence": null, "answer": "Answer: Portugal,", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 11, "question_id": "tc_96", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 11, "question_id": "tc_21", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 11, "question_id": "tc_41", "correct": null, "confidence": null, "answer": "Answer: Dance,", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 11, "question_id": "tc_72", "correct": null, "confidence": null, "answer": "", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 11, "question_id": "tc_124", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 12, "question_id": "tc_91", "correct": null, "confidence": null, "answer": "", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 12, "question_id": "tc_87", "correct": null, "confidence": null, "answer": "Answer: Hong Kong", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 12, "question_id": "tc_97", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 12, "question_id": "tc_24", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 12, "question_id": "tc_48", "correct": null, "confidence": null, "answer": "", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 12, "question_id": "tc_16", "correct": null, "confidence": null, "answer": "assistant\n\n", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 12, "question_id": "tc_108", "correct": null, "confidence": null, "answer": "Answer: Calvin Klein", "format": "no_confidence"}
+{"expt": "adhoc", "run": "exact-penalty", "trainer": "exact", "step": 12, "question_id": "tc_26", "correct": null, "confidence": null, "answer": "assistant", "format": "no_confidence"}

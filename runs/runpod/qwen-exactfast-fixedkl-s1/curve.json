@@ -1,0 +1,56 @@
+{
+ "500": {
+  "model": "/workspace/runs/qwen-exactfast-fixedkl-s1/snapshot-step00500",
+  "n": 512,
+  "wrong_format_rate": 0.01171875,
+  "ece": 0.040513813495635986,
+  "accuracy": 0.40711462450592883,
+  "auroc": 0.8663106796116505,
+  "brier": 0.14606719367588933
+ },
+ "1000": {
+  "model": "/workspace/runs/qwen-exactfast-fixedkl-s1/snapshot-step01000",
+  "n": 512,
+  "wrong_format_rate": 0.01171875,
+  "ece": 0.04268781095743179,
+  "accuracy": 0.38735177865612647,
+  "auroc": 0.8789993416721527,
+  "brier": 0.13549407114624507
+ },
+ "1500": {
+  "model": "/workspace/runs/qwen-exactfast-fixedkl-s1/snapshot-step01500",
+  "n": 512,
+  "wrong_format_rate": 0.013671875,
+  "ece": 0.04851487651467323,
+  "accuracy": 0.38811881188118813,
+  "auroc": 0.8828677101908724,
+  "brier": 0.1311881188118812
+ },
+ "2000": {
+  "model": "/workspace/runs/qwen-exactfast-fixedkl-s1/snapshot-step02000",
+  "n": 512,
+  "wrong_format_rate": 0.0078125,
+  "ece": 0.04074806347489357,
+  "accuracy": 0.38976377952755903,
+  "auroc": 0.8862577386770936,
+  "brier": 0.12820866141732282
+ },
+ "2500": {
+  "model": "/workspace/runs/qwen-exactfast-fixedkl-s1/snapshot-step02500",
+  "n": 512,
+  "wrong_format_rate": 0.009765625,
+  "ece": 0.05404368415474892,
+  "accuracy": 0.3905325443786982,
+  "auroc": 0.8835605243372234,
+  "brier": 0.1339250493096647
+ },
+ "3000": {
+  "model": "/workspace/runs/qwen-exactfast-fixedkl-s1/snapshot-step03000",
+  "n": 512,
+  "wrong_format_rate": 0.0078125,
+  "ece": 0.0874016210436821,
+  "accuracy": 0.39763779527559057,
+  "auroc": 0.8843509350935094,
+  "brier": 0.1438188976377953
+ }
+}
