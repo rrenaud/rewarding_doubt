@@ -1,0 +1,124 @@
+✓ Initialized. View run at 
+https://modal.com/apps/rrenaud/main/ap-sD8BgGhcvyT222NgDntpxw
+Building image im-BpxKOTYArEIs4gbCy3hsTm
+
+=> Step 0: FROM base
+
+=> Step 1: COPY . /
+Saving image...
+Image saved, took 2.60s
+
+Built image im-BpxKOTYArEIs4gbCy3hsTm in 3.40s
+
+
+Building image im-tzmrKuFYQCC6jFSdMS1uju
+
+=> Step 0: FROM base
+
+=> Step 1: COPY . /
+Saving image...
+Image saved, took 810.56ms
+
+Built image im-tzmrKuFYQCC6jFSdMS1uju in 1.76s
+
+
+Building image im-Kmi0Qm0NGgEQ0hoxLDDKNT
+
+=> Step 0: FROM base
+
+=> Step 1: ENV PYTHONPATH=/opt/rd
+Saving image...
+Image saved, took 661.93ms
+
+Built image im-Kmi0Qm0NGgEQ0hoxLDDKNT in 1.57s
+
+
+Building image im-nLq32sLvI141rGChwrv2nn
+
+=> Step 0: FROM base
+
+=> Step 1: ENV HF_HOME=/vol/hf
+
+=> Step 2: ENV HF_HUB_ENABLE_HF_TRANSFER=1
+
+=> Step 3: ENV TOKENIZERS_PARALLELISM=false
+
+=> Step 4: ENV PYTHONUNBUFFERED=1
+
+=> Step 5: ENV WANDB_MODE=disabled
+Saving image...
+Image saved, took 726.90ms
+
+Built image im-nLq32sLvI141rGChwrv2nn in 1.74s
+
+
+✓ Created objects.
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/app.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/patches/e
+│   xact_confidence.patch
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/subset.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/exact_llama.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/shared_prefix.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/verify_shared_prefix.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/verify_single_pass.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/bench_batching.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/thinking_llama.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/frozen_eval.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/verify_levels.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/debug_levels.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/verify_fast_levels.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/modal_rep
+│   ro/fast_loop.py
+├── 🔨 Created mount 
+│   /home/rrenaud/rewarding_doubt/.claude/worktrees/logit-dynamics-viz/src/rewar
+│   ding_doubt
+├── 🔨 Created function train_for.
+├── 🔨 Created function train_and_evaluate_subset.
+├── 🔨 Created function train_and_evaluate_exact.
+├── 🔨 Created function train_with_snapshots.
+├── 🔨 Created function evaluate_checkpoint.
+├── 🔨 Created function shell.
+├── 🔨 Created function train_group.
+├── 🔨 Created function evaluate_group.
+├── 🔨 Created function verify_shared_prefix_remote.
+├── 🔨 Created function verify_single_pass_remote.
+├── 🔨 Created function bench_batching_remote.
+├── 🔨 Created function evaluate_test.
+├── 🔨 Created function evaluate_base_remote.
+├── 🔨 Created function read_files.
+└── 🔨 Created function list_snapshots.
+== trace-lr3e-4-s1 exit 0
+4000196136, "brier_sampled": 0.12694280078895465, "accuracy": 0.3905325443786982, "level_mass": 0.9999992696531937, "n": 507}
+{"step": 150, "minutes": 3.8, "beta": 0.05, "ece_expected": 0.052536800503730774, "auroc_expected": 0.907570854172796, "brier_expected": 0.1152529215886125, "ece_sampled": 0.043195515871047974, "auroc_sampled": 0.8903844267921938, "brier_sampled": 0.11808678500986193, "accuracy": 0.3905325443786982, "level_mass": 0.9999998545047352, "n": 507}
+{"step": 200, "minutes": 5.1, "beta": 0.05, "ece_expected": 0.062203213572502136, "auroc_expected": 0.9013925664411101, "brier_expected": 0.1317884879079975, "ece_sampled": 0.05818542093038559, "auroc_sampled": 0.84376940930339, "brier_sampled": 0.1348126232741617, "accuracy": 0.3905325443786982, "level_mass": 0.9999956169429958, "n": 507}
+{"step": 250, "minutes": 6.3, "beta": 0.05, "ece_expected": 0.029826480895280838, "auroc_expected": 0.9066065182570037, "brier_expected": 0.12191616848280541, "ece_sampled": 0.03175576776266098, "auroc_sampled": 0.876238109247818, "brier_sampled": 0.1219921104536489, "accuracy": 0.3905325443786982, "level_mass": 0.9999999062435412, "n": 507}
+{"step": 300, "minutes": 7.6, "beta": 0.05, "ece_expected": 0.04927705228328705, "auroc_expected": 0.9041221274230983, "brier_expected": 0.12777815079099908, "ece_sampled": 0.05345183238387108, "auroc_sampled": 0.8689892452028375, "brier_sampled": 0.1277909270216962, "accuracy": 0.3905325443786982, "level_mass": 0.9999993257985785, "n": 507}
+Stopping app - local entrypoint completed.
+✓ App completed. View run at 
+https://modal.com/apps/rrenaud/main/ap-sD8BgGhcvyT222NgDntpxw

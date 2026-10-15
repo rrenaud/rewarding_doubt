@@ -200,7 +200,8 @@ def cut_backward_below(model, first_trained_layer):
     return model.get_base_model().model.layers[first_trained_layer - 1].register_forward_hook(cut)
 
 
-def score_dev(model, scheme, rows, label_key="f1"):
+def dev_levels(model, scheme, rows):
+    """[len(rows), 11] level log-probs of each row's cached answer under the current model."""
     FastLanguageModel.for_training(model)
     set_gradient_checkpointing(model, False)  # for_training turns it back on, which roughly doubled backward time
     levels = []
@@ -208,7 +209,29 @@ def score_dev(model, scheme, rows, label_key="f1"):
         for start in range(0, len(rows), 32):
             chunk = rows[start:start + 32]
             levels += list(level_logps(model, scheme, [r["ids"] for r in chunk]).float().cpu())
+    return levels
+
+
+def score_dev(model, scheme, rows, label_key="f1", levels=None):
+    levels = dev_levels(model, scheme, rows) if levels is None else levels
     return dev_metrics_from_levels(levels, [r[label_key] for r in rows])
+
+
+def open_trace(path, rows, tok):
+    """--trace-every: trace.jsonl, a header line describing each dev row (question and answer text,
+    grades, reference level log-probs), then one line per traced step with every row's 11 level
+    log-probs. For watching individual questions' confidence distributions move during training."""
+    prefix = len(os.path.commonprefix([r["ids"] for r in rows]))
+    meta = [dict(qid=r["qid"], text=tok.decode(r["ids"][prefix:], skip_special_tokens=True).strip(), answer=r["answer"],
+                 em=r["em"], f1=r["f1"], ref=[round(float(x), 4) for x in r["ref"]]) for r in rows]
+    trace = open(path, "w")
+    trace.write(json.dumps(dict(rows=meta)) + "\n")
+    return trace
+
+
+def write_trace(trace, step, levels):
+    trace.write(json.dumps(dict(step=step, levels=[[round(float(x), 4) for x in lv] for lv in levels])) + "\n")
+    trace.flush()
 
 
 def epoch_batches(lengths, batchsize, window, rng):
@@ -247,7 +270,11 @@ def train(args):
     beta = args.kl_coef
     os.makedirs(args.out_dir, exist_ok=True)
     log = open(os.path.join(args.out_dir, "metrics.jsonl"), "w")
-    curve = {0: score_dev(model, scheme, dev_rows)}
+    trace = open_trace(os.path.join(args.out_dir, "trace.jsonl"), dev_rows, tok) if args.trace_every else None
+    levels = dev_levels(model, scheme, dev_rows)
+    if trace:
+        write_trace(trace, 0, levels)
+    curve = {0: score_dev(model, scheme, dev_rows, levels=levels)}
     print(json.dumps(dict(step=0, **curve[0])), flush=True)
     batches, t0 = [], time.time()
     phase_seconds = collections.Counter()
@@ -296,8 +323,13 @@ def train(args):
                       mean_confidence=statistics.fmean(s[2] for s in stats), beta=beta, seconds=time.time() - t0,
                       **({"phase_seconds": dict(phase_seconds)} if args.time_steps else {}))
         log.write(json.dumps(record) + "\n")
-        if step % args.eval_every == 0 or step == args.steps:
-            curve[step] = score_dev(model, scheme, dev_rows)
+        evaluating = step % args.eval_every == 0 or step == args.steps
+        tracing = trace is not None and (step % args.trace_every == 0 or step == args.steps)
+        levels = dev_levels(model, scheme, dev_rows) if evaluating or tracing else None
+        if tracing:
+            write_trace(trace, step, levels)
+        if evaluating:
+            curve[step] = score_dev(model, scheme, dev_rows, levels=levels)
             print(json.dumps(dict(step=step, minutes=round((time.time() - t0) / 60, 1), beta=round(beta, 4), **curve[step])), flush=True)
             log.flush()
     json.dump({str(k): v for k, v in curve.items()}, open(os.path.join(args.out_dir, "curve.json"), "w"), indent=1)
@@ -466,6 +498,7 @@ def main():
     t.add_argument("--seed", type=int, default=1)
     t.add_argument("--lora-modules", default=",".join(LORA_MODULES), help="projections whose adapters train")
     t.add_argument("--lora-layers", default="all", help='"all" or an inclusive range of decoder layers, e.g. "18-35"')
+    t.add_argument("--trace-every", type=int, default=0, help="every N steps, write every dev row's level log-probs to trace.jsonl")
     t.add_argument("--time-steps", action="store_true", help="log cumulative seconds per update phase (adds GPU syncs)")
     t.add_argument("--bucket-window", type=int, default=64, help="batches per length-sorting window; 0 = random batches")
     t.add_argument("--save", action="store_true")

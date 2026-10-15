@@ -1100,7 +1100,7 @@ def fast_train(configs: str, gpu: str = "L40S"):
         out = root / "runs" / "fast" / r["label"]
         out.mkdir(parents=True, exist_ok=True)
         (out / "train.log").write_text(r["log"])
-        for path, text in read_files.remote([f"{VOL}/outputs/{run}/{r['label']}/{n}" for n in ("curve.json", "metrics.jsonl")]).items():
+        for path, text in read_files.remote([f"{VOL}/outputs/{run}/{r['label']}/{n}" for n in ("curve.json", "metrics.jsonl", "trace.jsonl")]).items():
             (out / Path(path).name).write_text(text)
         print(f"== {r['label']} exit {r['exit_code']}")
         print("\n".join(l for l in r["log"].splitlines() if l.startswith('{"step"'))[-1500:])
