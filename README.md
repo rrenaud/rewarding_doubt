@@ -1,5 +1,8 @@
 # Rewarding Doubt with Tinker
 
+See [confidence quantization and its NLL cost](docs/confidence-quantization.md)
+for the eleven-label information bound, fractional-readout analysis, and offline results.
+
 An executable **single-answer adaptation**, plus an experiment that retains the
 confidence distribution instead of decoding one integer. A live 128/128 smoke test
 completed all three ten-update training arms and checkpoint evaluations using
